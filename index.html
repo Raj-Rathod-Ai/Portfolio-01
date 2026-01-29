@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rathod Raj | Data Scientist & AI Specialist</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="preloader">
+        <div class="loader-ring"><div class="loader-num" id="loader-perc">0</div></div>
+        <p class="loader-msg">Connecting With Raj....</p>
+        <div class="loader-bar"><div class="loader-fill" id="loader-bar-fill"></div></div>
+    </div>
+
+    <div id="status-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-corner-bl"></div>
+            <div class="modal-corner-tr"></div>
+            <div class="modal-icon-wrap"><i class="fas fa-microchip" id="modal-icon"></i></div>
+            <h3 id="modal-title">System Alert</h3>
+            <p id="modal-desc">Initializing data stream...</p>
+            <button class="spotlight-btn" style="width: 100%; border-radius: 0; padding: 18px; border-color: var(--primary);" onclick="closeModal()">
+                <div class="spotlight"></div>
+                DISMISS INTERFACE
+            </button>
+        </div>
+    </div>
+
+    <canvas id="bg-3d"></canvas>
+
+    <nav>
+        <a href="#home" class="nav-logo magnetic">
+            <img src="raj.jpeg" alt="Raj">
+            <span>Rathod Raj</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#education">Education</a></li>
+            <li><a href="#journey">My Journey</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact" class="nav-cta">Connect</a></li>
+        </ul>
+    </nav>
+    <main id="main-content">
+        <section id="home">
+            <div class="reveal-node">
+                <img src="raj.jpeg" alt="Rathod Raj" class="hero-img">
+                <p style="color: var(--primary); letter-spacing: 8px; margin-bottom: 20px; font-weight: 700; text-transform: uppercase;">Gujarat, India</p>
+                <h1 class="heading-reflect">Architecting<br><span class="highlight">Intelligence</span></h1>
+                <h2 style="font-size: 1.4rem; font-weight: 400; color: var(--text-dim);">I am a <span class="hacker-text">Data Scientist</span></h2>
+                <p class="hero-objective">Computer Science Engineer specialized in AI/ML and Algorithmic Performance. Developing high-fidelity neural architectures and MLOps pipelines to bridge the gap between abstract data and tangible intelligence.</p>
+                <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <a href="#projects" class="magnetic spotlight-btn" style="padding: 20px 45px; background: var(--primary); border: none; color: #fff;">
+                        <div class="spotlight"></div>
+                        Explore My Journey
+                    </a>
+                    <a href="RathodRaj.pdf" target="_blank" download class="spotlight-btn magnetic">
+                        <div class="spotlight"></div>
+                        <i class="fas fa-file-pdf" style="margin-right: 10px;"></i> Resume
+                    </a>
+                </div>
+            </div>
+        </section>
+        <section id="education">
+            <div class="reveal-container">
+                <p class="card-tag reveal-node">Academic Foundation</p>
+                <h2 class="heading-reflect reveal-node" style="font-size: 4rem; text-transform: uppercase; margin-bottom: 50px;">Education</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px;">
+                    <div class="glass-card reveal-node">
+                        <span class="card-tag">2023 - 2026</span>
+                        <h3>B.Tech Computer Science</h3>
+                        <p>Parul University, Gujarat</p>
+                        <h4 style="font-size: 2.2rem; color: var(--primary); margin-top: 15px;">7.43 CGPA</h4>
+                    </div>
+                    <div class="glass-card reveal-node">
+                        <span class="card-tag">2021 - 2023</span>
+                        <h3>Higher Secondary</h3>
+                        <p>Sigma School Porbandar</p>
+                        <h4 style="font-size: 2.2rem; color: #fff; margin-top: 15px;">60.61%</h4>
+                    </div>
+                    <div class="glass-card reveal-node">
+                        <span class="card-tag">2020 - 2021</span>
+                        <h3>Secondary Education</h3>
+                        <p>Sigma School Porbandar</p>
+                        <h4 style="font-size: 2.2rem; color: #fff; margin-top: 15px;">79.81%</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="journey">
+            <div class="reveal-container">
+                <p class="card-tag reveal-node">My Journey</p>
+                <h2 class="heading-reflect reveal-node" style="font-size: 4rem; text-transform: uppercase; margin-bottom: 50px;">The Path</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                    <div class="glass-card reveal-node">
+                        <span class="card-tag">Self-Directed Path</span>
+                        <h3>GenAI & Data Science</h3>
+                        <p style="color: var(--text-dim); margin-top: 15px; line-height: 1.8;">Architected end-to-end MLOps pipelines using MLFlow, Docker, and CI/CD. Specialized in LangChain orchestration and Vector Database indexing for autonomous RAG solutions.</p>
+                        <div style="margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <span class="badge">MLFLOW</span><span class="badge">DOCKER</span><span class="badge">CI/CD</span><span class="badge">Power Bi</span><span class="badge">ML/DL/GenAi</span>
+                        </div>
+                    </div>
+                    <div class="glass-card reveal-node">
+                        <span class="card-tag">Research Intensive</span>
+                        <h3>Programming in C</h3>
+                        <p style="color: var(--text-dim); margin-top: 15px; line-height: 1.8;">Dedicated 12 months to mastering low-level C programming and memory management, optimizing Data Structures for heavy AI workloads.</p>
+                        <div style="margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <span class="badge">C</span><span class="badge">VSCode</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SKILLS & EXPERTISE -->
+        <section id="skills">
+            <div class="reveal-container">
+                <p class="card-tag reveal-node">Expertise Ecosystem</p>
+                <h2 class="heading-reflect reveal-node" style="font-size: 4rem; text-transform: uppercase; margin-bottom: 20px;">The Skills</h2>
+                <div class="skills-container reveal-node" id="bubble-cloud">
+                    <div class="skill-bubble magnetic" data-brand="var(--c-java)" data-note="261.63"><i class="fab fa-java"></i><span>Java</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-c)" data-note="293.66"><i class="fas fa-copyright"></i><span>C Lang</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-cpp)" data-note="329.63"><i class="fas fa-code"></i><span>C++</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-python)" data-note="349.23"><i class="fab fa-python"></i><span>Python</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-ml)" data-note="392.00"><i class="fas fa-brain"></i><span>ML</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-data)" data-note="440.00"><i class="fas fa-chart-line"></i><span>Data</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-sql)" data-note="493.88"><i class="fas fa-database"></i><span>SQL</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-html)" data-note="523.25"><i class="fab fa-html5"></i><span>HTML</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-css)" data-note="587.33"><i class="fab fa-css3-alt"></i><span>CSS</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-js)" data-note="261.63"><i class="fab fa-js"></i><span>JS</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-aws)" data-note="293.66"><i class="fab fa-aws"></i><span>AWS</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-git)" data-note="329.63"><i class="fab fa-git-alt"></i><span>Git</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-langchain)" data-note="349.23"><i class="fas fa-link"></i><span>LangChain</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-vectordb)" data-note="392.00"><i class="fas fa-server"></i><span>Vector DB</span></div>
+                    <div class="skill-bubble magnetic" data-brand="var(--c-streamlit)" data-note="440.00"><i class="fas fa-window-maximize"></i><span>Streamlit</span></div>
+                </div>
+            </div>
+        </section>
+        <section id="projects">
+            <div class="reveal-container">
+                <p class="card-tag reveal-node">Featured Projects</p>
+                <h2 class="heading-reflect reveal-node" style="font-size: 4rem; text-transform: uppercase; margin-bottom: 50px;">Selected Work</h2>
+                
+                <div class="project-item reveal-node">
+                    <div style="flex: 1;">
+                        <h3>Fake News Detection <span class="status-tag">In Training</span></h3>
+                        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">Developing a Machine Learning model using Python to detect misinformation in real-time news streams with Transformer architectures.</p>
+                        <div class="project-meta"><span class="badge">PYTHON</span><span class="badge">ML</span><span class="badge">NLP</span></div>
+                    </div>
+                    <button class="run-btn" onclick="openStatus('Fake News Detection', 'Currently training the transformer model on global misinformation datasets. Scheduled release: Q2 2026.', 'fa-newspaper')">Run <i class="fas fa-play"></i></button>
+                </div>
+
+                <div class="project-item reveal-node">
+                    <div style="flex: 1;">
+                        <h3>AI Developer Code Reviewer <span class="status-tag">Development</span></h3>
+                        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">Built an intelligent tool that analyzes code for bugs and suggests optimizations using Large Language Models.</p>
+                        <div class="project-meta"><span class="badge">LLM</span><span class="badge">PYTHON</span><span class="badge">API</span></div>
+                    </div>
+                    <button class="run-btn" onclick="openStatus('AI Code Reviewer', 'Testing OpenAI API integrations for architectural suggestions. Beta deployment active soon.', 'fa-bug')">Run <i class="fas fa-play"></i></button>
+                </div>
+
+                <div class="project-item reveal-node">
+                    <div style="flex: 1;">
+                        <h3>AI Discord Assistant <span class="status-tag">Operational</span></h3>
+                        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">Created a smart bot for Discord servers that manages moderation and answers user queries automatically.</p>
+                        <div class="project-meta"><span class="badge">DISCORD.PY</span><span class="badge">AI</span><span class="badge">BOT</span></div>
+                    </div>
+                    <button class="run-btn" onclick="openStatus('Discord Assistant', 'Core neural logic is live. Currently optimizing latency and rate-limiting protocols.', 'fa-robot')">Run <i class="fas fa-play"></i></button>
+                </div>
+
+                <div class="project-item reveal-node">
+                    <div style="flex: 1;">
+                        <h3>Portfolio Website <span class="status-tag" style="color: var(--primary); opacity: 1;">Live</span></h3>
+                        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">Highly interactive portfolio featuring technical audio synthesis and reactive 3D neural networks using Three.js and GSAP.</p>
+                        <div class="project-meta"><span class="badge">JS</span><span class="badge">CSS</span><span class="badge">HTML5</span></div>
+                    </div>
+                    <button class="run-btn" onclick="window.open('https://rajrathodai.netlify.app/', '_blank')">Run <i class="fas fa-play"></i></button>
+                </div>
+            </div>
+        </section>
+        <section id="contact">
+            <div class="reveal-container">
+                <h2 class="heading-reflect reveal-node" style="font-size: 6vw; text-transform: uppercase; margin-bottom: 60px;">Contact Me</h2>
+                <div class="contact-form reveal-node">
+                    <form 
+  action="https://formsubmit.co/rathodraj1504@gmail.com" 
+  method="POST"
+>
+  <input type="hidden" name="_captcha" value="false">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_subject" value="New Portfolio Contact Message">
+
+  <div class="form-group">
+    <label>Full Name</label>
+    <input type="text" name="name" required placeholder="Ex. John Doe">
+  </div>
+
+  <div class="form-group">
+    <label>Email Address</label>
+    <input type="email" name="email" required placeholder="johndoe@email.com">
+  </div>
+
+  <div class="form-group">
+    <label>Message</label>
+    <textarea name="message" rows="4" required placeholder="What shall we architect together?"></textarea>
+  </div>
+
+  <button type="submit" class="spotlight-btn interactive-design" style="width:100%">
+    Dispatch Signal
+  </button>
+</form>
+
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-content">
+                <div class="social-links">
+                    <a href="https://github.com/Raj-Rathod-Ai" target="_blank" class="social-btn magnetic" style="--hover-color: var(--c-github)" title="GitHub">
+                        <div class="spotlight"></div><i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/raj-rathod-ai" target="_blank" class="social-btn magnetic" style="--hover-color: var(--c-linkedin)" title="LinkedIn">
+                        <div class="spotlight"></div><i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://leetcode.com/u/Rathod-Raj-Ai/" target="_blank" class="social-btn magnetic" style="--hover-color: var(--c-leetcode)" title="LeetCode">
+                        <div class="spotlight"></div><i class="fas fa-code"></i>
+                    </a>
+                    <a href="https://www.instagram.com/its._.rudra._.19.08_?igsh=dXN5M29rbHMxcmIy" target="_blank" class="social-btn magnetic" style="--hover-color: var(--c-instagram)" title="Instagram">
+                        <div class="spotlight"></div><i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="mailto:rathodraj1504@gmail.com" class="social-btn magnetic" style="--hover-color: var(--c-email)" title="Email">
+                        <div class="spotlight"></div><i class="fas fa-envelope"></i>
+                    </a>
+                    <a href="tel:+919624801014" class="social-btn magnetic" style="--hover-color: var(--c-phone)" title="Phone">
+                        <div class="spotlight"></div><i class="fas fa-phone"></i>
+                    </a>
+                </div>
+                <p class="footer-copyright">© 2026 RATHOD RAJ — DATA SCIENCE PORTFOLIO</p>
+            </div>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
