@@ -1,272 +1,1740 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rathod Raj | Data Scientist & AI Specialist</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rathod Raj — AI / Data Science</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --bg:#111214;--surface:rgba(22,24,28,0.96);--border:rgba(255,255,255,0.12);
+  --border2:rgba(255,255,255,0.055);--text:#e9e7e2;--muted:#7a7875;
+  --accent:#f0c060;--accent2:#60c8d8;--accent3:#b87cef;
+  --green:#5de08a;--red:#ff6058;--yellow:#ffbc44;
+  --font-head:'Syne',sans-serif;--font-mono:'DM Mono',monospace;
+  --font-serif:'Instrument Serif',serif;
+  --nav-h:28px;--dock-h:82px;
+  --win-radius:14px;--blur:40px;
+  --accent-hue:38;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{font-family:var(--font-mono);background:#000;color:var(--text);user-select:none;}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="style.css">
+/* DESKTOP BG */
+#desktop-bg{
+  position:fixed;inset:0;z-index:0;
+  background-size:cover;background-position:center;
+  transition:background-image .9s ease;
+}
+#desktop-overlay{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 80% 70% at 50% 50%,transparent 50%,rgba(0,0,0,.35) 100%);
+}
+/* dot grid */
+#desktop-grid{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+
+/* ── MENUBAR ── */
+#menubar{
+  position:fixed;top:0;left:0;right:0;height:var(--nav-h);
+  background:rgba(12,12,14,.82);backdrop-filter:blur(28px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;z-index:9500;font-size:12px;
+}
+.menu-left,.menu-right{display:flex;align-items:center;gap:10px;}
+.menu-item{
+  color:var(--text);opacity:.82;cursor:default;padding:2px 6px;
+  border-radius:4px;transition:background .15s;font-size:11px;white-space:nowrap;
+}
+.menu-item:hover{background:rgba(255,255,255,.10);opacity:1;}
+.menu-item.bold{font-weight:700;opacity:1;}
+.menu-right{gap:12px;font-size:11px;color:var(--text);opacity:.8;}
+#menu-weather{display:flex;align-items:center;gap:5px;font-size:11px;opacity:.85;}
+#menu-weather i{font-size:13px;}
+
+/* ── WORK AREA ── */
+#work-area{
+  position:fixed;top:var(--nav-h);bottom:calc(var(--dock-h) + 8px);
+  left:0;right:0;overflow:hidden;z-index:2;
+}
+
+/* ── DOCK ── */
+#dock-wrap{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:9500;}
+#dock{
+  display:flex;align-items:flex-end;gap:6px;
+  background:rgba(28,30,35,.62);backdrop-filter:blur(38px) saturate(160%);
+  border:1px solid rgba(255,255,255,.15);border-radius:24px;
+  padding:8px 12px 10px;
+  box-shadow:0 10px 50px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.10);
+}
+.dock-icon{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;position:relative;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.dock-icon:hover{transform:translateY(-14px) scale(1.25);}
+.dock-icon:hover .dock-tooltip{opacity:1;bottom:78px;}
+.dock-img{
+  width:52px;height:52px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.25);
+  transition:box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.dock-img::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),transparent);
+  border-radius:13px 13px 0 0;pointer-events:none;
+}
+.dock-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.65);visibility:hidden;}
+.dock-icon.open .dock-dot{visibility:visible;}
+.dock-tooltip{
+  position:absolute;bottom:70px;left:50%;transform:translateX(-50%);
+  background:rgba(18,20,24,.92);border:1px solid var(--border);
+  color:var(--text);font-size:10px;padding:3px 9px;border-radius:7px;
+  white-space:nowrap;opacity:0;pointer-events:none;
+  transition:opacity .15s,bottom .15s;
+}
+.dock-sep{width:1px;height:36px;background:rgba(255,255,255,.14);margin:0 4px;align-self:center;}
+
+/* dock icon colors */
+.di-about{background:linear-gradient(145deg,#2563eb,#60a5fa);}
+.di-edu{background:linear-gradient(145deg,#d97706,#fbbf24);}
+.di-skills{background:linear-gradient(145deg,#16a34a,#4ade80);}
+.di-journey{background:linear-gradient(145deg,#0891b2,#38bdf8);}
+.di-projects{background:linear-gradient(145deg,#7c3aed,#c084fc);}
+.di-cli{background:linear-gradient(145deg,#1e2028,#3a3d48);border:1px solid rgba(255,255,255,.12);}
+.di-contact{background:linear-gradient(145deg,#dc2626,#fb923c);}
+.di-settings{background:linear-gradient(145deg,#475569,#94a3b8);}
+.di-gh{background:linear-gradient(145deg,#24292e,#4a5568);}
+.di-li{background:linear-gradient(145deg,#0077b5,#0ea5e9);}
+.di-weather{background:linear-gradient(145deg,#0369a1,#38bdf8);}
+
+/* ── WINDOWS ── */
+.win{
+  position:absolute;border-radius:var(--win-radius);
+  background:var(--surface);backdrop-filter:blur(var(--blur)) saturate(160%);
+  border:1px solid var(--border);
+  box-shadow:0 28px 80px rgba(0,0,0,.75),0 0 0 .5px rgba(255,255,255,.04) inset;
+  display:flex;flex-direction:column;overflow:hidden;
+  min-width:300px;min-height:180px;z-index:100;
+  animation:winPop .22s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes winPop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.win.focused{
+  box-shadow:0 36px 100px rgba(0,0,0,.85),0 0 0 .5px rgba(255,255,255,.08) inset;
+  z-index:200;
+}
+.win-bar{
+  display:flex;align-items:center;padding:10px 14px 8px;
+  background:rgba(255,255,255,.025);border-bottom:1px solid var(--border2);
+  cursor:grab;flex-shrink:0;position:relative;gap:0;
+}
+.win-bar:active{cursor:grabbing;}
+.win-btns{display:flex;gap:7px;align-items:center;z-index:1;}
+.win-btn{
+  width:13px;height:13px;border-radius:50%;border:none;
+  outline:none;cursor:pointer;flex-shrink:0;
+  position:relative;transition:filter .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.win-btn::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:rgba(0,0,0,.12);
+}
+.win-btn:hover{filter:brightness(1.2);}
+.win-btn i{font-size:7px;opacity:0;color:rgba(0,0,0,.6);transition:opacity .15s;z-index:1;}
+.win-btns:hover .win-btn i{opacity:1;}
+.btn-close{background:#ff5f56;}
+.btn-min{background:#ffbd2e;}
+.btn-max{background:#27c93f;}
+.win-title{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-size:11px;color:rgba(255,255,255,.38);
+  pointer-events:none;white-space:nowrap;letter-spacing:.2px;
+}
+.win-body{
+  flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 24px;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent;
+}
+.win-body::-webkit-scrollbar{width:4px;}
+.win-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px;}
+
+/* resize */
+.resize-handle{
+  position:absolute;bottom:0;right:0;width:20px;height:20px;
+  cursor:se-resize;
+}
+.resize-handle::after{
+  content:'';position:absolute;bottom:4px;right:4px;
+  width:9px;height:9px;
+  border-right:2px solid rgba(255,255,255,.15);
+  border-bottom:2px solid rgba(255,255,255,.15);
+}
+
+/* ── SHARED CONTENT ── */
+.win-heading{font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.win-sub{font-size:10px;color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:18px;}
+.win-hr{border:none;border-top:1px solid var(--border2);margin:16px 0;}
+.tag{
+  display:inline-block;font-size:10px;padding:2px 9px;
+  border-radius:5px;border:1px solid var(--border);
+  color:var(--muted);margin:2px 2px 2px 0;
+}
+.tag.py{border-color:rgba(55,118,171,.6);color:#6bb5f5;}
+.tag.java{border-color:rgba(248,152,32,.5);color:#f8a040;}
+.tag.c{border-color:rgba(168,185,204,.4);color:#a8b9cc;}
+.tag.ml{border-color:rgba(76,175,80,.5);color:#5de08a;}
+.tag.data{border-color:rgba(0,188,212,.5);color:#60c8d8;}
+.tag.web{border-color:rgba(240,192,96,.5);color:#f0c060;}
+.tag.ai{border-color:rgba(184,124,239,.5);color:#b87cef;}
+.tag.tool{border-color:rgba(200,200,200,.2);color:#aaa;}
+
+/* ── ABOUT ── */
+.avatar-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.avatar{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent2),var(--accent3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.12);
+  box-shadow:0 0 0 4px rgba(96,200,216,.15);
+}
+.name-block h2{font-family:var(--font-head);font-size:18px;font-weight:800;}
+.name-block p{font-size:11px;color:var(--muted);margin-top:2px;}
+.info-row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);margin-bottom:9px;}
+.info-row i{width:14px;text-align:center;color:var(--accent);}
+.info-row a{color:var(--accent2);text-decoration:none;transition:color .15s;}
+.info-row a:hover{color:#fff;}
+.obj-box{
+  background:rgba(255,255,255,.022);border:1px solid var(--border2);
+  border-radius:10px;padding:14px 16px;font-size:12px;
+  line-height:1.8;color:rgba(233,231,226,.7);margin-top:14px;
+  font-family:var(--font-serif);font-style:italic;
+}
+
+/* ── EDUCATION ── */
+.edu-card{
+  background:rgba(255,255,255,.022);border:1px solid var(--border2);
+  border-radius:10px;padding:15px 17px;margin-bottom:12px;
+  transition:border-color .2s;
+}
+.edu-card:hover{border-color:rgba(240,192,96,.35);}
+.edu-card .period{font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;}
+.edu-card h3{font-family:var(--font-head);font-size:14px;font-weight:700;}
+.edu-card .inst{font-size:11px;color:var(--muted);margin-top:3px;}
+.edu-card .grade{font-size:20px;font-weight:800;font-family:var(--font-head);color:var(--accent);margin-top:9px;}
+
+/* ── SKILLS ── */
+.skills-tabs{
+  display:flex;gap:4px;margin-bottom:18px;
+  background:rgba(0,0,0,.22);border:1px solid var(--border2);
+  border-radius:9px;padding:4px;
+}
+.stab{
+  flex:1;text-align:center;font-size:10px;font-weight:500;
+  padding:6px 4px;border-radius:6px;cursor:pointer;
+  color:var(--muted);transition:background .18s,color .18s;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.stab.active{background:rgba(255,255,255,.10);color:var(--text);}
+.skill-panel{display:none;}
+.skill-panel.active{display:block;}
+.skill-group{margin-bottom:18px;}
+.skill-group-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:9px;}
+.skill-row{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
+.skill-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.skill-name{font-size:11px;width:105px;color:var(--text);flex-shrink:0;}
+.skill-bar-bg{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;}
+.skill-bar-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--bar-a),var(--bar-b));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .8s cubic-bezier(.22,1,.36,1);
+}
+.skill-pct{font-size:10px;color:var(--muted);width:28px;text-align:right;flex-shrink:0;}
+
+/* ── PROJECTS ── */
+.proj-item{
+  background:rgba(255,255,255,.018);border:1px solid var(--border2);
+  border-radius:11px;padding:15px 17px;margin-bottom:11px;
+  transition:border-color .2s,background .2s;
+}
+.proj-item:hover{border-color:rgba(184,124,239,.35);background:rgba(184,124,239,.03);}
+.proj-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px;}
+.proj-title{font-family:var(--font-head);font-size:13px;font-weight:700;}
+.proj-status{font-size:9px;padding:2px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0;}
+.st-live{background:rgba(93,224,138,.12);color:var(--green);border:1px solid rgba(93,224,138,.3);}
+.st-dev{background:rgba(240,192,96,.10);color:var(--accent);border:1px solid rgba(240,192,96,.3);}
+.st-ops{background:rgba(96,200,216,.10);color:var(--accent2);border:1px solid rgba(96,200,216,.3);}
+.proj-desc{font-size:11px;color:var(--muted);line-height:1.65;margin-bottom:8px;}
+.proj-link{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--accent2);text-decoration:none;margin-top:5px;transition:color .15s;}
+.proj-link:hover{color:#fff;}
+
+/* ── TERMINAL ── */
+#cli-output{
+  flex:1;overflow-y:auto;padding:14px 16px;
+  font-size:12px;line-height:1.8;color:#c0bdb6;
+  background:#000;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.07) transparent;
+}
+.cli-line{display:block;}
+.cli-prompt{color:var(--green);}
+.cli-cmd{color:var(--text);}
+.cli-out{color:#8e8b84;}
+.cli-hi{color:var(--accent);font-weight:600;}
+.cli-hi2{color:var(--accent2);}
+.cli-hi3{color:var(--accent3);}
+.cli-err{color:var(--red);}
+.cli-link{color:var(--accent2);cursor:pointer;text-decoration:underline;}
+.cli-link:hover{color:#fff;}
+#cli-input-row{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 16px 12px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;background:#000;
+}
+#cli-prompt-label{color:var(--green);font-size:12px;white-space:nowrap;}
+#cli-input{
+  flex:1;background:none;border:none;outline:none;
+  font-family:var(--font-mono);font-size:12px;
+  color:var(--text);caret-color:var(--accent);
+}
+
+/* ── CONTACT ── */
+.contact-link{
+  display:flex;align-items:center;gap:13px;
+  background:rgba(255,255,255,.022);border:1px solid var(--border2);
+  border-radius:10px;padding:13px 15px;margin-bottom:9px;
+  text-decoration:none;color:var(--text);
+  transition:border-color .18s,background .18s;cursor:pointer;
+}
+.contact-link:hover{border-color:var(--accent);background:rgba(240,192,96,.04);}
+.contact-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.contact-info strong{display:block;font-size:12px;}
+.contact-info span{font-size:10px;color:var(--muted);}
+
+/* ── JOURNEY ── */
+.journey-item{display:flex;gap:14px;margin-bottom:20px;position:relative;}
+.journey-item::before{content:'';position:absolute;left:15px;top:32px;bottom:-20px;width:1px;background:var(--border2);}
+.journey-item:last-child::before{display:none;}
+.journey-dot{width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid var(--border);}
+.journey-period{font-size:10px;color:var(--accent2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.journey-title{font-family:var(--font-head);font-size:13px;font-weight:700;margin-bottom:5px;}
+.journey-desc{font-size:11px;color:var(--muted);line-height:1.65;}
+
+/* ── SETTINGS ── */
+.settings-section{margin-bottom:24px;}
+.settings-section-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px;}
+.wp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.wp-thumb{
+  aspect-ratio:16/9;border-radius:8px;cursor:pointer;
+  background-size:cover;background-position:center;
+  border:2px solid transparent;transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.wp-thumb:hover{transform:scale(1.03);border-color:rgba(255,255,255,.3);}
+.wp-thumb.active{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(96,200,216,.25);}
+.wp-thumb .wp-label{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.7));
+  font-size:9px;padding:4px 6px 5px;color:rgba(255,255,255,.75);
+  opacity:0;transition:opacity .2s;
+}
+.wp-thumb:hover .wp-label{opacity:1;}
+.settings-toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.025);border:1px solid var(--border2);
+  border-radius:9px;padding:11px 14px;margin-bottom:8px;
+}
+.settings-toggle-label{font-size:12px;color:var(--text);}
+.settings-toggle-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.toggle-switch{
+  width:42px;height:24px;background:rgba(255,255,255,.10);
+  border-radius:99px;cursor:pointer;position:relative;
+  transition:background .2s;flex-shrink:0;border:1px solid rgba(255,255,255,.12);
+}
+.toggle-switch.on{background:var(--accent2);}
+.toggle-knob{
+  position:absolute;top:3px;left:3px;width:16px;height:16px;
+  background:#fff;border-radius:50%;transition:left .2s;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.toggle-switch.on .toggle-knob{left:21px;}
+.accent-row{display:flex;gap:8px;margin-top:8px;}
+.accent-dot{
+  width:24px;height:24px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:transform .15s,border-color .15s;
+}
+.accent-dot:hover{transform:scale(1.15);}
+.accent-dot.active{border-color:#fff;}
+.opacity-slider{width:100%;margin-top:6px;accent-color:var(--accent2);}
+.icon-size-btns{display:flex;gap:6px;margin-top:6px;}
+.icon-size-btn{
+  flex:1;padding:5px;border-radius:7px;border:1px solid var(--border2);
+  background:rgba(255,255,255,.04);color:var(--muted);font-size:10px;
+  cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font-mono);
+}
+.icon-size-btn:hover,.icon-size-btn.active{background:rgba(255,255,255,.10);color:var(--text);}
+
+/* ── WEATHER WINDOW ── */
+.weather-hero{
+  text-align:center;padding:20px 0 10px;
+}
+.weather-icon-big{font-size:64px;margin-bottom:8px;display:block;}
+.weather-temp{font-family:var(--font-head);font-size:52px;font-weight:800;color:var(--text);}
+.weather-desc{font-size:13px;color:var(--muted);margin-top:4px;text-transform:capitalize;}
+.weather-location{font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px;}
+.weather-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-top:20px;
+}
+.weather-card{
+  background:rgba(255,255,255,.03);border:1px solid var(--border2);
+  border-radius:10px;padding:12px 14px;
+  display:flex;align-items:center;gap:10px;
+}
+.weather-card i{font-size:18px;color:var(--accent2);width:20px;text-align:center;}
+.weather-card-label{font-size:10px;color:var(--muted);}
+.weather-card-value{font-size:13px;color:var(--text);font-weight:600;}
+.weather-forecast{margin-top:16px;}
+.forecast-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid var(--border2);font-size:11px;
+}
+.forecast-row:last-child{border-bottom:none;}
+.weather-loading{text-align:center;padding:40px;color:var(--muted);font-size:12px;}
+.weather-error{text-align:center;padding:30px;color:var(--red);font-size:12px;}
+
+/* ── PRELOADER ── */
+#preloader{
+  position:fixed;inset:0;background:#060810;z-index:99999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity .7s,visibility .7s;
+}
+#preloader.done{opacity:0;visibility:hidden;pointer-events:none;}
+.pre-logo{font-family:var(--font-head);font-size:46px;font-weight:800;letter-spacing:-1.5px;}
+.pre-logo span{color:var(--accent);}
+.pre-bar-wrap{width:220px;height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;}
+.pre-bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width .28s ease;}
+.pre-msg{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+
+/* ── DESKTOP ICONS ── */
+.desk-icon{
+  position:absolute;display:flex;flex-direction:column;
+  align-items:center;gap:5px;cursor:pointer;padding:7px;
+  border-radius:10px;transition:background .15s;width:78px;
+}
+.desk-icon:hover{background:rgba(255,255,255,.07);}
+.desk-icon-img{
+  width:52px;height:52px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+  box-shadow:0 4px 12px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.2);
+  position:relative;overflow:hidden;
+}
+.desk-icon-img::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);
+  pointer-events:none;
+}
+.desk-icon span{
+  font-size:10px;color:#fff;text-align:center;
+  text-shadow:0 1px 5px rgba(0,0,0,.9);line-height:1.2;
+  word-break:break-word;
+}
+
+/* notification badge */
+.badge{
+  position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;
+  background:var(--red);border-radius:99px;font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;padding:0 3px;border:1.5px solid rgba(10,10,12,.9);
+}
+
+/* ── SCROLLBAR ── */
+*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.07) transparent;}
+
+/* ── THEMES ── */
+body.theme-dim #desktop-overlay{background:rgba(0,0,0,.6);}
+body.theme-nodim #desktop-overlay{background:none;}
+body.glass-light .win{background:rgba(240,240,245,.10);}
+
+/* ── CONTEXT MENU ── */
+#ctx-menu{
+  position:fixed;z-index:99000;
+  background:rgba(22,24,28,.96);backdrop-filter:blur(28px);
+  border:1px solid var(--border);border-radius:11px;
+  padding:5px;min-width:180px;
+  box-shadow:0 12px 40px rgba(0,0,0,.7);
+  display:none;animation:ctxPop .12s ease;
+}
+@keyframes ctxPop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.ctx-item{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 12px;border-radius:7px;cursor:pointer;
+  font-size:11px;color:var(--text);transition:background .12s;
+}
+.ctx-item:hover{background:rgba(255,255,255,.10);}
+.ctx-item i{width:14px;text-align:center;color:var(--muted);}
+.ctx-sep{height:1px;background:var(--border2);margin:3px 0;}
+
+/* ── SPOTLIGHT ── */
+#spotlight-overlay{
+  position:fixed;inset:0;z-index:95000;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+  display:none;align-items:flex-start;justify-content:center;
+  padding-top:120px;
+}
+#spotlight-overlay.open{display:flex;}
+#spotlight-box{
+  width:560px;background:rgba(22,24,28,.97);backdrop-filter:blur(40px);
+  border:1px solid rgba(255,255,255,.15);border-radius:16px;
+  overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.8);
+}
+#spotlight-input{
+  width:100%;background:none;border:none;outline:none;
+  font-family:var(--font-mono);font-size:16px;color:var(--text);
+  padding:16px 20px;border-bottom:1px solid var(--border2);
+  caret-color:var(--accent);
+}
+#spotlight-results{padding:8px;}
+.sp-result{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 12px;border-radius:8px;cursor:pointer;
+  font-size:12px;color:var(--text);transition:background .12s;
+}
+.sp-result:hover,.sp-result.selected{background:rgba(255,255,255,.09);}
+.sp-result-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.sp-result-title{font-weight:600;}
+.sp-result-sub{font-size:10px;color:var(--muted);}
+</style>
 </head>
 <body>
 
-    <div id="preloader">
-        <div class="loader-ring"><div class="loader-num" id="loader-perc">0</div></div>
-        <p class="loader-msg">Connecting With Raj....</p>
-        <div class="loader-bar"><div class="loader-fill" id="loader-bar-fill"></div></div>
-    </div>
-
-    <div id="status-modal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-corner-bl"></div>
-            <div class="modal-corner-tr"></div>
-            <div class="modal-icon-wrap"><i class="fas fa-microchip" id="modal-icon"></i></div>
-            <h3 id="modal-title">System Alert</h3>
-            <p id="modal-desc">Initializing data stream...</p>
-            <button class="spotlight-btn" style="width: 100%; border-radius: 0; padding: 18px; border-color: var(--primary);" onclick="closeModal()">
-                <div class="spotlight"></div>
-                DISMISS INTERFACE
-            </button>
-        </div>
-    </div>
-
-    <canvas id="bg-3d"></canvas>
-
-    <nav>
-        <a href="#home" class="nav-logo magnetic">
-            <img src="raj.jpeg" alt="Raj">
-            <span>Rathod Raj</span>
-        </a>
-        <ul class="nav-links">
-            <li><a href="#education">Education</a></li>
-            <li><a href="#journey">My Journey</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#contact" class="nav-cta">Connect</a></li>
-        </ul>
-    </nav>
-    <main id="main-content">
-        <section id="home">
-            <div class="reveal-node">
-                <img src="raj.jpeg" alt="Rathod Raj" class="hero-img">
-                <p style="color: var(--primary); letter-spacing: 8px; margin-bottom: 20px; font-weight: 700; text-transform: uppercase;">Gujarat, India</p>
-                <h1 class="heading-reflect">Architecting<br><span class="highlight">Intelligence</span></h1>
-                <h2 style="font-size: 1.4rem; font-weight: 400; color: var(--text-dim);">I am a <span class="hacker-text">Data Scientist</span></h2>
-                <p class="hero-objective">Computer Science Engineer specialized in AI/ML and Algorithmic Performance. Developing high-fidelity neural architectures and MLOps pipelines to bridge the gap between abstract data and tangible intelligence.</p>
-                <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-                    <a href="#projects" class="magnetic spotlight-btn" style="padding: 20px 45px; background: var(--primary); border: none; color: #fff;">
-                        <div class="spotlight"></div>
-                        Explore My Journey
-                    </a>
-                    <a href="Raj_RathodResume.pdf" target="_blank" download class="spotlight-btn magnetic">
-                        <div class="spotlight"></div>
-                        <i class="fas fa-file-pdf" style="margin-right: 10px;"></i> Resume
-                    </a>
-                </div>
-            </div>
-        </section>
-        <section id="education">
-            <div class="reveal-container">
-                <p class="card-tag reveal-node">Academic Foundation</p>
-                <h2 class="heading-reflect reveal-node" style="font-size: 4rem; text-transform: uppercase; margin-bottom: 50px;">Education</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px;">
-                    <div class="glass-card reveal-node">
-                        <span class="card-tag">2023 - 2026</span>
-                        <h3>B.Tech Computer Science</h3>
-                        <p>Parul University, Gujarat</p>
-                        <h4 style="font-size: 2.2rem; color: var(--primary); margin-top: 15px;">7.43 CGPA</h4>
-                    </div>
-                    <div class="glass-card reveal-node">
-                        <span class="card-tag">2021 - 2023</span>
-                        <h3>Higher Secondary</h3>
-                        <p>Sigma School Porbandar</p>
-                        <h4 style="font-size: 2.2rem; color: #fff; margin-top: 15px;">60.61%</h4>
-                    </div>
-                    <div class="glass-card reveal-node">
-                        <span class="card-tag">2020 - 2021</span>
-                        <h3>Secondary Education</h3>
-                        <p>Sigma School Porbandar</p>
-                        <h4 style="font-size: 2.2rem; color: #fff; margin-top: 15px;">79.81%</h4>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section id="journey">
-            <div class="reveal-container">
-                <p class="card-tag reveal-node">My Journey</p>
-                <h2 class="heading-reflect reveal-node" style="font-size: 4rem; text-transform: uppercase; margin-bottom: 50px;">The Path</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
-                    <div class="glass-card reveal-node">
-                        <span class="card-tag">Self-Directed Path</span>
-                        <h3>GenAI & Data Science</h3>
-                        <p style="color: var(--text-dim); margin-top: 15px; line-height: 1.8;">Architected end-to-end MLOps pipelines using MLFlow, Docker, and CI/CD. Specialized in LangChain orchestration and Vector Database indexing for autonomous RAG solutions.</p>
-                        <div style="margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap;">
-                            <span class="badge">MLFLOW</span><span class="badge">DOCKER</span><span class="badge">CI/CD</span><span class="badge">Power Bi</span><span class="badge">ML/DL/GenAi</span>
-                        </div>
-                    </div>
-                    <div class="glass-card reveal-node">
-                        <span class="card-tag">Research Intensive</span>
-                        <h3>Programming in C</h3>
-                        <p style="color: var(--text-dim); margin-top: 15px; line-height: 1.8;">Dedicated 12 months to mastering low-level C programming and memory management, optimizing Data Structures for heavy AI workloads.</p>
-                        <div style="margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap;">
-                            <span class="badge">C</span><span class="badge">VSCode</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SKILLS & EXPERTISE -->
-        <section id="skills">
-            <div class="reveal-container">
-                <p class="card-tag reveal-node">Expertise Ecosystem</p>
-                <h2 class="heading-reflect reveal-node" style="font-size: 4rem; text-transform: uppercase; margin-bottom: 20px;">The Skills</h2>
-                <div class="skills-container reveal-node" id="bubble-cloud">
-                    <div class="skill-bubble magnetic" data-brand="var(--c-java)" data-note="261.63"><i class="fab fa-java"></i><span>Java</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-c)" data-note="293.66"><i class="fas fa-copyright"></i><span>C Lang</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-cpp)" data-note="329.63"><i class="fas fa-code"></i><span>C++</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-python)" data-note="349.23"><i class="fab fa-python"></i><span>Python</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-ml)" data-note="392.00"><i class="fas fa-brain"></i><span>ML</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-data)" data-note="440.00"><i class="fas fa-chart-line"></i><span>Data</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-sql)" data-note="493.88"><i class="fas fa-database"></i><span>SQL</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-html)" data-note="523.25"><i class="fab fa-html5"></i><span>HTML</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-css)" data-note="587.33"><i class="fab fa-css3-alt"></i><span>CSS</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-js)" data-note="261.63"><i class="fab fa-js"></i><span>JS</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-aws)" data-note="293.66"><i class="fab fa-aws"></i><span>AWS</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-git)" data-note="329.63"><i class="fab fa-git-alt"></i><span>Git</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-langchain)" data-note="349.23"><i class="fas fa-link"></i><span>LangChain</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-vectordb)" data-note="392.00"><i class="fas fa-server"></i><span>Vector DB</span></div>
-                    <div class="skill-bubble magnetic" data-brand="var(--c-streamlit)" data-note="440.00"><i class="fas fa-window-maximize"></i><span>Streamlit</span></div>
-                </div>
-            </div>
-        </section>
-        <section id="projects">
-            <div class="reveal-container">
-                <p class="card-tag reveal-node">Featured Projects</p>
-                <h2 class="heading-reflect reveal-node" style="font-size: 4rem; text-transform: uppercase; margin-bottom: 50px;">Selected Work</h2>
-                
-                <div class="project-item reveal-node">
-                    <div style="flex: 1;">
-                        <h3>Fake News Detection <span class="status-tag" style="color: var(--primary); opacity: 1;">Live</span><span class="status-tag">ML COMING SOON</span></h3>
-                        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">Developing a Machine Learning model using Python to detect misinformation in real-time news streams with Transformer architectures.</p>
-                        <div class="project-meta"><span class="badge">PYTHON</span><span class="badge">ML</span><span class="badge">NLP</span></div>
-                    </div>
-                    <button class="run-btn" onclick="openStatus('AI Code Reviewer', 'Testing OpenAI API integrations for architectural suggestions. Beta deployment active soon.', 'fa-bug')">Run <i class="fas fa-play"></i></button>
-                </div>
-                <div class="project-item reveal-node">
-    <div style="flex: 1;">
-        <h3>FloraScan - Flower Disease Detection <span class="status-tag">Live</span></h3>
-        
-        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">
-            AI-powered system that detects flower species and identifies plant diseases using deep learning. 
-            Upload an image and get instant predictions with a Flask backend and TensorFlow model.
-        </p>
-
-        <div class="project-meta">
-            <span class="badge">AI</span>
-            <span class="badge">TensorFlow</span>
-            <span class="badge">Flask API</span>
-            <span class="badge">Computer Vision</span>
-        </div>
-    </div>
-
-    <button class="run-btn" onclick="window.open('https://flower-disease-system.vercel.app/health', '_blank')">Run <i class="fas fa-play"></i></button>
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="pre-logo">Rathod <span>Raj</span></div>
+  <div class="pre-bar-wrap"><div class="pre-bar-fill" id="pre-fill"></div></div>
+  <div class="pre-msg" id="pre-msg">Booting system...</div>
 </div>
-                <div class="project-item reveal-node">
-                    <div style="flex: 1;">
-                        <h3>AI Developer Code Reviewer <span class="status-tag">Development</span></h3>
-                        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">Built an intelligent tool that analyzes code for bugs and suggests optimizations using Large Language Models.</p>
-                        <div class="project-meta"><span class="badge">LLM</span><span class="badge">PYTHON</span><span class="badge">API</span></div>
-                    </div>
-                    <button class="run-btn" onclick="openStatus('AI Code Reviewer', 'Testing OpenAI API integrations for architectural suggestions. Beta deployment active soon.', 'fa-bug')">Run <i class="fas fa-play"></i></button>
-                </div>
 
-                <div class="project-item reveal-node">
-                    <div style="flex: 1;">
-                        <h3>AI Discord Assistant <span class="status-tag">Operational</span></h3>
-                        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">Created a smart bot for Discord servers that manages moderation and answers user queries automatically.</p>
-                        <div class="project-meta"><span class="badge">DISCORD.PY</span><span class="badge">AI</span><span class="badge">BOT</span></div>
-                    </div>
-                    <button class="run-btn" onclick="openStatus('Discord Assistant', 'Core neural logic is live. Currently optimizing latency and rate-limiting protocols.', 'fa-robot')">Run <i class="fas fa-play"></i></button>
-                </div>
+<!-- DESKTOP -->
+<div id="desktop-bg"></div>
+<div id="desktop-overlay"></div>
+<div id="desktop-grid"></div>
 
-                <div class="project-item reveal-node">
-                    <div style="flex: 1;">
-                        <h3>Portfolio Website <span class="status-tag" style="color: var(--primary); opacity: 1;">Live</span></h3>
-                        <p style="color: var(--text-dim); margin-top: 10px; max-width: 750px;">Highly interactive portfolio featuring technical audio synthesis and reactive 3D neural networks using Three.js and GSAP.</p>
-                        <div class="project-meta"><span class="badge">JS</span><span class="badge">CSS</span><span class="badge">HTML5</span></div>
-                    </div>
-                    <button class="run-btn" onclick="window.open('https://rathodrajai.netlify.app/', '_blank')">Run <i class="fas fa-play"></i></button>
-                </div>
-            </div>
-        </section>
-        <section id="contact">
-            <div class="reveal-container">
-                <h2 class="heading-reflect reveal-node" style="font-size: 6vw; text-transform: uppercase; margin-bottom: 60px;">Contact Me</h2>
-                <div class="contact-form reveal-node">
-                    <form 
-  action="https://formsubmit.co/rathodraj1504@gmail.com" 
-  method="POST"
->
-  <input type="hidden" name="_captcha" value="false">
-  <input type="hidden" name="_template" value="table">
-  <input type="hidden" name="_subject" value="New Portfolio Contact Message">
+<!-- CONTEXT MENU -->
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="openWin('settings');closeCtx()"><i class="fa-solid fa-gear"></i> Change Wallpaper</div>
+  <div class="ctx-item" onclick="openWin('about');closeCtx()"><i class="fa-solid fa-user"></i> About Raj</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="openWin('cli');closeCtx()"><i class="fa-solid fa-terminal"></i> New Terminal</div>
+  <div class="ctx-item" onclick="openWin('weather');closeCtx()"><i class="fa-solid fa-cloud-sun"></i> Weather</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="closeAllWins();closeCtx()"><i class="fa-solid fa-rectangle-xmark"></i> Close All Windows</div>
+</div>
 
-  <div class="form-group">
-    <label>Full Name</label>
-    <input type="text" name="name" required placeholder="Ex. John Doe">
+<!-- SPOTLIGHT -->
+<div id="spotlight-overlay" onclick="closeSpotlight(event)">
+  <div id="spotlight-box">
+    <input type="text" id="spotlight-input" placeholder="🔍  Spotlight Search — type a command or section..." autocomplete="off" spellcheck="false">
+    <div id="spotlight-results"></div>
+  </div>
+</div>
+
+<!-- MENUBAR -->
+<div id="menubar">
+  <div class="menu-left">
+    <div class="menu-item" style="font-size:15px"><i class="fa-brands fa-apple"></i></div>
+    <div class="menu-item bold">Rathod Raj</div>
+    <div class="menu-item" onclick="openWin('about')">File</div>
+    <div class="menu-item" onclick="tileWindows()">Window</div>
+    <div class="menu-item" onclick="openWin('cli')">Terminal</div>
+    <div class="menu-item" onclick="openSpotlight()">🔍 Spotlight</div>
+  </div>
+  <div class="menu-right">
+    <div id="menu-weather" onclick="openWin('weather')" style="cursor:pointer">
+      <i class="fa-solid fa-cloud"></i>
+      <span id="menu-weather-text">--°C</span>
+    </div>
+    <span><i class="fa-solid fa-wifi" style="font-size:11px"></i></span>
+    <span><i class="fa-solid fa-battery-full" style="font-size:11px"></i> 100%</span>
+    <span id="clock" style="cursor:default"></span>
+  </div>
+</div>
+
+<!-- WORK AREA -->
+<div id="work-area">
+
+  <!-- Desktop right-column shortcuts -->
+  <div class="desk-icon" style="right:16px;top:10px" onclick="openWin('about')">
+    <div class="desk-icon-img" style="background:linear-gradient(145deg,#2563eb,#60a5fa)">🧑‍💻</div>
+    <span>About Me</span>
+  </div>
+  <div class="desk-icon" style="right:16px;top:108px" onclick="openWin('projects')">
+    <div class="desk-icon-img" style="background:linear-gradient(145deg,#7c3aed,#c084fc)">🚀</div>
+    <span>Projects</span>
+  </div>
+  <div class="desk-icon" style="right:16px;top:206px" onclick="openWin('weather')">
+    <div class="desk-icon-img" style="background:linear-gradient(145deg,#0369a1,#38bdf8)">🌤️</div>
+    <span>Weather</span>
+  </div>
+  <div class="desk-icon" style="right:16px;top:304px" onclick="openWin('cli')">
+    <div class="desk-icon-img" style="background:linear-gradient(145deg,#1e2028,#3a3d48);border:1px solid rgba(255,255,255,.12)">⌨️</div>
+    <span>Terminal</span>
   </div>
 
-  <div class="form-group">
-    <label>Email Address</label>
-    <input type="email" name="email" required placeholder="johndoe@email.com">
+  <!-- ═══ WINDOW: ABOUT ═══ -->
+  <div class="win" id="win-about" style="width:445px;height:430px;top:44px;left:50px">
+    <div class="win-bar" data-win="about">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('about')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('about')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('about')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">about.md — Rathod Raj</div>
+    </div>
+    <div class="win-body">
+      <div class="avatar-row">
+        <div class="avatar">🧠</div>
+        <div class="name-block">
+          <h2>Rathod Raj</h2>
+          <p>Data Scientist &amp; AI Specialist · Gujarat, India</p>
+        </div>
+      </div>
+      <div class="info-row"><i class="fa-solid fa-location-dot"></i> Porbandar, Gujarat, India</div>
+      <div class="info-row"><i class="fa-solid fa-graduation-cap"></i> B.Tech CSE · Parul University · 7.43 CGPA</div>
+      <div class="info-row"><i class="fa-brands fa-github"></i>
+        <a href="#" onclick="openExternal('https://github.com/Raj-Rathod-Ai');return false">github.com/Raj-Rathod-Ai</a>
+      </div>
+      <div class="info-row"><i class="fa-brands fa-linkedin"></i>
+        <a href="#" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai');return false">linkedin.com/in/raj-rathod-ai</a>
+      </div>
+      <div class="info-row"><i class="fa-solid fa-envelope"></i>
+        <a href="#" onclick="openExternal('mailto:rathodraj1504@gmail.com');return false">rathodraj1504@gmail.com</a>
+      </div>
+      <div class="info-row"><i class="fa-solid fa-phone"></i> +91 96248 01014</div>
+      <hr class="win-hr"/>
+      <div class="obj-box">"Computer Science engineer specialising in AI/ML and algorithmic performance. I build high-fidelity neural architectures and MLOps pipelines that bridge the gap between abstract data and real-world intelligence."</div>
+    </div>
+    <div class="resize-handle" data-win="about"></div>
   </div>
 
-  <div class="form-group">
-    <label>Message</label>
-    <textarea name="message" rows="4" required placeholder="What shall we architect together?"></textarea>
+  <!-- ═══ WINDOW: EDUCATION ═══ -->
+  <div class="win" id="win-edu" style="width:395px;height:375px;top:50px;left:548px">
+    <div class="win-bar" data-win="edu">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('edu')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('edu')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('edu')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">education.json</div>
+    </div>
+    <div class="win-body">
+      <div class="win-sub">Academic Timeline</div>
+      <div class="edu-card">
+        <div class="period">2023 – 2026</div>
+        <h3>B.Tech — Computer Science &amp; Engineering</h3>
+        <div class="inst">Parul University, Vadodara, Gujarat</div>
+        <div class="grade">7.43 CGPA</div>
+      </div>
+      <div class="edu-card">
+        <div class="period">2021 – 2023</div>
+        <h3>Higher Secondary (Science)</h3>
+        <div class="inst">Sigma English School, Porbandar</div>
+        <div style="font-size:16px;font-weight:700;font-family:var(--font-head);margin-top:8px;">60.61%</div>
+      </div>
+      <div class="edu-card">
+        <div class="period">2020 – 2021</div>
+        <h3>Secondary Education (SSC)</h3>
+        <div class="inst">Sigma English School, Porbandar</div>
+        <div style="font-size:16px;font-weight:700;font-family:var(--font-head);margin-top:8px;">79.81%</div>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="edu"></div>
   </div>
 
-  <button type="submit" class="spotlight-btn interactive-design" style="width:100%">
-    Dispatch Signal
-  </button>
-</form>
+  <!-- ═══ WINDOW: SKILLS ═══ -->
+  <div class="win" id="win-skills" style="width:475px;height:500px;top:330px;left:50px">
+    <div class="win-bar" data-win="skills">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('skills')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('skills')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('skills')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">skills.py — Expertise Ecosystem</div>
+    </div>
+    <div class="win-body">
+      <div class="skills-tabs">
+        <div class="stab active" onclick="switchTab('langs',this)">Languages</div>
+        <div class="stab"        onclick="switchTab('libs',this)">Libraries</div>
+        <div class="stab"        onclick="switchTab('tools',this)">Tools &amp; Infra</div>
+      </div>
+      <!-- LANGUAGES -->
+      <div class="skill-panel active" id="sp-langs">
+        <div class="skill-group">
+          <div class="skill-group-label">Programming Languages</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#3776ab"><i class="fa-brands fa-python"></i></span><span class="skill-name">Python</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:90%;--bar-a:#3776ab;--bar-b:#6bb5f5"></div></div><span class="skill-pct">90%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f89820"><i class="fa-brands fa-java"></i></span><span class="skill-name">Java</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:72%;--bar-a:#f89820;--bar-b:#ffcc60"></div></div><span class="skill-pct">72%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#a8b9cc"><i class="fa-solid fa-c"></i></span><span class="skill-name">C Language</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:78%;--bar-a:#607080;--bar-b:#a8b9cc"></div></div><span class="skill-pct">78%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#00599c"><i class="fa-solid fa-code"></i></span><span class="skill-name">C++</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:60%;--bar-a:#00599c;--bar-b:#4ac0f0"></div></div><span class="skill-pct">60%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f29111"><i class="fa-solid fa-database"></i></span><span class="skill-name">SQL</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:75%;--bar-a:#f29111;--bar-b:#ffd060"></div></div><span class="skill-pct">75%</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-label">Web (Supporting)</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#e34f26"><i class="fa-brands fa-html5"></i></span><span class="skill-name">HTML5</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:68%;--bar-a:#e34f26;--bar-b:#ff8060"></div></div><span class="skill-pct">68%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#1572b6"><i class="fa-brands fa-css3-alt"></i></span><span class="skill-name">CSS3</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:62%;--bar-a:#1572b6;--bar-b:#60c8d8"></div></div><span class="skill-pct">62%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f7df1e"><i class="fa-brands fa-js"></i></span><span class="skill-name">JavaScript</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:55%;--bar-a:#f7a000;--bar-b:#f7df1e"></div></div><span class="skill-pct">55%</span></div>
+        </div>
+      </div>
+      <!-- LIBRARIES -->
+      <div class="skill-panel" id="sp-libs">
+        <div class="skill-group">
+          <div class="skill-group-label">Data Science &amp; ML Libraries</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#4c72b0"><i class="fa-solid fa-chart-bar"></i></span><span class="skill-name">NumPy</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:88%;--bar-a:#4c72b0;--bar-b:#8db0e0"></div></div><span class="skill-pct">88%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#5060a0"><i class="fa-solid fa-table"></i></span><span class="skill-name">Pandas</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:85%;--bar-a:#5060a0;--bar-b:#9090d0"></div></div><span class="skill-pct">85%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f7931e"><i class="fa-solid fa-brain"></i></span><span class="skill-name">Scikit-learn</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%;--bar-a:#f7931e;--bar-b:#ffcc60"></div></div><span class="skill-pct">80%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#ff6f00"><i class="fa-solid fa-robot"></i></span><span class="skill-name">TensorFlow</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%;--bar-a:#ff6f00;--bar-b:#ffb060"></div></div><span class="skill-pct">70%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#ee4c2c"><i class="fa-solid fa-fire"></i></span><span class="skill-name">PyTorch</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:60%;--bar-a:#ee4c2c;--bar-b:#f08070"></div></div><span class="skill-pct">60%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#3776ab"><i class="fa-solid fa-chart-line"></i></span><span class="skill-name">Matplotlib</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:78%;--bar-a:#3776ab;--bar-b:#70a8d8"></div></div><span class="skill-pct">78%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#5de08a"><i class="fa-solid fa-eye"></i></span><span class="skill-name">Seaborn</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:72%;--bar-a:#2a8060;--bar-b:#5de08a"></div></div><span class="skill-pct">72%</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-label">GenAI / LLM Ecosystem</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#12ad4b"><i class="fa-solid fa-link"></i></span><span class="skill-name">LangChain</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:75%;--bar-a:#12ad4b;--bar-b:#60d8a0"></div></div><span class="skill-pct">75%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#9c27b0"><i class="fa-solid fa-server"></i></span><span class="skill-name">Vector DB</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:65%;--bar-a:#9c27b0;--bar-b:#b87cef"></div></div><span class="skill-pct">65%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#ff4b4b"><i class="fa-solid fa-window-maximize"></i></span><span class="skill-name">Streamlit</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%;--bar-a:#cc3030;--bar-b:#ff8080"></div></div><span class="skill-pct">80%</span></div>
+        </div>
+      </div>
+      <!-- TOOLS -->
+      <div class="skill-panel" id="sp-tools">
+        <div class="skill-group">
+          <div class="skill-group-label">MLOps &amp; DevOps</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#1eb1e0"><i class="fa-brands fa-docker"></i></span><span class="skill-name">Docker</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:65%;--bar-a:#1eb1e0;--bar-b:#80d8f0"></div></div><span class="skill-pct">65%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#60c8d8"><i class="fa-solid fa-gears"></i></span><span class="skill-name">MLflow</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:68%;--bar-a:#0080a0;--bar-b:#60c8d8"></div></div><span class="skill-pct">68%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#2088ff"><i class="fa-solid fa-circle-nodes"></i></span><span class="skill-name">CI / CD</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:55%;--bar-a:#2088ff;--bar-b:#80c0ff"></div></div><span class="skill-pct">55%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#ff9900"><i class="fa-brands fa-aws"></i></span><span class="skill-name">AWS</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:52%;--bar-a:#cc7000;--bar-b:#ff9900"></div></div><span class="skill-pct">52%</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-label">Analytics &amp; Version Control</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f05032"><i class="fa-brands fa-git-alt"></i></span><span class="skill-name">Git &amp; GitHub</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:82%;--bar-a:#c03020;--bar-b:#f08070"></div></div><span class="skill-pct">82%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f2c80f"><i class="fa-solid fa-chart-pie"></i></span><span class="skill-name">Power BI</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%;--bar-a:#c09010;--bar-b:#f2c80f"></div></div><span class="skill-pct">70%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#909898"><i class="fa-brands fa-linux"></i></span><span class="skill-name">Linux</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:60%;--bar-a:#404848;--bar-b:#909898"></div></div><span class="skill-pct">60%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="skills"></div>
+  </div>
 
-                </div>
-            </div>
-        </section>
+  <!-- ═══ WINDOW: JOURNEY ═══ -->
+  <div class="win" id="win-journey" style="width:405px;height:390px;top:468px;left:548px">
+    <div class="win-bar" data-win="journey">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('journey')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('journey')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('journey')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">journey.log — My Path</div>
+    </div>
+    <div class="win-body">
+      <div class="win-sub">Learning &amp; Growth</div>
+      <div class="journey-item">
+        <div class="journey-dot" style="background:rgba(96,200,216,.12)">🤖</div>
+        <div>
+          <div class="journey-period">Self-Directed · Ongoing</div>
+          <div class="journey-title">GenAI &amp; Data Science</div>
+          <div class="journey-desc">Architected end-to-end MLOps pipelines using MLflow, Docker, and CI/CD. Specialised in LangChain orchestration and Vector DB indexing for autonomous RAG solutions.</div>
+          <div style="margin-top:8px"><span class="tag ml">MLflow</span><span class="tag tool">Docker</span><span class="tag ai">LangChain</span><span class="tag ai">RAG</span></div>
+        </div>
+      </div>
+      <div class="journey-item">
+        <div class="journey-dot" style="background:rgba(240,192,96,.12)">🧮</div>
+        <div>
+          <div class="journey-period">2022 – 2023 · Research Intensive</div>
+          <div class="journey-title">Low-Level C Programming</div>
+          <div class="journey-desc">Dedicated 12 months to mastering C and memory management, optimising data structures for heavy AI workloads — foundation for understanding model performance bottlenecks.</div>
+          <div style="margin-top:8px"><span class="tag c">C Lang</span><span class="tag tool">VSCode</span></div>
+        </div>
+      </div>
+      <div class="journey-item">
+        <div class="journey-dot" style="background:rgba(184,124,239,.12)">☁️</div>
+        <div>
+          <div class="journey-period">2023 · Google Arcade</div>
+          <div class="journey-title">Cloud &amp; Skill Boost</div>
+          <div class="journey-desc">Completed Google Arcade Skill Boost — hands-on labs covering compute, storage, and ML APIs on Google Cloud Platform.</div>
+          <div style="margin-top:8px"><span class="tag tool">GCP</span><span class="tag tool">BigQuery</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="journey"></div>
+  </div>
 
-        <footer>
-            <div class="footer-content">
-                <div class="social-links">
-                    <a href="https://github.com/Raj-Rathod-Ai" target="_blank" class="social-btn magnetic" style="--hover-color: var(--c-github)" title="GitHub">
-                        <div class="spotlight"></div><i class="fab fa-github"></i>
-                    </a>
-                    <a href="https://linkedin.com/in/raj-rathod-ai" target="_blank" class="social-btn magnetic" style="--hover-color: var(--c-linkedin)" title="LinkedIn">
-                        <div class="spotlight"></div><i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a href="https://leetcode.com/u/Rathod-Raj-Ai/" target="_blank" class="social-btn magnetic" style="--hover-color: var(--c-leetcode)" title="LeetCode">
-                        <div class="spotlight"></div><i class="fas fa-code"></i>
-                    </a>
-                    <a href="https://www.instagram.com/its._.rudra._.19.08_?igsh=dXN5M29rbHMxcmIy" target="_blank" class="social-btn magnetic" style="--hover-color: var(--c-instagram)" title="Instagram">
-                        <div class="spotlight"></div><i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="mailto:rathodraj1504@gmail.com" class="social-btn magnetic" style="--hover-color: var(--c-email)" title="Email">
-                        <div class="spotlight"></div><i class="fas fa-envelope"></i>
-                    </a>
-                    <a href="tel:+919624801014" class="social-btn magnetic" style="--hover-color: var(--c-phone)" title="Phone">
-                        <div class="spotlight"></div><i class="fas fa-phone"></i>
-                    </a>
-                </div>
-                <p class="footer-copyright">© 2026 RATHOD RAJ — DATA SCIENCE PORTFOLIO</p>
-            </div>
-        </footer>
-    </main>
+  <!-- ═══ WINDOW: PROJECTS ═══ -->
+  <div class="win" id="win-projects" style="width:495px;height:520px;top:72px;left:1010px">
+    <div class="win-bar" data-win="projects">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('projects')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('projects')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('projects')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">projects.md — Selected Work</div>
+    </div>
+    <div class="win-body">
+      <div class="win-sub">Featured Builds</div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">FloraScan — Flower Disease Detection</div><span class="proj-status st-live">Live</span></div>
+        <div class="proj-desc">AI system detecting flower species and plant diseases using deep learning. Upload an image and get instant predictions with a Flask backend and TensorFlow CNN model.</div>
+        <div><span class="tag ai">TensorFlow</span><span class="tag tool">Flask API</span><span class="tag ml">Computer Vision</span><span class="tag py">Python</span></div>
+        <a class="proj-link" href="#" onclick="openExternal('https://flower-disease-system.vercel.app/health');return false"><i class="fa-solid fa-arrow-up-right-from-square"></i> flower-disease-system.vercel.app</a>
+      </div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">Fake News Detection</div><span class="proj-status st-dev">In Progress</span></div>
+        <div class="proj-desc">ML model to detect misinformation in real-time news streams using Transformer architectures and NLP preprocessing pipelines.</div>
+        <div><span class="tag py">Python</span><span class="tag ml">ML</span><span class="tag ai">NLP</span><span class="tag ai">Transformers</span></div>
+      </div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">AI Developer Code Reviewer</div><span class="proj-status st-dev">Beta</span></div>
+        <div class="proj-desc">Intelligent tool that analyses code for bugs and suggests optimisations using Large Language Models — built with LangChain and OpenAI API.</div>
+        <div><span class="tag ai">LLM</span><span class="tag py">Python</span><span class="tag ai">LangChain</span><span class="tag tool">OpenAI API</span></div>
+      </div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">AI Discord Assistant Bot</div><span class="proj-status st-ops">Operational</span></div>
+        <div class="proj-desc">Smart Discord bot for server moderation and automated query handling with AI-powered context-aware responses.</div>
+        <div><span class="tag py">discord.py</span><span class="tag ai">AI</span><span class="tag tool">Bot</span></div>
+      </div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">This Portfolio</div><span class="proj-status st-live">Live</span></div>
+        <div class="proj-desc">macOS-style interactive portfolio with draggable windows, live terminal, wallpapers, weather, spotlight search — all in a single HTML file.</div>
+        <div><span class="tag web">HTML5</span><span class="tag web">CSS3</span><span class="tag web">JavaScript</span></div>
+        <a class="proj-link" href="#" onclick="openExternal('https://rathodrajai.netlify.app/');return false"><i class="fa-solid fa-arrow-up-right-from-square"></i> rathodrajai.netlify.app</a>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="projects"></div>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- ═══ WINDOW: TERMINAL ═══ -->
+  <div class="win" id="win-cli" style="width:540px;height:360px;top:614px;left:1010px;flex-direction:column">
+    <div class="win-bar" data-win="cli">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('cli')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('cli')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('cli')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">raj@portfolio — zsh</div>
+    </div>
+    <div id="cli-output">
+      <span class="cli-line" style="color:var(--accent);font-weight:600;font-size:9.5px;line-height:1.2">
+██████╗  █████╗      ██╗<br>
+██╔══██╗██╔══██╗     ██║<br>
+██████╔╝███████║     ██║<br>
+██╔══██╗██╔══██║██   ██║<br>
+██║  ██║██║  ██║╚█████╔╝<br>
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚════╝</span>
+      <span class="cli-line" style="display:block;margin-top:6px">Welcome to <span class="cli-hi">Rathod Raj</span>'s portfolio terminal.</span>
+      <span class="cli-line cli-out">Type <span class="cli-hi2">help</span> to see all commands.</span>
+      <span class="cli-line" style="opacity:.2">────────────────────────────────────────────</span>
+    </div>
+    <div id="cli-input-row">
+      <span id="cli-prompt-label">raj@portfolio:~$</span>
+      <input type="text" id="cli-input" placeholder="type a command…" autocomplete="off" spellcheck="false"/>
+    </div>
+    <div class="resize-handle" data-win="cli"></div>
+  </div>
+
+  <!-- ═══ WINDOW: CONTACT ═══ -->
+  <div class="win" id="win-contact" style="width:375px;height:450px;top:180px;left:380px;display:none">
+    <div class="win-bar" data-win="contact">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('contact')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('contact')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('contact')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">contact.vcf — Get in Touch</div>
+    </div>
+    <div class="win-body">
+      <div class="win-sub">Reach Out</div>
+      <div class="contact-link" onclick="openExternal('mailto:rathodraj1504@gmail.com')">
+        <div class="contact-icon" style="background:rgba(240,192,96,.12)"><i class="fa-solid fa-envelope" style="color:var(--accent)"></i></div>
+        <div class="contact-info"><strong>rathodraj1504@gmail.com</strong><span>Email — preferred channel</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('tel:+919624801014')">
+        <div class="contact-icon" style="background:rgba(93,224,138,.10)"><i class="fa-solid fa-phone" style="color:var(--green)"></i></div>
+        <div class="contact-info"><strong>+91 96248 01014</strong><span>Phone / WhatsApp</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('https://github.com/Raj-Rathod-Ai')">
+        <div class="contact-icon" style="background:rgba(255,255,255,.05)"><i class="fa-brands fa-github" style="color:var(--text)"></i></div>
+        <div class="contact-info"><strong>Raj-Rathod-Ai</strong><span>GitHub</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai')">
+        <div class="contact-icon" style="background:rgba(0,119,181,.12)"><i class="fa-brands fa-linkedin" style="color:#0077b5"></i></div>
+        <div class="contact-info"><strong>raj-rathod-ai</strong><span>LinkedIn</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('https://leetcode.com/u/Rathod-Raj-Ai/')">
+        <div class="contact-icon" style="background:rgba(255,161,22,.10)"><i class="fa-solid fa-code" style="color:#ffa116"></i></div>
+        <div class="contact-info"><strong>Rathod-Raj-Ai</strong><span>LeetCode</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('https://www.instagram.com/its._.rudra._.19.08_')">
+        <div class="contact-icon" style="background:rgba(228,64,95,.10)"><i class="fa-brands fa-instagram" style="color:#e4405f"></i></div>
+        <div class="contact-info"><strong>its._.rudra._.19.08_</strong><span>Instagram</span></div>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="contact"></div>
+  </div>
+
+  <!-- ═══ WINDOW: WEATHER ═══ -->
+  <div class="win" id="win-weather" style="width:380px;height:480px;top:120px;left:700px;display:none">
+    <div class="win-bar" data-win="weather">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('weather')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('weather')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('weather')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">Weather — Live</div>
+    </div>
+    <div class="win-body" id="weather-body">
+      <div class="weather-loading"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>Fetching your location…</div>
+    </div>
+    <div class="resize-handle" data-win="weather"></div>
+  </div>
+
+  <!-- ═══ WINDOW: SETTINGS ═══ -->
+  <div class="win" id="win-settings" style="width:520px;height:580px;top:100px;left:350px;display:none">
+    <div class="win-bar" data-win="settings">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('settings')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('settings')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('settings')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">System Settings</div>
+    </div>
+    <div class="win-body">
+
+      <!-- WALLPAPERS -->
+      <div class="settings-section">
+        <div class="settings-section-title">🖼 Desktop Wallpaper</div>
+        <div class="wp-grid" id="wp-grid"></div>
+      </div>
+
+      <!-- ACCENT COLOR -->
+      <div class="settings-section">
+        <div class="settings-section-title">🎨 Accent Color</div>
+        <div class="accent-row" id="accent-row">
+          <div class="accent-dot active" style="background:#60c8d8" data-c="#60c8d8" data-v="rgba(96,200,216,0.35)" title="Cyan"></div>
+          <div class="accent-dot" style="background:#b87cef" data-c="#b87cef" data-v="rgba(184,124,239,0.35)" title="Purple"></div>
+          <div class="accent-dot" style="background:#f0c060" data-c="#f0c060" data-v="rgba(240,192,96,0.35)" title="Gold"></div>
+          <div class="accent-dot" style="background:#5de08a" data-c="#5de08a" data-v="rgba(93,224,138,0.35)" title="Green"></div>
+          <div class="accent-dot" style="background:#ff6b8a" data-c="#ff6b8a" data-v="rgba(255,107,138,0.35)" title="Pink"></div>
+          <div class="accent-dot" style="background:#ff9f45" data-c="#ff9f45" data-v="rgba(255,159,69,0.35)" title="Orange"></div>
+        </div>
+      </div>
+
+      <!-- TOGGLES -->
+      <div class="settings-section">
+        <div class="settings-section-title">⚙️ System Options</div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Show Dot Grid</div><div class="settings-toggle-sub">Subtle dot pattern on desktop</div></div>
+          <div class="toggle-switch on" id="tog-grid" onclick="toggleSetting('grid')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Desktop Overlay Dim</div><div class="settings-toggle-sub">Darken wallpaper edges</div></div>
+          <div class="toggle-switch on" id="tog-dim" onclick="toggleSetting('dim')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Window Blur / Glass</div><div class="settings-toggle-sub">Backdrop blur on windows</div></div>
+          <div class="toggle-switch on" id="tog-blur" onclick="toggleSetting('blur')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Animated Skill Bars</div><div class="settings-toggle-sub">Re-animate on tab switch</div></div>
+          <div class="toggle-switch on" id="tog-anim" onclick="toggleSetting('anim')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Show Desktop Icons</div><div class="settings-toggle-sub">Quick-launch icons on desktop</div></div>
+          <div class="toggle-switch on" id="tog-dicons" onclick="toggleSetting('dicons')"><div class="toggle-knob"></div></div>
+        </div>
+      </div>
+
+      <!-- WINDOW OPACITY -->
+      <div class="settings-section">
+        <div class="settings-section-title">🪟 Window Opacity</div>
+        <input type="range" class="opacity-slider" id="opacity-slider" min="70" max="100" value="97"
+          oninput="setWinOpacity(this.value)">
+        <div style="font-size:10px;color:var(--muted);margin-top:4px" id="opacity-label">97%</div>
+      </div>
+
+      <!-- ICON SIZE -->
+      <div class="settings-section">
+        <div class="settings-section-title">🔵 Dock Icon Size</div>
+        <div class="icon-size-btns">
+          <div class="icon-size-btn" onclick="setDockSize(40)">Small</div>
+          <div class="icon-size-btn active" onclick="setDockSize(52)">Default</div>
+          <div class="icon-size-btn" onclick="setDockSize(64)">Large</div>
+          <div class="icon-size-btn" onclick="setDockSize(72)">XL</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="resize-handle" data-win="settings"></div>
+  </div>
+
+</div><!-- /work-area -->
+
+<!-- DOCK -->
+<div id="dock-wrap">
+  <div id="dock">
+    <div class="dock-icon open" id="di-about" onclick="openWin('about')">
+      <div class="dock-img di-about">🧑‍💻</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">About Me</div>
+    </div>
+    <div class="dock-icon open" id="di-edu" onclick="openWin('edu')">
+      <div class="dock-img di-edu">🎓</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Education</div>
+    </div>
+    <div class="dock-icon open" id="di-skills" onclick="openWin('skills')">
+      <div class="dock-img di-skills">🧠</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Skills</div>
+    </div>
+    <div class="dock-icon open" id="di-journey" onclick="openWin('journey')">
+      <div class="dock-img di-journey">🛤️</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">My Journey</div>
+    </div>
+    <div class="dock-icon open" id="di-projects" onclick="openWin('projects')">
+      <div class="dock-img di-projects">🚀</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Projects</div>
+    </div>
+    <div class="dock-sep"></div>
+    <div class="dock-icon open" id="di-cli" onclick="openWin('cli')">
+      <div class="dock-img di-cli">⌨️</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Terminal</div>
+    </div>
+    <div class="dock-icon" id="di-weather" onclick="openWin('weather')">
+      <div class="dock-img di-weather">🌤️</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Weather</div>
+    </div>
+    <div class="dock-sep"></div>
+    <div class="dock-icon" id="di-contact" onclick="openWin('contact')">
+      <div class="dock-img di-contact">📬</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Contact</div>
+    </div>
+    <div class="dock-icon" onclick="openExternal('https://github.com/Raj-Rathod-Ai')">
+      <div class="dock-img di-gh"><i class="fa-brands fa-github" style="color:#fff;font-size:22px"></i></div><div class="dock-dot"></div>
+      <div class="dock-tooltip">GitHub</div>
+    </div>
+    <div class="dock-icon" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai')">
+      <div class="dock-img di-li"><i class="fa-brands fa-linkedin-in" style="color:#fff;font-size:22px"></i></div><div class="dock-dot"></div>
+      <div class="dock-tooltip">LinkedIn</div>
+    </div>
+    <div class="dock-sep"></div>
+    <div class="dock-icon" id="di-settings" onclick="openWin('settings')">
+      <div class="dock-img di-settings">⚙️</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Settings</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   WALLPAPERS — macOS-style gradients + Unsplash
+═══════════════════════════════════════════════ */
+const WALLPAPERS = [
+  {
+    label:'Sonoma Dunes',
+    css:`url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Big Sur',
+    css:`url('https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Ventura Tide',
+    css:`url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Aurora',
+    css:`url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Galaxy',
+    css:`url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Sequoia',
+    css:`url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Abstract Flow',
+    css:`url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Neon City',
+    css:`url('https://images.unsplash.com/photo-1477346611705-65d1883cee1e?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'macOS Blue',
+    css:`linear-gradient(135deg,#0f2027,#203a43,#2c5364)`
+  },
+  {
+    label:'Monterey',
+    css:`linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%)`
+  },
+  {
+    label:'Ventura Rose',
+    css:`linear-gradient(135deg,#2d1b69,#11998e,#38ef7d) no-repeat center/cover`
+  },
+  {
+    label:'Sonoma Warm',
+    css:`linear-gradient(135deg,#1c1c1e 0%,#3a1c71 30%,#d76d77 70%,#ffaf7b 100%)`
+  },
+];
+
+let currentWP = parseInt(localStorage.getItem('raj_wp')||'0');
+const bgEl = document.getElementById('desktop-bg');
+
+function applyWallpaper(idx){
+  currentWP = idx;
+  bgEl.style.background = WALLPAPERS[idx].css;
+  bgEl.style.backgroundSize = 'cover';
+  bgEl.style.backgroundPosition = 'center';
+  localStorage.setItem('raj_wp', idx);
+  document.querySelectorAll('.wp-thumb').forEach((t,i)=>{
+    t.classList.toggle('active', i===idx);
+  });
+}
+
+function buildWallpaperGrid(){
+  const grid = document.getElementById('wp-grid');
+  WALLPAPERS.forEach((wp,i)=>{
+    const d = document.createElement('div');
+    d.className = 'wp-thumb' + (i===currentWP?' active':'');
+    if(wp.css.startsWith('url(')){
+      d.style.backgroundImage = wp.css.match(/url\(['"]?([^'"]+)['"]?\)/)?.[1]
+        ? `url('${wp.css.match(/url\(['"]?([^'"]+)['"]?\)/)[1]}')`
+        : wp.css;
+    } else {
+      d.style.background = wp.css;
+    }
+    d.innerHTML = `<div class="wp-label">${wp.label}</div>`;
+    d.onclick = ()=> applyWallpaper(i);
+    grid.appendChild(d);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CLOCK
+═══════════════════════════════════════════ */
+function tick(){
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) +
+    '  ' + n.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+tick(); setInterval(tick, 10000);
+
+/* ═══════════════════════════════════════════
+   PRELOADER
+═══════════════════════════════════════════ */
+(function(){
+  const fill = document.getElementById('pre-fill');
+  const msg  = document.getElementById('pre-msg');
+  const msgs = ['Booting system...','Loading modules...','Mounting windows...','Almost ready...'];
+  let p = 0;
+  const iv = setInterval(()=>{
+    p += Math.random()*20+8; if(p>100) p=100;
+    fill.style.width = p+'%';
+    msg.textContent = msgs[Math.min(Math.floor(p/26),msgs.length-1)];
+    if(p>=100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        document.getElementById('preloader').classList.add('done');
+        animateBars();
+      },420);
+    }
+  },100);
+})();
+
+/* ═══════════════════════════════════════════
+   WINDOW MANAGER
+═══════════════════════════════════════════ */
+const WIN_IDS = ['about','edu','skills','journey','projects','cli','contact','weather','settings'];
+let zTop = 200;
+
+function focusWin(id){
+  zTop++;
+  const el = document.getElementById('win-'+id);
+  if(!el) return;
+  el.style.zIndex = zTop;
+  document.querySelectorAll('.win').forEach(w=>w.classList.remove('focused'));
+  el.classList.add('focused');
+}
+function openWin(id){
+  const el = document.getElementById('win-'+id);
+  if(!el) return;
+  el.style.display = 'flex';
+  el.style.animation = 'winPop .22s cubic-bezier(.34,1.56,.64,1)';
+  focusWin(id);
+  const di = document.getElementById('di-'+id);
+  if(di) di.classList.add('open');
+  if(id==='skills') setTimeout(animateBars,80);
+  if(id==='weather') initWeather();
+}
+function closeWin(id){
+  const el = document.getElementById('win-'+id);
+  if(!el) return;
+  el.style.display = 'none';
+  const di = document.getElementById('di-'+id);
+  if(di) di.classList.remove('open');
+}
+function minWin(id){ closeWin(id); }
+function maxWin(id){
+  const el = document.getElementById('win-'+id);
+  const wa = document.getElementById('work-area').getBoundingClientRect();
+  if(el._max){
+    Object.assign(el.style, el._prev); el._max = false;
+  } else {
+    el._prev = {left:el.style.left,top:el.style.top,width:el.style.width,height:el.style.height};
+    Object.assign(el.style,{left:'0px',top:'0px',width:wa.width+'px',height:wa.height+'px'});
+    el._max = true;
+  }
+}
+function closeAllWins(){
+  WIN_IDS.forEach(id=>closeWin(id));
+}
+function tileWindows(){
+  const wa = document.getElementById('work-area').getBoundingClientRect();
+  const visible = WIN_IDS.filter(id=>{
+    const el = document.getElementById('win-'+id);
+    return el && el.style.display!=='none';
+  });
+  const cols = Math.ceil(Math.sqrt(visible.length));
+  const rows = Math.ceil(visible.length/cols);
+  const w = Math.floor(wa.width/cols)-8;
+  const h = Math.floor(wa.height/rows)-8;
+  visible.forEach((id,i)=>{
+    const col = i%cols, row = Math.floor(i/cols);
+    const el = document.getElementById('win-'+id);
+    Object.assign(el.style,{
+      left:(col*(w+8))+'px',top:(row*(h+8))+'px',
+      width:w+'px',height:h+'px'
+    });
+    el._max = false;
+  });
+}
+
+/* click to focus */
+document.querySelectorAll('.win').forEach(w=>{
+  w.addEventListener('mousedown',()=>{
+    const id = WIN_IDS.find(i=>document.getElementById('win-'+i)===w);
+    if(id) focusWin(id);
+  });
+});
+
+/* ═══════════════════════════════════════════
+   DRAG
+═══════════════════════════════════════════ */
+document.querySelectorAll('.win-bar').forEach(bar=>{
+  bar.addEventListener('mousedown', e=>{
+    if(e.target.classList.contains('win-btn')||e.target.closest('.win-btn')) return;
+    const win = bar.closest('.win');
+    const id = bar.dataset.win;
+    focusWin(id);
+    const ox = e.clientX - win.offsetLeft, oy = e.clientY - win.offsetTop;
+    const wa = document.getElementById('work-area').getBoundingClientRect();
+    function mv(e2){
+      let nx = e2.clientX-ox, ny = e2.clientY-oy;
+      nx = Math.max(-win.offsetWidth+80, Math.min(wa.width-80, nx));
+      ny = Math.max(0, Math.min(wa.height-40, ny));
+      win.style.left = nx+'px'; win.style.top = ny+'px';
+    }
+    function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); }
+    document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up);
+  });
+});
+
+/* ═══════════════════════════════════════════
+   RESIZE
+═══════════════════════════════════════════ */
+document.querySelectorAll('.resize-handle').forEach(h=>{
+  h.addEventListener('mousedown', e=>{
+    e.preventDefault();
+    const win = h.closest('.win');
+    const sx=e.clientX, sy=e.clientY, sw=win.offsetWidth, sh=win.offsetHeight;
+    function mv(e2){
+      win.style.width  = Math.max(300, sw+e2.clientX-sx)+'px';
+      win.style.height = Math.max(180, sh+e2.clientY-sy)+'px';
+    }
+    function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); }
+    document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up);
+  });
+});
+
+/* ═══════════════════════════════════════════
+   SKILL BARS & TABS
+═══════════════════════════════════════════ */
+let animEnabled = true;
+function animateBars(){
+  if(!animEnabled) return;
+  document.querySelectorAll('.skill-bar-fill').forEach(b=>{
+    const w = b.style.width;
+    b.style.transition = 'none';
+    b.style.transform = 'scaleX(0)';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      b.style.transition = 'transform .8s cubic-bezier(.22,1,.36,1)';
+      b.style.transform = 'scaleX(1)';
+      b.style.width = w;
+    }));
+  });
+}
+function switchTab(panel, tabEl){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.skill-panel').forEach(p=>p.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById('sp-'+panel).classList.add('active');
+  setTimeout(animateBars, 60);
+}
+
+/* ═══════════════════════════════════════════
+   TERMINAL  (full command set)
+═══════════════════════════════════════════ */
+const cliOut   = document.getElementById('cli-output');
+const cliIn    = document.getElementById('cli-input');
+let cliHistory = [], cliHIdx = -1;
+
+const CMDS = {
+  help: ()=>`<span class="cli-hi">Available commands:</span>
+  <span class="cli-hi2">about</span>        — who is Rathod Raj
+  <span class="cli-hi2">skills</span>       — full tech stack
+  <span class="cli-hi2">projects</span>     — featured builds
+  <span class="cli-hi2">education</span>    — academic timeline
+  <span class="cli-hi2">contact</span>      — reach out
+  <span class="cli-hi2">achievements</span> — notable wins
+  <span class="cli-hi2">social</span>       — open social links
+  <span class="cli-hi2">weather</span>      — open weather window
+  <span class="cli-hi2">open [window]</span>— open any window
+  <span class="cli-hi2">close [window]</span>— close any window
+  <span class="cli-hi2">list</span>         — list open windows
+  <span class="cli-hi2">whoami</span>       — identity
+  <span class="cli-hi2">date</span>         — current date & time
+  <span class="cli-hi2">matrix</span>       — :)
+  <span class="cli-hi2">neofetch</span>     — system info
+  <span class="cli-hi2">clear</span>        — clear terminal`,
+
+  about: ()=>`👋  <span class="cli-hi">Rathod Raj</span> — Data Scientist &amp; AI Specialist
+📍  Porbandar, Gujarat, India
+🎓  B.Tech CSE · Parul University · 7.43 CGPA
+💡  Building neural architectures &amp; MLOps pipelines
+🔗  <a class="cli-link" onclick="openWin('about')">→ Open About window</a>`,
+
+  skills: ()=>`<span class="cli-hi">⚡ Languages:</span>  Python (90%) · Java (72%) · C (78%) · C++ (60%) · SQL (75%)
+<span class="cli-hi">📦 Libraries:</span>  NumPy (88%) · Pandas (85%) · Scikit-learn (80%) · TensorFlow (70%)
+              PyTorch (60%) · Matplotlib (78%) · LangChain (75%) · Streamlit (80%)
+<span class="cli-hi">🛠  Tools:</span>     Docker (65%) · MLflow (68%) · Git (82%) · AWS (52%) · Power BI (70%)
+🔗  <a class="cli-link" onclick="openWin('skills')">→ Open Skills window</a>`,
+
+  projects: ()=>`<span class="cli-hi">🚀 Featured Projects:</span>
+  1. <span class="cli-hi2">FloraScan</span>          — Flower Disease Detection (TF + Flask) · <span class="cli-out">Live ✓</span>
+     <a class="cli-link" onclick="openExternal('https://flower-disease-system.vercel.app/health')">↗ Open Link</a>
+  2. <span class="cli-hi2">Fake News Detector</span> — NLP Transformer pipeline         · <span class="cli-out">In Progress</span>
+  3. <span class="cli-hi2">AI Code Reviewer</span>   — LLM-powered bug analyser          · <span class="cli-out">Beta</span>
+  4. <span class="cli-hi2">Discord AI Bot</span>     — Smart server assistant            · <span class="cli-out">Operational ✓</span>
+  5. <span class="cli-hi2">This Portfolio</span>     — macOS-style single-file HTML       · <span class="cli-out">Live ✓</span>
+     <a class="cli-link" onclick="openExternal('https://rathodrajai.netlify.app/')">↗ Open Link</a>`,
+
+  education: ()=>`<span class="cli-hi">🎓 Academic Timeline:</span>
+  2023–2026  B.Tech CSE · Parul University · <span class="cli-hi2">7.43 CGPA</span>
+  2021–2023  Higher Secondary · Sigma School · 60.61%
+  2020–2021  Secondary (SSC)  · Sigma School · 79.81%`,
+
+  contact: ()=>`<span class="cli-hi">📬 Contact:</span>
+  Email    : <a class="cli-link" onclick="openExternal('mailto:rathodraj1504@gmail.com')">rathodraj1504@gmail.com</a>
+  Phone    : +91 96248 01014
+  GitHub   : <a class="cli-link" onclick="openExternal('https://github.com/Raj-Rathod-Ai')">github.com/Raj-Rathod-Ai</a>
+  LinkedIn : <a class="cli-link" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai')">linkedin.com/in/raj-rathod-ai</a>
+  LeetCode : <a class="cli-link" onclick="openExternal('https://leetcode.com/u/Rathod-Raj-Ai/')">leetcode.com/u/Rathod-Raj-Ai</a>`,
+
+  achievements: ()=>`<span class="cli-hi">🏆 Achievements:</span>
+  • Google Arcade Skill Boost — Google Cloud certified
+  • Top 500 · Hackathon Vadodara 6.0
+    Project: Language-Agnostic Chatbot (Dynamic Programming)`,
+
+  social: ()=>{
+    openExternal('https://github.com/Raj-Rathod-Ai');
+    return `<span class="cli-hi2">Opening GitHub in browser…</span>
+Also available: <a class="cli-link" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai')">LinkedIn</a>  <a class="cli-link" onclick="openExternal('https://leetcode.com/u/Rathod-Raj-Ai/')">LeetCode</a>`;
+  },
+
+  weather: ()=>{ openWin('weather'); return `<span class="cli-hi2">Opening Weather window…</span>`; },
+
+  whoami: ()=>`<span class="cli-hi">raj</span> — visitor@portfolio.local  [data-scientist, ai-engineer]`,
+
+  date: ()=>`<span class="cli-hi2">${new Date().toString()}</span>`,
+
+  neofetch: ()=>`<span class="cli-hi">
+        ███████╗    </span> <span class="cli-hi2">raj@portfolio</span>
+        <span class="cli-hi">██╔═══██╗   </span> ──────────────────
+        <span class="cli-hi">███████╔╝   </span> <span class="cli-out">OS:</span> RajOS 1.0 (Porbandar Build)
+        <span class="cli-hi">██╔══██╗    </span> <span class="cli-out">Host:</span> Single-File HTML Portfolio
+        <span class="cli-hi">██║  ██║    </span> <span class="cli-out">Kernel:</span> JavaScript v8+
+        <span class="cli-hi">╚═╝  ╚═╝    </span> <span class="cli-out">Shell:</span> Custom ZSH-style
+                    <span class="cli-out">Languages:</span> Python, Java, C, C++, SQL
+                    <span class="cli-out">Focus:</span> AI / ML / Data Science
+                    <span class="cli-out">CGPA:</span> 7.43 @ Parul University`,
+
+  list: ()=>{
+    const open = WIN_IDS.filter(id=>{
+      const el = document.getElementById('win-'+id);
+      return el && el.style.display !== 'none';
+    });
+    if(!open.length) return `<span class="cli-out">No windows open.</span>`;
+    return `<span class="cli-hi">Open windows:</span>\n` + open.map(id=>`  • <a class="cli-link" onclick="focusWin('${id}')">${id}</a>`).join('\n');
+  },
+
+  matrix: ()=>{
+    let s = '<span style="color:#0f0;font-size:10px">';
+    for(let i=0;i<8;i++){
+      let row='';
+      for(let j=0;j<48;j++) row+=Math.random()>0.5?'1':'0';
+      s+=row+'\n';
+    }
+    return s+'</span><span class="cli-hi2">There is no spoon.</span>';
+  },
+
+  clear: ()=>{ cliOut.innerHTML=''; return null; }
+};
+
+function cliPrint(html){
+  if(html===null) return;
+  html.split('\n').forEach(line=>{
+    const s = document.createElement('span');
+    s.className='cli-line'; s.innerHTML=line;
+    cliOut.appendChild(s);
+  });
+  cliOut.scrollTop = cliOut.scrollHeight;
+}
+
+cliIn.addEventListener('keydown', e=>{
+  if(e.key==='ArrowUp'){
+    if(cliHIdx<cliHistory.length-1) cliIn.value=cliHistory[++cliHIdx];
+    return;
+  }
+  if(e.key==='ArrowDown'){
+    if(cliHIdx>0) cliIn.value=cliHistory[--cliHIdx]; else{cliHIdx=-1;cliIn.value='';}
+    return;
+  }
+  if(e.key!=='Enter') return;
+  const raw = cliIn.value.trim();
+  cliIn.value = '';
+  if(!raw) return;
+  cliHistory.unshift(raw); cliHIdx=-1;
+
+  const echo = document.createElement('span');
+  echo.className='cli-line';
+  echo.innerHTML=`<span class="cli-prompt">raj@portfolio:~$</span> <span class="cli-cmd">${raw.replace(/</g,'&lt;')}</span>`;
+  cliOut.appendChild(echo);
+
+  const parts = raw.toLowerCase().split(' ');
+  const cmd   = parts[0];
+  const arg   = parts[1]||'';
+
+  if(cmd==='open' && arg){
+    const wins = ['about','edu','skills','journey','projects','cli','contact','weather','settings'];
+    const match = wins.find(w=>w.startsWith(arg));
+    if(match){ openWin(match); cliPrint(`<span class="cli-hi2">Opening ${match}…</span>`); }
+    else cliPrint(`<span class="cli-err">open: no window matching '${arg}'</span>`);
+  } else if(cmd==='close' && arg){
+    const wins = ['about','edu','skills','journey','projects','cli','contact','weather','settings'];
+    const match = wins.find(w=>w.startsWith(arg));
+    if(match){ closeWin(match); cliPrint(`<span class="cli-hi2">Closed ${match}.</span>`); }
+    else cliPrint(`<span class="cli-err">close: no window matching '${arg}'</span>`);
+  } else if(CMDS[cmd]){
+    cliPrint(CMDS[cmd]());
+  } else {
+    cliPrint(`<span class="cli-err">zsh: command not found: ${raw.replace(/</g,'&lt;')}</span>\nType <span class="cli-hi2">help</span> for available commands.`);
+  }
+});
+
+/* ═══════════════════════════════════════════
+   WEATHER (Open-Meteo, no API key needed)
+═══════════════════════════════════════════ */
+let weatherLoaded = false;
+async function initWeather(){
+  if(weatherLoaded) return;
+  weatherLoaded = true;
+  try {
+    if(!navigator.geolocation){ showWeatherError('Geolocation not available'); return; }
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      try {
+        const lat = pos.coords.latitude.toFixed(4);
+        const lon = pos.coords.longitude.toFixed(4);
+        // Reverse geocode (no key)
+        const geoR = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const geo  = await geoR.json();
+        const city = geo.address.city || geo.address.town || geo.address.village || 'Your Location';
+        const country = geo.address.country_code?.toUpperCase()||'';
+        // Weather (Open-Meteo free, no key)
+        const wR = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature` +
+          `&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`
+        );
+        const w = await wR.json();
+        const c = w.current;
+        renderWeather(c, w.daily, city, country);
+        // Update menubar
+        const icon = wmoIcon(c.weather_code);
+        document.getElementById('menu-weather').innerHTML =
+          `<span style="cursor:pointer" onclick="openWin('weather')">${icon} ${Math.round(c.temperature_2m)}°C</span>`;
+      } catch(err){ showWeatherError('Failed to fetch weather data'); weatherLoaded=false; }
+    }, ()=>{ showWeatherError('Location permission denied'); });
+  } catch(e){ showWeatherError('Error'); weatherLoaded=false; }
+}
+
+function wmoIcon(code){
+  if(code===0) return '☀️';
+  if(code<=2)  return '⛅';
+  if(code<=3)  return '☁️';
+  if(code<=9)  return '🌫️';
+  if(code<=12) return '🌦️';
+  if(code<=29) return '🌧️';
+  if(code<=39) return '🌨️';
+  if(code<=49) return '🌫️';
+  if(code<=59) return '🌧️';
+  if(code<=69) return '🌧️';
+  if(code<=79) return '❄️';
+  if(code<=84) return '🌧️';
+  if(code<=86) return '🌨️';
+  if(code<=99) return '⛈️';
+  return '🌤️';
+}
+function wmoDesc(code){
+  const MAP={0:'Clear Sky',1:'Mainly Clear',2:'Partly Cloudy',3:'Overcast',
+    45:'Fog',48:'Icy Fog',51:'Light Drizzle',53:'Drizzle',55:'Heavy Drizzle',
+    61:'Light Rain',63:'Rain',65:'Heavy Rain',71:'Light Snow',73:'Snow',75:'Heavy Snow',
+    77:'Snow Grains',80:'Light Showers',81:'Showers',82:'Heavy Showers',
+    85:'Snow Showers',86:'Heavy Snow Showers',95:'Thunderstorm',96:'Thunderstorm',99:'Thunderstorm'};
+  return MAP[code] || 'Unknown';
+}
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function renderWeather(c, daily, city, country){
+  const body = document.getElementById('weather-body');
+  const icon = wmoIcon(c.weather_code);
+  const desc = wmoDesc(c.weather_code);
+  let forecastHTML = '';
+  for(let i=1;i<5;i++){
+    const d = new Date(daily.time[i]);
+    forecastHTML += `<div class="forecast-row">
+      <span>${DAYS[d.getDay()]}</span>
+      <span>${wmoIcon(daily.weather_code[i])}</span>
+      <span style="color:var(--accent)">${Math.round(daily.temperature_2m_max[i])}°</span>
+      <span style="color:var(--accent2)">${Math.round(daily.temperature_2m_min[i])}°</span>
+    </div>`;
+  }
+  body.innerHTML = `
+    <div class="weather-hero">
+      <span class="weather-icon-big">${icon}</span>
+      <div class="weather-temp">${Math.round(c.temperature_2m)}°C</div>
+      <div class="weather-desc">${desc}</div>
+      <div class="weather-location"><i class="fa-solid fa-location-dot" style="color:var(--accent)"></i>${city}, ${country}</div>
+    </div>
+    <div class="weather-grid">
+      <div class="weather-card"><i class="fa-solid fa-temperature-half"></i><div><div class="weather-card-label">Feels Like</div><div class="weather-card-value">${Math.round(c.apparent_temperature)}°C</div></div></div>
+      <div class="weather-card"><i class="fa-solid fa-droplet"></i><div><div class="weather-card-label">Humidity</div><div class="weather-card-value">${c.relative_humidity_2m}%</div></div></div>
+      <div class="weather-card"><i class="fa-solid fa-wind"></i><div><div class="weather-card-label">Wind Speed</div><div class="weather-card-value">${c.wind_speed_10m} km/h</div></div></div>
+      <div class="weather-card"><i class="fa-solid fa-calendar-day"></i><div><div class="weather-card-label">Today High</div><div class="weather-card-value">${Math.round(daily.temperature_2m_max[0])}°C</div></div></div>
+    </div>
+    <div class="weather-forecast">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;">5-Day Forecast</div>
+      ${forecastHTML}
+    </div>`;
+}
+function showWeatherError(msg){
+  document.getElementById('weather-body').innerHTML=
+    `<div class="weather-error"><i class="fa-solid fa-triangle-exclamation" style="font-size:24px;display:block;margin-bottom:12px"></i>${msg}<br><small style="color:var(--muted);margin-top:8px;display:block">Please allow location access and try again.</small></div>`;
+}
+
+/* ═══════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════ */
+const settingsState = {
+  grid:true, dim:true, blur:true, anim:true, dicons:true
+};
+
+function toggleSetting(key){
+  settingsState[key] = !settingsState[key];
+  const tog = document.getElementById('tog-'+key);
+  tog.classList.toggle('on', settingsState[key]);
+  applySettings();
+}
+
+function applySettings(){
+  document.getElementById('desktop-grid').style.opacity = settingsState.grid ? '1' : '0';
+  document.getElementById('desktop-overlay').style.opacity = settingsState.dim ? '1' : '0';
+  document.querySelectorAll('.win').forEach(w=>{
+    w.style.backdropFilter = settingsState.blur ? 'blur(40px) saturate(160%)' : 'none';
+  });
+  animEnabled = settingsState.anim;
+  document.querySelectorAll('.desk-icon').forEach(di=>{
+    di.style.display = settingsState.dicons ? 'flex' : 'none';
+  });
+}
+
+function setWinOpacity(val){
+  document.getElementById('opacity-label').textContent = val+'%';
+  const alpha = (val/100).toFixed(2);
+  document.querySelectorAll('.win').forEach(w=>{
+    w.style.background = `rgba(22,24,28,${alpha})`;
+  });
+}
+
+function setDockSize(size){
+  document.querySelectorAll('.dock-img').forEach(d=>{ d.style.width=size+'px'; d.style.height=size+'px'; });
+  document.querySelectorAll('.icon-size-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+/* ACCENT COLOR */
+document.getElementById('accent-row').querySelectorAll('.accent-dot').forEach(dot=>{
+  dot.addEventListener('click',()=>{
+    document.querySelectorAll('.accent-dot').forEach(d=>d.classList.remove('active'));
+    dot.classList.add('active');
+    document.documentElement.style.setProperty('--accent2', dot.dataset.c);
+    document.documentElement.style.setProperty('--border', dot.dataset.v);
+  });
+});
+
+/* ═══════════════════════════════════════════
+   EXTERNAL LINKS — open in new tab when
+   portfolio is running (not blocked by OS)
+═══════════════════════════════════════════ */
+function openExternal(url){
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+/* ═══════════════════════════════════════════
+   CONTEXT MENU (right-click desktop)
+═══════════════════════════════════════════ */
+document.getElementById('desktop-bg').addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  const menu = document.getElementById('ctx-menu');
+  menu.style.display='block';
+  menu.style.left = Math.min(e.clientX, window.innerWidth-200)+'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight-200)+'px';
+});
+document.getElementById('desktop-overlay').addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const menu=document.getElementById('ctx-menu');
+  menu.style.display='block';
+  menu.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+  menu.style.top=Math.min(e.clientY,window.innerHeight-200)+'px';
+});
+document.getElementById('desktop-grid').addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const menu=document.getElementById('ctx-menu');
+  menu.style.display='block';
+  menu.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+  menu.style.top=Math.min(e.clientY,window.innerHeight-200)+'px';
+});
+document.addEventListener('click', ()=>closeCtx());
+function closeCtx(){ document.getElementById('ctx-menu').style.display='none'; }
+
+/* ═══════════════════════════════════════════
+   SPOTLIGHT  (Cmd+Space or click menubar)
+═══════════════════════════════════════════ */
+const SPOTLIGHT_ITEMS = [
+  {title:'About Me',      sub:'Who is Rathod Raj',                  icon:'🧑‍💻', action:()=>openWin('about')},
+  {title:'Education',     sub:'Academic timeline',                   icon:'🎓', action:()=>openWin('edu')},
+  {title:'Skills',        sub:'Full tech stack',                     icon:'🧠', action:()=>openWin('skills')},
+  {title:'Projects',      sub:'Featured builds',                     icon:'🚀', action:()=>openWin('projects')},
+  {title:'Journey',       sub:'My learning path',                    icon:'🛤️', action:()=>openWin('journey')},
+  {title:'Contact',       sub:'Reach out',                           icon:'📬', action:()=>openWin('contact')},
+  {title:'Terminal',      sub:'Command line interface',              icon:'⌨️', action:()=>openWin('cli')},
+  {title:'Weather',       sub:'Live weather forecast',               icon:'🌤️', action:()=>openWin('weather')},
+  {title:'Settings',      sub:'System preferences',                  icon:'⚙️', action:()=>openWin('settings')},
+  {title:'GitHub',        sub:'github.com/Raj-Rathod-Ai',           icon:'🐙', action:()=>openExternal('https://github.com/Raj-Rathod-Ai')},
+  {title:'LinkedIn',      sub:'linkedin.com/in/raj-rathod-ai',      icon:'💼', action:()=>openExternal('https://linkedin.com/in/raj-rathod-ai')},
+  {title:'FloraScan',     sub:'Live project — flower disease AI',    icon:'🌸', action:()=>openExternal('https://flower-disease-system.vercel.app/health')},
+  {title:'Tile Windows',  sub:'Arrange all open windows',           icon:'⊞', action:()=>tileWindows()},
+  {title:'Close All',     sub:'Close all windows',                  icon:'✕', action:()=>closeAllWins()},
+];
+
+let spIdx=0;
+function openSpotlight(){
+  document.getElementById('spotlight-overlay').classList.add('open');
+  document.getElementById('spotlight-input').value='';
+  renderSpotlight('');
+  setTimeout(()=>document.getElementById('spotlight-input').focus(),50);
+}
+function closeSpotlight(e){
+  if(e.target===document.getElementById('spotlight-overlay'))
+    document.getElementById('spotlight-overlay').classList.remove('open');
+}
+document.getElementById('spotlight-overlay').addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.getElementById('spotlight-overlay').classList.remove('open');
+});
+document.getElementById('spotlight-input').addEventListener('input',e=>{
+  renderSpotlight(e.target.value); spIdx=0;
+});
+document.getElementById('spotlight-input').addEventListener('keydown',e=>{
+  const results = document.querySelectorAll('.sp-result');
+  if(e.key==='ArrowDown'){ spIdx=Math.min(spIdx+1,results.length-1); highlightSp(results); e.preventDefault(); }
+  if(e.key==='ArrowUp')  { spIdx=Math.max(spIdx-1,0); highlightSp(results); e.preventDefault(); }
+  if(e.key==='Enter'){ if(results[spIdx]) results[spIdx].click(); }
+});
+function highlightSp(results){
+  results.forEach((r,i)=>r.classList.toggle('selected',i===spIdx));
+}
+function renderSpotlight(q){
+  const results = document.getElementById('spotlight-results');
+  const filtered = q
+    ? SPOTLIGHT_ITEMS.filter(i=>i.title.toLowerCase().includes(q.toLowerCase())||i.sub.toLowerCase().includes(q.toLowerCase()))
+    : SPOTLIGHT_ITEMS;
+  results.innerHTML = filtered.slice(0,8).map((item,i)=>`
+    <div class="sp-result${i===0?' selected':''}" onclick="item_${i}_action()">
+      <div class="sp-result-icon" style="background:rgba(255,255,255,.06)">${item.icon}</div>
+      <div><div class="sp-result-title">${item.title}</div><div class="sp-result-sub">${item.sub}</div></div>
+    </div>`).join('');
+  // attach actions
+  results.querySelectorAll('.sp-result').forEach((el,i)=>{
+    el.onclick=()=>{
+      filtered[i].action();
+      document.getElementById('spotlight-overlay').classList.remove('open');
+    };
+  });
+}
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey) && e.key===' '){ e.preventDefault(); openSpotlight(); }
+  if(e.key==='Escape') document.getElementById('spotlight-overlay').classList.remove('open');
+});
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+window.addEventListener('load',()=>{
+  applyWallpaper(currentWP);
+  buildWallpaperGrid();
+  focusWin('about');
+  animateBars();
+  // try to get weather silently for menubar
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      try{
+        const lat=pos.coords.latitude.toFixed(4),lon=pos.coords.longitude.toFixed(4);
+        const wR=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`);
+        const w=await wR.json();
+        const icon=wmoIcon(w.current.weather_code);
+        document.getElementById('menu-weather').innerHTML=
+          `<span style="cursor:pointer;display:flex;align-items:center;gap:4px" onclick="openWin('weather')">${icon} ${Math.round(w.current.temperature_2m)}°C</span>`;
+      }catch(e){}
+    },()=>{});
+  }
+});
+</script>
 </body>
 </html>
