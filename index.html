@@ -2,1521 +2,1738 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Rathod Raj · AI / Data Science</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fira+Code:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rathod Raj — AI / Data Science</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <style>
-/* ═══════════════════════════════════════════
-   ROOT TOKENS
-═══════════════════════════════════════════ */
 :root{
-  --c-bg:rgba(28,28,32,0.88);
-  --c-surface:rgba(38,38,44,0.82);
-  --c-bar:rgba(20,20,24,0.78);
-  --c-border:rgba(255,255,255,0.10);
-  --c-border2:rgba(255,255,255,0.05);
-  --c-text:#f0ede8;
-  --c-muted:#8a8884;
-  --c-accent:#ff9f45;
-  --c-blue:#4f9cf9;
-  --c-purple:#b77af4;
-  --c-green:#3ec97e;
-  --c-red:#ff5f56;
-  --c-yellow:#ffbd2e;
-  --c-teal:#40cfc3;
-  --f-ui:'Plus Jakarta Sans',sans-serif;
-  --f-mono:'Fira Code',monospace;
-  --f-display:'Playfair Display',serif;
-  --r-win:14px;
-  --dock-sz:54px;
-  --nav-h:28px;
+  --bg:#111214;--surface:rgba(22,24,28,0.96);--border:rgba(255,255,255,0.12);
+  --border2:rgba(255,255,255,0.055);--text:#e9e7e2;--muted:#7a7875;
+  --accent:#f0c060;--accent2:#60c8d8;--accent3:#b87cef;
+  --green:#5de08a;--red:#ff6058;--yellow:#ffbc44;
+  --font-head:'Syne',sans-serif;--font-mono:'DM Mono',monospace;
+  --font-serif:'Instrument Serif',serif;
+  --nav-h:28px;--dock-h:82px;
+  --win-radius:14px;--blur:40px;
+  --accent-hue:38;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{width:100%;height:100%;overflow:hidden;font-family:var(--f-ui);}
-body{background:#000;color:var(--c-text);user-select:none;-webkit-font-smoothing:antialiased;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{font-family:var(--font-mono);background:#000;color:var(--text);user-select:none;}
 
-/* ═══ DESKTOP ═══ */
-#bg{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;transition:background 0.8s ease;}
-#bg-overlay{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 90% 80% at 50% 50%,transparent 30%,rgba(0,0,0,.45) 100%);transition:opacity .4s;}
-#bg-noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;}
-
-/* ═══ macOS PRELOADER ═══ */
-#preloader{
-  position:fixed;inset:0;z-index:999999;
-  background:#000;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity .8s ease,visibility .8s ease;
+/* DESKTOP BG */
+#desktop-bg{
+  position:fixed;inset:0;z-index:0;
+  background-size:cover;background-position:center;
+  transition:background-image .9s ease;
 }
-#preloader.done{opacity:0;visibility:hidden;pointer-events:none;}
-.pre-apple-svg{margin-bottom:52px;opacity:.9;animation:preFloat 3s ease-in-out infinite;}
-@keyframes preFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.pre-progress-track{
-  width:200px;height:4px;
-  background:rgba(255,255,255,.10);
-  border-radius:99px;overflow:hidden;
-  margin-bottom:20px;
+#desktop-overlay{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 80% 70% at 50% 50%,transparent 50%,rgba(0,0,0,.35) 100%);
 }
-.pre-progress-fill{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,rgba(255,255,255,.4),rgba(255,255,255,.9));
-  border-radius:99px;
-  transition:width .15s ease;
-  box-shadow:0 0 14px rgba(255,255,255,.35);
-}
-.pre-label{
-  font-family:var(--f-mono);
-  font-size:11px;letter-spacing:.05em;
-  color:rgba(255,255,255,.3);
+/* dot grid */
+#desktop-grid{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:28px 28px;
 }
 
-/* ═══ MENUBAR ═══ */
+/* ── MENUBAR ── */
 #menubar{
-  position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:9800;
-  background:rgba(10,10,14,.76);backdrop-filter:blur(32px) saturate(200%);
-  border-bottom:1px solid rgba(255,255,255,.055);
+  position:fixed;top:0;left:0;right:0;height:var(--nav-h);
+  background:rgba(12,12,14,.82);backdrop-filter:blur(28px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,.07);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;
+  padding:0 14px;z-index:9500;font-size:12px;
 }
-.ml,.mr{display:flex;align-items:center;gap:0;}
-.mi{
-  font-family:var(--f-ui);font-size:12px;font-weight:500;
-  color:rgba(255,255,255,.82);cursor:default;
-  padding:3px 8px;border-radius:5px;
-  transition:background .14s;white-space:nowrap;
+.menu-left,.menu-right{display:flex;align-items:center;gap:10px;}
+.menu-item{
+  color:var(--text);opacity:.82;cursor:default;padding:2px 6px;
+  border-radius:4px;transition:background .15s;font-size:11px;white-space:nowrap;
 }
-.mi:hover{background:rgba(255,255,255,.10);}
-.mi.logo{font-size:15px;padding:2px 8px;}
-.mi.brand{font-weight:700;color:#fff;}
-.mr{gap:14px;font-size:11.5px;color:rgba(255,255,255,.75);}
-#mi-weather{cursor:pointer;display:flex;align-items:center;gap:5px;}
-#mi-weather:hover{color:#fff;}
+.menu-item:hover{background:rgba(255,255,255,.10);opacity:1;}
+.menu-item.bold{font-weight:700;opacity:1;}
+.menu-right{gap:12px;font-size:11px;color:var(--text);opacity:.8;}
+#menu-weather{display:flex;align-items:center;gap:5px;font-size:11px;opacity:.85;}
+#menu-weather i{font-size:13px;}
 
-/* ═══ WORK AREA ═══ */
-#wa{position:fixed;top:var(--nav-h);bottom:calc(var(--dock-sz)+26px);left:0;right:0;overflow:hidden;z-index:2;}
-
-/* ═══ DOCK ═══ */
-#dock-wrap{
-  position:fixed;bottom:10px;left:50%;transform:translateX(-50%);
-  z-index:9800;transition:bottom .35s cubic-bezier(.4,0,.2,1);
+/* ── WORK AREA ── */
+#work-area{
+  position:fixed;top:var(--nav-h);bottom:calc(var(--dock-h) + 8px);
+  left:0;right:0;overflow:hidden;z-index:2;
 }
+
+/* ── DOCK ── */
+#dock-wrap{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:9500;}
 #dock{
-  display:flex;align-items:flex-end;gap:5px;
-  background:rgba(30,30,38,.52);
-  backdrop-filter:blur(44px) saturate(180%);
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:22px;padding:8px 10px 9px;
-  box-shadow:0 16px 60px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.09);
+  display:flex;align-items:flex-end;gap:6px;
+  background:rgba(28,30,35,.62);backdrop-filter:blur(38px) saturate(160%);
+  border:1px solid rgba(255,255,255,.15);border-radius:24px;
+  padding:8px 12px 10px;
+  box-shadow:0 10px 50px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.10);
 }
-.di{
-  position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;
-  cursor:pointer;
-  --sz:var(--dock-sz);
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+.dock-icon{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;position:relative;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
 }
-/* magnification */
-.di:hover{transform:translateY(-12px) scale(1.28);}
-.di:hover~.di{transform:translateY(-4px) scale(1.08);}
-.di-img{
-  width:var(--sz);height:var(--sz);
-  border-radius:calc(var(--sz)*0.225);
+.dock-icon:hover{transform:translateY(-14px) scale(1.25);}
+.dock-icon:hover .dock-tooltip{opacity:1;bottom:78px;}
+.dock-img{
+  width:52px;height:52px;border-radius:13px;
   display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;position:relative;overflow:hidden;
-  box-shadow:0 4px 20px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2);
+  font-size:24px;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.25);
+  transition:box-shadow .15s;
+  position:relative;overflow:hidden;
 }
-/* glass shine */
-.di-img::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:52%;
-  background:linear-gradient(180deg,rgba(255,255,255,.22),transparent);
-  border-radius:calc(var(--sz)*0.225) calc(var(--sz)*0.225) 0 0;
-  pointer-events:none;z-index:2;
+.dock-img::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),transparent);
+  border-radius:13px 13px 0 0;pointer-events:none;
 }
-.di-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.7);opacity:0;transition:opacity .2s;}
-.di.open .di-dot{opacity:1;}
-.di.minimized .di-dot{background:var(--c-yellow);opacity:1;}
-.di-tip{
-  position:absolute;bottom:calc(var(--sz) + 18px);left:50%;transform:translateX(-50%);
-  background:rgba(14,14,18,.95);border:1px solid rgba(255,255,255,.12);
-  color:var(--c-text);font-size:10.5px;font-family:var(--f-ui);font-weight:500;
-  padding:3px 10px;border-radius:8px;white-space:nowrap;
-  opacity:0;pointer-events:none;transition:opacity .16s;
+.dock-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.65);visibility:hidden;}
+.dock-icon.open .dock-dot{visibility:visible;}
+.dock-tooltip{
+  position:absolute;bottom:70px;left:50%;transform:translateX(-50%);
+  background:rgba(18,20,24,.92);border:1px solid var(--border);
+  color:var(--text);font-size:10px;padding:3px 9px;border-radius:7px;
+  white-space:nowrap;opacity:0;pointer-events:none;
+  transition:opacity .15s,bottom .15s;
 }
-.di:hover .di-tip{opacity:1;}
-.dsep{width:1px;height:36px;background:rgba(255,255,255,.13);margin:0 3px;align-self:center;}
+.dock-sep{width:1px;height:36px;background:rgba(255,255,255,.14);margin:0 4px;align-self:center;}
 
-/* ═══ WINDOWS ═══ */
+/* dock icon colors */
+.di-about{background:linear-gradient(145deg,#2563eb,#60a5fa);}
+.di-edu{background:linear-gradient(145deg,#d97706,#fbbf24);}
+.di-skills{background:linear-gradient(145deg,#16a34a,#4ade80);}
+.di-journey{background:linear-gradient(145deg,#0891b2,#38bdf8);}
+.di-projects{background:linear-gradient(145deg,#7c3aed,#c084fc);}
+.di-cli{background:linear-gradient(145deg,#1e2028,#3a3d48);border:1px solid rgba(255,255,255,.12);}
+.di-contact{background:linear-gradient(145deg,#dc2626,#fb923c);}
+.di-settings{background:linear-gradient(145deg,#475569,#94a3b8);}
+.di-gh{background:linear-gradient(145deg,#24292e,#4a5568);}
+.di-li{background:linear-gradient(145deg,#0077b5,#0ea5e9);}
+.di-weather{background:linear-gradient(145deg,#0369a1,#38bdf8);}
+
+/* ── WINDOWS ── */
 .win{
-  position:absolute;border-radius:var(--r-win);
-  background:var(--c-bg);
-  backdrop-filter:blur(48px) saturate(180%);
-  border:1px solid var(--c-border);
-  box-shadow:0 32px 90px rgba(0,0,0,.8),0 0 0 .5px rgba(255,255,255,.04) inset;
+  position:absolute;border-radius:var(--win-radius);
+  background:var(--surface);backdrop-filter:blur(var(--blur)) saturate(160%);
+  border:1px solid var(--border);
+  box-shadow:0 28px 80px rgba(0,0,0,.75),0 0 0 .5px rgba(255,255,255,.04) inset;
   display:flex;flex-direction:column;overflow:hidden;
-  min-width:320px;min-height:200px;z-index:100;
-  transform-origin:50% 100%;
-  will-change:transform,opacity;
+  min-width:300px;min-height:180px;z-index:100;
+  animation:winPop .22s cubic-bezier(.34,1.56,.64,1);
 }
-.win.focused{z-index:300;border-color:rgba(255,255,255,.16);box-shadow:0 40px 100px rgba(0,0,0,.88),0 0 0 .5px rgba(255,255,255,.08) inset;}
-/* open pop */
-@keyframes winOpen{from{opacity:0;transform:scale(.88) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.win.popin{animation:winOpen .28s cubic-bezier(.34,1.56,.64,1) both;}
-/* genie-like minimize: squish & slide toward dock */
-@keyframes winGenie{
-  0%{opacity:1;transform:scale(1) translateY(0) scaleX(1);}
-  30%{transform:scale(.92) translateY(20px) scaleX(0.9);}
-  70%{transform:scale(.4) translateY(200px) scaleX(0.3);opacity:.6;}
-  100%{transform:scale(.08) translateY(500px) scaleX(0.05);opacity:0;}
+@keyframes winPop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.win.focused{
+  box-shadow:0 36px 100px rgba(0,0,0,.85),0 0 0 .5px rgba(255,255,255,.08) inset;
+  z-index:200;
 }
-@keyframes winGenieback{
-  0%{opacity:0;transform:scale(.08) translateY(500px) scaleX(0.05);}
-  30%{opacity:.5;transform:scale(.4) translateY(200px) scaleX(0.3);}
-  70%{transform:scale(.92) translateY(20px) scaleX(0.9);opacity:.9;}
-  100%{opacity:1;transform:scale(1) translateY(0) scaleX(1);}
-}
-.win.genie-out{animation:winGenie .42s cubic-bezier(.4,0,.2,1) both;pointer-events:none;}
-.win.genie-in{animation:winGenieback .38s cubic-bezier(.34,1.56,.64,1) both;}
-
-.wbar{
+.win-bar{
   display:flex;align-items:center;padding:10px 14px 8px;
-  background:rgba(255,255,255,.022);border-bottom:1px solid var(--c-border2);
-  cursor:grab;flex-shrink:0;position:relative;height:40px;
+  background:rgba(255,255,255,.025);border-bottom:1px solid var(--border2);
+  cursor:grab;flex-shrink:0;position:relative;gap:0;
 }
-.wbar:active{cursor:grabbing;}
-.wbtns{display:flex;gap:7px;align-items:center;z-index:1;}
-.wb{
-  width:13px;height:13px;border-radius:50%;border:none;outline:none;
-  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  transition:filter .15s;position:relative;
+.win-bar:active{cursor:grabbing;}
+.win-btns{display:flex;gap:7px;align-items:center;z-index:1;}
+.win-btn{
+  width:13px;height:13px;border-radius:50%;border:none;
+  outline:none;cursor:pointer;flex-shrink:0;
+  position:relative;transition:filter .15s;
+  display:flex;align-items:center;justify-content:center;
 }
-.wb i{font-size:6.5px;color:rgba(0,0,0,.7);opacity:0;transition:opacity .15s;z-index:1;}
-.wbtns:hover .wb i{opacity:1;}
-.wb:hover{filter:brightness(1.18);}
-.wb-close{background:#ff5f56;} .wb-min{background:#ffbd2e;} .wb-max{background:#27c93f;}
-.wtitle{
+.win-btn::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:rgba(0,0,0,.12);
+}
+.win-btn:hover{filter:brightness(1.2);}
+.win-btn i{font-size:7px;opacity:0;color:rgba(0,0,0,.6);transition:opacity .15s;z-index:1;}
+.win-btns:hover .win-btn i{opacity:1;}
+.btn-close{background:#ff5f56;}
+.btn-min{background:#ffbd2e;}
+.btn-max{background:#27c93f;}
+.win-title{
   position:absolute;left:50%;transform:translateX(-50%);
-  font-size:11.5px;font-weight:600;color:rgba(255,255,255,.32);
-  pointer-events:none;white-space:nowrap;font-family:var(--f-ui);
+  font-size:11px;color:rgba(255,255,255,.38);
+  pointer-events:none;white-space:nowrap;letter-spacing:.2px;
 }
-.wbody{
-  flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 22px;
+.win-body{
+  flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 24px;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent;
+}
+.win-body::-webkit-scrollbar{width:4px;}
+.win-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px;}
+
+/* resize */
+.resize-handle{
+  position:absolute;bottom:0;right:0;width:20px;height:20px;
+  cursor:se-resize;
+}
+.resize-handle::after{
+  content:'';position:absolute;bottom:4px;right:4px;
+  width:9px;height:9px;
+  border-right:2px solid rgba(255,255,255,.15);
+  border-bottom:2px solid rgba(255,255,255,.15);
+}
+
+/* ── SHARED CONTENT ── */
+.win-heading{font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.win-sub{font-size:10px;color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:18px;}
+.win-hr{border:none;border-top:1px solid var(--border2);margin:16px 0;}
+.tag{
+  display:inline-block;font-size:10px;padding:2px 9px;
+  border-radius:5px;border:1px solid var(--border);
+  color:var(--muted);margin:2px 2px 2px 0;
+}
+.tag.py{border-color:rgba(55,118,171,.6);color:#6bb5f5;}
+.tag.java{border-color:rgba(248,152,32,.5);color:#f8a040;}
+.tag.c{border-color:rgba(168,185,204,.4);color:#a8b9cc;}
+.tag.ml{border-color:rgba(76,175,80,.5);color:#5de08a;}
+.tag.data{border-color:rgba(0,188,212,.5);color:#60c8d8;}
+.tag.web{border-color:rgba(240,192,96,.5);color:#f0c060;}
+.tag.ai{border-color:rgba(184,124,239,.5);color:#b87cef;}
+.tag.tool{border-color:rgba(200,200,200,.2);color:#aaa;}
+
+/* ── ABOUT ── */
+.avatar-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.avatar{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent2),var(--accent3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.12);
+  box-shadow:0 0 0 4px rgba(96,200,216,.15);
+}
+.name-block h2{font-family:var(--font-head);font-size:18px;font-weight:800;}
+.name-block p{font-size:11px;color:var(--muted);margin-top:2px;}
+.info-row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);margin-bottom:9px;}
+.info-row i{width:14px;text-align:center;color:var(--accent);}
+.info-row a{color:var(--accent2);text-decoration:none;transition:color .15s;}
+.info-row a:hover{color:#fff;}
+.obj-box{
+  background:rgba(255,255,255,.022);border:1px solid var(--border2);
+  border-radius:10px;padding:14px 16px;font-size:12px;
+  line-height:1.8;color:rgba(233,231,226,.7);margin-top:14px;
+  font-family:var(--font-serif);font-style:italic;
+}
+
+/* ── EDUCATION ── */
+.edu-card{
+  background:rgba(255,255,255,.022);border:1px solid var(--border2);
+  border-radius:10px;padding:15px 17px;margin-bottom:12px;
+  transition:border-color .2s;
+}
+.edu-card:hover{border-color:rgba(240,192,96,.35);}
+.edu-card .period{font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;}
+.edu-card h3{font-family:var(--font-head);font-size:14px;font-weight:700;}
+.edu-card .inst{font-size:11px;color:var(--muted);margin-top:3px;}
+.edu-card .grade{font-size:20px;font-weight:800;font-family:var(--font-head);color:var(--accent);margin-top:9px;}
+
+/* ── SKILLS ── */
+.skills-tabs{
+  display:flex;gap:4px;margin-bottom:18px;
+  background:rgba(0,0,0,.22);border:1px solid var(--border2);
+  border-radius:9px;padding:4px;
+}
+.stab{
+  flex:1;text-align:center;font-size:10px;font-weight:500;
+  padding:6px 4px;border-radius:6px;cursor:pointer;
+  color:var(--muted);transition:background .18s,color .18s;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.stab.active{background:rgba(255,255,255,.10);color:var(--text);}
+.skill-panel{display:none;}
+.skill-panel.active{display:block;}
+.skill-group{margin-bottom:18px;}
+.skill-group-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:9px;}
+.skill-row{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
+.skill-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.skill-name{font-size:11px;width:105px;color:var(--text);flex-shrink:0;}
+.skill-bar-bg{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;}
+.skill-bar-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--bar-a),var(--bar-b));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .8s cubic-bezier(.22,1,.36,1);
+}
+.skill-pct{font-size:10px;color:var(--muted);width:28px;text-align:right;flex-shrink:0;}
+
+/* ── PROJECTS ── */
+.proj-item{
+  background:rgba(255,255,255,.018);border:1px solid var(--border2);
+  border-radius:11px;padding:15px 17px;margin-bottom:11px;
+  transition:border-color .2s,background .2s;
+}
+.proj-item:hover{border-color:rgba(184,124,239,.35);background:rgba(184,124,239,.03);}
+.proj-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px;}
+.proj-title{font-family:var(--font-head);font-size:13px;font-weight:700;}
+.proj-status{font-size:9px;padding:2px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0;}
+.st-live{background:rgba(93,224,138,.12);color:var(--green);border:1px solid rgba(93,224,138,.3);}
+.st-dev{background:rgba(240,192,96,.10);color:var(--accent);border:1px solid rgba(240,192,96,.3);}
+.st-ops{background:rgba(96,200,216,.10);color:var(--accent2);border:1px solid rgba(96,200,216,.3);}
+.proj-desc{font-size:11px;color:var(--muted);line-height:1.65;margin-bottom:8px;}
+.proj-link{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--accent2);text-decoration:none;margin-top:5px;transition:color .15s;}
+.proj-link:hover{color:#fff;}
+
+/* ── TERMINAL ── */
+#cli-output{
+  flex:1;overflow-y:auto;padding:14px 16px;
+  font-size:12px;line-height:1.8;color:#c0bdb6;
+  background:#000;
   scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.07) transparent;
 }
-.wbody::-webkit-scrollbar{width:4px;}
-.wbody::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px;}
-.rh{position:absolute;bottom:0;right:0;width:20px;height:20px;cursor:se-resize;}
-.rh::after{content:'';position:absolute;bottom:4px;right:4px;width:9px;height:9px;border-right:2px solid rgba(255,255,255,.13);border-bottom:2px solid rgba(255,255,255,.13);}
-
-/* ═══ SHARED ═══ */
-h2.wh{font-family:var(--f-display);font-size:22px;font-weight:700;margin-bottom:4px;color:var(--c-text);}
-.wsub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--c-muted);margin-bottom:18px;font-family:var(--f-mono);}
-.whr{border:none;border-top:1px solid var(--c-border2);margin:14px 0;}
-.tag{display:inline-block;font-size:10px;padding:2px 9px;border-radius:5px;border:1px solid var(--c-border);color:var(--c-muted);margin:2px 2px 2px 0;font-family:var(--f-mono);}
-.tag.py{border-color:rgba(79,156,249,.5);color:#4f9cf9;}
-.tag.ml{border-color:rgba(62,201,126,.5);color:#3ec97e;}
-.tag.ai{border-color:rgba(183,122,244,.5);color:#b77af4;}
-.tag.tool{border-color:rgba(200,200,200,.18);color:#888;}
-.tag.web{border-color:rgba(255,159,69,.4);color:var(--c-accent);}
-.tag.c{border-color:rgba(168,185,204,.35);color:#a8b9cc;}
-
-/* about */
-.av-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
-.av{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--c-teal),var(--c-purple));display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;border:2px solid rgba(255,255,255,.12);box-shadow:0 0 0 5px rgba(64,207,195,.12);}
-.ir{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--c-muted);margin-bottom:9px;}
-.ir i{width:14px;text-align:center;color:var(--c-accent);flex-shrink:0;}
-/* links open in system browser */
-.syslink{color:var(--c-blue);cursor:pointer;text-decoration:none;transition:color .15s;background:none;border:none;font:inherit;padding:0;}
-.syslink:hover{color:#fff;text-decoration:underline;}
-.qbox{background:rgba(255,255,255,.02);border:1px solid var(--c-border2);border-radius:10px;padding:14px 16px;font-size:12.5px;line-height:1.8;color:rgba(240,237,232,.65);margin-top:14px;font-family:var(--f-display);font-style:italic;}
-
-/* edu */
-.ec{background:rgba(255,255,255,.02);border:1px solid var(--c-border2);border-radius:10px;padding:14px 16px;margin-bottom:11px;transition:border-color .2s;}
-.ec:hover{border-color:rgba(255,159,69,.3);}
-.ec .per{font-size:10px;color:var(--c-accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;font-family:var(--f-mono);}
-.ec h3{font-family:var(--f-ui);font-size:14px;font-weight:700;}
-.ec .inst{font-size:11px;color:var(--c-muted);margin-top:3px;}
-.ec .grade{font-size:20px;font-weight:800;font-family:var(--f-display);color:var(--c-accent);margin-top:8px;}
-
-/* skills */
-.stabs{display:flex;gap:4px;margin-bottom:18px;background:rgba(0,0,0,.2);border:1px solid var(--c-border2);border-radius:9px;padding:4px;}
-.st{flex:1;text-align:center;font-size:10px;font-weight:600;padding:6px 4px;border-radius:6px;cursor:pointer;color:var(--c-muted);transition:background .18s,color .18s;text-transform:uppercase;letter-spacing:.5px;font-family:var(--f-mono);}
-.st.on{background:rgba(255,255,255,.10);color:var(--c-text);}
-.sp{display:none;} .sp.on{display:block;}
-.sg{margin-bottom:18px;}
-.sgl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--c-muted);margin-bottom:9px;font-family:var(--f-mono);}
-.sr{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
-.si{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
-.sn{font-size:11.5px;width:108px;color:var(--c-text);flex-shrink:0;font-family:var(--f-ui);font-weight:500;}
-.sb{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;}
-.sf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ba),var(--bb));transform:scaleX(0);transform-origin:left;transition:transform .85s cubic-bezier(.22,1,.36,1);}
-.sp2{font-size:10px;color:var(--c-muted);width:28px;text-align:right;flex-shrink:0;font-family:var(--f-mono);}
-
-/* projects */
-.pi{background:rgba(255,255,255,.018);border:1px solid var(--c-border2);border-radius:11px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s,background .2s;}
-.pi:hover{border-color:rgba(183,122,244,.35);background:rgba(183,122,244,.03);}
-.ptop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px;}
-.pt{font-family:var(--f-ui);font-size:13px;font-weight:700;}
-.ps{font-size:9px;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:1px;flex-shrink:0;font-family:var(--f-mono);}
-.live{background:rgba(62,201,126,.10);color:var(--c-green);border:1px solid rgba(62,201,126,.28);}
-.dev{background:rgba(255,159,69,.10);color:var(--c-accent);border:1px solid rgba(255,159,69,.28);}
-.ops{background:rgba(64,207,195,.10);color:var(--c-teal);border:1px solid rgba(64,207,195,.28);}
-.pd{font-size:11.5px;color:var(--c-muted);line-height:1.65;margin-bottom:8px;}
-
-/* terminal */
-#clio{flex:1;overflow-y:auto;padding:12px 14px;font-size:12px;line-height:1.85;color:#bab7b0;background:#0a0a0c;scrollbar-width:thin;}
-.cl{display:block;}
-.cp{color:var(--c-green);}
-.cc{color:var(--c-text);}
-.ch{color:var(--c-accent);font-weight:600;}
-.ch2{color:var(--c-blue);}
-.ch3{color:var(--c-purple);}
-.ce{color:var(--c-red);}
-.co{color:#6e6b64;}
-.clink{color:var(--c-blue);cursor:pointer;text-decoration:underline;}
-.clink:hover{color:#fff;}
-#clir{display:flex;align-items:center;gap:8px;padding:8px 14px 12px;border-top:1px solid rgba(255,255,255,.055);flex-shrink:0;background:#0a0a0c;}
-#clil{color:var(--c-green);font-size:12px;white-space:nowrap;font-family:var(--f-mono);}
-#clii{flex:1;background:none;border:none;outline:none;font-family:var(--f-mono);font-size:12px;color:var(--c-text);caret-color:var(--c-accent);}
-
-/* contact */
-.cl2{display:flex;align-items:center;gap:13px;background:rgba(255,255,255,.02);border:1px solid var(--c-border2);border-radius:10px;padding:13px 15px;margin-bottom:8px;cursor:pointer;color:var(--c-text);transition:border-color .18s,background .18s;}
-.cl2:hover{border-color:var(--c-accent);background:rgba(255,159,69,.04);}
-.cic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.ci2 strong{display:block;font-size:12px;font-weight:600;}
-.ci2 span{font-size:10px;color:var(--c-muted);}
-
-/* journey */
-.ji{display:flex;gap:14px;margin-bottom:20px;position:relative;}
-.ji::before{content:'';position:absolute;left:15px;top:32px;bottom:-20px;width:1px;background:var(--c-border2);}
-.ji:last-child::before{display:none;}
-.jd{width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid var(--c-border);}
-.jp{font-size:10px;color:var(--c-teal);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;font-family:var(--f-mono);}
-.jtit{font-family:var(--f-ui);font-size:13px;font-weight:700;margin-bottom:5px;}
-.jde{font-size:11.5px;color:var(--c-muted);line-height:1.65;}
-
-/* weather */
-.wh2{text-align:center;padding:18px 0 8px;}
-.wib{font-size:60px;display:block;margin-bottom:8px;}
-.wt{font-family:var(--f-display);font-size:50px;font-weight:700;color:var(--c-text);}
-.wd2{font-size:13px;color:var(--c-muted);margin-top:4px;text-transform:capitalize;}
-.wl{font-size:11px;color:var(--c-muted);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px;}
-.wgg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px;}
-.wc{background:rgba(255,255,255,.03);border:1px solid var(--c-border2);border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:9px;}
-.wc i{font-size:17px;color:var(--c-teal);width:20px;text-align:center;}
-.wcl{font-size:10px;color:var(--c-muted);font-family:var(--f-mono);}
-.wcv{font-size:13px;color:var(--c-text);font-weight:600;}
-.wfc{margin-top:14px;}
-.wfr{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--c-border2);font-size:11px;}
-.wfr:last-child{border:none;}
-
-/* settings — two-column */
-.set-wrap{display:flex;flex:1;overflow:hidden;}
-.set-nav{width:156px;flex-shrink:0;background:rgba(0,0,0,.18);border-right:1px solid var(--c-border2);padding:8px 0;overflow-y:auto;}
-.sni{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:500;color:var(--c-muted);transition:background .13s,color .13s;font-family:var(--f-ui);}
-.sni:hover{background:rgba(255,255,255,.05);color:var(--c-text);}
-.sni.on{background:rgba(255,255,255,.08);color:var(--c-text);}
-.sni i{width:14px;text-align:center;font-size:12px;color:var(--c-blue);}
-.set-con{flex:1;overflow-y:auto;padding:18px 18px 24px;scrollbar-width:thin;}
-.ssp{display:none;} .ssp.on{display:block;}
-.ssl{font-size:10px;text-transform:uppercase;letter-spacing:2.5px;color:var(--c-muted);margin-bottom:12px;font-family:var(--f-mono);}
-/* wallpaper grid */
-.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
-.wth{aspect-ratio:16/9;border-radius:8px;cursor:pointer;background-size:cover;background-position:center;border:2.5px solid transparent;transition:all .2s;position:relative;overflow:hidden;}
-.wth:hover{transform:scale(1.04);border-color:rgba(255,255,255,.28);}
-.wth.on{border-color:var(--c-teal);box-shadow:0 0 0 3px rgba(64,207,195,.22);}
-.wth-lbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.78));font-size:9px;padding:3px 6px 5px;color:rgba(255,255,255,.8);opacity:0;transition:opacity .2s;}
-.wth:hover .wth-lbl{opacity:1;}
-/* accent dots */
-.adots{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px;}
-.adot{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:transform .15s,border-color .15s;}
-.adot:hover{transform:scale(1.2);}
-.adot.on{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.14);}
-/* toggles */
-.tr{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.025);border:1px solid var(--c-border2);border-radius:9px;padding:10px 14px;margin-bottom:7px;}
-.trl{font-size:12px;font-weight:500;color:var(--c-text);font-family:var(--f-ui);}
-.trs{font-size:10px;color:var(--c-muted);margin-top:1px;}
-.tsw{width:44px;height:24px;background:rgba(255,255,255,.10);border-radius:99px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
-.tsw.on{background:var(--c-teal);}
-.tkn{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 5px rgba(0,0,0,.35);}
-.tsw.on .tkn{left:23px;}
-/* font picker */
-.fop{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.025);border:1px solid var(--c-border2);border-radius:9px;padding:10px 14px;margin-bottom:7px;cursor:pointer;transition:border-color .15s;}
-.fop:hover{border-color:rgba(255,255,255,.2);}
-.fop.on{border-color:var(--c-teal);background:rgba(64,207,195,.06);}
-.fop-n{font-size:13px;font-weight:600;color:var(--c-text);}
-.fop-p{font-size:11px;color:var(--c-muted);margin-top:1px;}
-/* size buttons */
-.szb{display:flex;gap:6px;margin-top:6px;}
-.sb2{flex:1;padding:6px;border-radius:7px;border:1px solid var(--c-border2);background:rgba(255,255,255,.04);color:var(--c-muted);font-size:10px;cursor:pointer;text-align:center;transition:all .15s;font-family:var(--f-mono);}
-.sb2:hover,.sb2.on{background:rgba(255,255,255,.10);color:var(--c-text);}
-/* slider */
-.osl{width:100%;margin-top:8px;accent-color:var(--c-teal);}
-/* theme chips */
-.thop{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.025);border:1px solid var(--c-border2);border-radius:9px;padding:10px 14px;margin-bottom:7px;cursor:pointer;transition:border-color .15s;}
-.thop:hover{border-color:rgba(255,255,255,.2);}
-.thop.on{border-color:var(--c-teal);}
-.thsw{width:34px;height:34px;border-radius:8px;flex-shrink:0;}
-
-/* in-system browser window */
-#win-browser .wbody{padding:0;display:flex;flex-direction:column;}
-.br-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--c-border2);flex-shrink:0;}
-.br-url{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--c-border2);border-radius:8px;padding:5px 12px;font-size:11.5px;color:var(--c-muted);font-family:var(--f-mono);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-.br-btns{display:flex;gap:6px;}
-.br-btn{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid var(--c-border2);color:var(--c-muted);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .14s,color .14s;}
-.br-btn:hover{background:rgba(255,255,255,.12);color:var(--c-text);}
-#br-frame{flex:1;border:none;background:#fff;}
-
-/* context menus */
-.ctxm{
-  position:fixed;z-index:99000;
-  background:rgba(22,22,28,.97);backdrop-filter:blur(32px);
-  border:1px solid rgba(255,255,255,.12);border-radius:11px;
-  padding:5px;min-width:196px;
-  box-shadow:0 16px 50px rgba(0,0,0,.75);
-  display:none;animation:ctxp .12s ease;
+.cli-line{display:block;}
+.cli-prompt{color:var(--green);}
+.cli-cmd{color:var(--text);}
+.cli-out{color:#8e8b84;}
+.cli-hi{color:var(--accent);font-weight:600;}
+.cli-hi2{color:var(--accent2);}
+.cli-hi3{color:var(--accent3);}
+.cli-err{color:var(--red);}
+.cli-link{color:var(--accent2);cursor:pointer;text-decoration:underline;}
+.cli-link:hover{color:#fff;}
+#cli-input-row{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 16px 12px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;background:#000;
 }
-@keyframes ctxp{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
-.cxi{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;color:var(--c-text);transition:background .12s;font-family:var(--f-ui);}
-.cxi:hover{background:rgba(255,255,255,.09);}
-.cxi.red{color:var(--c-red);}
-.cxi.red:hover{background:rgba(255,95,86,.10);}
-.cxi i{width:14px;text-align:center;color:var(--c-muted);font-size:12px;}
-.cxs{height:1px;background:var(--c-border2);margin:3px 0;}
-.cxl{font-size:10px;color:var(--c-muted);padding:4px 12px 2px;text-transform:uppercase;letter-spacing:1.5px;font-family:var(--f-mono);}
+#cli-prompt-label{color:var(--green);font-size:12px;white-space:nowrap;}
+#cli-input{
+  flex:1;background:none;border:none;outline:none;
+  font-family:var(--font-mono);font-size:12px;
+  color:var(--text);caret-color:var(--accent);
+}
 
-/* spotlight */
-#spov{position:fixed;inset:0;z-index:95000;background:rgba(0,0,0,.5);backdrop-filter:blur(12px);display:none;align-items:flex-start;justify-content:center;padding-top:110px;}
-#spov.on{display:flex;}
-#spb{width:580px;background:rgba(20,20,26,.98);backdrop-filter:blur(48px);border:1px solid rgba(255,255,255,.15);border-radius:16px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.88);}
-#spi{width:100%;background:none;border:none;outline:none;font-family:var(--f-mono);font-size:16px;color:var(--c-text);padding:16px 20px;border-bottom:1px solid var(--c-border2);caret-color:var(--c-accent);}
-#spr{padding:7px;max-height:340px;overflow-y:auto;}
-.sri{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--c-text);transition:background .12s;font-family:var(--f-ui);}
-.sri:hover,.sri.sel{background:rgba(255,255,255,.09);}
-.sri-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(255,255,255,.06);}
-.sri-t{font-weight:600;}
-.sri-s{font-size:10px;color:var(--c-muted);}
+/* ── CONTACT ── */
+.contact-link{
+  display:flex;align-items:center;gap:13px;
+  background:rgba(255,255,255,.022);border:1px solid var(--border2);
+  border-radius:10px;padding:13px 15px;margin-bottom:9px;
+  text-decoration:none;color:var(--text);
+  transition:border-color .18s,background .18s;cursor:pointer;
+}
+.contact-link:hover{border-color:var(--accent);background:rgba(240,192,96,.04);}
+.contact-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.contact-info strong{display:block;font-size:12px;}
+.contact-info span{font-size:10px;color:var(--muted);}
 
-/* toast */
-#toast{
-  position:fixed;top:38px;right:16px;z-index:99990;
-  background:rgba(24,24,30,.96);border:1px solid var(--c-border);
-  border-radius:12px;padding:11px 16px;
+/* ── JOURNEY ── */
+.journey-item{display:flex;gap:14px;margin-bottom:20px;position:relative;}
+.journey-item::before{content:'';position:absolute;left:15px;top:32px;bottom:-20px;width:1px;background:var(--border2);}
+.journey-item:last-child::before{display:none;}
+.journey-dot{width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid var(--border);}
+.journey-period{font-size:10px;color:var(--accent2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.journey-title{font-family:var(--font-head);font-size:13px;font-weight:700;margin-bottom:5px;}
+.journey-desc{font-size:11px;color:var(--muted);line-height:1.65;}
+
+/* ── SETTINGS ── */
+.settings-section{margin-bottom:24px;}
+.settings-section-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px;}
+.wp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.wp-thumb{
+  aspect-ratio:16/9;border-radius:8px;cursor:pointer;
+  background-size:cover;background-position:center;
+  border:2px solid transparent;transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.wp-thumb:hover{transform:scale(1.03);border-color:rgba(255,255,255,.3);}
+.wp-thumb.active{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(96,200,216,.25);}
+.wp-thumb .wp-label{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.7));
+  font-size:9px;padding:4px 6px 5px;color:rgba(255,255,255,.75);
+  opacity:0;transition:opacity .2s;
+}
+.wp-thumb:hover .wp-label{opacity:1;}
+.settings-toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.025);border:1px solid var(--border2);
+  border-radius:9px;padding:11px 14px;margin-bottom:8px;
+}
+.settings-toggle-label{font-size:12px;color:var(--text);}
+.settings-toggle-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.toggle-switch{
+  width:42px;height:24px;background:rgba(255,255,255,.10);
+  border-radius:99px;cursor:pointer;position:relative;
+  transition:background .2s;flex-shrink:0;border:1px solid rgba(255,255,255,.12);
+}
+.toggle-switch.on{background:var(--accent2);}
+.toggle-knob{
+  position:absolute;top:3px;left:3px;width:16px;height:16px;
+  background:#fff;border-radius:50%;transition:left .2s;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.toggle-switch.on .toggle-knob{left:21px;}
+.accent-row{display:flex;gap:8px;margin-top:8px;}
+.accent-dot{
+  width:24px;height:24px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:transform .15s,border-color .15s;
+}
+.accent-dot:hover{transform:scale(1.15);}
+.accent-dot.active{border-color:#fff;}
+.opacity-slider{width:100%;margin-top:6px;accent-color:var(--accent2);}
+.icon-size-btns{display:flex;gap:6px;margin-top:6px;}
+.icon-size-btn{
+  flex:1;padding:5px;border-radius:7px;border:1px solid var(--border2);
+  background:rgba(255,255,255,.04);color:var(--muted);font-size:10px;
+  cursor:pointer;text-align:center;transition:all .15s;font-family:var(--font-mono);
+}
+.icon-size-btn:hover,.icon-size-btn.active{background:rgba(255,255,255,.10);color:var(--text);}
+
+/* ── WEATHER WINDOW ── */
+.weather-hero{
+  text-align:center;padding:20px 0 10px;
+}
+.weather-icon-big{font-size:64px;margin-bottom:8px;display:block;}
+.weather-temp{font-family:var(--font-head);font-size:52px;font-weight:800;color:var(--text);}
+.weather-desc{font-size:13px;color:var(--muted);margin-top:4px;text-transform:capitalize;}
+.weather-location{font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px;}
+.weather-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-top:20px;
+}
+.weather-card{
+  background:rgba(255,255,255,.03);border:1px solid var(--border2);
+  border-radius:10px;padding:12px 14px;
   display:flex;align-items:center;gap:10px;
-  min-width:220px;max-width:320px;
-  box-shadow:0 10px 36px rgba(0,0,0,.6);
-  transform:translateX(130%);opacity:0;
-  transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .28s;
-  font-family:var(--f-ui);font-size:12.5px;font-weight:500;
 }
-#toast.on{transform:translateX(0);opacity:1;}
-#toast-ic{font-size:18px;}
+.weather-card i{font-size:18px;color:var(--accent2);width:20px;text-align:center;}
+.weather-card-label{font-size:10px;color:var(--muted);}
+.weather-card-value{font-size:13px;color:var(--text);font-weight:600;}
+.weather-forecast{margin-top:16px;}
+.forecast-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid var(--border2);font-size:11px;
+}
+.forecast-row:last-child{border-bottom:none;}
+.weather-loading{text-align:center;padding:40px;color:var(--muted);font-size:12px;}
+.weather-error{text-align:center;padding:30px;color:var(--red);font-size:12px;}
 
-/* desk icons (right side) */
-.dki{position:absolute;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:7px;border-radius:10px;transition:background .15s;width:80px;}
-.dki:hover{background:rgba(255,255,255,.07);}
-.dki-img{width:52px;height:52px;border-radius:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5),inset 0 1px 1px rgba(255,255,255,.2);position:relative;overflow:hidden;}
-.dki-img::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.18),transparent);pointer-events:none;z-index:1;}
-.dki span{font-size:10.5px;color:#fff;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.95);line-height:1.2;word-break:break-word;font-weight:500;}
+/* ── PRELOADER ── */
+#preloader{
+  position:fixed;inset:0;background:#060810;z-index:99999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity .7s,visibility .7s;
+}
+#preloader.done{opacity:0;visibility:hidden;pointer-events:none;}
+.pre-logo{font-family:var(--font-head);font-size:46px;font-weight:800;letter-spacing:-1.5px;}
+.pre-logo span{color:var(--accent);}
+.pre-bar-wrap{width:220px;height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;}
+.pre-bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width .28s ease;}
+.pre-msg{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
 
+/* ── DESKTOP ICONS ── */
+.desk-icon{
+  position:absolute;display:flex;flex-direction:column;
+  align-items:center;gap:5px;cursor:pointer;padding:7px;
+  border-radius:10px;transition:background .15s;width:78px;
+}
+.desk-icon:hover{background:rgba(255,255,255,.07);}
+.desk-icon-img{
+  width:52px;height:52px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+  box-shadow:0 4px 12px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.2);
+  position:relative;overflow:hidden;
+}
+.desk-icon-img::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);
+  pointer-events:none;
+}
+.desk-icon span{
+  font-size:10px;color:#fff;text-align:center;
+  text-shadow:0 1px 5px rgba(0,0,0,.9);line-height:1.2;
+  word-break:break-word;
+}
+
+/* notification badge */
+.badge{
+  position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;
+  background:var(--red);border-radius:99px;font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;padding:0 3px;border:1.5px solid rgba(10,10,12,.9);
+}
+
+/* ── SCROLLBAR ── */
 *{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.07) transparent;}
+
+/* ── THEMES ── */
+body.theme-dim #desktop-overlay{background:rgba(0,0,0,.6);}
+body.theme-nodim #desktop-overlay{background:none;}
+body.glass-light .win{background:rgba(240,240,245,.10);}
+
+/* ── CONTEXT MENU ── */
+#ctx-menu{
+  position:fixed;z-index:99000;
+  background:rgba(22,24,28,.96);backdrop-filter:blur(28px);
+  border:1px solid var(--border);border-radius:11px;
+  padding:5px;min-width:180px;
+  box-shadow:0 12px 40px rgba(0,0,0,.7);
+  display:none;animation:ctxPop .12s ease;
+}
+@keyframes ctxPop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.ctx-item{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 12px;border-radius:7px;cursor:pointer;
+  font-size:11px;color:var(--text);transition:background .12s;
+}
+.ctx-item:hover{background:rgba(255,255,255,.10);}
+.ctx-item i{width:14px;text-align:center;color:var(--muted);}
+.ctx-sep{height:1px;background:var(--border2);margin:3px 0;}
+
+/* ── SPOTLIGHT ── */
+#spotlight-overlay{
+  position:fixed;inset:0;z-index:95000;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+  display:none;align-items:flex-start;justify-content:center;
+  padding-top:120px;
+}
+#spotlight-overlay.open{display:flex;}
+#spotlight-box{
+  width:560px;background:rgba(22,24,28,.97);backdrop-filter:blur(40px);
+  border:1px solid rgba(255,255,255,.15);border-radius:16px;
+  overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.8);
+}
+#spotlight-input{
+  width:100%;background:none;border:none;outline:none;
+  font-family:var(--font-mono);font-size:16px;color:var(--text);
+  padding:16px 20px;border-bottom:1px solid var(--border2);
+  caret-color:var(--accent);
+}
+#spotlight-results{padding:8px;}
+.sp-result{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 12px;border-radius:8px;cursor:pointer;
+  font-size:12px;color:var(--text);transition:background .12s;
+}
+.sp-result:hover,.sp-result.selected{background:rgba(255,255,255,.09);}
+.sp-result-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.sp-result-title{font-weight:600;}
+.sp-result-sub{font-size:10px;color:var(--muted);}
 </style>
 </head>
 <body>
 
-<!-- ═══ MACOS PRELOADER ═══ -->
+<!-- PRELOADER -->
 <div id="preloader">
-  <svg class="pre-apple-svg" width="72" height="88" viewBox="0 0 56 68" fill="none">
-    <path d="M38.5 0C38.5 0 40 11 28 14.5 16 18 10 10 10 10S12 21 22 22C32 23 36 18 38.5 0Z" fill="white" opacity=".85"/>
-    <path d="M28 17C17 17 8 26 8 40C8 54 17 68 28 68C34 68 37 64 40 60C43 64 46 68 52 68C53 60 50 53 46 47C43 42 39 39 35 39C31 39 29 41 28 43C27 41 25 37 25 33C25 24 30 20 36 19C33 17.5 30.5 17 28 17Z" fill="white" opacity=".85"/>
-  </svg>
-  <div class="pre-progress-track"><div class="pre-progress-fill" id="pf"></div></div>
-  <div class="pre-label" id="pm">Loading…</div>
+  <div class="pre-logo">Rathod <span>Raj</span></div>
+  <div class="pre-bar-wrap"><div class="pre-bar-fill" id="pre-fill"></div></div>
+  <div class="pre-msg" id="pre-msg">Booting system...</div>
 </div>
 
-<!-- ═══ DESKTOP ═══ -->
-<div id="bg"></div><div id="bg-overlay"></div><div id="bg-noise"></div>
+<!-- DESKTOP -->
+<div id="desktop-bg"></div>
+<div id="desktop-overlay"></div>
+<div id="desktop-grid"></div>
 
-<!-- ═══ TOAST ═══ -->
-<div id="toast"><span id="toast-ic">✅</span><span id="toast-msg">Done</span></div>
-
-<!-- ═══ CONTEXT MENUS ═══ -->
-<div class="ctxm" id="ctx-desk">
-  <div class="cxl">Desktop</div>
-  <div class="cxi" onclick="openWin('settings');cc()"><i class="fa-solid fa-image"></i>Change Wallpaper</div>
-  <div class="cxi" onclick="tile();cc()"><i class="fa-solid fa-table-cells-large"></i>Tile All Windows</div>
-  <div class="cxi" onclick="refreshPage();cc()"><i class="fa-solid fa-rotate-right"></i>Refresh</div>
-  <div class="cxs"></div>
-  <div class="cxi" onclick="openWin('cli');cc()"><i class="fa-solid fa-terminal"></i>New Terminal</div>
-  <div class="cxi" onclick="openWin('weather');cc()"><i class="fa-solid fa-cloud-sun"></i>Weather</div>
-  <div class="cxi" onclick="openSpotlight();cc()"><i class="fa-solid fa-magnifying-glass"></i>Spotlight</div>
-  <div class="cxs"></div>
-  <div class="cxi red" onclick="closeAll();cc()"><i class="fa-solid fa-rectangle-xmark"></i>Close All Windows</div>
-</div>
-<div class="ctxm" id="ctx-win">
-  <div class="cxl" id="ctx-win-lbl">Window</div>
-  <div class="cxi" onclick="cwa('front')"><i class="fa-solid fa-arrow-up"></i>Bring to Front</div>
-  <div class="cxi" onclick="cwa('min')"><i class="fa-solid fa-minus"></i>Minimize</div>
-  <div class="cxi" onclick="cwa('max')"><i class="fa-solid fa-expand"></i>Maximize / Restore</div>
-  <div class="cxs"></div>
-  <div class="cxi red" onclick="cwa('close')"><i class="fa-solid fa-xmark"></i>Close</div>
-</div>
-<div class="ctxm" id="ctx-dock">
-  <div class="cxl" id="ctx-dk-lbl">App</div>
-  <div class="cxi" onclick="cda('open')"><i class="fa-solid fa-arrow-up-from-bracket"></i>Open</div>
-  <div class="cxi" onclick="cda('min')"><i class="fa-solid fa-window-minimize"></i>Minimize</div>
-  <div class="cxs"></div>
-  <div class="cxi red" onclick="cda('close')"><i class="fa-solid fa-xmark"></i>Quit</div>
+<!-- CONTEXT MENU -->
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="openWin('settings');closeCtx()"><i class="fa-solid fa-gear"></i> Change Wallpaper</div>
+  <div class="ctx-item" onclick="openWin('about');closeCtx()"><i class="fa-solid fa-user"></i> About Raj</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="openWin('cli');closeCtx()"><i class="fa-solid fa-terminal"></i> New Terminal</div>
+  <div class="ctx-item" onclick="openWin('weather');closeCtx()"><i class="fa-solid fa-cloud-sun"></i> Weather</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="closeAllWins();closeCtx()"><i class="fa-solid fa-rectangle-xmark"></i> Close All Windows</div>
 </div>
 
-<!-- ═══ SPOTLIGHT ═══ -->
-<div id="spov" onclick="closeSp(event)">
-  <div id="spb">
-    <input id="spi" placeholder="🔍  Spotlight Search — open anything…" autocomplete="off" spellcheck="false">
-    <div id="spr"></div>
+<!-- SPOTLIGHT -->
+<div id="spotlight-overlay" onclick="closeSpotlight(event)">
+  <div id="spotlight-box">
+    <input type="text" id="spotlight-input" placeholder="🔍  Spotlight Search — type a command or section..." autocomplete="off" spellcheck="false">
+    <div id="spotlight-results"></div>
   </div>
 </div>
 
-<!-- ═══ MENUBAR ═══ -->
+<!-- MENUBAR -->
 <div id="menubar">
-  <div class="ml">
-    <div class="mi logo"><i class="fa-brands fa-apple"></i></div>
-    <div class="mi brand">Rathod Raj</div>
-    <div class="mi" onclick="openWin('about')">About</div>
-    <div class="mi" onclick="openWin('projects')">Projects</div>
-    <div class="mi" onclick="tile()">Window</div>
-    <div class="mi" onclick="refreshPage()">↺ Refresh</div>
-    <div class="mi" onclick="openSpotlight()">🔍</div>
+  <div class="menu-left">
+    <div class="menu-item" style="font-size:15px"><i class="fa-brands fa-apple"></i></div>
+    <div class="menu-item bold">Rathod Raj</div>
+    <div class="menu-item" onclick="openWin('about')">File</div>
+    <div class="menu-item" onclick="tileWindows()">Window</div>
+    <div class="menu-item" onclick="openWin('cli')">Terminal</div>
+    <div class="menu-item" onclick="openSpotlight()">🔍 Spotlight</div>
   </div>
-  <div class="mr">
-    <div id="mi-weather" onclick="openWin('weather')"><span id="mi-wt">⛅ --°C</span></div>
-    <span><i class="fa-solid fa-wifi"></i></span>
-    <span><i class="fa-solid fa-battery-full"></i> 100%</span>
-    <span id="clock"></span>
-  </div>
-</div>
-
-<!-- ═══ WORK AREA ═══ -->
-<div id="wa">
-
-<!-- Desktop right-column icons -->
-<div class="dki" style="right:14px;top:10px"  onclick="tw('about')">
-  <div class="dki-img" style="background:linear-gradient(145deg,#1d4ed8,#60a5fa)">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><circle cx="15" cy="10" r="5" fill="white" opacity=".9"/><path d="M5 25c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".9"/></svg>
-  </div><span>About</span>
-</div>
-<div class="dki" style="right:14px;top:108px" onclick="tw('projects')">
-  <div class="dki-img" style="background:linear-gradient(145deg,#6d28d9,#c084fc)">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M6 24L15 6l9 18" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/><path d="M9 18h12" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".9"/></svg>
-  </div><span>Projects</span>
-</div>
-<div class="dki" style="right:14px;top:206px" onclick="tw('weather')">
-  <div class="dki-img" style="background:linear-gradient(145deg,#0369a1,#38bdf8)">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><circle cx="11" cy="11" r="5" fill="white" opacity=".9"/><path d="M8 20h14a5 5 0 000-10c-.34 0-.67.034-1 .1A7 7 0 008 20z" fill="white" opacity=".65"/></svg>
-  </div><span>Weather</span>
-</div>
-<div class="dki" style="right:14px;top:304px" onclick="tw('cli')">
-  <div class="dki-img" style="background:linear-gradient(145deg,#1c1c22,#38384a);border:1px solid rgba(255,255,255,.12)">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect x="4" y="6" width="22" height="18" rx="3" stroke="white" stroke-width="1.8" opacity=".7"/><path d="M9 12l4 3-4 3M17 18h4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>
-  </div><span>Terminal</span>
-</div>
-
-<!-- ════ WINDOW: ABOUT ════ -->
-<div class="win" id="win-about" style="width:455px;height:440px;top:44px;left:50px">
-  <div class="wbar" data-win="about">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('about')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('about')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('about')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">about.md — Rathod Raj</div>
-  </div>
-  <div class="wbody">
-    <div class="av-row"><div class="av">🧠</div><div><h2 class="wh" style="font-size:20px">Rathod Raj</h2><p style="font-size:11.5px;color:var(--c-muted);margin-top:2px">Data Scientist &amp; AI Specialist · Gujarat, India</p></div></div>
-    <div class="ir"><i class="fa-solid fa-location-dot"></i><span>Porbandar, Gujarat, India</span></div>
-    <div class="ir"><i class="fa-solid fa-graduation-cap"></i><span>B.Tech CSE · Parul University · 7.43 CGPA</span></div>
-    <div class="ir"><i class="fa-brands fa-github"></i><button class="syslink" onclick="openBrowser('https://github.com/Raj-Rathod-Ai','GitHub — Raj-Rathod-Ai')">github.com/Raj-Rathod-Ai</button></div>
-    <div class="ir"><i class="fa-brands fa-linkedin"></i><button class="syslink" onclick="openBrowser('https://linkedin.com/in/raj-rathod-ai','LinkedIn — raj-rathod-ai')">linkedin.com/in/raj-rathod-ai</button></div>
-    <div class="ir"><i class="fa-solid fa-envelope"></i><button class="syslink" onclick="openBrowser('mailto:rathodraj1504@gmail.com','Email Raj')">rathodraj1504@gmail.com</button></div>
-    <div class="ir"><i class="fa-solid fa-phone"></i><span>+91 96248 01014</span></div>
-    <hr class="whr"/>
-    <div class="qbox">"Computer Science engineer specialising in AI/ML and algorithmic performance. I build high-fidelity neural architectures and MLOps pipelines that bridge the gap between abstract data and real-world intelligence."</div>
-  </div>
-  <div class="rh" data-win="about"></div>
-</div>
-
-<!-- ════ WINDOW: EDUCATION ════ -->
-<div class="win" id="win-edu" style="width:395px;height:380px;top:50px;left:558px">
-  <div class="wbar" data-win="edu">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('edu')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('edu')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('edu')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">education.json</div>
-  </div>
-  <div class="wbody">
-    <div class="wsub">Academic Timeline</div>
-    <div class="ec"><div class="per">2023 – 2026</div><h3>B.Tech — Computer Science &amp; Engineering</h3><div class="inst" style="font-size:11px;color:var(--c-muted);margin-top:3px">Parul University, Vadodara, Gujarat</div><div class="grade">7.43 CGPA</div></div>
-    <div class="ec"><div class="per">2021 – 2023</div><h3>Higher Secondary (Science)</h3><div class="inst" style="font-size:11px;color:var(--c-muted);margin-top:3px">Sigma English School, Porbandar</div><div style="font-size:17px;font-weight:800;font-family:var(--f-display);margin-top:8px">60.61%</div></div>
-    <div class="ec"><div class="per">2020 – 2021</div><h3>Secondary Education (SSC)</h3><div class="inst" style="font-size:11px;color:var(--c-muted);margin-top:3px">Sigma English School, Porbandar</div><div style="font-size:17px;font-weight:800;font-family:var(--f-display);margin-top:8px">79.81%</div></div>
-  </div>
-  <div class="rh" data-win="edu"></div>
-</div>
-
-<!-- ════ WINDOW: SKILLS ════ -->
-<div class="win" id="win-skills" style="width:475px;height:508px;top:334px;left:50px">
-  <div class="wbar" data-win="skills">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('skills')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('skills')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('skills')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">skills.py — Expertise Map</div>
-  </div>
-  <div class="wbody">
-    <div class="stabs"><div class="st on" onclick="stab('langs',this)">Languages</div><div class="st" onclick="stab('libs',this)">Libraries</div><div class="st" onclick="stab('tools',this)">Tools &amp; Infra</div></div>
-    <div class="sp on" id="sp-langs">
-      <div class="sg"><div class="sgl">Programming Languages</div>
-        <div class="sr"><span class="si" style="color:#3776ab"><i class="fa-brands fa-python"></i></span><span class="sn">Python</span><div class="sb"><div class="sf" style="width:90%;--ba:#3776ab;--bb:#6bb5f5"></div></div><span class="sp2">90%</span></div>
-        <div class="sr"><span class="si" style="color:#f89820"><i class="fa-brands fa-java"></i></span><span class="sn">Java</span><div class="sb"><div class="sf" style="width:72%;--ba:#f89820;--bb:#ffcc60"></div></div><span class="sp2">72%</span></div>
-        <div class="sr"><span class="si" style="color:#a8b9cc"><i class="fa-solid fa-c"></i></span><span class="sn">C Language</span><div class="sb"><div class="sf" style="width:78%;--ba:#607080;--bb:#a8b9cc"></div></div><span class="sp2">78%</span></div>
-        <div class="sr"><span class="si" style="color:#00599c"><i class="fa-solid fa-code"></i></span><span class="sn">C++</span><div class="sb"><div class="sf" style="width:60%;--ba:#00599c;--bb:#4ac0f0"></div></div><span class="sp2">60%</span></div>
-        <div class="sr"><span class="si" style="color:#f29111"><i class="fa-solid fa-database"></i></span><span class="sn">SQL</span><div class="sb"><div class="sf" style="width:75%;--ba:#f29111;--bb:#ffd060"></div></div><span class="sp2">75%</span></div>
-      </div>
-      <div class="sg"><div class="sgl">Web (Supporting)</div>
-        <div class="sr"><span class="si" style="color:#e34f26"><i class="fa-brands fa-html5"></i></span><span class="sn">HTML5</span><div class="sb"><div class="sf" style="width:68%;--ba:#e34f26;--bb:#ff8060"></div></div><span class="sp2">68%</span></div>
-        <div class="sr"><span class="si" style="color:#1572b6"><i class="fa-brands fa-css3-alt"></i></span><span class="sn">CSS3</span><div class="sb"><div class="sf" style="width:62%;--ba:#1572b6;--bb:#40cfc3"></div></div><span class="sp2">62%</span></div>
-        <div class="sr"><span class="si" style="color:#f7df1e"><i class="fa-brands fa-js"></i></span><span class="sn">JavaScript</span><div class="sb"><div class="sf" style="width:55%;--ba:#c0900a;--bb:#f7df1e"></div></div><span class="sp2">55%</span></div>
-      </div>
+  <div class="menu-right">
+    <div id="menu-weather" onclick="openWin('weather')" style="cursor:pointer">
+      <i class="fa-solid fa-cloud"></i>
+      <span id="menu-weather-text">--°C</span>
     </div>
-    <div class="sp" id="sp-libs">
-      <div class="sg"><div class="sgl">Data Science &amp; ML</div>
-        <div class="sr"><span class="si" style="color:#4c72b0"><i class="fa-solid fa-chart-bar"></i></span><span class="sn">NumPy</span><div class="sb"><div class="sf" style="width:88%;--ba:#4c72b0;--bb:#8db0e0"></div></div><span class="sp2">88%</span></div>
-        <div class="sr"><span class="si" style="color:#5060a0"><i class="fa-solid fa-table"></i></span><span class="sn">Pandas</span><div class="sb"><div class="sf" style="width:85%;--ba:#5060a0;--bb:#9090d0"></div></div><span class="sp2">85%</span></div>
-        <div class="sr"><span class="si" style="color:#f7931e"><i class="fa-solid fa-brain"></i></span><span class="sn">Scikit-learn</span><div class="sb"><div class="sf" style="width:80%;--ba:#f7931e;--bb:#ffcc60"></div></div><span class="sp2">80%</span></div>
-        <div class="sr"><span class="si" style="color:#ff6f00"><i class="fa-solid fa-robot"></i></span><span class="sn">TensorFlow</span><div class="sb"><div class="sf" style="width:70%;--ba:#ff6f00;--bb:#ffb060"></div></div><span class="sp2">70%</span></div>
-        <div class="sr"><span class="si" style="color:#ee4c2c"><i class="fa-solid fa-fire"></i></span><span class="sn">PyTorch</span><div class="sb"><div class="sf" style="width:60%;--ba:#ee4c2c;--bb:#f08070"></div></div><span class="sp2">60%</span></div>
-        <div class="sr"><span class="si" style="color:#3776ab"><i class="fa-solid fa-chart-line"></i></span><span class="sn">Matplotlib</span><div class="sb"><div class="sf" style="width:78%;--ba:#3776ab;--bb:#70a8d8"></div></div><span class="sp2">78%</span></div>
-        <div class="sr"><span class="si" style="color:#3ec97e"><i class="fa-solid fa-eye"></i></span><span class="sn">Seaborn</span><div class="sb"><div class="sf" style="width:72%;--ba:#1a7a40;--bb:#3ec97e"></div></div><span class="sp2">72%</span></div>
+    <span><i class="fa-solid fa-wifi" style="font-size:11px"></i></span>
+    <span><i class="fa-solid fa-battery-full" style="font-size:11px"></i> 100%</span>
+    <span id="clock" style="cursor:default"></span>
+  </div>
+</div>
+
+<!-- WORK AREA -->
+<div id="work-area">
+
+  <!-- Desktop right-column shortcuts -->
+  <div class="desk-icon" style="right:16px;top:10px" onclick="openWin('about')">
+    <div class="desk-icon-img" style="background:linear-gradient(145deg,#2563eb,#60a5fa)">🧑‍💻</div>
+    <span>About Me</span>
+  </div>
+  <div class="desk-icon" style="right:16px;top:108px" onclick="openWin('projects')">
+    <div class="desk-icon-img" style="background:linear-gradient(145deg,#7c3aed,#c084fc)">🚀</div>
+    <span>Projects</span>
+  </div>
+  <div class="desk-icon" style="right:16px;top:206px" onclick="openWin('weather')">
+    <div class="desk-icon-img" style="background:linear-gradient(145deg,#0369a1,#38bdf8)">🌤️</div>
+    <span>Weather</span>
+  </div>
+  <div class="desk-icon" style="right:16px;top:304px" onclick="openWin('cli')">
+    <div class="desk-icon-img" style="background:linear-gradient(145deg,#1e2028,#3a3d48);border:1px solid rgba(255,255,255,.12)">⌨️</div>
+    <span>Terminal</span>
+  </div>
+
+  <!-- ═══ WINDOW: ABOUT ═══ -->
+  <div class="win" id="win-about" style="width:445px;height:430px;top:44px;left:50px">
+    <div class="win-bar" data-win="about">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('about')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('about')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('about')"><i class="fa-solid fa-plus"></i></button>
       </div>
-      <div class="sg"><div class="sgl">GenAI / LLM</div>
-        <div class="sr"><span class="si" style="color:#12ad4b"><i class="fa-solid fa-link"></i></span><span class="sn">LangChain</span><div class="sb"><div class="sf" style="width:75%;--ba:#12ad4b;--bb:#60d8a0"></div></div><span class="sp2">75%</span></div>
-        <div class="sr"><span class="si" style="color:#b77af4"><i class="fa-solid fa-server"></i></span><span class="sn">Vector DB</span><div class="sb"><div class="sf" style="width:65%;--ba:#7c3aed;--bb:#b77af4"></div></div><span class="sp2">65%</span></div>
-        <div class="sr"><span class="si" style="color:#ff4b4b"><i class="fa-solid fa-window-maximize"></i></span><span class="sn">Streamlit</span><div class="sb"><div class="sf" style="width:80%;--ba:#cc3030;--bb:#ff8080"></div></div><span class="sp2">80%</span></div>
-      </div>
+      <div class="win-title">about.md — Rathod Raj</div>
     </div>
-    <div class="sp" id="sp-tools">
-      <div class="sg"><div class="sgl">MLOps &amp; DevOps</div>
-        <div class="sr"><span class="si" style="color:#1eb1e0"><i class="fa-brands fa-docker"></i></span><span class="sn">Docker</span><div class="sb"><div class="sf" style="width:65%;--ba:#1eb1e0;--bb:#80d8f0"></div></div><span class="sp2">65%</span></div>
-        <div class="sr"><span class="si" style="color:#40cfc3"><i class="fa-solid fa-gears"></i></span><span class="sn">MLflow</span><div class="sb"><div class="sf" style="width:68%;--ba:#0080a0;--bb:#40cfc3"></div></div><span class="sp2">68%</span></div>
-        <div class="sr"><span class="si" style="color:#4f9cf9"><i class="fa-solid fa-circle-nodes"></i></span><span class="sn">CI / CD</span><div class="sb"><div class="sf" style="width:55%;--ba:#2088ff;--bb:#80c0ff"></div></div><span class="sp2">55%</span></div>
-        <div class="sr"><span class="si" style="color:#ff9900"><i class="fa-brands fa-aws"></i></span><span class="sn">AWS</span><div class="sb"><div class="sf" style="width:52%;--ba:#cc7000;--bb:#ff9900"></div></div><span class="sp2">52%</span></div>
-      </div>
-      <div class="sg"><div class="sgl">Analytics &amp; Version Control</div>
-        <div class="sr"><span class="si" style="color:#f05032"><i class="fa-brands fa-git-alt"></i></span><span class="sn">Git &amp; GitHub</span><div class="sb"><div class="sf" style="width:82%;--ba:#c03020;--bb:#f08070"></div></div><span class="sp2">82%</span></div>
-        <div class="sr"><span class="si" style="color:#f2c80f"><i class="fa-solid fa-chart-pie"></i></span><span class="sn">Power BI</span><div class="sb"><div class="sf" style="width:70%;--ba:#c09010;--bb:#f2c80f"></div></div><span class="sp2">70%</span></div>
-        <div class="sr"><span class="si" style="color:#909898"><i class="fa-brands fa-linux"></i></span><span class="sn">Linux</span><div class="sb"><div class="sf" style="width:60%;--ba:#404848;--bb:#909898"></div></div><span class="sp2">60%</span></div>
-      </div>
-    </div>
-  </div>
-  <div class="rh" data-win="skills"></div>
-</div>
-
-<!-- ════ WINDOW: JOURNEY ════ -->
-<div class="win" id="win-journey" style="width:405px;height:392px;top:476px;left:558px">
-  <div class="wbar" data-win="journey">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('journey')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('journey')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('journey')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">journey.log — My Path</div>
-  </div>
-  <div class="wbody">
-    <div class="wsub">Learning &amp; Growth</div>
-    <div class="ji"><div class="jd" style="background:rgba(64,207,195,.10)">🤖</div><div><div class="jp">Self-Directed · Ongoing</div><div class="jtit">GenAI &amp; Data Science</div><div class="jde">End-to-end MLOps pipelines using MLflow, Docker, and CI/CD. Specialised in LangChain orchestration and Vector DB for autonomous RAG solutions.</div><div style="margin-top:8px"><span class="tag ml">MLflow</span><span class="tag tool">Docker</span><span class="tag ai">LangChain</span><span class="tag ai">RAG</span></div></div></div>
-    <div class="ji"><div class="jd" style="background:rgba(255,159,69,.10)">🧮</div><div><div class="jp">2022 – 2023</div><div class="jtit">Low-Level C Programming</div><div class="jde">12 months mastering C and memory management, optimising data structures for heavy AI workloads — foundation for model performance analysis.</div><div style="margin-top:8px"><span class="tag c">C Lang</span><span class="tag tool">VSCode</span></div></div></div>
-    <div class="ji"><div class="jd" style="background:rgba(183,122,244,.10)">☁️</div><div><div class="jp">2023 · Google Arcade</div><div class="jtit">Cloud &amp; Skill Boost</div><div class="jde">Completed Google Arcade Skill Boost — hands-on GCP labs covering compute, storage, and ML APIs.</div><div style="margin-top:8px"><span class="tag tool">GCP</span><span class="tag tool">BigQuery</span></div></div></div>
-  </div>
-  <div class="rh" data-win="journey"></div>
-</div>
-
-<!-- ════ WINDOW: PROJECTS ════ -->
-<div class="win" id="win-projects" style="width:495px;height:524px;top:72px;left:1018px">
-  <div class="wbar" data-win="projects">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('projects')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('projects')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('projects')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">projects.md — Selected Work</div>
-  </div>
-  <div class="wbody">
-    <div class="wsub">Featured Builds</div>
-    <div class="pi"><div class="ptop"><div class="pt">FloraScan — Flower Disease Detection</div><span class="ps live">Live</span></div><div class="pd">AI system detecting flower species and diseases using deep learning. TensorFlow CNN + Flask backend.</div><div><span class="tag ai">TensorFlow</span><span class="tag tool">Flask</span><span class="tag ml">CV</span><span class="tag py">Python</span></div><button class="syslink" style="margin-top:8px;display:flex;align-items:center;gap:5px;font-size:10.5px" onclick="openBrowser('https://flower-disease-system.vercel.app/health','FloraScan — Live Demo')"><i class="fa-solid fa-arrow-up-right-from-square"></i> flower-disease-system.vercel.app</button></div>
-    <div class="pi"><div class="ptop"><div class="pt">Fake News Detection</div><span class="ps dev">In Progress</span></div><div class="pd">ML model detecting misinformation using Transformer architectures and NLP preprocessing pipelines.</div><div><span class="tag py">Python</span><span class="tag ml">ML</span><span class="tag ai">NLP</span><span class="tag ai">Transformers</span></div></div>
-    <div class="pi"><div class="ptop"><div class="pt">AI Developer Code Reviewer</div><span class="ps dev">Beta</span></div><div class="pd">LLM-powered tool analysing code for bugs and optimisations — LangChain + OpenAI API.</div><div><span class="tag ai">LLM</span><span class="tag py">Python</span><span class="tag ai">LangChain</span><span class="tag tool">OpenAI</span></div></div>
-    <div class="pi"><div class="ptop"><div class="pt">AI Discord Assistant Bot</div><span class="ps ops">Operational</span></div><div class="pd">Smart Discord bot for moderation and AI-powered context-aware query handling.</div><div><span class="tag py">discord.py</span><span class="tag ai">AI</span><span class="tag tool">Bot</span></div></div>
-    <div class="pi"><div class="ptop"><div class="pt">This Portfolio</div><span class="ps live">Live</span></div><div class="pd">macOS-style interactive portfolio — genie animations, wallpapers, weather, in-system browser, spotlight.</div><div><span class="tag web">HTML5</span><span class="tag web">CSS3</span><span class="tag web">JS</span></div><button class="syslink" style="margin-top:8px;display:flex;align-items:center;gap:5px;font-size:10.5px" onclick="openBrowser('https://rathodrajai.netlify.app/','Portfolio — rathodrajai.netlify.app')"><i class="fa-solid fa-arrow-up-right-from-square"></i> rathodrajai.netlify.app</button></div>
-  </div>
-  <div class="rh" data-win="projects"></div>
-</div>
-
-<!-- ════ WINDOW: TERMINAL ════ -->
-<div class="win" id="win-cli" style="width:545px;height:364px;top:618px;left:1018px;flex-direction:column">
-  <div class="wbar" data-win="cli">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('cli')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('cli')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('cli')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">raj@portfolio — zsh</div>
-  </div>
-  <div id="clio">
-<span class="cl" style="color:var(--c-accent);font-size:9.5px;line-height:1.18;font-family:var(--f-mono)">██████╗  █████╗      ██╗<br>██╔══██╗██╔══██╗     ██║<br>██████╔╝███████║     ██║<br>██╔══██╗██╔══██║██   ██║<br>██║  ██║██║  ██║╚█████╔╝<br>╚═╝  ╚═╝╚═╝  ╚═╝ ╚════╝</span>
-    <span class="cl" style="display:block;margin-top:7px">Welcome to <span class="ch">Rathod Raj</span>'s portfolio terminal.</span>
-    <span class="cl co">Type <span class="ch2">help</span> for all commands.</span>
-    <span class="cl" style="opacity:.15">──────────────────────────────────────────</span>
-  </div>
-  <div id="clir"><span id="clil">raj@portfolio:~$</span><input type="text" id="clii" placeholder="type a command…" autocomplete="off" spellcheck="false"/></div>
-  <div class="rh" data-win="cli"></div>
-</div>
-
-<!-- ════ WINDOW: CONTACT ════ -->
-<div class="win" id="win-contact" style="width:375px;height:460px;top:180px;left:390px;display:none">
-  <div class="wbar" data-win="contact">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('contact')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('contact')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('contact')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">contact.vcf</div>
-  </div>
-  <div class="wbody">
-    <div class="wsub">Reach Out</div>
-    <div class="cl2" onclick="openBrowser('mailto:rathodraj1504@gmail.com','Email Raj')"><div class="cic" style="background:rgba(255,159,69,.12)"><i class="fa-solid fa-envelope" style="color:var(--c-accent)"></i></div><div class="ci2"><strong>rathodraj1504@gmail.com</strong><span>Email — preferred</span></div></div>
-    <div class="cl2" onclick="openBrowser('tel:+919624801014','Call Raj')"><div class="cic" style="background:rgba(62,201,126,.10)"><i class="fa-solid fa-phone" style="color:var(--c-green)"></i></div><div class="ci2"><strong>+91 96248 01014</strong><span>Phone / WhatsApp</span></div></div>
-    <div class="cl2" onclick="openBrowser('https://github.com/Raj-Rathod-Ai','GitHub — Raj-Rathod-Ai')"><div class="cic" style="background:rgba(255,255,255,.05)"><i class="fa-brands fa-github" style="color:var(--c-text)"></i></div><div class="ci2"><strong>Raj-Rathod-Ai</strong><span>GitHub</span></div></div>
-    <div class="cl2" onclick="openBrowser('https://linkedin.com/in/raj-rathod-ai','LinkedIn — raj-rathod-ai')"><div class="cic" style="background:rgba(0,119,181,.12)"><i class="fa-brands fa-linkedin" style="color:#0077b5"></i></div><div class="ci2"><strong>raj-rathod-ai</strong><span>LinkedIn</span></div></div>
-    <div class="cl2" onclick="openBrowser('https://leetcode.com/u/Rathod-Raj-Ai/','LeetCode — Rathod-Raj-Ai')"><div class="cic" style="background:rgba(255,161,22,.10)"><i class="fa-solid fa-code" style="color:#ffa116"></i></div><div class="ci2"><strong>Rathod-Raj-Ai</strong><span>LeetCode</span></div></div>
-    <div class="cl2" onclick="openBrowser('https://www.instagram.com/its._.rudra._.19.08_','Instagram')"><div class="cic" style="background:rgba(228,64,95,.10)"><i class="fa-brands fa-instagram" style="color:#e4405f"></i></div><div class="ci2"><strong>its._.rudra._.19.08_</strong><span>Instagram</span></div></div>
-  </div>
-  <div class="rh" data-win="contact"></div>
-</div>
-
-<!-- ════ WINDOW: WEATHER ════ -->
-<div class="win" id="win-weather" style="width:380px;height:480px;top:110px;left:700px;display:none">
-  <div class="wbar" data-win="weather">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('weather')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('weather')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('weather')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">Weather — Live</div>
-  </div>
-  <div class="wbody" id="wb-weather"><div style="text-align:center;padding:44px;color:var(--c-muted);font-size:12px"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;display:block;margin-bottom:12px"></i>Fetching location…</div></div>
-  <div class="rh" data-win="weather"></div>
-</div>
-
-<!-- ════ WINDOW: IN-SYSTEM BROWSER ════ -->
-<div class="win" id="win-browser" style="width:740px;height:520px;top:60px;left:200px;display:none">
-  <div class="wbar" data-win="browser">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('browser')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('browser')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('browser')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle" id="br-title">Browser</div>
-  </div>
-  <div class="wbody">
-    <div class="br-bar">
-      <div class="br-btns">
-        <div class="br-btn" onclick="document.getElementById('br-frame').contentWindow.history.back()" title="Back"><i class="fa-solid fa-chevron-left"></i></div>
-        <div class="br-btn" onclick="document.getElementById('br-frame').contentWindow.history.forward()" title="Forward"><i class="fa-solid fa-chevron-right"></i></div>
-        <div class="br-btn" onclick="document.getElementById('br-frame').contentWindow.location.reload()" title="Reload"><i class="fa-solid fa-rotate-right"></i></div>
-      </div>
-      <div class="br-url" id="br-url">about:blank</div>
-      <div class="br-btn" onclick="window.open(document.getElementById('br-frame').src,'_blank')" title="Open in new tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
-    </div>
-    <iframe id="br-frame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"></iframe>
-  </div>
-  <div class="rh" data-win="browser"></div>
-</div>
-
-<!-- ════ WINDOW: SETTINGS ════ -->
-<div class="win" id="win-settings" style="width:590px;height:560px;top:80px;left:290px;display:none;flex-direction:column">
-  <div class="wbar" data-win="settings">
-    <div class="wbtns"><button class="wb wb-close" onclick="closeWin('settings')"><i class="fa-solid fa-xmark"></i></button><button class="wb wb-min" onclick="minWin('settings')"><i class="fa-solid fa-minus"></i></button><button class="wb wb-max" onclick="maxWin('settings')"><i class="fa-solid fa-plus"></i></button></div>
-    <div class="wtitle">System Settings</div>
-  </div>
-  <div class="set-wrap">
-    <div class="set-nav">
-      <div class="sni on" onclick="sset('wallpaper',this)"><i class="fa-solid fa-image"></i>Wallpaper</div>
-      <div class="sni" onclick="sset('appear',this)"><i class="fa-solid fa-palette"></i>Appearance</div>
-      <div class="sni" onclick="sset('fonts',this)"><i class="fa-solid fa-font"></i>Fonts</div>
-      <div class="sni" onclick="sset('display',this)"><i class="fa-solid fa-display"></i>Display</div>
-      <div class="sni" onclick="sset('dock',this)"><i class="fa-solid fa-circle-dot"></i>Dock</div>
-      <div class="sni" onclick="sset('windows',this)"><i class="fa-solid fa-window-restore"></i>Windows</div>
-      <div class="sni" onclick="sset('shortcuts',this)"><i class="fa-solid fa-keyboard"></i>Shortcuts</div>
-      <div class="sni" onclick="sset('sysinfo',this)"><i class="fa-solid fa-circle-info"></i>About</div>
-    </div>
-    <div class="set-con">
-      <!-- WALLPAPER -->
-      <div class="ssp on" id="ssp-wallpaper"><div class="ssl">Desktop Wallpaper</div><div class="wgrid" id="wp-grid"></div></div>
-      <!-- APPEARANCE -->
-      <div class="ssp" id="ssp-appear">
-        <div class="ssl">Accent Color</div>
-        <div class="adots" id="adots">
-          <div class="adot on" style="background:#40cfc3" data-c="#40cfc3" title="Teal"></div>
-          <div class="adot" style="background:#b77af4" data-c="#b77af4" title="Purple"></div>
-          <div class="adot" style="background:#ff9f45" data-c="#ff9f45" title="Orange"></div>
-          <div class="adot" style="background:#3ec97e" data-c="#3ec97e" title="Green"></div>
-          <div class="adot" style="background:#f94f6b" data-c="#f94f6b" title="Red"></div>
-          <div class="adot" style="background:#4f9cf9" data-c="#4f9cf9" title="Blue"></div>
-          <div class="adot" style="background:#f2c80f" data-c="#f2c80f" title="Yellow"></div>
-          <div class="adot" style="background:#e0ddd8" data-c="#e0ddd8" title="Silver"></div>
-        </div>
-        <div style="margin-top:20px" class="ssl">Color Theme</div>
-        <div class="thop on" id="th-dark" onclick="setTheme('dark',this)"><div class="thsw" style="background:linear-gradient(135deg,#0a0a0c,#1c1c22)"></div><div><div style="font-size:12px;font-weight:600">Dark</div><div style="font-size:10px;color:var(--c-muted)">Default macOS dark appearance</div></div></div>
-        <div class="thop" id="th-midnight" onclick="setTheme('midnight',this)"><div class="thsw" style="background:linear-gradient(135deg,#03030a,#0a0a28)"></div><div><div style="font-size:12px;font-weight:600">Midnight</div><div style="font-size:10px;color:var(--c-muted)">Deep navy void</div></div></div>
-        <div class="thop" id="th-graphite" onclick="setTheme('graphite',this)"><div class="thsw" style="background:linear-gradient(135deg,#1a1a1c,#2e2e32)"></div><div><div style="font-size:12px;font-weight:600">Graphite</div><div style="font-size:10px;color:var(--c-muted)">Warm dark charcoal</div></div></div>
-      </div>
-      <!-- FONTS -->
-      <div class="ssp" id="ssp-fonts">
-        <div class="ssl">System Font</div>
-        <div class="fop on" id="fo-jakarta" onclick="setFont('Plus Jakarta Sans',this)" style="font-family:'Plus Jakarta Sans',sans-serif"><div><div class="fop-n">Plus Jakarta Sans</div><div class="fop-p">A B C — 7.43 CGPA · Rathod Raj</div></div><i class="fa-solid fa-check" style="color:var(--c-teal)"></i></div>
-        <div class="fop" id="fo-outfit" onclick="setFont('Outfit',this)" style="font-family:'Outfit',sans-serif"><div><div class="fop-n">Outfit</div><div class="fop-p">A B C — 7.43 CGPA · Rathod Raj</div></div><i class="fa-solid fa-check" style="color:var(--c-teal);opacity:0"></i></div>
-        <div class="fop" id="fo-dm" onclick="setFont('DM Sans',this)" style="font-family:'DM Sans',sans-serif"><div><div class="fop-n">DM Sans</div><div class="fop-p">A B C — 7.43 CGPA · Rathod Raj</div></div><i class="fa-solid fa-check" style="color:var(--c-teal);opacity:0"></i></div>
-        <div class="fop" id="fo-playfair" onclick="setFont('Playfair Display',this)" style="font-family:'Playfair Display',serif"><div><div class="fop-n">Playfair Display</div><div class="fop-p">A B C — 7.43 CGPA · Rathod Raj</div></div><i class="fa-solid fa-check" style="color:var(--c-teal);opacity:0"></i></div>
-        <div class="fop" id="fo-fira" onclick="setFont('Fira Code',this)" style="font-family:'Fira Code',monospace"><div><div class="fop-n">Fira Code</div><div class="fop-p">A B C — 7.43 CGPA · Rathod Raj</div></div><i class="fa-solid fa-check" style="color:var(--c-teal);opacity:0"></i></div>
-        <div class="fop" id="fo-syne" onclick="setFont('Syne',this)" style="font-family:'Syne',sans-serif"><div><div class="fop-n">Syne</div><div class="fop-p">A B C — 7.43 CGPA · Rathod Raj</div></div><i class="fa-solid fa-check" style="color:var(--c-teal);opacity:0"></i></div>
-      </div>
-      <!-- DISPLAY -->
-      <div class="ssp" id="ssp-display">
-        <div class="ssl">Display Options</div>
-        <div class="tr"><div><div class="trl">Background Noise Texture</div><div class="trs">Subtle grain overlay</div></div><div class="tsw on" id="tog-noise" onclick="togSet('noise')"><div class="tkn"></div></div></div>
-        <div class="tr"><div><div class="trl">Desktop Overlay Dim</div><div class="trs">Darken wallpaper edges</div></div><div class="tsw on" id="tog-dim" onclick="togSet('dim')"><div class="tkn"></div></div></div>
-        <div class="tr"><div><div class="trl">Window Blur / Glass</div><div class="trs">Frosted glass on windows</div></div><div class="tsw on" id="tog-blur" onclick="togSet('blur')"><div class="tkn"></div></div></div>
-        <div style="margin-top:16px" class="ssl">Window Opacity</div>
-        <input type="range" class="osl" id="osl" min="55" max="100" value="88" oninput="setOpacity(this.value)">
-        <div style="font-size:10px;color:var(--c-muted);margin-top:4px;font-family:var(--f-mono)" id="osl-lbl">88%</div>
-      </div>
-      <!-- DOCK -->
-      <div class="ssp" id="ssp-dock">
-        <div class="ssl">Icon Size</div>
-        <div class="szb">
-          <div class="sb2" onclick="setDock(38,this)">Small</div>
-          <div class="sb2 on" onclick="setDock(54,this)">Default</div>
-          <div class="sb2" onclick="setDock(66,this)">Large</div>
-          <div class="sb2" onclick="setDock(78,this)">XL</div>
-        </div>
-        <div style="margin-top:18px" class="ssl">Dock Behaviour</div>
-        <div class="tr"><div><div class="trl">Auto-hide Dock</div><div class="trs">Hide when not in use</div></div><div class="tsw" id="tog-autohide" onclick="togSet('autohide')"><div class="tkn"></div></div></div>
-        <div class="tr"><div><div class="trl">Show Running Indicators</div><div class="trs">Dots below open apps</div></div><div class="tsw on" id="tog-dots" onclick="togSet('dots')"><div class="tkn"></div></div></div>
-      </div>
-      <!-- WINDOWS -->
-      <div class="ssp" id="ssp-windows">
-        <div class="ssl">Window Behaviour</div>
-        <div class="tr"><div><div class="trl">Genie Minimize Effect</div><div class="trs">macOS genie animation</div></div><div class="tsw on" id="tog-genie" onclick="togSet('genie')"><div class="tkn"></div></div></div>
-        <div class="tr"><div><div class="trl">Pop-in on Open</div><div class="trs">Scale animation when opening</div></div><div class="tsw on" id="tog-popin" onclick="togSet('popin')"><div class="tkn"></div></div></div>
-        <div class="tr"><div><div class="trl">Animated Skill Bars</div><div class="trs">Animate on tab switch</div></div><div class="tsw on" id="tog-anim" onclick="togSet('anim')"><div class="tkn"></div></div></div>
-        <div class="tr"><div><div class="trl">Show Desktop Icons</div><div class="trs">Right-side shortcut icons</div></div><div class="tsw on" id="tog-dicons" onclick="togSet('dicons')"><div class="tkn"></div></div></div>
-      </div>
-      <!-- SHORTCUTS -->
-      <div class="ssp" id="ssp-shortcuts">
-        <div class="ssl">Keyboard Shortcuts</div>
-        <div style="display:flex;flex-direction:column;gap:7px">
-          <div class="tr" style="cursor:default"><div><div class="trl">Spotlight</div><div class="trs">Open Spotlight Search</div></div><span style="font-family:var(--f-mono);font-size:11px;color:var(--c-teal);background:rgba(64,207,195,.1);padding:3px 8px;border-radius:6px">Ctrl+Space</span></div>
-          <div class="tr" style="cursor:default"><div><div class="trl">Close Window</div><div class="trs">Close focused window</div></div><span style="font-family:var(--f-mono);font-size:11px;color:var(--c-teal);background:rgba(64,207,195,.1);padding:3px 8px;border-radius:6px">Ctrl+W</span></div>
-          <div class="tr" style="cursor:default"><div><div class="trl">Terminal</div><div class="trs">New terminal window</div></div><span style="font-family:var(--f-mono);font-size:11px;color:var(--c-teal);background:rgba(64,207,195,.1);padding:3px 8px;border-radius:6px">Ctrl+T</span></div>
-          <div class="tr" style="cursor:default"><div><div class="trl">Tile Windows</div><div class="trs">Arrange all windows</div></div><span style="font-family:var(--f-mono);font-size:11px;color:var(--c-teal);background:rgba(64,207,195,.1);padding:3px 8px;border-radius:6px">Ctrl+G</span></div>
-          <div class="tr" style="cursor:default"><div><div class="trl">Refresh</div><div class="trs">Reload portfolio</div></div><span style="font-family:var(--f-mono);font-size:11px;color:var(--c-teal);background:rgba(64,207,195,.1);padding:3px 8px;border-radius:6px">Ctrl+R</span></div>
+    <div class="win-body">
+      <div class="avatar-row">
+        <div class="avatar">🧠</div>
+        <div class="name-block">
+          <h2>Rathod Raj</h2>
+          <p>Data Scientist &amp; AI Specialist · Gujarat, India</p>
         </div>
       </div>
-      <!-- ABOUT -->
-      <div class="ssp" id="ssp-sysinfo">
-        <div class="ssl">About This System</div>
-        <div style="background:rgba(255,255,255,.02);border:1px solid var(--c-border2);border-radius:10px;padding:18px;font-size:11.5px;line-height:2;color:var(--c-muted)">
-          <div style="font-family:var(--f-display);font-size:17px;font-weight:700;color:var(--c-text);margin-bottom:12px">RajOS v3.0</div>
-          <div><span style="color:var(--c-text);font-weight:600">Owner:</span> Rathod Raj</div>
-          <div><span style="color:var(--c-text);font-weight:600">Build:</span> Single-File HTML · CSS · JavaScript</div>
-          <div><span style="color:var(--c-text);font-weight:600">Kernel:</span> V8 JavaScript Engine</div>
-          <div><span style="color:var(--c-text);font-weight:600">Weather:</span> Open-Meteo (zero API key)</div>
-          <div><span style="color:var(--c-text);font-weight:600">Fonts:</span> Plus Jakarta Sans · Fira Code · Playfair Display</div>
-          <div><span style="color:var(--c-text);font-weight:600">Wallpapers:</span> Unsplash HDR + CSS gradients</div>
+      <div class="info-row"><i class="fa-solid fa-location-dot"></i> Porbandar, Gujarat, India</div>
+      <div class="info-row"><i class="fa-solid fa-graduation-cap"></i> B.Tech CSE · Parul University · 7.43 CGPA</div>
+      <div class="info-row"><i class="fa-brands fa-github"></i>
+        <a href="#" onclick="openExternal('https://github.com/Raj-Rathod-Ai');return false">github.com/Raj-Rathod-Ai</a>
+      </div>
+      <div class="info-row"><i class="fa-brands fa-linkedin"></i>
+        <a href="#" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai');return false">linkedin.com/in/raj-rathod-ai</a>
+      </div>
+      <div class="info-row"><i class="fa-solid fa-envelope"></i>
+        <a href="#" onclick="openExternal('mailto:rathodraj1504@gmail.com');return false">rathodraj1504@gmail.com</a>
+      </div>
+      <div class="info-row"><i class="fa-solid fa-phone"></i> +91 96248 01014</div>
+      <hr class="win-hr"/>
+      <div class="obj-box">"Computer Science engineer specialising in AI/ML and algorithmic performance. I build high-fidelity neural architectures and MLOps pipelines that bridge the gap between abstract data and real-world intelligence."</div>
+    </div>
+    <div class="resize-handle" data-win="about"></div>
+  </div>
+
+  <!-- ═══ WINDOW: EDUCATION ═══ -->
+  <div class="win" id="win-edu" style="width:395px;height:375px;top:50px;left:548px">
+    <div class="win-bar" data-win="edu">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('edu')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('edu')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('edu')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">education.json</div>
+    </div>
+    <div class="win-body">
+      <div class="win-sub">Academic Timeline</div>
+      <div class="edu-card">
+        <div class="period">2023 – 2026</div>
+        <h3>B.Tech — Computer Science &amp; Engineering</h3>
+        <div class="inst">Parul University, Vadodara, Gujarat</div>
+        <div class="grade">7.43 CGPA</div>
+      </div>
+      <div class="edu-card">
+        <div class="period">2021 – 2023</div>
+        <h3>Higher Secondary (Science)</h3>
+        <div class="inst">Sigma English School, Porbandar</div>
+        <div style="font-size:16px;font-weight:700;font-family:var(--font-head);margin-top:8px;">60.61%</div>
+      </div>
+      <div class="edu-card">
+        <div class="period">2020 – 2021</div>
+        <h3>Secondary Education (SSC)</h3>
+        <div class="inst">Sigma English School, Porbandar</div>
+        <div style="font-size:16px;font-weight:700;font-family:var(--font-head);margin-top:8px;">79.81%</div>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="edu"></div>
+  </div>
+
+  <!-- ═══ WINDOW: SKILLS ═══ -->
+  <div class="win" id="win-skills" style="width:475px;height:500px;top:330px;left:50px">
+    <div class="win-bar" data-win="skills">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('skills')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('skills')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('skills')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">skills.py — Expertise Ecosystem</div>
+    </div>
+    <div class="win-body">
+      <div class="skills-tabs">
+        <div class="stab active" onclick="switchTab('langs',this)">Languages</div>
+        <div class="stab"        onclick="switchTab('libs',this)">Libraries</div>
+        <div class="stab"        onclick="switchTab('tools',this)">Tools &amp; Infra</div>
+      </div>
+      <!-- LANGUAGES -->
+      <div class="skill-panel active" id="sp-langs">
+        <div class="skill-group">
+          <div class="skill-group-label">Programming Languages</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#3776ab"><i class="fa-brands fa-python"></i></span><span class="skill-name">Python</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:90%;--bar-a:#3776ab;--bar-b:#6bb5f5"></div></div><span class="skill-pct">90%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f89820"><i class="fa-brands fa-java"></i></span><span class="skill-name">Java</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:72%;--bar-a:#f89820;--bar-b:#ffcc60"></div></div><span class="skill-pct">72%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#a8b9cc"><i class="fa-solid fa-c"></i></span><span class="skill-name">C Language</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:78%;--bar-a:#607080;--bar-b:#a8b9cc"></div></div><span class="skill-pct">78%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#00599c"><i class="fa-solid fa-code"></i></span><span class="skill-name">C++</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:60%;--bar-a:#00599c;--bar-b:#4ac0f0"></div></div><span class="skill-pct">60%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f29111"><i class="fa-solid fa-database"></i></span><span class="skill-name">SQL</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:75%;--bar-a:#f29111;--bar-b:#ffd060"></div></div><span class="skill-pct">75%</span></div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:14px">
-          <div class="sb2" style="padding:9px 16px;flex:none" onclick="openBrowser('https://github.com/Raj-Rathod-Ai','GitHub')">GitHub ↗</div>
-          <div class="sb2" style="padding:9px 16px;flex:none" onclick="openBrowser('https://rathodrajai.netlify.app/','Live Site')">Live Site ↗</div>
+        <div class="skill-group">
+          <div class="skill-group-label">Web (Supporting)</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#e34f26"><i class="fa-brands fa-html5"></i></span><span class="skill-name">HTML5</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:68%;--bar-a:#e34f26;--bar-b:#ff8060"></div></div><span class="skill-pct">68%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#1572b6"><i class="fa-brands fa-css3-alt"></i></span><span class="skill-name">CSS3</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:62%;--bar-a:#1572b6;--bar-b:#60c8d8"></div></div><span class="skill-pct">62%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f7df1e"><i class="fa-brands fa-js"></i></span><span class="skill-name">JavaScript</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:55%;--bar-a:#f7a000;--bar-b:#f7df1e"></div></div><span class="skill-pct">55%</span></div>
+        </div>
+      </div>
+      <!-- LIBRARIES -->
+      <div class="skill-panel" id="sp-libs">
+        <div class="skill-group">
+          <div class="skill-group-label">Data Science &amp; ML Libraries</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#4c72b0"><i class="fa-solid fa-chart-bar"></i></span><span class="skill-name">NumPy</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:88%;--bar-a:#4c72b0;--bar-b:#8db0e0"></div></div><span class="skill-pct">88%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#5060a0"><i class="fa-solid fa-table"></i></span><span class="skill-name">Pandas</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:85%;--bar-a:#5060a0;--bar-b:#9090d0"></div></div><span class="skill-pct">85%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f7931e"><i class="fa-solid fa-brain"></i></span><span class="skill-name">Scikit-learn</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%;--bar-a:#f7931e;--bar-b:#ffcc60"></div></div><span class="skill-pct">80%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#ff6f00"><i class="fa-solid fa-robot"></i></span><span class="skill-name">TensorFlow</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%;--bar-a:#ff6f00;--bar-b:#ffb060"></div></div><span class="skill-pct">70%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#ee4c2c"><i class="fa-solid fa-fire"></i></span><span class="skill-name">PyTorch</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:60%;--bar-a:#ee4c2c;--bar-b:#f08070"></div></div><span class="skill-pct">60%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#3776ab"><i class="fa-solid fa-chart-line"></i></span><span class="skill-name">Matplotlib</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:78%;--bar-a:#3776ab;--bar-b:#70a8d8"></div></div><span class="skill-pct">78%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#5de08a"><i class="fa-solid fa-eye"></i></span><span class="skill-name">Seaborn</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:72%;--bar-a:#2a8060;--bar-b:#5de08a"></div></div><span class="skill-pct">72%</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-label">GenAI / LLM Ecosystem</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#12ad4b"><i class="fa-solid fa-link"></i></span><span class="skill-name">LangChain</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:75%;--bar-a:#12ad4b;--bar-b:#60d8a0"></div></div><span class="skill-pct">75%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#9c27b0"><i class="fa-solid fa-server"></i></span><span class="skill-name">Vector DB</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:65%;--bar-a:#9c27b0;--bar-b:#b87cef"></div></div><span class="skill-pct">65%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#ff4b4b"><i class="fa-solid fa-window-maximize"></i></span><span class="skill-name">Streamlit</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%;--bar-a:#cc3030;--bar-b:#ff8080"></div></div><span class="skill-pct">80%</span></div>
+        </div>
+      </div>
+      <!-- TOOLS -->
+      <div class="skill-panel" id="sp-tools">
+        <div class="skill-group">
+          <div class="skill-group-label">MLOps &amp; DevOps</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#1eb1e0"><i class="fa-brands fa-docker"></i></span><span class="skill-name">Docker</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:65%;--bar-a:#1eb1e0;--bar-b:#80d8f0"></div></div><span class="skill-pct">65%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#60c8d8"><i class="fa-solid fa-gears"></i></span><span class="skill-name">MLflow</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:68%;--bar-a:#0080a0;--bar-b:#60c8d8"></div></div><span class="skill-pct">68%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#2088ff"><i class="fa-solid fa-circle-nodes"></i></span><span class="skill-name">CI / CD</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:55%;--bar-a:#2088ff;--bar-b:#80c0ff"></div></div><span class="skill-pct">55%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#ff9900"><i class="fa-brands fa-aws"></i></span><span class="skill-name">AWS</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:52%;--bar-a:#cc7000;--bar-b:#ff9900"></div></div><span class="skill-pct">52%</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-label">Analytics &amp; Version Control</div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f05032"><i class="fa-brands fa-git-alt"></i></span><span class="skill-name">Git &amp; GitHub</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:82%;--bar-a:#c03020;--bar-b:#f08070"></div></div><span class="skill-pct">82%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#f2c80f"><i class="fa-solid fa-chart-pie"></i></span><span class="skill-name">Power BI</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%;--bar-a:#c09010;--bar-b:#f2c80f"></div></div><span class="skill-pct">70%</span></div>
+          <div class="skill-row"><span class="skill-icon" style="color:#909898"><i class="fa-brands fa-linux"></i></span><span class="skill-name">Linux</span><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:60%;--bar-a:#404848;--bar-b:#909898"></div></div><span class="skill-pct">60%</span></div>
         </div>
       </div>
     </div>
+    <div class="resize-handle" data-win="skills"></div>
   </div>
-  <div class="rh" data-win="settings"></div>
-</div>
 
-</div><!-- /wa -->
+  <!-- ═══ WINDOW: JOURNEY ═══ -->
+  <div class="win" id="win-journey" style="width:405px;height:390px;top:468px;left:548px">
+    <div class="win-bar" data-win="journey">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('journey')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('journey')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('journey')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">journey.log — My Path</div>
+    </div>
+    <div class="win-body">
+      <div class="win-sub">Learning &amp; Growth</div>
+      <div class="journey-item">
+        <div class="journey-dot" style="background:rgba(96,200,216,.12)">🤖</div>
+        <div>
+          <div class="journey-period">Self-Directed · Ongoing</div>
+          <div class="journey-title">GenAI &amp; Data Science</div>
+          <div class="journey-desc">Architected end-to-end MLOps pipelines using MLflow, Docker, and CI/CD. Specialised in LangChain orchestration and Vector DB indexing for autonomous RAG solutions.</div>
+          <div style="margin-top:8px"><span class="tag ml">MLflow</span><span class="tag tool">Docker</span><span class="tag ai">LangChain</span><span class="tag ai">RAG</span></div>
+        </div>
+      </div>
+      <div class="journey-item">
+        <div class="journey-dot" style="background:rgba(240,192,96,.12)">🧮</div>
+        <div>
+          <div class="journey-period">2022 – 2023 · Research Intensive</div>
+          <div class="journey-title">Low-Level C Programming</div>
+          <div class="journey-desc">Dedicated 12 months to mastering C and memory management, optimising data structures for heavy AI workloads — foundation for understanding model performance bottlenecks.</div>
+          <div style="margin-top:8px"><span class="tag c">C Lang</span><span class="tag tool">VSCode</span></div>
+        </div>
+      </div>
+      <div class="journey-item">
+        <div class="journey-dot" style="background:rgba(184,124,239,.12)">☁️</div>
+        <div>
+          <div class="journey-period">2023 · Google Arcade</div>
+          <div class="journey-title">Cloud &amp; Skill Boost</div>
+          <div class="journey-desc">Completed Google Arcade Skill Boost — hands-on labs covering compute, storage, and ML APIs on Google Cloud Platform.</div>
+          <div style="margin-top:8px"><span class="tag tool">GCP</span><span class="tag tool">BigQuery</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="journey"></div>
+  </div>
 
-<!-- ═══ DOCK ═══ -->
+  <!-- ═══ WINDOW: PROJECTS ═══ -->
+  <div class="win" id="win-projects" style="width:495px;height:520px;top:72px;left:1010px">
+    <div class="win-bar" data-win="projects">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('projects')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('projects')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('projects')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">projects.md — Selected Work</div>
+    </div>
+    <div class="win-body">
+      <div class="win-sub">Featured Builds</div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">FloraScan — Flower Disease Detection</div><span class="proj-status st-live">Live</span></div>
+        <div class="proj-desc">AI system detecting flower species and plant diseases using deep learning. Upload an image and get instant predictions with a Flask backend and TensorFlow CNN model.</div>
+        <div><span class="tag ai">TensorFlow</span><span class="tag tool">Flask API</span><span class="tag ml">Computer Vision</span><span class="tag py">Python</span></div>
+        <a class="proj-link" href="#" onclick="openExternal('https://flower-disease-system.vercel.app/health');return false"><i class="fa-solid fa-arrow-up-right-from-square"></i> flower-disease-system.vercel.app</a>
+      </div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">Fake News Detection</div><span class="proj-status st-dev">In Progress</span></div>
+        <div class="proj-desc">ML model to detect misinformation in real-time news streams using Transformer architectures and NLP preprocessing pipelines.</div>
+        <div><span class="tag py">Python</span><span class="tag ml">ML</span><span class="tag ai">NLP</span><span class="tag ai">Transformers</span></div>
+      </div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">AI Developer Code Reviewer</div><span class="proj-status st-dev">Beta</span></div>
+        <div class="proj-desc">Intelligent tool that analyses code for bugs and suggests optimisations using Large Language Models — built with LangChain and OpenAI API.</div>
+        <div><span class="tag ai">LLM</span><span class="tag py">Python</span><span class="tag ai">LangChain</span><span class="tag tool">OpenAI API</span></div>
+      </div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">AI Discord Assistant Bot</div><span class="proj-status st-ops">Operational</span></div>
+        <div class="proj-desc">Smart Discord bot for server moderation and automated query handling with AI-powered context-aware responses.</div>
+        <div><span class="tag py">discord.py</span><span class="tag ai">AI</span><span class="tag tool">Bot</span></div>
+      </div>
+      <div class="proj-item">
+        <div class="proj-top"><div class="proj-title">This Portfolio</div><span class="proj-status st-live">Live</span></div>
+        <div class="proj-desc">macOS-style interactive portfolio with draggable windows, live terminal, wallpapers, weather, spotlight search — all in a single HTML file.</div>
+        <div><span class="tag web">HTML5</span><span class="tag web">CSS3</span><span class="tag web">JavaScript</span></div>
+        <a class="proj-link" href="#" onclick="openExternal('https://rathodrajai.netlify.app/');return false"><i class="fa-solid fa-arrow-up-right-from-square"></i> rathodrajai.netlify.app</a>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="projects"></div>
+  </div>
+
+  <!-- ═══ WINDOW: TERMINAL ═══ -->
+  <div class="win" id="win-cli" style="width:540px;height:360px;top:614px;left:1010px;flex-direction:column">
+    <div class="win-bar" data-win="cli">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('cli')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('cli')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('cli')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">raj@portfolio — zsh</div>
+    </div>
+    <div id="cli-output">
+      <span class="cli-line" style="color:var(--accent);font-weight:600;font-size:9.5px;line-height:1.2">
+██████╗  █████╗      ██╗<br>
+██╔══██╗██╔══██╗     ██║<br>
+██████╔╝███████║     ██║<br>
+██╔══██╗██╔══██║██   ██║<br>
+██║  ██║██║  ██║╚█████╔╝<br>
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚════╝</span>
+      <span class="cli-line" style="display:block;margin-top:6px">Welcome to <span class="cli-hi">Rathod Raj</span>'s portfolio terminal.</span>
+      <span class="cli-line cli-out">Type <span class="cli-hi2">help</span> to see all commands.</span>
+      <span class="cli-line" style="opacity:.2">────────────────────────────────────────────</span>
+    </div>
+    <div id="cli-input-row">
+      <span id="cli-prompt-label">raj@portfolio:~$</span>
+      <input type="text" id="cli-input" placeholder="type a command…" autocomplete="off" spellcheck="false"/>
+    </div>
+    <div class="resize-handle" data-win="cli"></div>
+  </div>
+
+  <!-- ═══ WINDOW: CONTACT ═══ -->
+  <div class="win" id="win-contact" style="width:375px;height:450px;top:180px;left:380px;display:none">
+    <div class="win-bar" data-win="contact">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('contact')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('contact')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('contact')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">contact.vcf — Get in Touch</div>
+    </div>
+    <div class="win-body">
+      <div class="win-sub">Reach Out</div>
+      <div class="contact-link" onclick="openExternal('mailto:rathodraj1504@gmail.com')">
+        <div class="contact-icon" style="background:rgba(240,192,96,.12)"><i class="fa-solid fa-envelope" style="color:var(--accent)"></i></div>
+        <div class="contact-info"><strong>rathodraj1504@gmail.com</strong><span>Email — preferred channel</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('tel:+919624801014')">
+        <div class="contact-icon" style="background:rgba(93,224,138,.10)"><i class="fa-solid fa-phone" style="color:var(--green)"></i></div>
+        <div class="contact-info"><strong>+91 96248 01014</strong><span>Phone / WhatsApp</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('https://github.com/Raj-Rathod-Ai')">
+        <div class="contact-icon" style="background:rgba(255,255,255,.05)"><i class="fa-brands fa-github" style="color:var(--text)"></i></div>
+        <div class="contact-info"><strong>Raj-Rathod-Ai</strong><span>GitHub</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai')">
+        <div class="contact-icon" style="background:rgba(0,119,181,.12)"><i class="fa-brands fa-linkedin" style="color:#0077b5"></i></div>
+        <div class="contact-info"><strong>raj-rathod-ai</strong><span>LinkedIn</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('https://leetcode.com/u/Rathod-Raj-Ai/')">
+        <div class="contact-icon" style="background:rgba(255,161,22,.10)"><i class="fa-solid fa-code" style="color:#ffa116"></i></div>
+        <div class="contact-info"><strong>Rathod-Raj-Ai</strong><span>LeetCode</span></div>
+      </div>
+      <div class="contact-link" onclick="openExternal('https://www.instagram.com/its._.rudra._.19.08_')">
+        <div class="contact-icon" style="background:rgba(228,64,95,.10)"><i class="fa-brands fa-instagram" style="color:#e4405f"></i></div>
+        <div class="contact-info"><strong>its._.rudra._.19.08_</strong><span>Instagram</span></div>
+      </div>
+    </div>
+    <div class="resize-handle" data-win="contact"></div>
+  </div>
+
+  <!-- ═══ WINDOW: WEATHER ═══ -->
+  <div class="win" id="win-weather" style="width:380px;height:480px;top:120px;left:700px;display:none">
+    <div class="win-bar" data-win="weather">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('weather')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('weather')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('weather')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">Weather — Live</div>
+    </div>
+    <div class="win-body" id="weather-body">
+      <div class="weather-loading"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>Fetching your location…</div>
+    </div>
+    <div class="resize-handle" data-win="weather"></div>
+  </div>
+
+  <!-- ═══ WINDOW: SETTINGS ═══ -->
+  <div class="win" id="win-settings" style="width:520px;height:580px;top:100px;left:350px;display:none">
+    <div class="win-bar" data-win="settings">
+      <div class="win-btns">
+        <button class="win-btn btn-close" onclick="closeWin('settings')"><i class="fa-solid fa-xmark"></i></button>
+        <button class="win-btn btn-min"   onclick="minWin('settings')"><i class="fa-solid fa-minus"></i></button>
+        <button class="win-btn btn-max"   onclick="maxWin('settings')"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="win-title">System Settings</div>
+    </div>
+    <div class="win-body">
+
+      <!-- WALLPAPERS -->
+      <div class="settings-section">
+        <div class="settings-section-title">🖼 Desktop Wallpaper</div>
+        <div class="wp-grid" id="wp-grid"></div>
+      </div>
+
+      <!-- ACCENT COLOR -->
+      <div class="settings-section">
+        <div class="settings-section-title">🎨 Accent Color</div>
+        <div class="accent-row" id="accent-row">
+          <div class="accent-dot active" style="background:#60c8d8" data-c="#60c8d8" data-v="rgba(96,200,216,0.35)" title="Cyan"></div>
+          <div class="accent-dot" style="background:#b87cef" data-c="#b87cef" data-v="rgba(184,124,239,0.35)" title="Purple"></div>
+          <div class="accent-dot" style="background:#f0c060" data-c="#f0c060" data-v="rgba(240,192,96,0.35)" title="Gold"></div>
+          <div class="accent-dot" style="background:#5de08a" data-c="#5de08a" data-v="rgba(93,224,138,0.35)" title="Green"></div>
+          <div class="accent-dot" style="background:#ff6b8a" data-c="#ff6b8a" data-v="rgba(255,107,138,0.35)" title="Pink"></div>
+          <div class="accent-dot" style="background:#ff9f45" data-c="#ff9f45" data-v="rgba(255,159,69,0.35)" title="Orange"></div>
+        </div>
+      </div>
+
+      <!-- TOGGLES -->
+      <div class="settings-section">
+        <div class="settings-section-title">⚙️ System Options</div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Show Dot Grid</div><div class="settings-toggle-sub">Subtle dot pattern on desktop</div></div>
+          <div class="toggle-switch on" id="tog-grid" onclick="toggleSetting('grid')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Desktop Overlay Dim</div><div class="settings-toggle-sub">Darken wallpaper edges</div></div>
+          <div class="toggle-switch on" id="tog-dim" onclick="toggleSetting('dim')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Window Blur / Glass</div><div class="settings-toggle-sub">Backdrop blur on windows</div></div>
+          <div class="toggle-switch on" id="tog-blur" onclick="toggleSetting('blur')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Animated Skill Bars</div><div class="settings-toggle-sub">Re-animate on tab switch</div></div>
+          <div class="toggle-switch on" id="tog-anim" onclick="toggleSetting('anim')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-toggle-row">
+          <div><div class="settings-toggle-label">Show Desktop Icons</div><div class="settings-toggle-sub">Quick-launch icons on desktop</div></div>
+          <div class="toggle-switch on" id="tog-dicons" onclick="toggleSetting('dicons')"><div class="toggle-knob"></div></div>
+        </div>
+      </div>
+
+      <!-- WINDOW OPACITY -->
+      <div class="settings-section">
+        <div class="settings-section-title">🪟 Window Opacity</div>
+        <input type="range" class="opacity-slider" id="opacity-slider" min="70" max="100" value="97"
+          oninput="setWinOpacity(this.value)">
+        <div style="font-size:10px;color:var(--muted);margin-top:4px" id="opacity-label">97%</div>
+      </div>
+
+      <!-- ICON SIZE -->
+      <div class="settings-section">
+        <div class="settings-section-title">🔵 Dock Icon Size</div>
+        <div class="icon-size-btns">
+          <div class="icon-size-btn" onclick="setDockSize(40)">Small</div>
+          <div class="icon-size-btn active" onclick="setDockSize(52)">Default</div>
+          <div class="icon-size-btn" onclick="setDockSize(64)">Large</div>
+          <div class="icon-size-btn" onclick="setDockSize(72)">XL</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="resize-handle" data-win="settings"></div>
+  </div>
+
+</div><!-- /work-area -->
+
+<!-- DOCK -->
 <div id="dock-wrap">
- <div id="dock">
-  <div class="di open" id="di-about"    onclick="tw('about')">
-    <div class="di-img" style="background:linear-gradient(145deg,#1d4ed8,#60a5fa)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="9" r="5" fill="white" opacity=".92"/><path d="M4 24c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity=".92"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">About Me</div>
+  <div id="dock">
+    <div class="dock-icon open" id="di-about" onclick="openWin('about')">
+      <div class="dock-img di-about">🧑‍💻</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">About Me</div>
+    </div>
+    <div class="dock-icon open" id="di-edu" onclick="openWin('edu')">
+      <div class="dock-img di-edu">🎓</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Education</div>
+    </div>
+    <div class="dock-icon open" id="di-skills" onclick="openWin('skills')">
+      <div class="dock-img di-skills">🧠</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Skills</div>
+    </div>
+    <div class="dock-icon open" id="di-journey" onclick="openWin('journey')">
+      <div class="dock-img di-journey">🛤️</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">My Journey</div>
+    </div>
+    <div class="dock-icon open" id="di-projects" onclick="openWin('projects')">
+      <div class="dock-img di-projects">🚀</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Projects</div>
+    </div>
+    <div class="dock-sep"></div>
+    <div class="dock-icon open" id="di-cli" onclick="openWin('cli')">
+      <div class="dock-img di-cli">⌨️</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Terminal</div>
+    </div>
+    <div class="dock-icon" id="di-weather" onclick="openWin('weather')">
+      <div class="dock-img di-weather">🌤️</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Weather</div>
+    </div>
+    <div class="dock-sep"></div>
+    <div class="dock-icon" id="di-contact" onclick="openWin('contact')">
+      <div class="dock-img di-contact">📬</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Contact</div>
+    </div>
+    <div class="dock-icon" onclick="openExternal('https://github.com/Raj-Rathod-Ai')">
+      <div class="dock-img di-gh"><i class="fa-brands fa-github" style="color:#fff;font-size:22px"></i></div><div class="dock-dot"></div>
+      <div class="dock-tooltip">GitHub</div>
+    </div>
+    <div class="dock-icon" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai')">
+      <div class="dock-img di-li"><i class="fa-brands fa-linkedin-in" style="color:#fff;font-size:22px"></i></div><div class="dock-dot"></div>
+      <div class="dock-tooltip">LinkedIn</div>
+    </div>
+    <div class="dock-sep"></div>
+    <div class="dock-icon" id="di-settings" onclick="openWin('settings')">
+      <div class="dock-img di-settings">⚙️</div><div class="dock-dot"></div>
+      <div class="dock-tooltip">Settings</div>
+    </div>
   </div>
-  <div class="di open" id="di-edu"      onclick="tw('edu')">
-    <div class="di-img" style="background:linear-gradient(145deg,#b45309,#fbbf24)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 5L4 10l10 5 10-5-10-5z" fill="white" opacity=".92"/><path d="M4 10v7" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".7"/><path d="M8 13v5c0 2 3 4 6 4s6-2 6-4v-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">Education</div>
-  </div>
-  <div class="di open" id="di-skills"   onclick="tw('skills')">
-    <div class="di-img" style="background:linear-gradient(145deg,#166534,#4ade80)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="5" y="18" width="4" height="6" rx="1" fill="white" opacity=".9"/><rect x="12" y="12" width="4" height="12" rx="1" fill="white" opacity=".9"/><rect x="19" y="6" width="4" height="18" rx="1" fill="white" opacity=".9"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">Skills</div>
-  </div>
-  <div class="di open" id="di-journey"  onclick="tw('journey')">
-    <div class="di-img" style="background:linear-gradient(145deg,#0c4a6e,#38bdf8)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M5 20 Q10 8 14 14 Q18 20 23 8" stroke="white" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".92"/><circle cx="5" cy="20" r="2" fill="white" opacity=".9"/><circle cx="23" cy="8" r="2" fill="white" opacity=".9"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">Journey</div>
-  </div>
-  <div class="di open" id="di-projects" onclick="tw('projects')">
-    <div class="di-img" style="background:linear-gradient(145deg,#581c87,#c084fc)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 4L17 10H23L18 14L20 20L14 16L8 20L10 14L5 10H11L14 4Z" fill="white" opacity=".9"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">Projects</div>
-  </div>
-  <div class="dsep"></div>
-  <div class="di open" id="di-cli"      onclick="tw('cli')">
-    <div class="di-img" style="background:linear-gradient(145deg,#0f0f14,#2a2a36);border:1px solid rgba(255,255,255,.1)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="16" rx="3" stroke="white" stroke-width="1.8" opacity=".7"/><path d="M8 11l4 3-4 3M16 17h5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">Terminal</div>
-  </div>
-  <div class="di" id="di-weather"  onclick="tw('weather')">
-    <div class="di-img" style="background:linear-gradient(145deg,#075985,#38bdf8)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="11" cy="11" r="4.5" fill="white" opacity=".9"/><path d="M8 19h13a4.5 4.5 0 000-9c-.3 0-.6.03-.9.09A6.5 6.5 0 008 19z" fill="white" opacity=".62"/><path d="M10 22h8M12 25h4" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity=".5"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">Weather</div>
-  </div>
-  <div class="dsep"></div>
-  <div class="di" id="di-contact"  onclick="tw('contact')">
-    <div class="di-img" style="background:linear-gradient(145deg,#9a3412,#fb923c)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="8" width="20" height="14" rx="3" stroke="white" stroke-width="1.9" opacity=".9"/><path d="M4 10l10 7 10-7" stroke="white" stroke-width="1.9" stroke-linecap="round" opacity=".9"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">Contact</div>
-  </div>
-  <!-- GitHub — opens in system browser -->
-  <div class="di" onclick="openBrowser('https://github.com/Raj-Rathod-Ai','GitHub — Raj-Rathod-Ai')">
-    <div class="di-img" style="background:linear-gradient(145deg,#24292e,#4a5568)">
-      <svg width="28" height="28" viewBox="0 0 98 96" fill="white" opacity=".92"><path d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">GitHub</div>
-  </div>
-  <!-- LinkedIn — opens in system browser -->
-  <div class="di" onclick="openBrowser('https://linkedin.com/in/raj-rathod-ai','LinkedIn — raj-rathod-ai')">
-    <div class="di-img" style="background:linear-gradient(145deg,#005580,#0ea5e9)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="white" opacity=".92"><rect x="4" y="4" width="20" height="20" rx="4"/><path d="M8 12v8M8 9.5v.01M12 20v-5c0-2 4-2 4 0v5M12 15h4" stroke="#0369a1" stroke-width="2" stroke-linecap="round"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">LinkedIn</div>
-  </div>
-  <div class="dsep"></div>
-  <div class="di" id="di-settings" onclick="tw('settings')">
-    <div class="di-img" style="background:linear-gradient(145deg,#374151,#9ca3af)">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="3.5" stroke="white" stroke-width="2" opacity=".92"/><path d="M14 4v3M14 21v3M4 14h3M21 14h3M6.93 6.93l2.12 2.12M18.95 18.95l2.12 2.12M6.93 21.07l2.12-2.12M18.95 9.05l2.12-2.12" stroke="white" stroke-width="2" stroke-linecap="round" opacity=".85"/></svg>
-    </div><div class="di-dot"></div><div class="di-tip">Settings</div>
-  </div>
- </div>
 </div>
 
 <script>
-/* ─────────────────────────────────────────
-   WALLPAPERS
-───────────────────────────────────────── */
-const WPS=[
-  {l:'Sonoma Dunes',    c:"url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Big Sur',         c:"url('https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Ventura Tide',    c:"url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Aurora',          c:"url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Galaxy',          c:"url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Sequoia',         c:"url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Abstract Flow',   c:"url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Neon City',       c:"url('https://images.unsplash.com/photo-1477346611705-65d1883cee1e?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Ocean Mist',      c:"url('https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'Desert Storm',    c:"url('https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1800&q=80&auto=format&fit=crop')"},
-  {l:'macOS Blue',      c:'linear-gradient(135deg,#0f2027,#203a43,#2c5364)'},
-  {l:'Monterey',        c:'linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)'},
-  {l:'Ventura Rose',    c:'linear-gradient(135deg,#2d1b69,#11998e,#38ef7d)'},
-  {l:'Sonoma Warm',     c:'linear-gradient(135deg,#1c1c1e,#3a1c71,#d76d77,#ffaf7b)'},
-  {l:'Deep Cosmos',     c:'linear-gradient(135deg,#020024,#090979,#00d4ff)'},
-  {l:'Forest Dark',     c:'linear-gradient(135deg,#0a2e1a,#1a6030,#3ab855)'},
+/* ═══════════════════════════════════════════════
+   WALLPAPERS — macOS-style gradients + Unsplash
+═══════════════════════════════════════════════ */
+const WALLPAPERS = [
+  {
+    label:'Sonoma Dunes',
+    css:`url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Big Sur',
+    css:`url('https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Ventura Tide',
+    css:`url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Aurora',
+    css:`url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Galaxy',
+    css:`url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Sequoia',
+    css:`url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Abstract Flow',
+    css:`url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'Neon City',
+    css:`url('https://images.unsplash.com/photo-1477346611705-65d1883cee1e?w=1800&auto=format&fit=crop&q=80')`
+  },
+  {
+    label:'macOS Blue',
+    css:`linear-gradient(135deg,#0f2027,#203a43,#2c5364)`
+  },
+  {
+    label:'Monterey',
+    css:`linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%)`
+  },
+  {
+    label:'Ventura Rose',
+    css:`linear-gradient(135deg,#2d1b69,#11998e,#38ef7d) no-repeat center/cover`
+  },
+  {
+    label:'Sonoma Warm',
+    css:`linear-gradient(135deg,#1c1c1e 0%,#3a1c71 30%,#d76d77 70%,#ffaf7b 100%)`
+  },
 ];
-let CWP=parseInt(localStorage.getItem('rwp')||'0');
-const bgEl=document.getElementById('bg');
 
-function applyWP(i){
-  CWP=i;
-  const w=WPS[i];
-  if(w.c.startsWith('url(')){bgEl.style.background=`${w.c} center/cover no-repeat`;}
-  else{bgEl.style.background=w.c;bgEl.style.backgroundSize='cover';}
-  localStorage.setItem('rwp',i);
-  document.querySelectorAll('.wth').forEach((t,j)=>t.classList.toggle('on',j===i));
-}
-function buildWPGrid(){
-  const g=document.getElementById('wp-grid');
-  WPS.forEach((w,i)=>{
-    const d=document.createElement('div');
-    d.className='wth'+(i===CWP?' on':'');
-    if(w.c.startsWith('url(')){const m=w.c.match(/url\(['"]?([^'"]+)['"]?\)/);if(m)d.style.backgroundImage=`url('${m[1]}')`;}
-    else{d.style.background=w.c;}
-    d.innerHTML=`<div class="wth-lbl">${w.l}</div>`;
-    d.onclick=()=>applyWP(i);
-    g.appendChild(d);
+let currentWP = parseInt(localStorage.getItem('raj_wp')||'0');
+const bgEl = document.getElementById('desktop-bg');
+
+function applyWallpaper(idx){
+  currentWP = idx;
+  bgEl.style.background = WALLPAPERS[idx].css;
+  bgEl.style.backgroundSize = 'cover';
+  bgEl.style.backgroundPosition = 'center';
+  localStorage.setItem('raj_wp', idx);
+  document.querySelectorAll('.wp-thumb').forEach((t,i)=>{
+    t.classList.toggle('active', i===idx);
   });
 }
 
-/* ─────────────────────────────────────────
-   CLOCK
-───────────────────────────────────────── */
-function tick(){
-  const n=new Date();
-  document.getElementById('clock').textContent=
-    n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+
-    '  '+n.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+function buildWallpaperGrid(){
+  const grid = document.getElementById('wp-grid');
+  WALLPAPERS.forEach((wp,i)=>{
+    const d = document.createElement('div');
+    d.className = 'wp-thumb' + (i===currentWP?' active':'');
+    if(wp.css.startsWith('url(')){
+      d.style.backgroundImage = wp.css.match(/url\(['"]?([^'"]+)['"]?\)/)?.[1]
+        ? `url('${wp.css.match(/url\(['"]?([^'"]+)['"]?\)/)[1]}')`
+        : wp.css;
+    } else {
+      d.style.background = wp.css;
+    }
+    d.innerHTML = `<div class="wp-label">${wp.label}</div>`;
+    d.onclick = ()=> applyWallpaper(i);
+    grid.appendChild(d);
+  });
 }
-tick();setInterval(tick,10000);
 
-/* ─────────────────────────────────────────
-   macOS PRELOADER
-───────────────────────────────────────── */
-(()=>{
-  const fill=document.getElementById('pf');
-  const msg=document.getElementById('pm');
-  const msgs=['Checking system…','Loading preferences…','Starting window manager…','Mounting filesystem…','Initialising UI…','Welcome.'];
-  let p=0,mi=0;
-  const iv=setInterval(()=>{
-    p+=Math.random()*13+4;if(p>100)p=100;
-    fill.style.width=p+'%';
-    const ni=Math.min(Math.floor(p/18),msgs.length-1);
-    if(ni!==mi){mi=ni;msg.textContent=msgs[mi];}
-    if(p>=100){clearInterval(iv);setTimeout(()=>{document.getElementById('preloader').classList.add('done');animBars();},600);}
-  },80);
+/* ═══════════════════════════════════════════
+   CLOCK
+═══════════════════════════════════════════ */
+function tick(){
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) +
+    '  ' + n.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+tick(); setInterval(tick, 10000);
+
+/* ═══════════════════════════════════════════
+   PRELOADER
+═══════════════════════════════════════════ */
+(function(){
+  const fill = document.getElementById('pre-fill');
+  const msg  = document.getElementById('pre-msg');
+  const msgs = ['Booting system...','Loading modules...','Mounting windows...','Almost ready...'];
+  let p = 0;
+  const iv = setInterval(()=>{
+    p += Math.random()*20+8; if(p>100) p=100;
+    fill.style.width = p+'%';
+    msg.textContent = msgs[Math.min(Math.floor(p/26),msgs.length-1)];
+    if(p>=100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        document.getElementById('preloader').classList.add('done');
+        animateBars();
+      },420);
+    }
+  },100);
 })();
 
-/* ─────────────────────────────────────────
-   TOAST
-───────────────────────────────────────── */
-let toastT;
-function toast(ic,msg){
-  clearTimeout(toastT);
-  document.getElementById('toast-ic').textContent=ic;
-  document.getElementById('toast-msg').textContent=msg;
-  document.getElementById('toast').classList.add('on');
-  toastT=setTimeout(()=>document.getElementById('toast').classList.remove('on'),2600);
-}
-
-/* ─────────────────────────────────────────
+/* ═══════════════════════════════════════════
    WINDOW MANAGER
-───────────────────────────────────────── */
-const WIDS=['about','edu','skills','journey','projects','cli','contact','weather','browser','settings'];
-const WS={}; // state: 'open'|'min'|'closed'
-WIDS.forEach(id=>{
-  const el=document.getElementById('win-'+id);
-  WS[id]=(el&&el.style.display!=='none')?'open':'closed';
-});
-let ZT=200;
-const CFG={genie:true,popin:true,anim:true,blur:true,dim:true,noise:true,dicons:true,autohide:false,dots:true};
+═══════════════════════════════════════════ */
+const WIN_IDS = ['about','edu','skills','journey','projects','cli','contact','weather','settings'];
+let zTop = 200;
 
-function focus(id){
-  ZT++;
-  const el=document.getElementById('win-'+id);
-  if(!el)return;
-  el.style.zIndex=ZT;
+function focusWin(id){
+  zTop++;
+  const el = document.getElementById('win-'+id);
+  if(!el) return;
+  el.style.zIndex = zTop;
   document.querySelectorAll('.win').forEach(w=>w.classList.remove('focused'));
   el.classList.add('focused');
 }
-
 function openWin(id){
-  const el=document.getElementById('win-'+id);
-  if(!el)return;
-  WS[id]='open';
-  el.style.display='flex';
-  el.style.transform='';el.style.opacity='';
-  el.classList.remove('genie-out','genie-in');
-  if(CFG.popin){void el.offsetWidth;el.classList.add('popin');}
-  focus(id);
-  const di=document.getElementById('di-'+id);
-  if(di){di.classList.add('open');di.classList.remove('minimized');}
-  if(id==='skills')setTimeout(animBars,80);
-  if(id==='weather')initWeather();
+  const el = document.getElementById('win-'+id);
+  if(!el) return;
+  el.style.display = 'flex';
+  el.style.animation = 'winPop .22s cubic-bezier(.34,1.56,.64,1)';
+  focusWin(id);
+  const di = document.getElementById('di-'+id);
+  if(di) di.classList.add('open');
+  if(id==='skills') setTimeout(animateBars,80);
+  if(id==='weather') initWeather();
 }
-
-/* TOGGLE: dock tap or desktop icon click */
-function tw(id){
-  const state=WS[id];
-  const el=document.getElementById('win-'+id);
-  if(state==='open'){
-    if(el&&el.classList.contains('focused')) minWin(id);
-    else focus(id);
-  } else if(state==='min'){
-    restoreWin(id);
-  } else {
-    openWin(id);
-  }
-}
-
-/* CLOSE */
 function closeWin(id){
-  const el=document.getElementById('win-'+id);
-  if(!el)return;
-  WS[id]='closed';
-  el.style.display='none';
-  el.classList.remove('genie-out','genie-in','focused','popin');
-  const di=document.getElementById('di-'+id);
-  if(di){di.classList.remove('open','minimized');}
+  const el = document.getElementById('win-'+id);
+  if(!el) return;
+  el.style.display = 'none';
+  const di = document.getElementById('di-'+id);
+  if(di) di.classList.remove('open');
 }
-
-/* GENIE MINIMIZE */
-function minWin(id){
-  const el=document.getElementById('win-'+id);
-  if(!el||WS[id]!=='open')return;
-  WS[id]='min';
-  if(CFG.genie){
-    el.classList.remove('genie-in','popin');
-    void el.offsetWidth;
-    el.classList.add('genie-out');
-    setTimeout(()=>{el.style.display='none';el.classList.remove('genie-out');},420);
-  } else {
-    el.style.display='none';
-  }
-  const di=document.getElementById('di-'+id);
-  if(di){di.classList.add('open','minimized');}
-}
-
-/* GENIE RESTORE */
-function restoreWin(id){
-  const el=document.getElementById('win-'+id);
-  if(!el)return;
-  WS[id]='open';
-  el.style.display='flex';
-  el.style.transform='';el.style.opacity='';
-  if(CFG.genie){
-    el.classList.remove('genie-out','popin');
-    void el.offsetWidth;
-    el.classList.add('genie-in');
-    setTimeout(()=>el.classList.remove('genie-in'),380);
-  }
-  focus(id);
-  const di=document.getElementById('di-'+id);
-  if(di){di.classList.add('open');di.classList.remove('minimized');}
-  if(id==='skills')setTimeout(animBars,80);
-}
-
-/* MAXIMIZE */
+function minWin(id){ closeWin(id); }
 function maxWin(id){
-  const el=document.getElementById('win-'+id);
-  if(!el)return;
-  const wa=document.getElementById('wa').getBoundingClientRect();
-  if(el._max){Object.assign(el.style,el._prev);el._max=false;}
-  else{
-    el._prev={left:el.style.left,top:el.style.top,width:el.style.width,height:el.style.height};
+  const el = document.getElementById('win-'+id);
+  const wa = document.getElementById('work-area').getBoundingClientRect();
+  if(el._max){
+    Object.assign(el.style, el._prev); el._max = false;
+  } else {
+    el._prev = {left:el.style.left,top:el.style.top,width:el.style.width,height:el.style.height};
     Object.assign(el.style,{left:'0px',top:'0px',width:wa.width+'px',height:wa.height+'px'});
-    el._max=true;
+    el._max = true;
   }
-  focus(id);
 }
-
-function closeAll(){WIDS.forEach(id=>closeWin(id));toast('✅','All windows closed');}
-
-function tile(){
-  const wa=document.getElementById('wa').getBoundingClientRect();
-  const vis=WIDS.filter(id=>(WS[id]==='open'||WS[id]==='min')&&document.getElementById('win-'+id));
-  if(!vis.length){toast('ℹ️','No windows to tile');return;}
-  vis.forEach(id=>{if(WS[id]==='min')restoreWin(id);});
-  const cols=Math.ceil(Math.sqrt(vis.length)),rows=Math.ceil(vis.length/cols);
-  const w=Math.floor(wa.width/cols)-5,h=Math.floor(wa.height/rows)-5;
-  vis.forEach((id,i)=>{
-    const col=i%cols,row=Math.floor(i/cols);
-    const el=document.getElementById('win-'+id);
-    Object.assign(el.style,{left:col*(w+5)+'px',top:row*(h+5)+'px',width:w+'px',height:h+'px'});
-    el._max=false;
+function closeAllWins(){
+  WIN_IDS.forEach(id=>closeWin(id));
+}
+function tileWindows(){
+  const wa = document.getElementById('work-area').getBoundingClientRect();
+  const visible = WIN_IDS.filter(id=>{
+    const el = document.getElementById('win-'+id);
+    return el && el.style.display!=='none';
   });
-  toast('⊞','Windows tiled');
+  const cols = Math.ceil(Math.sqrt(visible.length));
+  const rows = Math.ceil(visible.length/cols);
+  const w = Math.floor(wa.width/cols)-8;
+  const h = Math.floor(wa.height/rows)-8;
+  visible.forEach((id,i)=>{
+    const col = i%cols, row = Math.floor(i/cols);
+    const el = document.getElementById('win-'+id);
+    Object.assign(el.style,{
+      left:(col*(w+8))+'px',top:(row*(h+8))+'px',
+      width:w+'px',height:h+'px'
+    });
+    el._max = false;
+  });
 }
 
-/* focus on click */
+/* click to focus */
 document.querySelectorAll('.win').forEach(w=>{
   w.addEventListener('mousedown',()=>{
-    const id=WIDS.find(i=>document.getElementById('win-'+i)===w);
-    if(id)focus(id);
+    const id = WIN_IDS.find(i=>document.getElementById('win-'+i)===w);
+    if(id) focusWin(id);
   });
 });
 
-/* ─────────────────────────────────────────
+/* ═══════════════════════════════════════════
    DRAG
-───────────────────────────────────────── */
-document.querySelectorAll('.wbar').forEach(bar=>{
-  bar.addEventListener('mousedown',e=>{
-    if(e.target.closest('.wb')||e.button!==0)return;
-    const win=bar.closest('.win'),id=bar.dataset.win;
-    focus(id);
-    const ox=e.clientX-win.offsetLeft,oy=e.clientY-win.offsetTop;
-    const wa=document.getElementById('wa').getBoundingClientRect();
-    const mv=e2=>{
-      let nx=e2.clientX-ox,ny=e2.clientY-oy;
-      nx=Math.max(-win.offsetWidth+80,Math.min(wa.width-80,nx));
-      ny=Math.max(0,Math.min(wa.height-40,ny));
-      win.style.left=nx+'px';win.style.top=ny+'px';
-    };
-    const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
-    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+═══════════════════════════════════════════ */
+document.querySelectorAll('.win-bar').forEach(bar=>{
+  bar.addEventListener('mousedown', e=>{
+    if(e.target.classList.contains('win-btn')||e.target.closest('.win-btn')) return;
+    const win = bar.closest('.win');
+    const id = bar.dataset.win;
+    focusWin(id);
+    const ox = e.clientX - win.offsetLeft, oy = e.clientY - win.offsetTop;
+    const wa = document.getElementById('work-area').getBoundingClientRect();
+    function mv(e2){
+      let nx = e2.clientX-ox, ny = e2.clientY-oy;
+      nx = Math.max(-win.offsetWidth+80, Math.min(wa.width-80, nx));
+      ny = Math.max(0, Math.min(wa.height-40, ny));
+      win.style.left = nx+'px'; win.style.top = ny+'px';
+    }
+    function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); }
+    document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up);
   });
-  bar.addEventListener('dblclick',e=>{if(!e.target.closest('.wb'))maxWin(bar.dataset.win);});
 });
 
-/* ─────────────────────────────────────────
+/* ═══════════════════════════════════════════
    RESIZE
-───────────────────────────────────────── */
-document.querySelectorAll('.rh').forEach(h=>{
-  h.addEventListener('mousedown',e=>{
-    e.preventDefault();e.stopPropagation();
-    const win=h.closest('.win'),sx=e.clientX,sy=e.clientY,sw=win.offsetWidth,sh=win.offsetHeight;
-    const mv=e2=>{win.style.width=Math.max(300,sw+e2.clientX-sx)+'px';win.style.height=Math.max(200,sh+e2.clientY-sy)+'px';};
-    const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
-    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+═══════════════════════════════════════════ */
+document.querySelectorAll('.resize-handle').forEach(h=>{
+  h.addEventListener('mousedown', e=>{
+    e.preventDefault();
+    const win = h.closest('.win');
+    const sx=e.clientX, sy=e.clientY, sw=win.offsetWidth, sh=win.offsetHeight;
+    function mv(e2){
+      win.style.width  = Math.max(300, sw+e2.clientX-sx)+'px';
+      win.style.height = Math.max(180, sh+e2.clientY-sy)+'px';
+    }
+    function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); }
+    document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up);
   });
 });
 
-/* ─────────────────────────────────────────
-   CONTEXT MENUS
-───────────────────────────────────────── */
-let ctxW=null,ctxD=null;
-document.addEventListener('contextmenu',e=>{
-  e.preventDefault();cc();
-  const win=e.target.closest('.win');
-  const di=e.target.closest('.di');
-  if(di&&di.id&&di.id.startsWith('di-')){
-    ctxD=di.id.replace('di-','');
-    document.getElementById('ctx-dk-lbl').textContent=ctxD.charAt(0).toUpperCase()+ctxD.slice(1);
-    showCtx('ctx-dock',e);
-  } else if(win){
-    ctxW=WIDS.find(i=>document.getElementById('win-'+i)===win);
-    if(ctxW)document.getElementById('ctx-win-lbl').textContent=ctxW.charAt(0).toUpperCase()+ctxW.slice(1);
-    showCtx('ctx-win',e);
-  } else {
-    showCtx('ctx-desk',e);
-  }
-});
-function showCtx(id,e){
-  const m=document.getElementById(id);
-  m.style.display='block';
-  m.style.left=Math.min(e.clientX,window.innerWidth-210)+'px';
-  m.style.top=Math.min(e.clientY,window.innerHeight-260)+'px';
-}
-function cc(){document.querySelectorAll('.ctxm').forEach(m=>m.style.display='none');}
-document.addEventListener('click',e=>{if(!e.target.closest('.ctxm'))cc();});
-function cwa(act){
-  if(!ctxW)return;
-  if(act==='front')focus(ctxW);
-  if(act==='min')minWin(ctxW);
-  if(act==='max')maxWin(ctxW);
-  if(act==='close')closeWin(ctxW);
-  cc();
-}
-function cda(act){
-  if(!ctxD)return;
-  if(act==='open')openWin(ctxD);
-  if(act==='min')minWin(ctxD);
-  if(act==='close')closeWin(ctxD);
-  cc();
-}
-
-/* ─────────────────────────────────────────
-   IN-SYSTEM BROWSER
-───────────────────────────────────────── */
-function openBrowser(url,title){
-  // for mailto/tel, still use system handler
-  if(url.startsWith('mailto:')||url.startsWith('tel:')){
-    window.open(url,'_blank');return;
-  }
-  const frame=document.getElementById('br-frame');
-  const urlEl=document.getElementById('br-url');
-  const titleEl=document.getElementById('br-title');
-  // Use a CORS proxy for same-origin restriction workaround
-  // Just show the URL in address bar and open in iframe if possible
-  frame.src=url;
-  urlEl.textContent=url;
-  titleEl.textContent=title||url;
-  openWin('browser');
-  toast('🌐',title||'Opening in browser…');
-}
-
-/* ─────────────────────────────────────────
-   REFRESH
-───────────────────────────────────────── */
-function refreshPage(){toast('🔄','Refreshing…');setTimeout(()=>location.reload(),500);}
-
-/* ─────────────────────────────────────────
+/* ═══════════════════════════════════════════
    SKILL BARS & TABS
-───────────────────────────────────────── */
-let animEnabled=true;
-function animBars(){
-  if(!animEnabled)return;
-  document.querySelectorAll('.sf').forEach(b=>{
-    const w=b.style.width;b.style.transition='none';b.style.transform='scaleX(0)';
+═══════════════════════════════════════════ */
+let animEnabled = true;
+function animateBars(){
+  if(!animEnabled) return;
+  document.querySelectorAll('.skill-bar-fill').forEach(b=>{
+    const w = b.style.width;
+    b.style.transition = 'none';
+    b.style.transform = 'scaleX(0)';
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      b.style.transition='transform .85s cubic-bezier(.22,1,.36,1)';
-      b.style.transform='scaleX(1)';b.style.width=w;
+      b.style.transition = 'transform .8s cubic-bezier(.22,1,.36,1)';
+      b.style.transform = 'scaleX(1)';
+      b.style.width = w;
     }));
   });
 }
-function stab(p,el){
-  document.querySelectorAll('.st').forEach(t=>t.classList.remove('on'));
-  document.querySelectorAll('.sp').forEach(s=>s.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('sp-'+p).classList.add('on');
-  setTimeout(animBars,60);
+function switchTab(panel, tabEl){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.skill-panel').forEach(p=>p.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById('sp-'+panel).classList.add('active');
+  setTimeout(animateBars, 60);
 }
 
-/* ─────────────────────────────────────────
-   SETTINGS
-───────────────────────────────────────── */
-function sset(p,nav){
-  document.querySelectorAll('.sni').forEach(n=>n.classList.remove('on'));
-  document.querySelectorAll('.ssp').forEach(s=>s.classList.remove('on'));
-  nav.classList.add('on');
-  document.getElementById('ssp-'+p).classList.add('on');
-}
-function togSet(k){
-  CFG[k]=!CFG[k];
-  const t=document.getElementById('tog-'+k);
-  if(t)t.classList.toggle('on',CFG[k]);
-  applyCFG();
-}
-function applyCFG(){
-  document.getElementById('bg-noise').style.opacity=CFG.noise?'.025':'0';
-  document.getElementById('bg-overlay').style.opacity=CFG.dim?'1':'0';
-  const bf=CFG.blur?'blur(48px) saturate(180%)':'none';
-  document.querySelectorAll('.win').forEach(w=>w.style.backdropFilter=bf);
-  animEnabled=CFG.anim;
-  document.querySelectorAll('.dki').forEach(d=>d.style.display=CFG.dicons?'flex':'none');
-  const dw=document.getElementById('dock-wrap');
-  if(CFG.autohide){dw.style.bottom='-96px';dw.onmouseenter=()=>dw.style.bottom='10px';dw.onmouseleave=()=>dw.style.bottom='-96px';}
-  else{dw.style.bottom='10px';dw.onmouseenter=null;dw.onmouseleave=null;}
-  document.querySelectorAll('.di-dot').forEach(d=>d.style.opacity=CFG.dots?null:'0');
-}
-function setOpacity(v){
-  document.getElementById('osl-lbl').textContent=v+'%';
-  const a=(v/100).toFixed(2);
-  document.querySelectorAll('.win').forEach(w=>w.style.background=`rgba(28,28,32,${a})`);
-}
-function setDock(sz,btn){
-  document.documentElement.style.setProperty('--dock-sz',sz+'px');
-  document.querySelectorAll('.sb2').forEach(b=>b.classList.remove('on'));
-  if(btn)btn.classList.add('on');
-}
-/* accent color */
-document.getElementById('adots').querySelectorAll('.adot').forEach(d=>{
-  d.addEventListener('click',()=>{
-    document.querySelectorAll('.adot').forEach(x=>x.classList.remove('on'));
-    d.classList.add('on');
-    document.documentElement.style.setProperty('--c-teal',d.dataset.c);
-    toast('🎨','Accent: '+d.title);
-  });
-});
-/* font */
-function setFont(f,el){
-  document.documentElement.style.setProperty('--f-ui',`'${f}',sans-serif`);
-  document.querySelectorAll('.fop i').forEach(i=>i.style.opacity='0');
-  el.querySelector('i').style.opacity='1';
-  document.querySelectorAll('.fop').forEach(x=>x.classList.remove('on'));
-  el.classList.add('on');
-  toast('🔤','Font: '+f);
-}
-/* theme */
-function setTheme(n,el){
-  const T={dark:{s:'rgba(28,28,32,0.88)',bar:'rgba(10,10,14,.76)'},midnight:{s:'rgba(5,5,16,0.96)',bar:'rgba(4,4,10,.88)'},graphite:{s:'rgba(34,34,36,0.90)',bar:'rgba(16,16,18,.82)'}};
-  const t=T[n];if(!t)return;
-  document.documentElement.style.setProperty('--c-bg',t.s);
-  document.documentElement.style.setProperty('--c-bar',t.bar);
-  document.querySelectorAll('.thop').forEach(x=>x.classList.remove('on'));
-  el.classList.add('on');
-  toast('🎨','Theme: '+n);
-}
+/* ═══════════════════════════════════════════
+   TERMINAL  (full command set)
+═══════════════════════════════════════════ */
+const cliOut   = document.getElementById('cli-output');
+const cliIn    = document.getElementById('cli-input');
+let cliHistory = [], cliHIdx = -1;
 
-/* ─────────────────────────────────────────
-   TERMINAL
-───────────────────────────────────────── */
-const clio=document.getElementById('clio');
-const clii=document.getElementById('clii');
-let cliH=[],cliHI=-1;
-const CMDS={
-  help:()=>`<span class="ch">Available commands:</span>
-  <span class="ch2">about</span>         — who is Rathod Raj
-  <span class="ch2">skills</span>        — full tech stack
-  <span class="ch2">projects</span>      — featured builds
-  <span class="ch2">education</span>     — academic timeline
-  <span class="ch2">contact</span>       — reach out
-  <span class="ch2">achievements</span>  — notable wins
-  <span class="ch2">social</span>        — open social links in browser
-  <span class="ch2">open [win]</span>    — open any window
-  <span class="ch2">close [win]</span>   — close window
-  <span class="ch2">min [win]</span>     — minimize (genie)
-  <span class="ch2">list</span>          — list window states
-  <span class="ch2">tile</span>          — tile all windows
-  <span class="ch2">wallpaper [n]</span> — set wallpaper (0-${WPS.length-1})
-  <span class="ch2">neofetch</span>      — system info
-  <span class="ch2">matrix</span>        — ;)
-  <span class="ch2">clear</span>         — clear terminal`,
-  about:()=>`👋  <span class="ch">Rathod Raj</span> — Data Scientist &amp; AI Specialist
+const CMDS = {
+  help: ()=>`<span class="cli-hi">Available commands:</span>
+  <span class="cli-hi2">about</span>        — who is Rathod Raj
+  <span class="cli-hi2">skills</span>       — full tech stack
+  <span class="cli-hi2">projects</span>     — featured builds
+  <span class="cli-hi2">education</span>    — academic timeline
+  <span class="cli-hi2">contact</span>      — reach out
+  <span class="cli-hi2">achievements</span> — notable wins
+  <span class="cli-hi2">social</span>       — open social links
+  <span class="cli-hi2">weather</span>      — open weather window
+  <span class="cli-hi2">open [window]</span>— open any window
+  <span class="cli-hi2">close [window]</span>— close any window
+  <span class="cli-hi2">list</span>         — list open windows
+  <span class="cli-hi2">whoami</span>       — identity
+  <span class="cli-hi2">date</span>         — current date & time
+  <span class="cli-hi2">matrix</span>       — :)
+  <span class="cli-hi2">neofetch</span>     — system info
+  <span class="cli-hi2">clear</span>        — clear terminal`,
+
+  about: ()=>`👋  <span class="cli-hi">Rathod Raj</span> — Data Scientist &amp; AI Specialist
 📍  Porbandar, Gujarat, India
 🎓  B.Tech CSE · Parul University · 7.43 CGPA
-🔗  <a class="clink" onclick="openWin('about')">→ Open About window</a>`,
-  skills:()=>`<span class="ch">⚡ Languages:</span>  Python 90% · Java 72% · C 78% · C++ 60% · SQL 75%
-<span class="ch">📦 Libraries:</span>  NumPy 88% · Pandas 85% · Scikit-learn 80% · TensorFlow 70%
-              LangChain 75% · Streamlit 80% · PyTorch 60%
-<span class="ch">🛠  Tools:</span>     Docker 65% · MLflow 68% · Git 82% · AWS 52% · Power BI 70%`,
-  projects:()=>`<span class="ch">🚀 Projects:</span>
-  1. <span class="ch2">FloraScan</span>       <span class="ch">Live ✓</span>  <a class="clink" onclick="openBrowser('https://flower-disease-system.vercel.app/health','FloraScan')">open ↗</a>
-  2. <span class="ch2">Fake News</span>       <span class="co">In Progress</span>
-  3. <span class="ch2">Code Reviewer</span>   <span class="co">Beta</span>
-  4. <span class="ch2">Discord Bot</span>     <span class="ch">Operational ✓</span>
-  5. <span class="ch2">This Portfolio</span>  <span class="ch">Live ✓</span>  <a class="clink" onclick="openBrowser('https://rathodrajai.netlify.app/','Portfolio')">open ↗</a>`,
-  education:()=>`<span class="ch">🎓 Education:</span>
-  2023–26  B.Tech CSE · Parul University · <span class="ch2">7.43 CGPA</span>
-  2021–23  Higher Secondary · Sigma School · 60.61%
-  2020–21  Secondary (SSC)  · Sigma School · 79.81%`,
-  contact:()=>`<span class="ch">📬 Contact:</span>
-  Email    <a class="clink" onclick="openBrowser('mailto:rathodraj1504@gmail.com','Email Raj')">rathodraj1504@gmail.com</a>
-  Phone    +91 96248 01014
-  GitHub   <a class="clink" onclick="openBrowser('https://github.com/Raj-Rathod-Ai','GitHub')">github.com/Raj-Rathod-Ai</a>
-  LinkedIn <a class="clink" onclick="openBrowser('https://linkedin.com/in/raj-rathod-ai','LinkedIn')">linkedin.com/in/raj-rathod-ai</a>`,
-  achievements:()=>`<span class="ch">🏆 Achievements:</span>
-  • Google Arcade Skill Boost — GCP certified
+💡  Building neural architectures &amp; MLOps pipelines
+🔗  <a class="cli-link" onclick="openWin('about')">→ Open About window</a>`,
+
+  skills: ()=>`<span class="cli-hi">⚡ Languages:</span>  Python (90%) · Java (72%) · C (78%) · C++ (60%) · SQL (75%)
+<span class="cli-hi">📦 Libraries:</span>  NumPy (88%) · Pandas (85%) · Scikit-learn (80%) · TensorFlow (70%)
+              PyTorch (60%) · Matplotlib (78%) · LangChain (75%) · Streamlit (80%)
+<span class="cli-hi">🛠  Tools:</span>     Docker (65%) · MLflow (68%) · Git (82%) · AWS (52%) · Power BI (70%)
+🔗  <a class="cli-link" onclick="openWin('skills')">→ Open Skills window</a>`,
+
+  projects: ()=>`<span class="cli-hi">🚀 Featured Projects:</span>
+  1. <span class="cli-hi2">FloraScan</span>          — Flower Disease Detection (TF + Flask) · <span class="cli-out">Live ✓</span>
+     <a class="cli-link" onclick="openExternal('https://flower-disease-system.vercel.app/health')">↗ Open Link</a>
+  2. <span class="cli-hi2">Fake News Detector</span> — NLP Transformer pipeline         · <span class="cli-out">In Progress</span>
+  3. <span class="cli-hi2">AI Code Reviewer</span>   — LLM-powered bug analyser          · <span class="cli-out">Beta</span>
+  4. <span class="cli-hi2">Discord AI Bot</span>     — Smart server assistant            · <span class="cli-out">Operational ✓</span>
+  5. <span class="cli-hi2">This Portfolio</span>     — macOS-style single-file HTML       · <span class="cli-out">Live ✓</span>
+     <a class="cli-link" onclick="openExternal('https://rathodrajai.netlify.app/')">↗ Open Link</a>`,
+
+  education: ()=>`<span class="cli-hi">🎓 Academic Timeline:</span>
+  2023–2026  B.Tech CSE · Parul University · <span class="cli-hi2">7.43 CGPA</span>
+  2021–2023  Higher Secondary · Sigma School · 60.61%
+  2020–2021  Secondary (SSC)  · Sigma School · 79.81%`,
+
+  contact: ()=>`<span class="cli-hi">📬 Contact:</span>
+  Email    : <a class="cli-link" onclick="openExternal('mailto:rathodraj1504@gmail.com')">rathodraj1504@gmail.com</a>
+  Phone    : +91 96248 01014
+  GitHub   : <a class="cli-link" onclick="openExternal('https://github.com/Raj-Rathod-Ai')">github.com/Raj-Rathod-Ai</a>
+  LinkedIn : <a class="cli-link" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai')">linkedin.com/in/raj-rathod-ai</a>
+  LeetCode : <a class="cli-link" onclick="openExternal('https://leetcode.com/u/Rathod-Raj-Ai/')">leetcode.com/u/Rathod-Raj-Ai</a>`,
+
+  achievements: ()=>`<span class="cli-hi">🏆 Achievements:</span>
+  • Google Arcade Skill Boost — Google Cloud certified
   • Top 500 · Hackathon Vadodara 6.0
     Project: Language-Agnostic Chatbot (Dynamic Programming)`,
-  social:()=>{openBrowser('https://github.com/Raj-Rathod-Ai','GitHub');return`<span class="ch2">Opening GitHub in system browser…</span>
-  <a class="clink" onclick="openBrowser('https://linkedin.com/in/raj-rathod-ai','LinkedIn')">LinkedIn</a>  <a class="clink" onclick="openBrowser('https://leetcode.com/u/Rathod-Raj-Ai/','LeetCode')">LeetCode</a>`;},
-  list:()=>{
-    let o='<span class="ch">Window States:</span>\n';
-    WIDS.forEach(id=>{
-      const s=WS[id];
-      const col=s==='open'?'var(--c-green)':s==='min'?'var(--c-accent)':'var(--c-muted)';
-      o+=`  <span style="color:${col}">${s.padEnd(7)}</span>  <a class="clink" onclick="${s==='min'?`restoreWin('${id}')`:s==='closed'?`openWin('${id}')`:``}focus('${id}')">${id}</a>\n`;
-    });
-    return o;
+
+  social: ()=>{
+    openExternal('https://github.com/Raj-Rathod-Ai');
+    return `<span class="cli-hi2">Opening GitHub in browser…</span>
+Also available: <a class="cli-link" onclick="openExternal('https://linkedin.com/in/raj-rathod-ai')">LinkedIn</a>  <a class="cli-link" onclick="openExternal('https://leetcode.com/u/Rathod-Raj-Ai/')">LeetCode</a>`;
   },
-  tile:()=>{tile();return`<span class="ch2">Windows tiled.</span>`;},
-  neofetch:()=>`<span class="ch">
-        ███████╗    </span><span class="ch2">raj@rajOS</span>
-        <span class="ch">██╔═══██╗   </span>──────────────────────────────
-        <span class="ch">███████╔╝   </span><span class="co">OS:</span>      RajOS v3.0 (Porbandar)
-        <span class="ch">██╔══██╗    </span><span class="co">Host:</span>    Single-File HTML Portfolio
-        <span class="ch">██║  ██║    </span><span class="co">Kernel:</span>  V8 JavaScript Engine
-        <span class="ch">╚═╝  ╚═╝    </span><span class="co">Shell:</span>   Custom ZSH (Fira Code)
-                    <span class="co">CPU:</span>     Neural Architecture Designer
-                    <span class="co">Memory:</span>  7.43 CGPA @ Parul University
-                    <span class="co">GPU:</span>     TensorFlow + PyTorch`,
-  matrix:()=>{let s='<span style="color:#0f0;font-size:10px;letter-spacing:2px;font-family:var(--f-mono)">';for(let i=0;i<10;i++){let r='';for(let j=0;j<44;j++)r+=Math.random()>.5?'1':'0';s+=r+'\n';}return s+'</span><span class="ch2">Follow the white rabbit.</span>';},
-  clear:()=>{clio.innerHTML='';return null;}
+
+  weather: ()=>{ openWin('weather'); return `<span class="cli-hi2">Opening Weather window…</span>`; },
+
+  whoami: ()=>`<span class="cli-hi">raj</span> — visitor@portfolio.local  [data-scientist, ai-engineer]`,
+
+  date: ()=>`<span class="cli-hi2">${new Date().toString()}</span>`,
+
+  neofetch: ()=>`<span class="cli-hi">
+        ███████╗    </span> <span class="cli-hi2">raj@portfolio</span>
+        <span class="cli-hi">██╔═══██╗   </span> ──────────────────
+        <span class="cli-hi">███████╔╝   </span> <span class="cli-out">OS:</span> RajOS 1.0 (Porbandar Build)
+        <span class="cli-hi">██╔══██╗    </span> <span class="cli-out">Host:</span> Single-File HTML Portfolio
+        <span class="cli-hi">██║  ██║    </span> <span class="cli-out">Kernel:</span> JavaScript v8+
+        <span class="cli-hi">╚═╝  ╚═╝    </span> <span class="cli-out">Shell:</span> Custom ZSH-style
+                    <span class="cli-out">Languages:</span> Python, Java, C, C++, SQL
+                    <span class="cli-out">Focus:</span> AI / ML / Data Science
+                    <span class="cli-out">CGPA:</span> 7.43 @ Parul University`,
+
+  list: ()=>{
+    const open = WIN_IDS.filter(id=>{
+      const el = document.getElementById('win-'+id);
+      return el && el.style.display !== 'none';
+    });
+    if(!open.length) return `<span class="cli-out">No windows open.</span>`;
+    return `<span class="cli-hi">Open windows:</span>\n` + open.map(id=>`  • <a class="cli-link" onclick="focusWin('${id}')">${id}</a>`).join('\n');
+  },
+
+  matrix: ()=>{
+    let s = '<span style="color:#0f0;font-size:10px">';
+    for(let i=0;i<8;i++){
+      let row='';
+      for(let j=0;j<48;j++) row+=Math.random()>0.5?'1':'0';
+      s+=row+'\n';
+    }
+    return s+'</span><span class="cli-hi2">There is no spoon.</span>';
+  },
+
+  clear: ()=>{ cliOut.innerHTML=''; return null; }
 };
+
 function cliPrint(html){
-  if(html===null)return;
+  if(html===null) return;
   html.split('\n').forEach(line=>{
-    const s=document.createElement('span');
-    s.className='cl';s.innerHTML=line;clio.appendChild(s);
+    const s = document.createElement('span');
+    s.className='cli-line'; s.innerHTML=line;
+    cliOut.appendChild(s);
   });
-  clio.scrollTop=clio.scrollHeight;
+  cliOut.scrollTop = cliOut.scrollHeight;
 }
-clii.addEventListener('keydown',e=>{
-  if(e.key==='ArrowUp'){if(cliHI<cliH.length-1)clii.value=cliH[++cliHI];return;}
-  if(e.key==='ArrowDown'){if(cliHI>0)clii.value=cliH[--cliHI];else{cliHI=-1;clii.value='';}return;}
-  if(e.key!=='Enter')return;
-  const raw=clii.value.trim();clii.value='';if(!raw)return;
-  cliH.unshift(raw);cliHI=-1;
-  const echo=document.createElement('span');
-  echo.className='cl';
-  echo.innerHTML=`<span class="cp">raj@portfolio:~$</span> <span class="cc">${raw.replace(/</g,'&lt;')}</span>`;
-  clio.appendChild(echo);
-  const pts=raw.toLowerCase().split(' '),cmd=pts[0],arg=pts[1]||'';
-  if(cmd==='open'&&arg){const m=WIDS.find(w=>w.startsWith(arg));m?(openWin(m),cliPrint(`<span class="ch2">Opening ${m}…</span>`)):cliPrint(`<span class="ce">open: no window '${arg}'</span>`);}
-  else if(cmd==='close'&&arg){const m=WIDS.find(w=>w.startsWith(arg));m?(closeWin(m),cliPrint(`<span class="ch2">Closed ${m}.</span>`)):cliPrint(`<span class="ce">close: no window '${arg}'</span>`);}
-  else if(cmd==='min'&&arg){const m=WIDS.find(w=>w.startsWith(arg));m?(minWin(m),cliPrint(`<span class="ch2">Minimized ${m} (genie).</span>`)):cliPrint(`<span class="ce">min: no window '${arg}'</span>`);}
-  else if(cmd==='wallpaper'){const n=parseInt(arg);!isNaN(n)&&n>=0&&n<WPS.length?(applyWP(n),cliPrint(`<span class="ch2">Wallpaper → ${WPS[n].l}</span>`)):cliPrint(`<span class="ch">Wallpapers:</span>\n`+WPS.map((w,i)=>`  <span class="ch2">${i}</span>  ${w.l}`).join('\n'));}
-  else if(CMDS[cmd])cliPrint(CMDS[cmd]());
-  else cliPrint(`<span class="ce">zsh: command not found: ${raw.replace(/</g,'&lt;')}</span>\nType <span class="ch2">help</span>`);
+
+cliIn.addEventListener('keydown', e=>{
+  if(e.key==='ArrowUp'){
+    if(cliHIdx<cliHistory.length-1) cliIn.value=cliHistory[++cliHIdx];
+    return;
+  }
+  if(e.key==='ArrowDown'){
+    if(cliHIdx>0) cliIn.value=cliHistory[--cliHIdx]; else{cliHIdx=-1;cliIn.value='';}
+    return;
+  }
+  if(e.key!=='Enter') return;
+  const raw = cliIn.value.trim();
+  cliIn.value = '';
+  if(!raw) return;
+  cliHistory.unshift(raw); cliHIdx=-1;
+
+  const echo = document.createElement('span');
+  echo.className='cli-line';
+  echo.innerHTML=`<span class="cli-prompt">raj@portfolio:~$</span> <span class="cli-cmd">${raw.replace(/</g,'&lt;')}</span>`;
+  cliOut.appendChild(echo);
+
+  const parts = raw.toLowerCase().split(' ');
+  const cmd   = parts[0];
+  const arg   = parts[1]||'';
+
+  if(cmd==='open' && arg){
+    const wins = ['about','edu','skills','journey','projects','cli','contact','weather','settings'];
+    const match = wins.find(w=>w.startsWith(arg));
+    if(match){ openWin(match); cliPrint(`<span class="cli-hi2">Opening ${match}…</span>`); }
+    else cliPrint(`<span class="cli-err">open: no window matching '${arg}'</span>`);
+  } else if(cmd==='close' && arg){
+    const wins = ['about','edu','skills','journey','projects','cli','contact','weather','settings'];
+    const match = wins.find(w=>w.startsWith(arg));
+    if(match){ closeWin(match); cliPrint(`<span class="cli-hi2">Closed ${match}.</span>`); }
+    else cliPrint(`<span class="cli-err">close: no window matching '${arg}'</span>`);
+  } else if(CMDS[cmd]){
+    cliPrint(CMDS[cmd]());
+  } else {
+    cliPrint(`<span class="cli-err">zsh: command not found: ${raw.replace(/</g,'&lt;')}</span>\nType <span class="cli-hi2">help</span> for available commands.`);
+  }
 });
 
-/* ─────────────────────────────────────────
-   WEATHER
-───────────────────────────────────────── */
-let wLoaded=false;
+/* ═══════════════════════════════════════════
+   WEATHER (Open-Meteo, no API key needed)
+═══════════════════════════════════════════ */
+let weatherLoaded = false;
 async function initWeather(){
-  if(wLoaded)return;wLoaded=true;
-  if(!navigator.geolocation){wErr('Geolocation unavailable');return;}
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    try{
-      const lat=pos.coords.latitude.toFixed(4),lon=pos.coords.longitude.toFixed(4);
-      const gR=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-      const geo=await gR.json();
-      const city=geo.address.city||geo.address.town||geo.address.village||'Location';
-      const cc2=(geo.address.country_code||'').toUpperCase();
-      const wR=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
-      const w=await wR.json();
-      rWeather(w.current,w.daily,city,cc2);
-      document.getElementById('mi-wt').textContent=`${wIc(w.current.weather_code)} ${Math.round(w.current.temperature_2m)}°C`;
-    }catch(e){wErr('Failed to fetch weather');wLoaded=false;}
-  },()=>{wErr('Location access denied');});
+  if(weatherLoaded) return;
+  weatherLoaded = true;
+  try {
+    if(!navigator.geolocation){ showWeatherError('Geolocation not available'); return; }
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      try {
+        const lat = pos.coords.latitude.toFixed(4);
+        const lon = pos.coords.longitude.toFixed(4);
+        // Reverse geocode (no key)
+        const geoR = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const geo  = await geoR.json();
+        const city = geo.address.city || geo.address.town || geo.address.village || 'Your Location';
+        const country = geo.address.country_code?.toUpperCase()||'';
+        // Weather (Open-Meteo free, no key)
+        const wR = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature` +
+          `&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`
+        );
+        const w = await wR.json();
+        const c = w.current;
+        renderWeather(c, w.daily, city, country);
+        // Update menubar
+        const icon = wmoIcon(c.weather_code);
+        document.getElementById('menu-weather').innerHTML =
+          `<span style="cursor:pointer" onclick="openWin('weather')">${icon} ${Math.round(c.temperature_2m)}°C</span>`;
+      } catch(err){ showWeatherError('Failed to fetch weather data'); weatherLoaded=false; }
+    }, ()=>{ showWeatherError('Location permission denied'); });
+  } catch(e){ showWeatherError('Error'); weatherLoaded=false; }
 }
-function wIc(c){if(c===0)return'☀️';if(c<=2)return'⛅';if(c<=3)return'☁️';if(c<=9)return'🌫️';if(c<=29)return'🌧️';if(c<=39)return'🌨️';if(c<=49)return'🌫️';if(c<=69)return'🌧️';if(c<=79)return'❄️';if(c<=86)return'🌨️';return'⛈️';}
-function wDe(c){const M={0:'Clear Sky',1:'Mainly Clear',2:'Partly Cloudy',3:'Overcast',45:'Fog',51:'Light Drizzle',53:'Drizzle',61:'Light Rain',63:'Rain',65:'Heavy Rain',71:'Light Snow',73:'Snow',80:'Showers',95:'Thunderstorm'};return M[c]||'Mixed';}
-const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-function rWeather(c,d,city,cc2){
-  const b=document.getElementById('wb-weather');
-  let fc='';
-  for(let i=1;i<5;i++){const dt=new Date(d.time[i]);fc+=`<div class="wfr"><span>${DAYS[dt.getDay()]}</span><span>${wIc(d.weather_code[i])}</span><span style="color:var(--c-accent)">${Math.round(d.temperature_2m_max[i])}°</span><span style="color:var(--c-teal)">${Math.round(d.temperature_2m_min[i])}°</span></div>`;}
-  b.innerHTML=`<div class="wh2"><span class="wib">${wIc(c.weather_code)}</span><div class="wt">${Math.round(c.temperature_2m)}°C</div><div class="wd2">${wDe(c.weather_code)}</div><div class="wl"><i class="fa-solid fa-location-dot" style="color:var(--c-accent)"></i>${city}, ${cc2}</div></div>
-  <div class="wgg"><div class="wc"><i class="fa-solid fa-temperature-half"></i><div><div class="wcl">Feels Like</div><div class="wcv">${Math.round(c.apparent_temperature)}°C</div></div></div><div class="wc"><i class="fa-solid fa-droplet"></i><div><div class="wcl">Humidity</div><div class="wcv">${c.relative_humidity_2m}%</div></div></div><div class="wc"><i class="fa-solid fa-wind"></i><div><div class="wcl">Wind</div><div class="wcv">${c.wind_speed_10m} km/h</div></div></div><div class="wc"><i class="fa-solid fa-sun"></i><div><div class="wcl">Today High</div><div class="wcv">${Math.round(d.temperature_2m_max[0])}°C</div></div></div></div>
-  <div class="wfc"><div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--c-muted);margin-bottom:8px;font-family:var(--f-mono)">5-Day Forecast</div>${fc}</div>`;
-}
-function wErr(m){document.getElementById('wb-weather').innerHTML=`<div style="text-align:center;padding:40px;color:var(--c-red);font-size:12px"><i class="fa-solid fa-triangle-exclamation" style="font-size:24px;display:block;margin-bottom:12px"></i>${m}<br><small style="color:var(--c-muted);display:block;margin-top:8px">Allow location access and reopen.</small></div>`;}
 
-/* ─────────────────────────────────────────
-   SPOTLIGHT
-───────────────────────────────────────── */
-const SPI=[
-  {t:'About Me',      s:'Who is Rathod Raj',            i:'🧑‍💻',a:()=>openWin('about')},
-  {t:'Education',     s:'Academic timeline',             i:'🎓',a:()=>openWin('edu')},
-  {t:'Skills',        s:'Full tech stack',               i:'🧠',a:()=>openWin('skills')},
-  {t:'Projects',      s:'Featured builds',               i:'🚀',a:()=>openWin('projects')},
-  {t:'Journey',       s:'My learning path',              i:'🛤️',a:()=>openWin('journey')},
-  {t:'Contact',       s:'Get in touch',                  i:'📬',a:()=>openWin('contact')},
-  {t:'Terminal',      s:'Command line',                  i:'⌨️',a:()=>openWin('cli')},
-  {t:'Weather',       s:'Live forecast',                 i:'🌤️',a:()=>openWin('weather')},
-  {t:'Settings',      s:'System preferences',            i:'⚙️',a:()=>openWin('settings')},
-  {t:'GitHub',        s:'github.com/Raj-Rathod-Ai',     i:'🐙',a:()=>openBrowser('https://github.com/Raj-Rathod-Ai','GitHub')},
-  {t:'LinkedIn',      s:'linkedin.com/in/raj-rathod-ai',i:'💼',a:()=>openBrowser('https://linkedin.com/in/raj-rathod-ai','LinkedIn')},
-  {t:'FloraScan',     s:'Live ML project',               i:'🌸',a:()=>openBrowser('https://flower-disease-system.vercel.app/health','FloraScan')},
-  {t:'Tile Windows',  s:'Arrange open windows',          i:'⊞',a:()=>tile()},
-  {t:'Close All',     s:'Close all windows',             i:'✕',a:()=>closeAll()},
-  {t:'Refresh',       s:'Reload portfolio',              i:'🔄',a:()=>refreshPage()},
+function wmoIcon(code){
+  if(code===0) return '☀️';
+  if(code<=2)  return '⛅';
+  if(code<=3)  return '☁️';
+  if(code<=9)  return '🌫️';
+  if(code<=12) return '🌦️';
+  if(code<=29) return '🌧️';
+  if(code<=39) return '🌨️';
+  if(code<=49) return '🌫️';
+  if(code<=59) return '🌧️';
+  if(code<=69) return '🌧️';
+  if(code<=79) return '❄️';
+  if(code<=84) return '🌧️';
+  if(code<=86) return '🌨️';
+  if(code<=99) return '⛈️';
+  return '🌤️';
+}
+function wmoDesc(code){
+  const MAP={0:'Clear Sky',1:'Mainly Clear',2:'Partly Cloudy',3:'Overcast',
+    45:'Fog',48:'Icy Fog',51:'Light Drizzle',53:'Drizzle',55:'Heavy Drizzle',
+    61:'Light Rain',63:'Rain',65:'Heavy Rain',71:'Light Snow',73:'Snow',75:'Heavy Snow',
+    77:'Snow Grains',80:'Light Showers',81:'Showers',82:'Heavy Showers',
+    85:'Snow Showers',86:'Heavy Snow Showers',95:'Thunderstorm',96:'Thunderstorm',99:'Thunderstorm'};
+  return MAP[code] || 'Unknown';
+}
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function renderWeather(c, daily, city, country){
+  const body = document.getElementById('weather-body');
+  const icon = wmoIcon(c.weather_code);
+  const desc = wmoDesc(c.weather_code);
+  let forecastHTML = '';
+  for(let i=1;i<5;i++){
+    const d = new Date(daily.time[i]);
+    forecastHTML += `<div class="forecast-row">
+      <span>${DAYS[d.getDay()]}</span>
+      <span>${wmoIcon(daily.weather_code[i])}</span>
+      <span style="color:var(--accent)">${Math.round(daily.temperature_2m_max[i])}°</span>
+      <span style="color:var(--accent2)">${Math.round(daily.temperature_2m_min[i])}°</span>
+    </div>`;
+  }
+  body.innerHTML = `
+    <div class="weather-hero">
+      <span class="weather-icon-big">${icon}</span>
+      <div class="weather-temp">${Math.round(c.temperature_2m)}°C</div>
+      <div class="weather-desc">${desc}</div>
+      <div class="weather-location"><i class="fa-solid fa-location-dot" style="color:var(--accent)"></i>${city}, ${country}</div>
+    </div>
+    <div class="weather-grid">
+      <div class="weather-card"><i class="fa-solid fa-temperature-half"></i><div><div class="weather-card-label">Feels Like</div><div class="weather-card-value">${Math.round(c.apparent_temperature)}°C</div></div></div>
+      <div class="weather-card"><i class="fa-solid fa-droplet"></i><div><div class="weather-card-label">Humidity</div><div class="weather-card-value">${c.relative_humidity_2m}%</div></div></div>
+      <div class="weather-card"><i class="fa-solid fa-wind"></i><div><div class="weather-card-label">Wind Speed</div><div class="weather-card-value">${c.wind_speed_10m} km/h</div></div></div>
+      <div class="weather-card"><i class="fa-solid fa-calendar-day"></i><div><div class="weather-card-label">Today High</div><div class="weather-card-value">${Math.round(daily.temperature_2m_max[0])}°C</div></div></div>
+    </div>
+    <div class="weather-forecast">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;">5-Day Forecast</div>
+      ${forecastHTML}
+    </div>`;
+}
+function showWeatherError(msg){
+  document.getElementById('weather-body').innerHTML=
+    `<div class="weather-error"><i class="fa-solid fa-triangle-exclamation" style="font-size:24px;display:block;margin-bottom:12px"></i>${msg}<br><small style="color:var(--muted);margin-top:8px;display:block">Please allow location access and try again.</small></div>`;
+}
+
+/* ═══════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════ */
+const settingsState = {
+  grid:true, dim:true, blur:true, anim:true, dicons:true
+};
+
+function toggleSetting(key){
+  settingsState[key] = !settingsState[key];
+  const tog = document.getElementById('tog-'+key);
+  tog.classList.toggle('on', settingsState[key]);
+  applySettings();
+}
+
+function applySettings(){
+  document.getElementById('desktop-grid').style.opacity = settingsState.grid ? '1' : '0';
+  document.getElementById('desktop-overlay').style.opacity = settingsState.dim ? '1' : '0';
+  document.querySelectorAll('.win').forEach(w=>{
+    w.style.backdropFilter = settingsState.blur ? 'blur(40px) saturate(160%)' : 'none';
+  });
+  animEnabled = settingsState.anim;
+  document.querySelectorAll('.desk-icon').forEach(di=>{
+    di.style.display = settingsState.dicons ? 'flex' : 'none';
+  });
+}
+
+function setWinOpacity(val){
+  document.getElementById('opacity-label').textContent = val+'%';
+  const alpha = (val/100).toFixed(2);
+  document.querySelectorAll('.win').forEach(w=>{
+    w.style.background = `rgba(22,24,28,${alpha})`;
+  });
+}
+
+function setDockSize(size){
+  document.querySelectorAll('.dock-img').forEach(d=>{ d.style.width=size+'px'; d.style.height=size+'px'; });
+  document.querySelectorAll('.icon-size-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+/* ACCENT COLOR */
+document.getElementById('accent-row').querySelectorAll('.accent-dot').forEach(dot=>{
+  dot.addEventListener('click',()=>{
+    document.querySelectorAll('.accent-dot').forEach(d=>d.classList.remove('active'));
+    dot.classList.add('active');
+    document.documentElement.style.setProperty('--accent2', dot.dataset.c);
+    document.documentElement.style.setProperty('--border', dot.dataset.v);
+  });
+});
+
+/* ═══════════════════════════════════════════
+   EXTERNAL LINKS — open in new tab when
+   portfolio is running (not blocked by OS)
+═══════════════════════════════════════════ */
+function openExternal(url){
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+/* ═══════════════════════════════════════════
+   CONTEXT MENU (right-click desktop)
+═══════════════════════════════════════════ */
+document.getElementById('desktop-bg').addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  const menu = document.getElementById('ctx-menu');
+  menu.style.display='block';
+  menu.style.left = Math.min(e.clientX, window.innerWidth-200)+'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight-200)+'px';
+});
+document.getElementById('desktop-overlay').addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const menu=document.getElementById('ctx-menu');
+  menu.style.display='block';
+  menu.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+  menu.style.top=Math.min(e.clientY,window.innerHeight-200)+'px';
+});
+document.getElementById('desktop-grid').addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const menu=document.getElementById('ctx-menu');
+  menu.style.display='block';
+  menu.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+  menu.style.top=Math.min(e.clientY,window.innerHeight-200)+'px';
+});
+document.addEventListener('click', ()=>closeCtx());
+function closeCtx(){ document.getElementById('ctx-menu').style.display='none'; }
+
+/* ═══════════════════════════════════════════
+   SPOTLIGHT  (Cmd+Space or click menubar)
+═══════════════════════════════════════════ */
+const SPOTLIGHT_ITEMS = [
+  {title:'About Me',      sub:'Who is Rathod Raj',                  icon:'🧑‍💻', action:()=>openWin('about')},
+  {title:'Education',     sub:'Academic timeline',                   icon:'🎓', action:()=>openWin('edu')},
+  {title:'Skills',        sub:'Full tech stack',                     icon:'🧠', action:()=>openWin('skills')},
+  {title:'Projects',      sub:'Featured builds',                     icon:'🚀', action:()=>openWin('projects')},
+  {title:'Journey',       sub:'My learning path',                    icon:'🛤️', action:()=>openWin('journey')},
+  {title:'Contact',       sub:'Reach out',                           icon:'📬', action:()=>openWin('contact')},
+  {title:'Terminal',      sub:'Command line interface',              icon:'⌨️', action:()=>openWin('cli')},
+  {title:'Weather',       sub:'Live weather forecast',               icon:'🌤️', action:()=>openWin('weather')},
+  {title:'Settings',      sub:'System preferences',                  icon:'⚙️', action:()=>openWin('settings')},
+  {title:'GitHub',        sub:'github.com/Raj-Rathod-Ai',           icon:'🐙', action:()=>openExternal('https://github.com/Raj-Rathod-Ai')},
+  {title:'LinkedIn',      sub:'linkedin.com/in/raj-rathod-ai',      icon:'💼', action:()=>openExternal('https://linkedin.com/in/raj-rathod-ai')},
+  {title:'FloraScan',     sub:'Live project — flower disease AI',    icon:'🌸', action:()=>openExternal('https://flower-disease-system.vercel.app/health')},
+  {title:'Tile Windows',  sub:'Arrange all open windows',           icon:'⊞', action:()=>tileWindows()},
+  {title:'Close All',     sub:'Close all windows',                  icon:'✕', action:()=>closeAllWins()},
 ];
+
 let spIdx=0;
 function openSpotlight(){
-  document.getElementById('spov').classList.add('on');
-  document.getElementById('spi').value='';
-  renderSp('');spIdx=0;
-  setTimeout(()=>document.getElementById('spi').focus(),50);
+  document.getElementById('spotlight-overlay').classList.add('open');
+  document.getElementById('spotlight-input').value='';
+  renderSpotlight('');
+  setTimeout(()=>document.getElementById('spotlight-input').focus(),50);
 }
-function closeSp(e){if(e.target===document.getElementById('spov'))document.getElementById('spov').classList.remove('on');}
-document.getElementById('spi').addEventListener('input',e=>{renderSp(e.target.value);spIdx=0;});
-document.getElementById('spi').addEventListener('keydown',e=>{
-  const rs=document.querySelectorAll('.sri');
-  if(e.key==='ArrowDown'){spIdx=Math.min(spIdx+1,rs.length-1);hlSp(rs);e.preventDefault();}
-  if(e.key==='ArrowUp'){spIdx=Math.max(spIdx-1,0);hlSp(rs);e.preventDefault();}
-  if(e.key==='Enter'){if(rs[spIdx])rs[spIdx].click();}
-  if(e.key==='Escape')document.getElementById('spov').classList.remove('on');
+function closeSpotlight(e){
+  if(e.target===document.getElementById('spotlight-overlay'))
+    document.getElementById('spotlight-overlay').classList.remove('open');
+}
+document.getElementById('spotlight-overlay').addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.getElementById('spotlight-overlay').classList.remove('open');
 });
-function hlSp(rs){rs.forEach((r,i)=>r.classList.toggle('sel',i===spIdx));}
-function renderSp(q){
-  const res=document.getElementById('spr');
-  const f=q?SPI.filter(i=>i.t.toLowerCase().includes(q.toLowerCase())||i.s.toLowerCase().includes(q.toLowerCase())):SPI;
-  res.innerHTML=f.slice(0,9).map((it,i)=>`<div class="sri${i===0?' sel':''}"><div class="sri-ic">${it.i}</div><div><div class="sri-t">${it.t}</div><div class="sri-s">${it.s}</div></div></div>`).join('');
-  res.querySelectorAll('.sri').forEach((el,i)=>{el.onclick=()=>{f[i].a();document.getElementById('spov').classList.remove('on');};});
+document.getElementById('spotlight-input').addEventListener('input',e=>{
+  renderSpotlight(e.target.value); spIdx=0;
+});
+document.getElementById('spotlight-input').addEventListener('keydown',e=>{
+  const results = document.querySelectorAll('.sp-result');
+  if(e.key==='ArrowDown'){ spIdx=Math.min(spIdx+1,results.length-1); highlightSp(results); e.preventDefault(); }
+  if(e.key==='ArrowUp')  { spIdx=Math.max(spIdx-1,0); highlightSp(results); e.preventDefault(); }
+  if(e.key==='Enter'){ if(results[spIdx]) results[spIdx].click(); }
+});
+function highlightSp(results){
+  results.forEach((r,i)=>r.classList.toggle('selected',i===spIdx));
 }
-
-/* ─────────────────────────────────────────
-   KEYBOARD SHORTCUTS
-───────────────────────────────────────── */
+function renderSpotlight(q){
+  const results = document.getElementById('spotlight-results');
+  const filtered = q
+    ? SPOTLIGHT_ITEMS.filter(i=>i.title.toLowerCase().includes(q.toLowerCase())||i.sub.toLowerCase().includes(q.toLowerCase()))
+    : SPOTLIGHT_ITEMS;
+  results.innerHTML = filtered.slice(0,8).map((item,i)=>`
+    <div class="sp-result${i===0?' selected':''}" onclick="item_${i}_action()">
+      <div class="sp-result-icon" style="background:rgba(255,255,255,.06)">${item.icon}</div>
+      <div><div class="sp-result-title">${item.title}</div><div class="sp-result-sub">${item.sub}</div></div>
+    </div>`).join('');
+  // attach actions
+  results.querySelectorAll('.sp-result').forEach((el,i)=>{
+    el.onclick=()=>{
+      filtered[i].action();
+      document.getElementById('spotlight-overlay').classList.remove('open');
+    };
+  });
+}
 document.addEventListener('keydown',e=>{
-  const ctrl=e.ctrlKey||e.metaKey;
-  if(ctrl&&e.key===' '){e.preventDefault();openSpotlight();}
-  if(ctrl&&e.key==='w'){e.preventDefault();const f=WIDS.find(id=>{const el=document.getElementById('win-'+id);return el&&el.classList.contains('focused');});if(f)closeWin(f);}
-  if(ctrl&&e.key==='t'){e.preventDefault();openWin('cli');}
-  if(ctrl&&e.key==='g'){e.preventDefault();tile();}
-  if(ctrl&&e.key==='r'){e.preventDefault();refreshPage();}
-  if(e.key==='Escape'){document.getElementById('spov').classList.remove('on');cc();}
+  if((e.metaKey||e.ctrlKey) && e.key===' '){ e.preventDefault(); openSpotlight(); }
+  if(e.key==='Escape') document.getElementById('spotlight-overlay').classList.remove('open');
 });
 
-/* ─────────────────────────────────────────
+/* ═══════════════════════════════════════════
    INIT
-───────────────────────────────────────── */
+═══════════════════════════════════════════ */
 window.addEventListener('load',()=>{
-  applyWP(CWP);buildWPGrid();
-  focus('about');animBars();
-  // silent weather for menubar
+  applyWallpaper(currentWP);
+  buildWallpaperGrid();
+  focusWin('about');
+  animateBars();
+  // try to get weather silently for menubar
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(async pos=>{
       try{
         const lat=pos.coords.latitude.toFixed(4),lon=pos.coords.longitude.toFixed(4);
         const wR=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`);
         const w=await wR.json();
-        document.getElementById('mi-wt').textContent=`${wIc(w.current.weather_code)} ${Math.round(w.current.temperature_2m)}°C`;
+        const icon=wmoIcon(w.current.weather_code);
+        document.getElementById('menu-weather').innerHTML=
+          `<span style="cursor:pointer;display:flex;align-items:center;gap:4px" onclick="openWin('weather')">${icon} ${Math.round(w.current.temperature_2m)}°C</span>`;
       }catch(e){}
     },()=>{});
   }
-  // add extra fonts to load for font picker
-  const lnk=document.createElement('link');
-  lnk.rel='stylesheet';
-  lnk.href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=DM+Sans:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap';
-  document.head.appendChild(lnk);
 });
 </script>
 </body>
