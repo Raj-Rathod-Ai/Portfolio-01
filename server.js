@@ -206,28 +206,50 @@ app.post('/api/contact', async (req, res) => {
     - Use dark background #0d1117, border-color #30363d, font-color #e6edf3, accent-color #6366f1, and wrap the content in a responsive, padded card layout.
     - Return ONLY the raw clean HTML content (starting with <div> or <html>). Do not include markdown code block syntax (like \`\`\`html or \`\`\`).`;
 
-    const geminiRes = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: promptText }]
-        }]
-      })
-    });
+    let htmlReply = '';
+    try {
+      const geminiRes = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: promptText }]
+          }]
+        })
+      });
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      throw new Error(`Gemini API failed with status ${geminiRes.status}: ${errText}`);
+      if (geminiRes.ok) {
+        const geminiData = await geminiRes.json();
+        htmlReply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        htmlReply = htmlReply.replace(/```html/gi, '').replace(/```/g, '').trim();
+      } else {
+        const errText = await geminiRes.text();
+        console.warn(`Gemini API failed (${geminiRes.status}): ${errText}. Falling back to default response template.`);
+      }
+    } catch (aiErr) {
+      console.warn('Gemini AI call caught error:', aiErr.message, 'Falling back to default template.');
     }
 
-    const geminiData = await geminiRes.json();
-    let htmlReply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    // Strip markdown wrappers if any
-    htmlReply = htmlReply.replace(/```html/gi, '').replace(/```/g, '').trim();
-
+    // Default premium HTML fallback template if Gemini failed or returned empty
     if (!htmlReply) {
-      throw new Error('Gemini returned an empty reply text');
+      htmlReply = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 25px; background: #0d1117; color: #e6edf3; border-radius: 12px; border: 1px solid #30363d; max-width: 600px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
+            <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 24px; font-weight: bold;">🧠</div>
+            <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; font-family: sans-serif;">Raj's AI Personal Assistant</h2>
+            <span style="font-size: 10px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Automated Portfolio Response</span>
+          </div>
+          <p>Hi ${name}, 👋</p>
+          <p>Thank you for reaching out! I am Raj's AI Personal Assistant, and I wanted to let you know that your message regarding <strong>"${subject}"</strong> has been successfully received and stored in our database.</p>
+          <p>Raj will review your message shortly and follow up with you directly at <strong>${email}</strong>.</p>
+          <p>Have a wonderful day! ✨</p>
+          <br>
+          <p style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e; margin-bottom: 0;">
+            Best regards,<br>
+            <strong>Raj's AI Assistant</strong>
+          </p>
+        </div>
+      `;
     }
 
     // Setup sender email address (configurable if Brevo account uses a different primary sender)
