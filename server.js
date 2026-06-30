@@ -189,12 +189,22 @@ app.post('/api/contact', async (req, res) => {
     "${message}"
 
     Requirements:
-    - Write as "Raj's AI Personal Assistant". Keep the tone natural, polite, and direct (not overly robotic).
-    - Format with beautiful inline HTML and CSS inside a dark themed modern card matching a premium portfolio (use dark bg #0d1117, light text #f0f6fc, indigo accents #6366f1, and light borders/padding).
-    - Incorporate standard emojis contextually.
-    - Mention that their inquiry was logged at ${dateStr} IST.
-    - Confirm that Raj will review it and follow up soon.
-    - Return ONLY clean HTML content (start with <div> or <html>). Do not include markdown code block syntax (like \`\`\`html).`;
+    - IDENTIFY the language style used by the sender. You must reply in the EXACT SAME language style/mix. For example:
+      * If they wrote in English, reply in English.
+      * If they wrote in Hinglish (Hindi + English mix, e.g. "kaam accha hai, check out my profile"), reply in natural, friendly Hinglish.
+      * If they wrote in Hindi (Devanagari), reply in Hindi.
+    - Write as "Raj's AI Personal Assistant". Keep the tone natural, helpful, warm, and direct (do not use cliché robotic AI openings like "I hope this email finds you well" or "Thank you for writing to us"). Use human-like conversational words.
+    - Mention that their message was officially logged in Raj's portfolio database on ${dateStr} IST.
+    - Confirm that Raj will review it and get back to them soon.
+    - Style the reply with clean inline HTML and CSS. Wrap it inside a premium, modern dark card matching a high-end AI engineer's portfolio.
+    - The HTML body must include this top logo branding element:
+      <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
+        <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 24px; font-weight: bold; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">🧠</div>
+        <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">Raj's AI Personal Assistant</h2>
+        <span style="font-size: 10px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Automated Portfolio Response</span>
+      </div>
+    - Use dark background #0d1117, border-color #30363d, font-color #e6edf3, accent-color #6366f1, and wrap the content in a responsive, padded card layout.
+    - Return ONLY the raw clean HTML content (starting with <div> or <html>). Do not include markdown code block syntax (like \`\`\`html or \`\`\`).`;
 
     const geminiRes = await fetch(geminiUrl, {
       method: 'POST',
@@ -262,7 +272,7 @@ app.post('/api/contact', async (req, res) => {
       body: JSON.stringify({
         sender: { name: "Raj's AI Assistant", email: senderEmail },
         to: [{ email: email, name: name }],
-        subject: `Re: ${subject} [Logged by AI Assistant]`,
+        subject: `[Raj Rathod's AI Assistant] Re: ${subject}`,
         htmlContent: htmlReply
       })
     });
