@@ -370,15 +370,12 @@ if (reviewForm) {
         date: formattedDate
       });
       localStorage.setItem('portfolioReviews', JSON.stringify(reviews));
+      
+      showModal('success', 'Review Posted!', 'Thanks for your feedback!');
+      if (typeof confetti !== 'undefined') confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
     } catch (err) {
-      console.warn('API submit failed, falling back to FormSubmit email handler...', err);
-      try {
-        await fetch(reviewForm.action, {
-          method: 'POST',
-          body: new FormData(reviewForm),
-          headers: { 'Accept': 'application/json' }
-        });
-      } catch (_) {}
+      console.error('Submit review error:', err);
+      showModal('error', 'Failed to Post', 'Please try again later.');
     }
 
     await renderReviews();
@@ -391,8 +388,6 @@ if (reviewForm) {
       });
     }
     if (btn) { btn.textContent = 'Submit Review'; btn.disabled = false; }
-    showModal('success', 'Review Posted!', 'Thanks for your feedback!');
-    if (typeof confetti !== 'undefined') confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
   });
 }
 renderReviews();
@@ -423,22 +418,8 @@ if (contactForm) {
       showModal('success', 'Message Sent!', 'Thank you! I will get back to you soon.');
       contactForm.reset();
     } catch (err) {
-      console.warn('API contact failed, falling back to FormSubmit...', err);
-      try {
-        const fallbackRes = await fetch(contactForm.action, {
-          method: 'POST',
-          body: new FormData(contactForm),
-          headers: { 'Accept': 'application/json' }
-        });
-        if (fallbackRes.ok) {
-          showModal('success', 'Message Sent!', 'Thank you! I will get back to you soon.');
-          contactForm.reset();
-        } else {
-          showModal('error', 'Failed to Send', 'Please try emailing directly at rathodraj1504@gmail.com');
-        }
-      } catch (_) {
-        showModal('error', 'Network Error', 'Please try emailing directly at rathodraj1504@gmail.com');
-      }
+      console.error('Contact submission error:', err);
+      showModal('error', 'Failed to Send', 'Could not establish connection to the mail server. Please try emailing directly at rathodraj1504@gmail.com');
     }
     if (btn) { btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message'; btn.disabled = false; }
   });

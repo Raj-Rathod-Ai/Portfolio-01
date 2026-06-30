@@ -38,6 +38,16 @@ const ReviewSchema = new mongoose.Schema({
 
 const Review = mongoose.model('Review', ReviewSchema);
 
+const ContactSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  subject: { type: String, required: true },
+  message: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Contact = mongoose.model('Contact', ContactSchema);
+
 // Preset Default Reviews to seed if database is empty
 const DEFAULT_PRESETS = [
   {
@@ -144,10 +154,29 @@ app.post('/api/contact', async (req, res) => {
 
     console.log(`Inquiry received from: ${name} (${email})`);
 
+    // 1. Save the inquiry to MongoDB database
+    let dbSaved = false;
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const newContact = new Contact({ name, email, subject, message });
+        await newContact.save();
+        dbSaved = true;
+        console.log(`Inquiry from ${name} saved successfully in MongoDB.`);
+      } else {
+        console.warn('MongoDB not connected. Inquiry not saved to DB.');
+      }
+    } catch (dbErr) {
+      console.error('Error saving contact to MongoDB:', dbErr.message);
+    }
+
+    // 2. Check if we have API keys to send the auto-response
     const hasKeys = process.env.GEMINI_API_KEY && process.env.BREVO_API_KEY;
     if (!hasKeys) {
-      console.warn('AI or Brevo API keys missing. Returning 500 to trigger FormSubmit fallback.');
-      return res.status(500).json({ error: 'API keys missing on the server.' });
+      if (dbSaved) {
+        console.log('Inquiry saved to DB, but API keys are missing. Returning success.');
+        return res.status(200).json({ success: true, status: 'saved_to_db_only' });
+      }
+      return res.status(500).json({ error: 'Database offline and API keys missing.' });
     }
 
     // Call Gemini API to write a customizable email response
