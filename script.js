@@ -410,42 +410,22 @@ if (contactForm) {
     const tempContact = { name: nameVal, email: emailVal, subject: subjectVal, message: messageVal, timestamp: Date.now() };
     localStorage.setItem('tempContactMessage', JSON.stringify(tempContact));
 
-    // 2. Fire backend request to trigger AI Auto-responder via Brevo API
+    // 2. Fire backend request to trigger AI Auto-responder + store contact in DB
     try {
-      await fetch(API_BASE_URL + '/api/contact', {
+      const res = await fetch(API_BASE_URL + '/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: nameVal, email: emailVal, subject: subjectVal, message: messageVal })
       });
-      console.log('AI auto-responder request sent to backend.');
+      
+      if (!res.ok) throw new Error('Backend contact submission failed');
+      
+      showModal('success', 'Message Sent!', 'Thank you! I will get back to you soon.');
+      contactForm.reset();
+      localStorage.removeItem('tempContactMessage'); // Clear cached details on success
     } catch (err) {
-      console.warn('Backend AI auto-responder failed, continuing to FormSubmit...', err);
-    }
-
-    // 3. Dispatch to FormSubmit so Raj receives the direct notification email
-    try {
-      const formData = new FormData();
-      formData.append('name', nameVal);
-      formData.append('email', emailVal);
-      formData.append('_subject', `New message from portfolio: ${subjectVal}`);
-      formData.append('message', messageVal);
-
-      const fsRes = await fetch('https://formsubmit.co/ajax/rathodraj1504@gmail.com', {
-        method: 'POST',
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-      });
-
-      if (fsRes.ok) {
-        showModal('success', 'Message Sent!', 'Thank you! I will get back to you soon.');
-        contactForm.reset();
-        localStorage.removeItem('tempContactMessage'); // Clear cached details on success
-      } else {
-        showModal('error', 'Failed to Send', 'Please try emailing directly at rathodraj1504@gmail.com');
-      }
-    } catch (fsErr) {
-      console.error('FormSubmit failed:', fsErr);
-      showModal('error', 'Network Error', 'Please try emailing directly at rathodraj1504@gmail.com');
+      console.error('Contact submission error:', err);
+      showModal('error', 'Failed to Send', 'Could not establish connection to the mail server. Please try emailing directly at rathodraj1504@gmail.com');
     }
 
     if (btn) { btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message'; btn.disabled = false; }
