@@ -307,6 +307,11 @@ if (starContainer) {
 }
 
 
+// Base URL configuration for Backend deployed on Render & Frontend on Netlify
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? ''
+  : 'https://portfolio-01-backend.onrender.com'; // Replace this with your actual Render service URL after deployment!
+
 // ================= REVIEWS RENDERER =================
 async function renderReviews() {
   const container = document.getElementById('reviews-list-container');
@@ -314,7 +319,7 @@ async function renderReviews() {
   
   let reviews = [];
   try {
-    const res = await fetch('/api/reviews');
+    const res = await fetch(API_BASE_URL + '/api/reviews');
     if (!res.ok) throw new Error('API failed');
     reviews = await res.json();
   } catch (err) {
@@ -371,7 +376,7 @@ if (reviewForm) {
     };
 
     try {
-      const res = await fetch('/api/reviews', {
+      const res = await fetch(API_BASE_URL + '/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData)
