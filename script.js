@@ -1,27 +1,4 @@
-// ================= CUSTOM CURSOR =================
-const dot = document.getElementById('custom-cursor-dot');
-const ring = document.getElementById('custom-cursor-ring');
-let mouseX = 0, mouseY = 0, dotX = 0, dotY = 0, ringX = 0, ringY = 0;
 
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-});
-
-function updateCursor() {
-  dotX += (mouseX - dotX) * 0.2;
-  dotY += (mouseY - dotY) * 0.2;
-  if (dot) { dot.style.left = `${dotX}px`; dot.style.top = `${dotY}px`; }
-  ringX += (mouseX - ringX) * 0.1;
-  ringY += (mouseY - ringY) * 0.1;
-  if (ring) { ring.style.left = `${ringX}px`; ring.style.top = `${ringY}px`; }
-  requestAnimationFrame(updateCursor);
-}
-requestAnimationFrame(updateCursor);
-
-const hoverables = 'a, button, input, textarea, [role="button"], .spotlight-card';
-document.addEventListener('mouseover', (e) => { if (e.target.closest(hoverables)) document.body.classList.add('cursor-hover'); });
-document.addEventListener('mouseout', (e) => { if (e.target.closest(hoverables)) document.body.classList.remove('cursor-hover'); });
 
 
 // ================= PRELOADER =================
