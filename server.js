@@ -184,27 +184,29 @@ app.post('/api/contact', async (req, res) => {
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
     const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-    const promptText = `You are Raj Rathod's AI Personal Assistant.
-    Write a warm, human-like, and highly professional HTML reply email to ${name} (${email}) who contacted Raj with subject "${subject}" and message:
+    const promptText = `Write a warm, human-like, and highly professional HTML reply email to ${name} (${email}) who contacted Raj Rathod with subject "${subject}" and message:
     "${message}"
 
     Requirements:
+    - Write as "Alex", a human Administrative/Personal Assistant to Raj Rathod. Do NOT say "I am an AI", "I am a bot", or "This is an automated response". Write exactly like a real human assistant managing Raj's inbox.
+    - Keep the tone warm, conversational, and direct. Avoid cliché formal openings like "I hope this email finds you well" or "Thank you for contacting us". Speak naturally.
     - IDENTIFY the language style used by the sender. You must reply in the EXACT SAME language style/mix. For example:
-      * If they wrote in English, reply in English.
-      * If they wrote in Hinglish (Hindi + English mix, e.g. "kaam accha hai, check out my profile"), reply in natural, friendly Hinglish.
-      * If they wrote in Hindi (Devanagari), reply in Hindi.
-    - Write as "Raj's AI Personal Assistant". Keep the tone natural, helpful, warm, and direct (do not use cliché robotic AI openings like "I hope this email finds you well" or "Thank you for writing to us"). Use human-like conversational words.
-    - Mention that their message was officially logged in Raj's portfolio database on ${dateStr} IST.
-    - Confirm that Raj will review it and get back to them soon.
-    - Style the reply with clean inline HTML and CSS. Wrap it inside a premium, modern dark card matching a high-end AI engineer's portfolio.
-    - The HTML body must include this top logo branding element:
+      * If they wrote in English, reply in English (e.g., "Hi ${name}, thanks for reaching out. I'm helping Raj manage his inbox...").
+      * If they wrote in Hinglish (Hindi + English mix), reply in natural Hinglish (e.g., "Hi ${name}, message bhejne ke liye thank you! Main Raj ka scheduling and inbox help karta hoon...").
+      * If they wrote in Hindi, reply in Hindi.
+    - Mention that their inquiry has been successfully received, logged in Raj's calendar database, and that Raj will follow up with them shortly at this address.
+    - Format with clean inline HTML and CSS inside a dark themed premium card layout.
+    - Incorporate standard emojis contextually.
+    - Include this header logo card element at the top:
       <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
-        <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 24px; font-weight: bold; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">🧠</div>
-        <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">Raj's AI Personal Assistant</h2>
-        <span style="font-size: 10px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Automated Portfolio Response</span>
+        <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 22px; font-weight: bold; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">💼</div>
+        <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">Office of Raj Rathod</h2>
+        <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Personal Assistant Dispatch</span>
       </div>
-    - Use dark background #0d1117, border-color #30363d, font-color #e6edf3, accent-color #6366f1, and wrap the content in a responsive, padded card layout.
-    - Return ONLY the raw clean HTML content (starting with <div> or <html>). Do not include markdown code block syntax (like \`\`\`html or \`\`\`).`;
+    - Sign off as:
+      Best,
+      Alex (Personal Assistant to Raj Rathod)
+    - Return ONLY the clean raw HTML content. Do not wrap in markdown code blocks.`;
 
     let htmlReply = '';
     try {
@@ -235,18 +237,18 @@ app.post('/api/contact', async (req, res) => {
       htmlReply = `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 25px; background: #0d1117; color: #e6edf3; border-radius: 12px; border: 1px solid #30363d; max-width: 600px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
           <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
-            <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 24px; font-weight: bold;">🧠</div>
-            <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; font-family: sans-serif;">Raj's AI Personal Assistant</h2>
-            <span style="font-size: 10px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Automated Portfolio Response</span>
+            <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 22px; font-weight: bold;">💼</div>
+            <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; font-family: sans-serif;">Office of Raj Rathod</h2>
+            <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Personal Assistant Dispatch</span>
           </div>
           <p>Hi ${name}, 👋</p>
-          <p>Thank you for reaching out! I am Raj's AI Personal Assistant, and I wanted to let you know that your message regarding <strong>"${subject}"</strong> has been successfully received and stored in our database.</p>
-          <p>Raj will review your message shortly and follow up with you directly at <strong>${email}</strong>.</p>
+          <p>Thank you for reaching out! I am Raj's Personal Assistant, Alex. I wanted to let you know that your message regarding <strong>"${subject}"</strong> has been successfully received and saved in our inbox.</p>
+          <p>Raj is currently review-syncing on some deliverables, but I've flagged this for his attention. He will get back to you directly at this address (<strong>${email}</strong>) as soon as possible.</p>
           <p>Have a wonderful day! ✨</p>
           <br>
           <p style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e; margin-bottom: 0;">
             Best regards,<br>
-            <strong>Raj's AI Assistant</strong>
+            <strong>Alex (Personal Assistant to Raj Rathod)</strong>
           </p>
         </div>
       `;
@@ -292,9 +294,10 @@ app.post('/api/contact', async (req, res) => {
         'api-key': process.env.BREVO_API_KEY
       },
       body: JSON.stringify({
-        sender: { name: "Raj's AI Assistant", email: senderEmail },
+        sender: { name: "Raj's Assistant", email: senderEmail },
         to: [{ email: email, name: name }],
-        subject: `[Raj Rathod's AI Assistant] Re: ${subject}`,
+        replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
+        subject: `Regarding your inquiry: ${subject} - Raj Rathod`,
         htmlContent: htmlReply
       })
     });
