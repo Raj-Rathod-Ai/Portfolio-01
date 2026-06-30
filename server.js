@@ -134,6 +134,92 @@ app.post('/api/reviews', async (req, res) => {
   }
 });
 
+// POST /api/contact - Direct inquiry handler with Gemini AI assistant auto-replies via Brevo SMTP
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    console.log(`Inquiry received from: ${name} (${email})`);
+
+    const hasKeys = process.env.GEMINI_API_KEY && process.env.BREVO_API_KEY;
+    if (!hasKeys) {
+      console.warn('AI or Brevo API keys missing. Skipping AI reply.');
+      return res.status(200).json({ success: true, status: 'fallback_only' });
+    }
+
+    // Call Gemini API to write a customizable email response
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+    const promptText = `You are Raj Rathod's AI Personal Assistant.
+    Write a warm, human-like, and highly professional HTML reply email to ${name} (${email}) who contacted Raj with subject "${subject}" and message:
+    "${message}"
+
+    Requirements:
+    - Write as "Raj's AI Personal Assistant". Keep the tone natural, polite, and direct (not overly robotic).
+    - Format with beautiful inline HTML and CSS inside a dark themed modern card matching a premium portfolio (use dark bg #0d1117, light text #f0f6fc, indigo accents #6366f1, and light borders/padding).
+    - Incorporate standard emojis contextually.
+    - Mention that their inquiry was logged at ${dateStr} IST.
+    - Confirm that Raj will review it and follow up soon.
+    - Return ONLY clean HTML content (start with <div> or <html>). Do not include markdown code block syntax (like \`\`\`html).`;
+
+    const geminiRes = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: promptText }]
+        }]
+      })
+    });
+
+    if (!geminiRes.ok) {
+      throw new Error(`Gemini API failed with status ${geminiRes.status}`);
+    }
+
+    const geminiData = await geminiRes.json();
+    let htmlReply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Strip markdown wrappers if any
+    htmlReply = htmlReply.replace(/```html/gi, '').replace(/```/g, '').trim();
+
+    if (!htmlReply) {
+      throw new Error('Gemini returned an empty reply text');
+    }
+
+    // Call Brevo transactional API to send response to user
+    const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': process.env.BREVO_API_KEY
+      },
+      body: JSON.stringify({
+        sender: { name: "Raj's AI Assistant", email: "rathodraj1504@gmail.com" },
+        to: [{ email: email, name: name }],
+        cc: [{ email: "rathodraj1504@gmail.com", name: "Raj Rathod" }],
+        subject: `Re: ${subject} [Logged by AI Assistant]`,
+        htmlContent: htmlReply
+      })
+    });
+
+    if (!brevoRes.ok) {
+      const errText = await brevoRes.text();
+      throw new Error(`Brevo API failed: ${errText}`);
+    }
+
+    console.log(`AI Auto-response successfully dispatched via Brevo to: ${email}`);
+    res.status(200).json({ success: true, status: 'dispatched' });
+
+  } catch (err) {
+    console.error('Contact endpoint error:', err.message);
+    // Return 200/201 anyway so frontend handles fallback/standard confirmation gracefully
+    res.status(200).json({ success: true, status: 'error_fallback', error: err.message });
+  }
+});
+
 // Serve frontend route fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

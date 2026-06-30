@@ -428,20 +428,40 @@ if (contactForm) {
     e.preventDefault();
     const btn = document.getElementById('contact-btn');
     if (btn) { btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Sending...'; btn.disabled = true; }
+
+    const bodyData = {
+      name: document.getElementById('msg-name')?.value.trim(),
+      email: document.getElementById('msg-email')?.value.trim(),
+      subject: document.getElementById('msg-subj')?.value.trim(),
+      message: document.getElementById('msg-content')?.value.trim()
+    };
+
     try {
-      const res = await fetch(contactForm.action, {
+      const res = await fetch(API_BASE_URL + '/api/contact', {
         method: 'POST',
-        body: new FormData(contactForm),
-        headers: { 'Accept': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData)
       });
-      if (res.ok) {
-        showModal('success', 'Message Sent!', 'Thank you! I will get back to you soon.');
-        contactForm.reset();
-      } else {
-        showModal('error', 'Failed to Send', 'Please try emailing directly at rathodraj1504@gmail.com');
+      if (!res.ok) throw new Error('API contact failed');
+      showModal('success', 'Message Sent!', 'Thank you! I will get back to you soon.');
+      contactForm.reset();
+    } catch (err) {
+      console.warn('API contact failed, falling back to FormSubmit...', err);
+      try {
+        const fallbackRes = await fetch(contactForm.action, {
+          method: 'POST',
+          body: new FormData(contactForm),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (fallbackRes.ok) {
+          showModal('success', 'Message Sent!', 'Thank you! I will get back to you soon.');
+          contactForm.reset();
+        } else {
+          showModal('error', 'Failed to Send', 'Please try emailing directly at rathodraj1504@gmail.com');
+        }
+      } catch (_) {
+        showModal('error', 'Network Error', 'Please try emailing directly at rathodraj1504@gmail.com');
       }
-    } catch (_) {
-      showModal('error', 'Network Error', 'Please try emailing directly at rathodraj1504@gmail.com');
     }
     if (btn) { btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message'; btn.disabled = false; }
   });
