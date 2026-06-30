@@ -310,7 +310,7 @@ if (starContainer) {
 // Base URL configuration for Backend deployed on Render & Frontend on Netlify
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? ''
-  : 'https://portfolio-01-backend.onrender.com'; // Replace this with your actual Render service URL after deployment!
+  : 'https://portfolio-raj-qda3.onrender.com';
 
 // ================= REVIEWS RENDERER =================
 async function renderReviews() {
