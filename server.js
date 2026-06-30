@@ -180,7 +180,7 @@ app.post('/api/contact', async (req, res) => {
     }
 
     // Call Gemini API to write a customizable email response
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
     const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
     const promptText = `You are Raj Rathod's AI Personal Assistant.
@@ -222,7 +222,36 @@ app.post('/api/contact', async (req, res) => {
     // Setup sender email address (configurable if Brevo account uses a different primary sender)
     const senderEmail = process.env.BREVO_SENDER_EMAIL || 'rathodraj1504@gmail.com';
 
-    // Call Brevo transactional API to send response to user
+    // 1. Call Brevo transactional API to send notification to Raj
+    try {
+      await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': process.env.BREVO_API_KEY
+        },
+        body: JSON.stringify({
+          sender: { name: "Portfolio Notification", email: senderEmail },
+          to: [{ email: "rathodraj1504@gmail.com", name: "Raj Rathod" }],
+          subject: `[New Inquiry] ${subject} from ${name}`,
+          htmlContent: `
+            <div style="font-family: sans-serif; padding: 20px; background: #0d1117; color: #f0f6fc; border-radius: 12px; border: 1px solid #30363d; max-width: 600px; margin: auto;">
+              <h2 style="color: #6366f1; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-top: 0;">New Message Logged</h2>
+              <p><strong>Name:</strong> ${name}</p>
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Subject:</strong> ${subject}</p>
+              <div style="background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #21262d; margin: 15px 0; white-space: pre-wrap; font-size: 14px; line-height: 1.5; color: #e6edf3;">${message}</div>
+              <span style="font-size: 11px; color: #8b949e;">Date: ${dateStr}</span>
+            </div>
+          `
+        })
+      });
+      console.log(`Notification email successfully sent to rathodraj1504@gmail.com`);
+    } catch (notifyErr) {
+      console.error('Failed to send notification email to Raj:', notifyErr.message);
+    }
+
+    // 2. Call Brevo transactional API to send AI reply to the user
     const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
@@ -232,7 +261,6 @@ app.post('/api/contact', async (req, res) => {
       body: JSON.stringify({
         sender: { name: "Raj's AI Assistant", email: senderEmail },
         to: [{ email: email, name: name }],
-        cc: [{ email: 'rathodraj1504@gmail.com', name: "Raj Rathod" }],
         subject: `Re: ${subject} [Logged by AI Assistant]`,
         htmlContent: htmlReply
       })
@@ -240,7 +268,7 @@ app.post('/api/contact', async (req, res) => {
 
     if (!brevoRes.ok) {
       const errText = await brevoRes.text();
-      throw new Error(`Brevo API failed: ${errText}`);
+      throw new Error(`Brevo auto-reply failed: ${errText}`);
     }
 
     console.log(`AI Auto-response successfully dispatched via Brevo to: ${email}`);
