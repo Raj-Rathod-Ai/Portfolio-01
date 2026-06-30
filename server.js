@@ -146,8 +146,8 @@ app.post('/api/contact', async (req, res) => {
 
     const hasKeys = process.env.GEMINI_API_KEY && process.env.BREVO_API_KEY;
     if (!hasKeys) {
-      console.warn('AI or Brevo API keys missing. Skipping AI reply.');
-      return res.status(200).json({ success: true, status: 'fallback_only' });
+      console.warn('AI or Brevo API keys missing. Returning 500 to trigger FormSubmit fallback.');
+      return res.status(500).json({ error: 'API keys missing on the server.' });
     }
 
     // Call Gemini API to write a customizable email response
@@ -177,7 +177,8 @@ app.post('/api/contact', async (req, res) => {
     });
 
     if (!geminiRes.ok) {
-      throw new Error(`Gemini API failed with status ${geminiRes.status}`);
+      const errText = await geminiRes.text();
+      throw new Error(`Gemini API failed with status ${geminiRes.status}: ${errText}`);
     }
 
     const geminiData = await geminiRes.json();
@@ -189,6 +190,9 @@ app.post('/api/contact', async (req, res) => {
       throw new Error('Gemini returned an empty reply text');
     }
 
+    // Setup sender email address (configurable if Brevo account uses a different primary sender)
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'rathodraj1504@gmail.com';
+
     // Call Brevo transactional API to send response to user
     const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
@@ -197,9 +201,9 @@ app.post('/api/contact', async (req, res) => {
         'api-key': process.env.BREVO_API_KEY
       },
       body: JSON.stringify({
-        sender: { name: "Raj's AI Assistant", email: "rathodraj1504@gmail.com" },
+        sender: { name: "Raj's AI Assistant", email: senderEmail },
         to: [{ email: email, name: name }],
-        cc: [{ email: "rathodraj1504@gmail.com", name: "Raj Rathod" }],
+        cc: [{ email: 'rathodraj1504@gmail.com', name: "Raj Rathod" }],
         subject: `Re: ${subject} [Logged by AI Assistant]`,
         htmlContent: htmlReply
       })
@@ -215,8 +219,7 @@ app.post('/api/contact', async (req, res) => {
 
   } catch (err) {
     console.error('Contact endpoint error:', err.message);
-    // Return 200/201 anyway so frontend handles fallback/standard confirmation gracefully
-    res.status(200).json({ success: true, status: 'error_fallback', error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
