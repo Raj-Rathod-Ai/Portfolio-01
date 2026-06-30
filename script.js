@@ -334,7 +334,7 @@ async function renderReviews() {
           date: '12 Jun 2026'
         },
         {
-          name: 'Amit Shah (AI Hackathon Teammate)',
+          name: 'Mayur (Cyber Security Teammate)',
           rating: 5,
           review: 'Worked with Raj on computer vision applications. His speed in debugging model deployments and building pipeline interfaces is exceptional. Great teammate!',
           date: '02 May 2026'
