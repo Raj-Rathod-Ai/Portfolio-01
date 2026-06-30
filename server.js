@@ -180,7 +180,7 @@ app.post('/api/contact', async (req, res) => {
     }
 
     // Call Gemini API to write a customizable email response
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
     const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
     const promptText = `You are Raj Rathod's AI Personal Assistant.
