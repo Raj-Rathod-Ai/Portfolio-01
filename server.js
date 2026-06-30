@@ -280,6 +280,19 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
+// GET /api/health - Diagnostic endpoint for validating configurations
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'online',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    config: {
+      hasGeminiKey: !!process.env.GEMINI_API_KEY,
+      hasBrevoKey: !!process.env.BREVO_API_KEY,
+      senderEmail: process.env.BREVO_SENDER_EMAIL || 'rathodraj1504@gmail.com'
+    }
+  });
+});
+
 // Serve frontend route fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
