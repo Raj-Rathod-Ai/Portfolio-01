@@ -184,17 +184,29 @@ app.post('/api/contact', async (req, res) => {
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
     const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-    const promptText = `Write a warm, human-like, and highly professional HTML reply email to ${name} (${email}) who contacted Raj Rathod with subject "${subject}" and message:
-    "${message}"
+    const promptText = `Analyze the contact inquiry details:
+    Name: ${name}
+    Email: ${email}
+    Subject: ${subject}
+    Message: "${message}"
+
+    Determine the message type:
+    - CATEGORY A: Professional business/job opportunity, technical question, feedback, or genuine networking.
+    - CATEGORY B: Spam, promotional offer, phishing, suspicious link, cryptocurrency pitch, bulk marketing, or offensive content.
 
     Requirements:
-    - Write as "Alex", a human Administrative/Personal Assistant to Raj Rathod. Do NOT say "I am an AI", "I am a bot", or "This is an automated response". Write exactly like a real human assistant managing Raj's inbox.
+    - Write a warm, human-like, and highly professional HTML reply email.
+    - Write as "Rudra", a human Administrative/Personal Assistant to Raj Rathod. Do NOT say "I am an AI", "I am a bot", or "This is an automated response". Write exactly like a real human assistant managing Raj's inbox.
     - Keep the tone warm, conversational, and direct. Avoid cliché formal openings like "I hope this email finds you well" or "Thank you for contacting us". Speak naturally.
-    - IDENTIFY the language style used by the sender. You must reply in the EXACT SAME language style/mix. For example:
-      * If they wrote in English, reply in English (e.g., "Hi ${name}, thanks for reaching out. I'm helping Raj manage his inbox...").
-      * If they wrote in Hinglish (Hindi + English mix), reply in natural Hinglish (e.g., "Hi ${name}, message bhejne ke liye thank you! Main Raj ka scheduling and inbox help karta hoon...").
-      * If they wrote in Hindi, reply in Hindi.
+    - IDENTIFY the language style used by the sender and reply in the EXACT SAME language style/mix (e.g. English, Hinglish, or Hindi).
+    
+    If the message falls under CATEGORY A:
     - Mention that their inquiry has been successfully received, logged in Raj's calendar database, and that Raj will follow up with them shortly at this address.
+    
+    If the message falls under CATEGORY B (Suspicious/Spam/Promo):
+    - Write a polite but cautious and guarded response. Do NOT mention logging it in the calendar database. 
+    - Cautiously inform them that the inquiry contains marketing terms, unverified links, or indicators typical of automated mail. Direct them to email Raj directly at rathodraj1504@gmail.com if this is a genuine request, and request them not to send bulk links or solicitations.
+
     - Format with clean inline HTML and CSS inside a dark themed premium card layout.
     - Incorporate standard emojis contextually.
     - Include this header logo card element at the top:
@@ -205,7 +217,7 @@ app.post('/api/contact', async (req, res) => {
       </div>
     - Sign off as:
       Best,
-      Alex (Personal Assistant to Raj Rathod)
+      Rudra (Personal Assistant to Raj Rathod)
     - Return ONLY the clean raw HTML content. Do not wrap in markdown code blocks.`;
 
     let htmlReply = '';
@@ -242,13 +254,13 @@ app.post('/api/contact', async (req, res) => {
             <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Personal Assistant Dispatch</span>
           </div>
           <p>Hi ${name}, 👋</p>
-          <p>Thank you for reaching out! I am Raj's Personal Assistant, Alex. I wanted to let you know that your message regarding <strong>"${subject}"</strong> has been successfully received and saved in our inbox.</p>
+          <p>Thank you for reaching out! I am Raj's Personal Assistant, Rudra. I wanted to let you know that your message regarding <strong>"${subject}"</strong> has been successfully received and saved in our inbox.</p>
           <p>Raj is currently review-syncing on some deliverables, but I've flagged this for his attention. He will get back to you directly at this address (<strong>${email}</strong>) as soon as possible.</p>
           <p>Have a wonderful day! ✨</p>
           <br>
           <p style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e; margin-bottom: 0;">
             Best regards,<br>
-            <strong>Alex (Personal Assistant to Raj Rathod)</strong>
+            <strong>Rudra (Personal Assistant to Raj Rathod)</strong>
           </p>
         </div>
       `;
