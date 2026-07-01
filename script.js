@@ -1,5 +1,78 @@
+// ================= TYPEWRITER EFFECT =================
+function initTypewriter() {
+  const roles = [
+    'AI & Machine Learning Developer',
+    'Deep Learning Specialist',
+    'Computer Vision Developer',
+    'Full-Stack Developer'
+  ];
+  const target = document.getElementById('typewriter-role');
+  if (!target) return;
 
+  let roleIdx = 0;
+  let charIdx = 0;
+  let isDeleting = false;
+  let delay = 100;
 
+  function type() {
+    const currentRole = roles[roleIdx];
+    
+    if (isDeleting) {
+      target.textContent = currentRole.substring(0, charIdx - 1);
+      charIdx--;
+      delay = 50;
+    } else {
+      target.textContent = currentRole.substring(0, charIdx + 1);
+      charIdx++;
+      delay = 100;
+    }
+
+    if (!isDeleting && charIdx === currentRole.length) {
+      delay = 2000;
+      isDeleting = true;
+    } else if (isDeleting && charIdx === 0) {
+      isDeleting = false;
+      roleIdx = (roleIdx + 1) % roles.length;
+      delay = 500;
+    }
+
+    setTimeout(type, delay);
+  }
+
+  type();
+}
+
+// ================= GSAP ANIMATIONS =================
+function initGSAPAnimations() {
+  if (typeof gsap === 'undefined') return;
+
+  // Stagger entry for Hero Left Column
+  gsap.from('#hero .scroll-reveal > *', {
+    duration: 0.8,
+    y: 25,
+    opacity: 0,
+    stagger: 0.12,
+    ease: 'power2.out'
+  });
+
+  // Stagger the quick social badges in the profile card
+  gsap.from('#hero .spotlight-card img', {
+    duration: 1.0,
+    scale: 0.8,
+    opacity: 0,
+    ease: 'back.out(1.7)',
+    delay: 0.4
+  });
+
+  gsap.from('#hero .spotlight-card h3, #hero .spotlight-card p, #hero .spotlight-card hr, #hero .spotlight-card .grid, #hero .spotlight-card a', {
+    duration: 0.6,
+    y: 12,
+    opacity: 0,
+    stagger: 0.08,
+    ease: 'power2.out',
+    delay: 0.6
+  });
+}
 
 // ================= PRELOADER =================
 const loaderFill = document.getElementById('loader-fill');
@@ -20,6 +93,8 @@ const preloaderInterval = setInterval(() => {
         setTimeout(() => {
           loaderScreen.style.display = 'none';
           initScrollReveals();
+          initTypewriter();
+          initGSAPAnimations();
         }, 400);
       }
     }, 150);
@@ -35,8 +110,7 @@ const revealObserver = new IntersectionObserver((entries) => {
     if (entry.isIntersecting) {
       entry.target.classList.add('active');
     } else {
-      // Replays when scrolling back up/down
-      entry.target.classList.remove('active');
+      entry.target.classList.remove('active'); // Replay transitions when scrolling back up/down
     }
   });
 }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
@@ -60,7 +134,7 @@ function initScrollReveals() {
           });
         } else {
           skillBars.forEach(bar => {
-            bar.style.width = '0%';
+            bar.style.width = '0%'; // Reset widths when scrolled away to animate again
           });
         }
       });
@@ -83,34 +157,61 @@ window.addEventListener('scroll', () => {
 
 
 // ================= DYNAMIC SPOTLIGHT TRACKER =================
-document.addEventListener('mousemove', (e) => {
-  const spotlightCards = document.querySelectorAll('.spotlight-card, .skill-card');
-  spotlightCards.forEach(card => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
+// Disable on mobile/touch viewports to eliminate useless style calculation overhead
+if (window.matchMedia('(hover: hover)').matches) {
+  document.addEventListener('mousemove', (e) => {
+    const spotlightCards = document.querySelectorAll('.spotlight-card, .skill-card');
+    spotlightCards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
   });
-});
+}
 
 
+// ================= NEURAL BACKGROUND CANVAS =================
 const canvas = document.getElementById('neural-canvas');
 if (canvas) {
   const ctx = canvas.getContext('2d');
   let nodes = [];
-  const NODE_COUNT = 65;
-  const MAX_DIST = 145;
-  let mouse = { x: null, y: null, radius: 170 };
+  
+  // Detect mobile device width for performance scale down
+  const isMobile = window.innerWidth < 768;
+  const NODE_COUNT = isMobile ? 22 : 65;
+  const MAX_DIST = isMobile ? 100 : 145;
+  let mouse = { x: null, y: null, radius: isMobile ? 100 : 170 };
 
-  window.addEventListener('mousemove', (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
+  if (window.matchMedia('(hover: hover)').matches) {
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
 
-  window.addEventListener('mouseleave', () => {
-    mouse.x = null;
-    mouse.y = null;
+    window.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+  }
+
+  // Interactive Click Burst Reaction (speed push)
+  window.addEventListener('click', (e) => {
+    const clickX = e.clientX;
+    const clickY = e.clientY;
+    nodes.forEach(n => {
+      const dx = n.x - clickX;
+      const dy = n.y - clickY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const pushRadius = isMobile ? 180 : 300;
+      if (dist < pushRadius) {
+        const force = (pushRadius - dist) / pushRadius;
+        // Explode outward
+        n.vx += (dx / dist) * force * (isMobile ? 8 : 15);
+        n.vy += (dy / dist) * force * (isMobile ? 8 : 15);
+      }
+    });
   });
 
   // Sharp high-DPI scaling for Retina/High-Res screens
@@ -127,11 +228,15 @@ if (canvas) {
 
   // Ingest initial nodes
   for (let i = 0; i < NODE_COUNT; i++) {
+    const baseVx = (Math.random() - 0.5) * 0.6;
+    const baseVy = (Math.random() - 0.5) * 0.6;
     nodes.push({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.6,
-      vy: (Math.random() - 0.5) * 0.6,
+      vx: baseVx,
+      vy: baseVy,
+      baseVx: baseVx,
+      baseVy: baseVy,
       r: Math.random() * 1.5 + 1.2
     });
   }
@@ -144,8 +249,18 @@ if (canvas) {
       n.x += n.vx;
       n.y += n.vy;
 
-      if (n.x < 0 || n.x > window.innerWidth) n.vx *= -1;
-      if (n.y < 0 || n.y > window.innerHeight) n.vy *= -1;
+      // Friction: gradually decay velocity back to base random float speed
+      n.vx += (n.baseVx - n.vx) * 0.05;
+      n.vy += (n.baseVy - n.vy) * 0.05;
+
+      if (n.x < 0 || n.x > window.innerWidth) {
+        n.vx *= -1;
+        n.baseVx *= -1;
+      }
+      if (n.y < 0 || n.y > window.innerHeight) {
+        n.vy *= -1;
+        n.baseVy *= -1;
+      }
 
       // Cursor push effect
       if (mouse.x !== null && mouse.y !== null) {
@@ -160,7 +275,7 @@ if (canvas) {
       }
     });
 
-    // Draw triangles (polygons)
+    // Draw triangles & lines
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dx1 = nodes[i].x - nodes[j].x;
@@ -168,27 +283,29 @@ if (canvas) {
         const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
 
         if (dist1 < MAX_DIST) {
-          // Check for mutual connection with a third node to form a triangle
-          for (let k = j + 1; k < nodes.length; k++) {
-            const dx2 = nodes[j].x - nodes[k].x;
-            const dy2 = nodes[j].y - nodes[k].y;
-            const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+          // Bypassed on mobile to prevent slow O(N^3) layout rendering iterations
+          if (!isMobile) {
+            for (let k = j + 1; k < nodes.length; k++) {
+              const dx2 = nodes[j].x - nodes[k].x;
+              const dy2 = nodes[j].y - nodes[k].y;
+              const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
 
-            const dx3 = nodes[k].x - nodes[i].x;
-            const dy3 = nodes[k].y - nodes[i].y;
-            const dist3 = Math.sqrt(dx3 * dx3 + dy3 * dy3);
+              const dx3 = nodes[k].x - nodes[i].x;
+              const dy3 = nodes[k].y - nodes[i].y;
+              const dist3 = Math.sqrt(dx3 * dx3 + dy3 * dy3);
 
-            if (dist2 < MAX_DIST && dist3 < MAX_DIST) {
-              ctx.beginPath();
-              ctx.moveTo(nodes[i].x, nodes[i].y);
-              ctx.lineTo(nodes[j].x, nodes[j].y);
-              ctx.lineTo(nodes[k].x, nodes[k].y);
-              ctx.closePath();
+              if (dist2 < MAX_DIST && dist3 < MAX_DIST) {
+                ctx.beginPath();
+                ctx.moveTo(nodes[i].x, nodes[i].y);
+                ctx.lineTo(nodes[j].x, nodes[j].y);
+                ctx.lineTo(nodes[k].x, nodes[k].y);
+                ctx.closePath();
 
-              const avgDist = (dist1 + dist2 + dist3) / 3;
-              const opacity = (1 - avgDist / MAX_DIST) * 0.2;
-              ctx.fillStyle = `rgba(99, 102, 241, ${opacity})`;
-              ctx.fill();
+                const avgDist = (dist1 + dist2 + dist3) / 3;
+                const opacity = (1 - avgDist / MAX_DIST) * 0.15;
+                ctx.fillStyle = `rgba(99, 102, 241, ${opacity})`;
+                ctx.fill();
+              }
             }
           }
 

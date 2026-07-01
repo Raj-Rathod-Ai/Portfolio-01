@@ -321,3 +321,53 @@ body {
 .animate-spin-reverse {
   animation: spin-reverse 6s linear infinite;
 }
+
+/* ===== GRADIENT TEXT ANIMATION ===== */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient-text {
+  background-size: 200% auto !important;
+  animation: gradientMove 5s ease infinite !important;
+}
+
+/* ===== TYPEWRITER EFFECT ===== */
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  background-color: #f59e0b; /* Accent color */
+  margin-left: 2px;
+  animation: blink 0.75s step-end infinite;
+}
+@keyframes blink {
+  from, to { background-color: transparent }
+  50% { background-color: #f59e0b; }
+}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 768px) {
+  /* Prevent heavy compositing of large blurred blobs on scroll */
+  .aurora-blob {
+    animation: none !important;
+    filter: blur(80px) !important;
+    -webkit-filter: blur(80px) !important;
+    width: 250px !important;
+    height: 250px !important;
+    opacity: 0.12 !important;
+  }
+  
+  /* Disable expensive glass blur effects that lag mobile GPUs */
+  .glass-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(22, 27, 34, 0.96) !important;
+  }
+  
+  header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(13, 17, 23, 0.98) !important;
+  }
+}
