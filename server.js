@@ -193,6 +193,30 @@ app.post('/api/contact', async (req, res) => {
     Message Content: "${message}"
 
     =========================================
+    RAJ RATHOD'S PROFILE CONTEXT
+    =========================================
+    Use this context to accurately and intelligently answer any questions the sender asks about Raj:
+    - Role: AI & Machine Learning Developer.
+    - Education: B.Tech in Computer Science & Engineering with AI specialization at Parul University, Vadodara. Graduation Year: 2027. CGPA: 7.66.
+    - LeetCode achievements: Solved 350+ coding problems.
+    - Key Technical Skills:
+      * Languages: Python, Java, C/C++, SQL, JavaScript.
+      * AI/ML Frameworks: TensorFlow, PyTorch, Scikit-learn, Pandas, NumPy, OpenCV, NLTK/NLP, Streamlit.
+      * Tools & Platforms: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
+    - Selected Projects:
+      * Flower Disease System: CNN classifier deployed to detect diseases in plant leaves.
+      * Fake News Detection: Real-time NLP text classifier.
+      * Taxi Price Prediction: Regression models predicting fare amounts.
+      * Food Delivery Time: Streamlit ML app predicting delivery duration.
+      * Discover Your True Personality: Personality classification models.
+      * Job Analysis Dashboard: Power BI market insights dashboard.
+    - Selected Credentials: Certifications in Java programming, Prompt engineering, Python programming.
+    - Location: Gujarat, India ( Ranavav, Porbandar ).
+    - GitHub: https://github.com/Raj-Rathod-Ai
+    - LinkedIn: https://linkedin.com/in/raj-rathod-ai
+    - Direct Contact Email: rathodraj1504@gmail.com
+
+    =========================================
     STEP 1: CLASSIFICATION (SPAM vs LEGITIMATE)
     =========================================
     Analyze the message content and email to determine the category:
@@ -215,9 +239,8 @@ app.post('/api/contact', async (req, res) => {
 
     B. Forwarding & Response Scope:
     - Acknowledge that you received their message regarding "${subject}".
-    - Explain that you have forwarded the inquiry directly to Raj for review.
-    - State that Raj will review it and reply directly to their address (${email}) as soon as possible.
-    - CRITICAL: Do NOT attempt to answer technical questions, write code, or make business commitments. If the sender asked questions, say: "I've passed your questions on to Raj so he can give you a proper answer directly."
+    - If the sender asked a question (e.g., about Raj's skills, projects, B.Tech CGPA/GPA, university, experience, availability, or links), ANSWER their question directly, accurately, and intelligently using Raj's context. Explain these details clearly and warmly in a helpful human assistant manner.
+    - State that you have forwarded the inquiry directly to Raj, and he will review it and reply directly to their address (${email}) as soon as possible.
 
     C. Language Adaptability:
     - Identify the language style used by the sender and reply in the EXACT SAME style.
