@@ -184,7 +184,7 @@ app.post('/api/contact', async (req, res) => {
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
     const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-    const promptText = `You are an advanced, high-EQ custom AI Professional Assistant named Rudra, representing Raj Rathod (who is an AI/ML developer). Your goal is to analyze the incoming message details, determine the category, and write an exceptionally high-quality, smart, and premium auto-acknowledgement email.
+    const promptText = `You are an advanced, high-EQ custom AI Professional Assistant named Rudra, representing Raj Rathod (who is an AI/ML developer). Your goal is to analyze the incoming message details and write an exceptionally high-quality, smart, and premium auto-reply email.
 
     Sender Profile:
     - Name: ${name}
@@ -217,17 +217,7 @@ app.post('/api/contact', async (req, res) => {
     - Direct Contact Email: rathodraj1504@gmail.com
 
     =========================================
-    STEP 1: CLASSIFICATION (SPAM vs LEGITIMATE)
-    =========================================
-    Analyze the message content and email to determine the category:
-    - CATEGORY A (LEGITIMATE): Technical inquiries, portfolio feedback, internship opportunities, freelance project requests, collaboration proposals, university queries, or general networking.
-    - CATEGORY B (SPAM/SUSPICIOUS): Marketing pitches, SEO ranking offers, cryptocurrency/Web3 promos, unsolicited link-building requests, bulk templates, phishing, offensive language, or empty/gibberish text.
-
-    You MUST prefix your output on the very first line with EXACTLY:
-    either '[CLASSIFICATION: LEGITIMATE]' or '[CLASSIFICATION: SPAM]' followed by a line break.
-
-    =========================================
-    STEP 2: EMAIL DRAFTING REQUIREMENTS
+    EMAIL DRAFTING REQUIREMENTS
     =========================================
     A. Persona & Tone (Rudra):
     - Introduce yourself on the first line as Raj's custom-built AI Assistant designed to help answer portfolio queries and coordinate communications.
@@ -245,7 +235,7 @@ app.post('/api/contact', async (req, res) => {
     - Match the language style used by the sender. If they wrote in Hinglish (mix of Hindi & English words), reply in natural, conversational Hinglish (e.g., "Hi ${name}, reach out karne ke liye thanks!"). If they wrote in English, reply in English. If in Hindi, reply in Hindi.
 
     =========================================
-    STEP 3: HTML STYLING & SIGN-OFF
+    HTML STYLING & SIGN-OFF
     =========================================
     - Format with clean, responsive inline HTML and CSS inside a dark-themed card container.
     - Background: #0d1117, Text color: #e6edf3, border: 1px solid #30363d, border-radius: 12px, padding: 25px, max-width: 600px, font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif.
@@ -259,10 +249,9 @@ app.post('/api/contact', async (req, res) => {
       Thanks,<br>
       Rudra<br>
       AI Assistant to Raj Rathod
-    - Return ONLY the raw HTML content starting with the classification tag. Do not wrap in markdown code blocks.`;
+    - Return ONLY the raw HTML content. Do not wrap in markdown code blocks.`;
 
     let htmlReply = '';
-    let isSpam = false;
     try {
       const geminiRes = await fetch(geminiUrl, {
         method: 'POST',
@@ -277,20 +266,7 @@ app.post('/api/contact', async (req, res) => {
       if (geminiRes.ok) {
         const geminiData = await geminiRes.json();
         let rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        rawText = rawText.replace(/```html/gi, '').replace(/```/g, '').trim();
-        
-        if (rawText.startsWith('[CLASSIFICATION: SPAM]')) {
-          isSpam = true;
-          rawText = rawText.replace('[CLASSIFICATION: SPAM]', '').trim();
-        } else if (rawText.startsWith('[CLASSIFICATION: LEGITIMATE]')) {
-          rawText = rawText.replace('[CLASSIFICATION: LEGITIMATE]', '').trim();
-        } else if (rawText.includes('[CLASSIFICATION: SPAM]')) {
-          isSpam = true;
-          rawText = rawText.replace('[CLASSIFICATION: SPAM]', '').trim();
-        } else if (rawText.includes('[CLASSIFICATION: LEGITIMATE]')) {
-          rawText = rawText.replace('[CLASSIFICATION: LEGITIMATE]', '').trim();
-        }
-        htmlReply = rawText;
+        htmlReply = rawText.replace(/```html/gi, '').replace(/```/g, '').trim();
       } else {
         const errText = await geminiRes.text();
         console.warn(`Gemini API failed (${geminiRes.status}): ${errText}. Falling back to default response template.`);
@@ -341,11 +317,11 @@ app.post('/api/contact', async (req, res) => {
         body: JSON.stringify({
           sender: { name: "Portfolio Notification", email: senderEmail },
           to: [{ email: "rathodraj1504@gmail.com", name: "Raj Rathod" }],
-          subject: `${isSpam ? '[SPAM Blocked] ' : '[New Inquiry] '}${subject} from ${name}`,
+          subject: `[New Inquiry] ${subject} from ${name}`,
           htmlContent: `
             <div style="font-family: sans-serif; padding: 20px; background: #0d1117; color: #f0f6fc; border-radius: 12px; border: 1px solid #30363d; max-width: 600px; margin: auto;">
-              <h2 style="color: ${isSpam ? '#f43f5e' : '#6366f1'}; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-top: 0;">
-                ${isSpam ? 'Suspicious Spam Blocked' : 'New Message Logged'}
+              <h2 style="color: #6366f1; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-top: 0;">
+                New Message Logged
               </h2>
               <p><strong>Name:</strong> ${name}</p>
               <p><strong>Email:</strong> ${email}</p>
@@ -361,40 +337,36 @@ app.post('/api/contact', async (req, res) => {
       console.error('Failed to send notification email to Raj:', notifyErr.message);
     }
 
-    // 2. Call Brevo transactional API to send AI reply to the user (ONLY if not classified as spam)
-    if (!isSpam) {
-      try {
-        const plainTextReply = htmlReply.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-        const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'api-key': process.env.BREVO_API_KEY
-          },
-          body: JSON.stringify({
-            sender: { name: "Rudra (Assistant to Raj)", email: senderEmail },
-            to: [{ email: email, name: name }],
-            replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
-            subject: `Regarding your inquiry: ${subject} - Raj Rathod`,
-            htmlContent: htmlReply,
-            textContent: plainTextReply // Standard plain-text counterpart to lower spam score
-          })
-        });
+    // 2. Call Brevo transactional API to send AI reply to the user
+    try {
+      const plainTextReply = htmlReply.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': process.env.BREVO_API_KEY
+        },
+        body: JSON.stringify({
+          sender: { name: "Rudra (AI Assistant to Raj)", email: senderEmail },
+          to: [{ email: email, name: name }],
+          replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
+          subject: `Regarding your inquiry: ${subject} - Raj Rathod`,
+          htmlContent: htmlReply,
+          textContent: plainTextReply // Standard plain-text counterpart to lower spam score
+        })
+      });
 
-        if (!brevoRes.ok) {
-          const errText = await brevoRes.text();
-          console.warn(`Brevo auto-reply failed: ${errText}`);
-        } else {
-          console.log(`AI Auto-response successfully dispatched via Brevo to: ${email}`);
-        }
-      } catch (brevoErr) {
-        console.warn('Brevo auto-reply call failed:', brevoErr.message);
+      if (!brevoRes.ok) {
+        const errText = await brevoRes.text();
+        console.warn(`Brevo auto-reply failed: ${errText}`);
+      } else {
+        console.log(`AI Auto-response successfully dispatched via Brevo to: ${email}`);
       }
-    } else {
-      console.log(`AI Auto-response skipped because message was classified as Category B (Spam/Junk).`);
+    } catch (brevoErr) {
+      console.warn('Brevo auto-reply call failed:', brevoErr.message);
     }
 
-    res.status(200).json({ success: true, status: isSpam ? 'spam_blocked' : 'dispatched' });
+    res.status(200).json({ success: true, status: 'dispatched' });
 
   } catch (err) {
     console.error('Contact endpoint error:', err.message);
