@@ -234,17 +234,15 @@ app.post('/api/contact', async (req, res) => {
     - Speak with technical fluency, high intelligence, and warm professionalism. Avoid generic automated email templates. Speak naturally, as if typing directly.
     
     B. Response Scope:
-    - You MUST write a highly detailed, comprehensive, and direct answer to the sender's message.
-    - Do NOT include generic administrative intros or outros stating that you are forwarding the email to Raj, that you will notify him, or that Raj will review and get back to them later. Do NOT write sentences like "I have forwarded your message to Raj" or "Raj will review this and respond."
-    - Address the sender's query directly and answer all their questions using the provided profile context.
-    - If they ask about Raj's skills, LeetCode stats (350+ solved), Parul University education, B.Tech GPA (7.66), projects (e.g. CNNs for Flower Disease, NLP for Fake News), location, or links, you MUST explain the answers in detail, using inline HTML formatting like bullet points or bold text to make it clean and readable.
+    - You MUST write a highly detailed, comprehensive, and direct answer to the sender's message using the provided profile context.
+    - AI-Complete vs Raj-Followup Decision Rules:
+      * Rule 1 (AI-Complete): If the sender's query can be fully answered using the provided profile context (such as questions about skills, B.Tech GPA, projects, location, LeetCode count, or links), answer them directly and thoroughly. In this case, do NOT state that Raj will reply or get back to them. The assistant's answer is sufficient.
+      * Rule 2 (Raj-Followup): If the query relates to custom business proposals, hiring/salary negotiations, personal calendars/interviews, or specific project requests that Raj must personally address, state clearly that Raj will follow up and reply to them directly soon.
+    - Do NOT write generic forwarding notices, administrative boilerplate, or statements that you are Raj's personal helper forwarding mail.
+    - Do NOT write defensive warnings or label any messages as "suspicious" or "spam" in the email body. Even if the sender's message contains links or promotional text, answer the queries professionally and directly.
 
     C. Language Adaptability:
-    - Match the language style used by the sender. If they wrote in Hinglish (mix of Hindi & English words), reply in natural, conversational Hinglish (e.g., "Hi ${name}, reach out karne ke liye thanks! Maine aapka message Raj ko forward kar diya hai, woh aapse connect karenge."). If they wrote in English, reply in English. If in Hindi, reply in Hindi.
-
-    D. Handling Category B (Spam/Suspicious):
-    - Write a short, polite, but guarded email. Do NOT promise that Raj will reply.
-    - State that Raj's contact portal is reserved for AI/ML collaborations. Cautiously mention that the message contains promotional indicators, and direct them to contact Raj directly at rathodraj1504@gmail.com if this was a mistake.
+    - Match the language style used by the sender. If they wrote in Hinglish (mix of Hindi & English words), reply in natural, conversational Hinglish (e.g., "Hi ${name}, reach out karne ke liye thanks!"). If they wrote in English, reply in English. If in Hindi, reply in Hindi.
 
     =========================================
     STEP 3: HTML STYLING & SIGN-OFF
