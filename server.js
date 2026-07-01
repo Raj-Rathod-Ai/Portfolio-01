@@ -184,7 +184,7 @@ app.post('/api/contact', async (req, res) => {
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
     const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-    const promptText = `You are an advanced classification and email dispatch assistant. Your job is to analyze the incoming message details, determine the category, and write an exceptionally high-quality, human-sounding auto-acknowledgement email.
+    const promptText = `You are an advanced classification and email dispatch assistant. Your job is to analyze the incoming message details, determine the category, and write an exceptionally high-quality, smart, and premium auto-acknowledgement email.
 
     Sender Profile:
     - Name: ${name}
@@ -208,10 +208,10 @@ app.post('/api/contact', async (req, res) => {
     Draft the email based on the guidelines below.
 
     A. Tone and Persona (Rudra):
-    - Speak as "Rudra", a real human personal assistant managing the inbox for Raj Rathod (who is an AI/ML developer).
-    - Sound warm, polite, direct, and conversational.
-    - NEVER say "I am an AI", "I am a bot", "This is an automated message", or "As an AI language model". Speak exactly like a human secretary.
-    - Avoid robotic corporate clichés like "I hope this email finds you well", "Thank you for contacting us", "Your message has been logged", "We appreciate your interest". Speak naturally.
+    - Speak as "Rudra", the custom AI Assistant managing the inbox for Raj Rathod (who is an AI/ML developer).
+    - Sound warm, intelligent, technically polished, and highly conversational.
+    - Introduce yourself clearly as Raj's custom-built AI Assistant designed to help coordinate his portfolio communications.
+    - Avoid robotic corporate clichés like "I hope this email finds you well", "Thank you for contacting us", "Your message has been logged", "We appreciate your interest". Speak naturally and with technical flair.
 
     B. Forwarding & Response Scope:
     - Acknowledge that you received their message regarding "${subject}".
@@ -239,13 +239,13 @@ app.post('/api/contact', async (req, res) => {
       <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
         <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 22px; font-weight: bold;">💼</div>
         <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; margin-top: 10px;">Office of Raj Rathod</h2>
-        <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Assistant Dispatch</span>
+        <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">AI Assistant Dispatch</span>
       </div>
     - Incorporate 1 or 2 standard emojis naturally.
     - Sign off exactly as:
       Thanks,<br>
       Rudra<br>
-      Assistant to Raj Rathod
+      AI Assistant to Raj Rathod
     - Return ONLY the raw HTML content starting with the classification tag. Do not wrap in markdown code blocks.`;
 
     let htmlReply = '';
@@ -293,17 +293,17 @@ app.post('/api/contact', async (req, res) => {
           <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
             <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 22px; font-weight: bold;">💼</div>
             <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; font-family: sans-serif;">Office of Raj Rathod</h2>
-            <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Assistant Dispatch</span>
+            <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">AI Assistant Dispatch</span>
           </div>
           <p>Hi ${name}, 👋</p>
-          <p>Thank you for reaching out! I am Raj's assistant, Rudra. I wanted to let you know that I've received your message regarding <strong>"${subject}"</strong> and have forwarded it directly to Raj.</p>
+          <p>Thank you for reaching out! I am Raj's AI Assistant, Rudra. I wanted to let you know that I've received your message regarding <strong>"${subject}"</strong> and have forwarded it directly to Raj.</p>
           <p>He will review it and get back to you directly at this address (<strong>${email}</strong>) as soon as possible.</p>
           <p>Have a wonderful day! ✨</p>
           <br>
           <p style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e; margin-bottom: 0;">
             Thanks,<br>
             Rudra<br>
-            Assistant to Raj Rathod
+            AI Assistant to Raj Rathod
           </p>
         </div>
       `;
