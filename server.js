@@ -233,12 +233,11 @@ app.post('/api/contact', async (req, res) => {
     - Introduce yourself on the first line as Raj's custom-built AI Assistant designed to help answer portfolio queries and coordinate communications.
     - Speak with technical fluency, high intelligence, and warm professionalism. Avoid generic automated email templates. Speak naturally, as if typing directly.
     
-    B. Forwarding & Response Scope:
-    - Acknowledge receipt of their message regarding "${subject}".
-    - CRITICAL DIRECTIVE: Do NOT just tell them you passed the query to Raj. You MUST read the sender's message, identify any questions they asked, and write a highly detailed, thorough, and structured answer to those questions right in the body of the email.
-    - Synthesize a comprehensive answer using the provided profile context. For example, if they ask about projects, explain the specific technical stacks (e.g. CNNs for the Flower Disease project or NLP for Fake News Detection). If they ask about university, mention Parul University, B.Tech CSE (AI) and graduation 2027. If they ask about coding practice, mention 350+ LeetCode problems solved.
-    - Present the facts in a clean, readable layout (using lists, bold text, or spacing where appropriate).
-    - Immediately after providing these detailed answers, write a concluding note stating clearly: "Additionally, I have forwarded your inquiry directly to Raj, and a more detailed, personal response from Raj himself will follow soon (or in some time) to pick up the discussion."
+    B. Response Scope:
+    - You MUST write a highly detailed, comprehensive, and direct answer to the sender's message.
+    - Do NOT include generic administrative intros or outros stating that you are forwarding the email to Raj, that you will notify him, or that Raj will review and get back to them later. Do NOT write sentences like "I have forwarded your message to Raj" or "Raj will review this and respond."
+    - Address the sender's query directly and answer all their questions using the provided profile context.
+    - If they ask about Raj's skills, LeetCode stats (350+ solved), Parul University education, B.Tech GPA (7.66), projects (e.g. CNNs for Flower Disease, NLP for Fake News), location, or links, you MUST explain the answers in detail, using inline HTML formatting like bullet points or bold text to make it clean and readable.
 
     C. Language Adaptability:
     - Match the language style used by the sender. If they wrote in Hinglish (mix of Hindi & English words), reply in natural, conversational Hinglish (e.g., "Hi ${name}, reach out karne ke liye thanks! Maine aapka message Raj ko forward kar diya hai, woh aapse connect karenge."). If they wrote in English, reply in English. If in Hindi, reply in Hindi.
@@ -312,9 +311,14 @@ app.post('/api/contact', async (req, res) => {
             <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">AI Assistant Dispatch</span>
           </div>
           <p>Hi ${name}, 👋</p>
-          <p>Thank you for reaching out! I am Raj's AI Assistant, Rudra. I wanted to let you know that I've received your message regarding <strong>"${subject}"</strong> and have forwarded it directly to Raj.</p>
-          <p>He will review it and get back to you directly at this address (<strong>${email}</strong>) as soon as possible.</p>
-          <p>Have a wonderful day! ✨</p>
+          <p>Thank you for your message regarding <strong>"${subject}"</strong>.</p>
+          <p>Here are Raj's key details for your reference:</p>
+          <ul>
+            <li><strong>Education:</strong> B.Tech in CSE (AI Specialization) at Parul University, Vadodara. CGPA: 7.66.</li>
+            <li><strong>Key Skills:</strong> Python, ML/Deep Learning (TensorFlow, PyTorch), OpenCV, NLP, SQL.</li>
+            <li><strong>Selected Projects:</strong> Flower Leaf Disease CNN classifier, Fake News Detection NLP model, Taxi Price Predictor.</li>
+          </ul>
+          <p>For direct coordination or detailed project proposals, feel free to email Raj directly at <strong>rathodraj1504@gmail.com</strong>.</p>
           <br>
           <p style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e; margin-bottom: 0;">
             Thanks,<br>
