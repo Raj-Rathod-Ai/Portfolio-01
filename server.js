@@ -197,29 +197,30 @@ app.post('/api/contact', async (req, res) => {
     Requirements:
     - Decide if the message is CATEGORY A or CATEGORY B. 
     - You MUST prefix your output on the very first line with EXACTLY either '[CLASSIFICATION: LEGITIMATE]' or '[CLASSIFICATION: SPAM]' followed by a line break, and then the HTML reply template.
-    - Write a warm, human-like, and highly professional HTML reply email.
-    - Write as "Rudra", a human Administrative/Personal Assistant to Raj Rathod. Do NOT say "I am an AI", "I am a bot", or "This is an automated response". Write exactly like a real human assistant managing Raj's inbox.
-    - Keep the tone warm, conversational, and direct. Avoid cliché formal openings like "I hope this email finds you well" or "Thank you for contacting us". Speak naturally.
-    - IDENTIFY the language style used by the sender and reply in the EXACT SAME language style/mix (e.g. English, Hinglish, or Hindi).
     
-    If the message falls under CATEGORY A:
-    - Mention that their inquiry has been successfully received, logged in Raj's calendar database, and that Raj will follow up with them shortly at this address.
+    Email Writing Guidelines (For CATEGORY A):
+    - Write as "Rudra", a human assistant to Raj Rathod. Speak naturally and warmly like a real assistant. Do NOT sound robotic.
+    - Do NOT mention "database", "calendar", "system logs", "saved in our inbox", or "logging records". Keep it warm and human.
+    - Explain that you have received their message regarding "${subject}" and have forwarded it directly to Raj.
+    - State that Raj will review it and reply directly to them at this address (${email}) as soon as possible.
+    - Do NOT attempt to answer any of the sender's questions or write details on Raj's behalf. Your only job is to confirm receipt, say you've passed it to Raj, and that he will respond soon.
+    - Keep it concise, natural, and direct. Avoid generic formal openings.
     
-    If the message falls under CATEGORY B (Suspicious/Spam/Promo):
-    - Write a polite but cautious and guarded response. Do NOT mention logging it in the calendar database. 
-    - Cautiously inform them that the inquiry contains marketing terms, unverified links, or indicators typical of automated mail. Direct them to email Raj directly at rathodraj1504@gmail.com if this is a genuine request, and request them not to send bulk links or solicitations.
-
+    Email Writing Guidelines (For CATEGORY B - Spam/Suspicious):
+    - Write a brief, polite, and guarded message. State that Raj's contact form is reserved for direct project/business collaborations. Do not promise that Raj will reply. Mention they can reach out at rathodraj1504@gmail.com directly if this is an error, and request them not to send marketing links.
+    
+    HTML Layout Guidelines:
     - Format with clean inline HTML and CSS inside a dark themed premium card layout.
-    - Incorporate standard emojis contextually.
     - Include this header logo card element at the top:
       <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
         <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 22px; font-weight: bold; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">💼</div>
         <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">Office of Raj Rathod</h2>
-        <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Personal Assistant Dispatch</span>
+        <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Assistant Dispatch</span>
       </div>
-    - Sign off as:
-      Best,
-      Rudra (Personal Assistant to Raj Rathod)
+    - Sign off exactly as:
+      Thanks,<br>
+      Rudra<br>
+      Assistant to Raj Rathod
     - Return ONLY the clean raw HTML content. Do not wrap in markdown code blocks.`;
 
     let htmlReply = '';
@@ -267,16 +268,17 @@ app.post('/api/contact', async (req, res) => {
           <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
             <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 22px; font-weight: bold;">💼</div>
             <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; font-family: sans-serif;">Office of Raj Rathod</h2>
-            <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Personal Assistant Dispatch</span>
+            <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Assistant Dispatch</span>
           </div>
           <p>Hi ${name}, 👋</p>
-          <p>Thank you for reaching out! I am Raj's Personal Assistant, Rudra. I wanted to let you know that your message regarding <strong>"${subject}"</strong> has been successfully received and saved in our inbox.</p>
-          <p>Raj is currently review-syncing on some deliverables, but I've flagged this for his attention. He will get back to you directly at this address (<strong>${email}</strong>) as soon as possible.</p>
+          <p>Thank you for reaching out! I am Raj's assistant, Rudra. I wanted to let you know that I've received your message regarding <strong>"${subject}"</strong> and have forwarded it directly to Raj.</p>
+          <p>He will review it and get back to you directly at this address (<strong>${email}</strong>) as soon as possible.</p>
           <p>Have a wonderful day! ✨</p>
           <br>
           <p style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e; margin-bottom: 0;">
-            Best regards,<br>
-            <strong>Rudra (Personal Assistant to Raj Rathod)</strong>
+            Thanks,<br>
+            Rudra<br>
+            Assistant to Raj Rathod
           </p>
         </div>
       `;
