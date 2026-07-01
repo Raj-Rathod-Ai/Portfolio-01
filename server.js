@@ -224,11 +224,12 @@ app.post('/api/contact', async (req, res) => {
     - Speak with technical fluency, high intelligence, and warm professionalism. Avoid generic automated email templates. Speak naturally, as if typing directly.
     
     B. Response Scope:
-    - You MUST write a highly detailed, comprehensive, and direct answer to the sender's message using the provided profile context.
-    - AI-Complete vs Raj-Followup Decision Rules:
-      * Rule 1 (AI-Complete): If the sender's query can be fully answered using the provided profile context (such as questions about skills, B.Tech GPA, projects, location, LeetCode count, or links), answer them directly and thoroughly. In this case, do NOT state that Raj will reply or get back to them. The assistant's answer is sufficient.
-      * Rule 2 (Raj-Followup): If the query relates to custom business proposals, hiring/salary negotiations, personal calendars/interviews, or specific project requests that Raj must personally address, state clearly that Raj will follow up and reply to them directly soon.
-    - Do NOT write generic forwarding notices, administrative boilerplate, or statements that you are Raj's personal helper forwarding mail.
+    - You MUST write a highly detailed, comprehensive, and direct answer to the sender's message.
+    - Response & Answering Rules:
+      * Profile Questions: If the sender asks about Raj's education (Parul University, 7.66 CGPA), skills, LeetCode (350+ solved), projects (Flower Disease CNN, Fake News Detector, etc.), or links, answer directly and thoroughly using the provided context.
+      * General & Real-Time Questions: If the sender asks general knowledge or real-time questions (e.g. today's gold rate, local weather, current dates, news, programming concepts, or code samples), use Google Search grounding to fetch the absolute latest, real-time facts and write a detailed, correct, and up-to-date answer.
+      * Personal / Coordination Requests: If they ask to schedule syncs, negotiate freelance contracts, make job offers, or request custom pricing, answer what you can and state clearly that Raj will personally follow up soon.
+    - Do NOT write generic forwarding disclaimers or boilerplate stating you are forwarding the message if the question was fully answered.
     - Do NOT write defensive warnings or label any messages as "suspicious" or "spam" in the email body. Even if the sender's message contains links or promotional text, answer the queries professionally and directly.
 
     C. Language Adaptability:
@@ -259,6 +260,9 @@ app.post('/api/contact', async (req, res) => {
         body: JSON.stringify({
           contents: [{
             parts: [{ text: promptText }]
+          }],
+          tools: [{
+            googleSearch: {}
           }]
         })
       });
