@@ -1,5 +1,3 @@
-import { navigate } from '../router.js';
-
 /**
  * CategoryCard component rendering individual category tiles.
  */
@@ -12,9 +10,9 @@ export class CategoryCard {
   render(category) {
     const projectWord = category.count === 1 ? 'Project' : 'Projects';
     return `
-      <div class="spotlight-card rounded-2xl border border-white/8 p-6 flex flex-col justify-between group hover:border-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer h-full select-none" 
-           style="background: rgba(22, 27, 34, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);" 
-           data-slug="${category.slug}">
+      <a href="/projects/${category.slug}" 
+         class="spotlight-card rounded-2xl border border-white/8 p-6 flex flex-col justify-between group hover:border-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer h-full select-none block" 
+         style="background: rgba(22, 27, 34, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
         
         <div class="space-y-4 pointer-events-none">
           <!-- Icon wrapper -->
@@ -34,21 +32,14 @@ export class CategoryCard {
             Explore <i class="fa-solid fa-arrow-right-long text-xs group-hover:translate-x-1 transition-transform"></i>
           </span>
         </div>
-      </div>
+      </a>
     `;
   }
 
   /**
-   * Setup click listeners on category cards.
-   * @param {HTMLElement} container - Container element where cards are mounted.
+   * No local event binding required. Clean native navigation intercepted globally.
    */
   setup(container) {
-    if (!container) return;
-    container.querySelectorAll('[data-slug]').forEach(card => {
-      card.addEventListener('click', (e) => {
-        const slug = card.getAttribute('data-slug');
-        navigate(`/projects/${slug}`);
-      });
-    });
+    // Left intentionally empty as navigation is handled via global link interceptors.
   }
 }

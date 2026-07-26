@@ -1,5 +1,4 @@
-import { getRepoIcon, getLiveUrl, formatDate } from '../utils/helpers.js';
-import { navigate } from '../router.js';
+import { getRepoIcon, getLiveUrl, formatDate, slugify } from '../utils/helpers.js';
 
 /**
  * ProjectDetails page component showing comprehensive information for a single project repository.
@@ -37,6 +36,11 @@ export class ProjectDetails {
     const defaultBranch = repo.default_branch || 'main';
     const repoSize = repo.size ? `${(repo.size / 1024).toFixed(2)} MB` : 'Unknown';
 
+    // Compute back link dynamically to point to the project's category workspace
+    const categoryName = repo.category || 'Others';
+    const categorySlug = categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const backHref = `/projects/${categorySlug}`;
+
     // Group Badge
     const meta = localMetadata.find(m => m.repo.toLowerCase() === repo.name.toLowerCase());
     const isGroup = meta && meta.type ? meta.type === 'group' : repo.isGroup;
@@ -45,7 +49,6 @@ export class ProjectDetails {
       : `<span class="px-2.5 py-1 rounded-md bg-teal/10 border border-teal/20 text-[10px] font-mono text-teal">Solo Project</span>`;
 
     // Category Badge
-    const categoryName = repo.category || 'Others';
     const categoryBadge = `<span class="px-2.5 py-1 rounded-md bg-primary/10 border border-primary/20 text-[10px] font-mono text-primary">${categoryName}</span>`;
 
     // Stars HTML
@@ -71,7 +74,7 @@ export class ProjectDetails {
       <section id="project-details" class="py-24 px-6 max-w-4xl mx-auto w-full min-h-[85vh]">
         <!-- Breadcrumb / Back button -->
         <div class="flex items-center gap-3 mb-8">
-          <a href="/projects" class="back-to-projects-btn flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-xs font-semibold text-gray-300 hover:text-white hover:border-primary/50 transition-all select-none">
+          <a href="${backHref}" class="back-to-projects-btn flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-xs font-semibold text-gray-300 hover:text-white hover:border-primary/50 transition-all select-none">
             <i class="fa-solid fa-arrow-left"></i><span>Back</span>
           </a>
           <span class="font-mono text-xs text-gray-600">Projects / ${repo.name}</span>
@@ -164,27 +167,9 @@ export class ProjectDetails {
   }
 
   /**
-   * Bind event actions for project details routing.
-   * @param {object} repo - The repository object loaded.
+   * No local event binding required. Clean native navigation intercepted globally.
    */
   setup(repo) {
-    // Bind back button click to return to the correct parent list
-    const backBtn = document.querySelector('.back-to-projects-btn');
-    if (backBtn) {
-      backBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        // Go back to the specific category containing the project if available
-        if (repo && repo.category) {
-          const categorySlug = repo.category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          navigate(`/projects/${categorySlug}`);
-        } else {
-          navigate('/projects');
-        }
-      });
-    }
-
-    // Regsiter observer updates
     if (window.initializeObservers) window.initializeObservers();
   }
 }

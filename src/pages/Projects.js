@@ -141,14 +141,6 @@ export class Projects {
     const filterMount = document.getElementById('filter-bar-mount');
     const sortMount = document.getElementById('sort-bar-mount');
 
-    // Intercept back button clicks
-    const backBtn = document.querySelector('.back-to-categories-btn');
-    if (backBtn) {
-      backBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        navigate('/projects');
-      });
-    }
 
     const renderGrid = () => {
       if (!projectsMount) return;

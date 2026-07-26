@@ -1,5 +1,4 @@
 import { getRepoIcon, getLiveUrl, formatDate, slugify } from '../utils/helpers.js';
-import { navigate } from '../router.js';
 
 const ACCENT_CYCLE = [
   { hover: 'hover:border-primary/45 hover:bg-primary/3' },
@@ -68,7 +67,9 @@ export class ProjectCard {
               <i class="fa-solid ${iconData.icon} ${iconData.color}"></i>
             </div>
             <div class="flex-1 min-w-0">
-              <h3 class="font-jakarta font-semibold text-sm text-gray-100 leading-snug cursor-pointer hover:text-primary transition-colors project-title-click" title="${repo.name}">${repoTitle}</h3>
+              <a href="/projects/${projectSlug}" class="hover:text-primary transition-colors block">
+                <h3 class="font-jakarta font-semibold text-sm text-gray-100 leading-snug truncate" title="${repo.name}">${repoTitle}</h3>
+              </a>
               <span class="font-mono text-[10px] text-gray-600">${lang} · ${updatedDate}</span>
             </div>
             ${starsHTML}
@@ -80,7 +81,7 @@ export class ProjectCard {
           <a href="${repo.html_url}" target="_blank" rel="noopener" class="flex items-center gap-1.5 text-xs font-mono text-gray-500 hover:text-white transition-colors">
             <i class="fa-brands fa-github"></i><span>Code</span>
           </a>
-          <a href="/projects/${projectSlug}" class="flex items-center gap-1.5 text-xs font-mono text-gray-500 hover:text-white transition-colors project-details-btn">
+          <a href="/projects/${projectSlug}" class="flex items-center gap-1.5 text-xs font-mono text-gray-500 hover:text-white transition-colors">
             <i class="fa-solid fa-circle-info"></i><span>Details</span>
           </a>
           ${liveBtnHTML}
@@ -90,30 +91,9 @@ export class ProjectCard {
   }
 
   /**
-   * Bind events for project details routing.
-   * @param {HTMLElement} container - The grid container.
+   * No local event binding required. Clean native navigation intercepted globally.
    */
   setup(container) {
-    if (!container) return;
-    
-    // Bind click on project title
-    container.querySelectorAll('.project-title-click').forEach(title => {
-      title.addEventListener('click', (e) => {
-        e.preventDefault();
-        const card = title.closest('[data-project-slug]');
-        const slug = card.getAttribute('data-project-slug');
-        navigate(`/projects/${slug}`);
-      });
-    });
-
-    // Bind click on details button
-    container.querySelectorAll('.project-details-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const card = btn.closest('[data-project-slug]');
-        const slug = card.getAttribute('data-project-slug');
-        navigate(`/projects/${slug}`);
-      });
-    });
+    // Left intentionally empty as navigation is handled via global link interceptors.
   }
 }
