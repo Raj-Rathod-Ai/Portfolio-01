@@ -406,14 +406,7 @@ body {
   will-change: transform;
 }
 
-/* Desktop: flip on hover */
-@media (hover: hover) and (pointer: fine) {
-  .flip-card:hover .flip-card-inner {
-    transform: rotateY(180deg);
-  }
-}
-
-/* Mobile/touch: flip on .is-flipped class toggled via JS */
+/* Desktop: flip ONLY via .is-flipped (set by flip button click, not hover) */
 .flip-card.is-flipped .flip-card-inner {
   transform: rotateY(180deg);
 }
@@ -446,7 +439,6 @@ body {
   border-color: rgba(99, 102, 241, 0.3);
 }
 
-.flip-card:hover .flip-card-back,
 .flip-card.is-flipped .flip-card-back {
   box-shadow: 0 20px 50px -10px rgba(139, 92, 246, 0.3);
   border-color: rgba(139, 92, 246, 0.35);
@@ -464,7 +456,8 @@ body {
   z-index: 2;
   border-radius: 16px;
 }
-.flip-card:hover .flip-card-front::after {
+/* Show spotlight only when not flipped */
+.flip-card:not(.is-flipped) .flip-card-front::after {
   opacity: 1;
 }
 
@@ -483,6 +476,30 @@ body {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* --- Flip Button (corner trigger on front & back) --- */
+.flip-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: rgba(156,163,175,0.6);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.3s;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+.flip-btn:hover {
+  background: rgba(99,102,241,0.2);
+  border-color: rgba(99,102,241,0.45);
+  color: #a5b4fc;
+  transform: rotate(180deg);
+}
+
 
 /* --- Category Badge Colors --- */
 .cat-badge-genai        { background: rgba(99,102,241,0.12); color: #818cf8; border-color: rgba(99,102,241,0.25); }

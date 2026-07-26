@@ -161,6 +161,10 @@ export class ProjectCard {
 
         <!-- ===== FRONT ===== -->
         <div class="flip-card-front ${isFeatured ? 'is-featured' : ''} p-5 flex flex-col justify-between">
+          <!-- Flip trigger button (top-right corner) -->
+          <button class="flip-btn" title="See project details" aria-label="Flip card">
+            <i class="fa-solid fa-rotate"></i>
+          </button>
           <!-- Header row -->
           <div class="space-y-3">
             <div class="flex items-start justify-between gap-3">
@@ -197,15 +201,16 @@ export class ProjectCard {
                 <i class="fa-brands fa-github text-xs"></i>Code
               </a>
               ${liveBtnHTML}
-              <span class="ml-auto text-[9px] font-mono text-gray-700 flex items-center gap-1">
-                Hover to flip <i class="fa-solid fa-rotate text-[8px]"></i>
-              </span>
             </div>
           </div>
         </div>
 
         <!-- ===== BACK ===== -->
         <div class="flip-card-back p-5 flex flex-col justify-between">
+          <!-- Unflip trigger button (top-right corner) -->
+          <button class="flip-btn" title="Go back" aria-label="Flip back">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
           <div class="space-y-3">
             <!-- Back header -->
             <div class="flex items-center gap-2">
@@ -260,19 +265,17 @@ export class ProjectCard {
   }
 
   /**
-   * Wire up touch/click flip toggle for mobile devices.
+   * Wire up click-only flip toggle via dedicated .flip-btn buttons.
+   * Links (Live Demo, GitHub, View Details) always work without flipping.
    * @param {HTMLElement} container
    */
   setup(container) {
-    // Touch devices: toggle .is-flipped on card click
-    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-    if (!isTouchDevice) return;
-
     container.querySelectorAll('.flip-card').forEach(card => {
-      card.addEventListener('click', e => {
-        // Allow native link navigation without flipping
-        if (e.target.closest('a')) return;
-        card.classList.toggle('is-flipped');
+      card.querySelectorAll('.flip-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation(); // Don't bubble to any parent handlers
+          card.classList.toggle('is-flipped');
+        });
       });
     });
   }
