@@ -371,3 +371,335 @@ body {
     background: rgba(13, 17, 23, 0.98) !important;
   }
 }
+
+/* ============================================================
+   PREMIUM PROJECT SECTION — FLIP CARDS & INTERACTIONS
+   ============================================================ */
+
+/* --- Stagger Delay Utilities --- */
+.stagger-1  { transition-delay: 0.05s !important; animation-delay: 0.05s !important; }
+.stagger-2  { transition-delay: 0.10s !important; animation-delay: 0.10s !important; }
+.stagger-3  { transition-delay: 0.15s !important; animation-delay: 0.15s !important; }
+.stagger-4  { transition-delay: 0.20s !important; animation-delay: 0.20s !important; }
+.stagger-5  { transition-delay: 0.25s !important; animation-delay: 0.25s !important; }
+.stagger-6  { transition-delay: 0.30s !important; animation-delay: 0.30s !important; }
+.stagger-7  { transition-delay: 0.35s !important; animation-delay: 0.35s !important; }
+.stagger-8  { transition-delay: 0.40s !important; animation-delay: 0.40s !important; }
+.stagger-9  { transition-delay: 0.45s !important; animation-delay: 0.45s !important; }
+.stagger-10 { transition-delay: 0.50s !important; animation-delay: 0.50s !important; }
+.stagger-11 { transition-delay: 0.55s !important; animation-delay: 0.55s !important; }
+.stagger-12 { transition-delay: 0.60s !important; animation-delay: 0.60s !important; }
+
+/* --- 3D Flip Card Container --- */
+.flip-card {
+  perspective: 1000px;
+  height: 340px;
+  cursor: pointer;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* Desktop: flip on hover */
+@media (hover: hover) and (pointer: fine) {
+  .flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Mobile/touch: flip on .is-flipped class toggled via JS */
+.flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(22, 27, 34, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+  background: rgba(16, 20, 30, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.flip-card:hover .flip-card-front,
+.flip-card.is-flipped .flip-card-front {
+  box-shadow: 0 20px 50px -10px rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.flip-card:hover .flip-card-back,
+.flip-card.is-flipped .flip-card-back {
+  box-shadow: 0 20px 50px -10px rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.35);
+}
+
+/* Spotlight glow overlay on flip-card-front */
+.flip-card-front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99,102,241,0.07), transparent 40%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 2;
+  border-radius: 16px;
+}
+.flip-card:hover .flip-card-front::after {
+  opacity: 1;
+}
+
+/* Featured shimmer stripe */
+.flip-card-front.is-featured::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #f59e0b, #14b8a6);
+  background-size: 200% 100%;
+  animation: shimmerBar 2.5s linear infinite;
+  z-index: 3;
+}
+@keyframes shimmerBar {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Category Badge Colors --- */
+.cat-badge-genai        { background: rgba(99,102,241,0.12); color: #818cf8; border-color: rgba(99,102,241,0.25); }
+.cat-badge-rag          { background: rgba(244,63,94,0.12);  color: #fb7185; border-color: rgba(244,63,94,0.25); }
+.cat-badge-dl           { background: rgba(20,184,166,0.12); color: #2dd4bf; border-color: rgba(20,184,166,0.25); }
+.cat-badge-nlp          { background: rgba(168,85,247,0.12); color: #c084fc; border-color: rgba(168,85,247,0.25); }
+.cat-badge-ml           { background: rgba(59,130,246,0.12); color: #60a5fa; border-color: rgba(59,130,246,0.25); }
+.cat-badge-ds           { background: rgba(245,158,11,0.12); color: #fbbf24; border-color: rgba(245,158,11,0.25); }
+.cat-badge-cv           { background: rgba(6,182,212,0.12);  color: #22d3ee; border-color: rgba(6,182,212,0.25); }
+.cat-badge-agents       { background: rgba(236,72,153,0.12); color: #f472b6; border-color: rgba(236,72,153,0.25); }
+.cat-badge-mlops        { background: rgba(100,116,139,0.15);color: #94a3b8; border-color: rgba(100,116,139,0.3); }
+.cat-badge-normal       { background: rgba(34,197,94,0.12);  color: #4ade80; border-color: rgba(34,197,94,0.25); }
+.cat-badge-python       { background: rgba(250,204,21,0.12); color: #facc15; border-color: rgba(250,204,21,0.25); }
+.cat-badge-others       { background: rgba(107,114,128,0.12);color: #9ca3af; border-color: rgba(107,114,128,0.25); }
+
+/* --- Premium Search Input --- */
+.premium-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+}
+.premium-search-wrap .search-icon {
+  position: absolute;
+  left: 14px;
+  color: rgba(156,163,175,0.7);
+  pointer-events: none;
+  font-size: 13px;
+  transition: color 0.3s;
+  z-index: 1;
+}
+.premium-search-input {
+  width: 100%;
+  padding: 10px 40px 10px 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(22,27,34,0.7);
+  backdrop-filter: blur(10px);
+  color: #f0f6fc;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}
+.premium-search-input::placeholder { color: rgba(156,163,175,0.5); }
+.premium-search-input:focus {
+  border-color: rgba(99,102,241,0.55);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12), 0 4px 20px rgba(99,102,241,0.1);
+  background: rgba(22,27,34,0.9);
+}
+.premium-search-input:focus ~ .search-icon,
+.premium-search-wrap:focus-within .search-icon {
+  color: #818cf8;
+}
+.search-clear-btn {
+  position: absolute;
+  right: 10px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #9ca3af;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.2s, transform 0.2s, background 0.2s;
+  z-index: 1;
+}
+.search-clear-btn.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+.search-clear-btn:hover { background: rgba(244,63,94,0.2); color: #fb7185; }
+
+/* --- Filter Chips --- */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(22,27,34,0.6);
+  color: rgba(156,163,175,0.8);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  white-space: nowrap;
+  user-select: none;
+}
+.filter-chip:hover {
+  border-color: rgba(99,102,241,0.4);
+  color: #e2e8f0;
+  background: rgba(99,102,241,0.08);
+}
+.filter-chip.active {
+  background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.2));
+  border-color: rgba(99,102,241,0.5);
+  color: #c7d2fe;
+  box-shadow: 0 0 14px rgba(99,102,241,0.15);
+}
+
+/* --- Sort Dropdown --- */
+.sort-select-wrap { position: relative; }
+.sort-select-wrap .sort-icon {
+  position: absolute;
+  left: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: rgba(156,163,175,0.6);
+  font-size: 12px;
+  pointer-events: none;
+}
+.premium-sort-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 9px 34px 9px 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(22,27,34,0.7);
+  color: #d1d5db;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  min-width: 160px;
+}
+.premium-sort-select:hover  { border-color: rgba(99,102,241,0.4); }
+.premium-sort-select:focus  {
+  border-color: rgba(99,102,241,0.55);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+.sort-chevron {
+  position: absolute;
+  right: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: rgba(156,163,175,0.5);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+/* --- Category Card Premium --- */
+.cat-card-premium {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s;
+}
+.cat-card-premium:hover {
+  transform: translateY(-5px) scale(1.015);
+}
+.cat-card-premium::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 18px;
+  background: conic-gradient(from var(--angle, 0deg), #6366f1, #8b5cf6, #f59e0b, #14b8a6, #6366f1);
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 0;
+  animation: rotateBorder 4s linear infinite paused;
+}
+.cat-card-premium:hover::before { opacity: 0.7; animation-play-state: running; }
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes rotateBorder {
+  to { --angle: 360deg; }
+}
+.cat-card-body {
+  position: relative;
+  z-index: 1;
+  border-radius: 17px;
+  background: rgba(22,27,34,0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 24px;
+  height: 100%;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+/* --- No Results Empty State --- */
+.no-results-state {
+  text-align: center;
+  padding: 64px 24px;
+  color: rgba(156,163,175,0.6);
+}
+.no-results-state svg { opacity: 0.25; }
+.no-results-state h4 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(209,213,219,0.7);
+  margin-top: 16px;
+}
+.no-results-state p {
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* Mobile: disable backdrop-filter on flip cards for perf */
+@media (max-width: 768px) {
+  .flip-card-front,
+  .flip-card-back {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(22,27,34,0.97) !important;
+  }
+  .cat-card-body {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(22,27,34,0.97) !important;
+  }
+}

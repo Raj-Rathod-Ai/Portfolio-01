@@ -1,56 +1,40 @@
 /**
- * Sorting utility for projects.
- * Supports: Newest, Oldest, Recently Updated, Stars, A-Z, Z-A.
- *
- * @param {Array} projects - List of projects.
- * @param {string} sortBy - Sort option slug (e.g. 'newest', 'stars').
- * @returns {Array} Sorted copy of the projects array.
+ * Sort projects by chosen criteria.
+ * Supports: default | newest | oldest | updated | stars | az | za
+ * @param {Array}  projects
+ * @param {string} sortKey
+ * @returns {Array}
  */
-export function sortProjects(projects, sortBy) {
-  if (!projects || projects.length === 0) return [];
-  const sorted = [...projects];
-  const option = sortBy ? sortBy.toLowerCase() : 'newest';
+export function sortProjects(projects, sortKey = 'default') {
+  const arr = [...projects]; // avoid mutating original
 
-  switch (option) {
+  switch (sortKey) {
     case 'newest':
-      return sorted.sort((a, b) => {
-        const dateA = new Date(a.created_at || a.updated_at || 0);
-        const dateB = new Date(b.created_at || b.updated_at || 0);
-        return dateB - dateA;
-      });
+      return arr.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     case 'oldest':
-      return sorted.sort((a, b) => {
-        const dateA = new Date(a.created_at || a.updated_at || 0);
-        const dateB = new Date(b.created_at || b.updated_at || 0);
-        return dateA - dateB;
-      });
+      return arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-    case 'recently-updated':
-      return sorted.sort((a, b) => {
-        const dateA = new Date(a.updated_at || 0);
-        const dateB = new Date(b.updated_at || 0);
-        return dateB - dateA;
-      });
+    case 'updated':
+      return arr.sort((a, b) =>
+        new Date(b.updated_at || b.pushed_at) - new Date(a.updated_at || a.pushed_at));
 
     case 'stars':
-      return sorted.sort((a, b) => {
-        const starsA = a.stargazers_count || 0;
-        const starsB = b.stargazers_count || 0;
-        if (starsB !== starsA) {
-          return starsB - starsA;
-        }
-        // Fallback to alphabetical if stars are equal
-        return a.name.localeCompare(b.name);
-      });
+      return arr.sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0));
 
-    case 'a-z':
-      return sorted.sort((a, b) => a.name.localeCompare(b.name));
+    case 'az':
+      return arr.sort((a, b) => a.name.localeCompare(b.name));
 
-    case 'z-a':
-      return sorted.sort((a, b) => b.name.localeCompare(a.name));
+    case 'za':
+      return arr.sort((a, b) => b.name.localeCompare(a.name));
 
+    case 'default':
     default:
-      return sorted;
+      // Featured first, then recently updated
+      return arr.sort((a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return new Date(b.updated_at || b.pushed_at) - new Date(a.updated_at || a.pushed_at);
+      });
   }
 }

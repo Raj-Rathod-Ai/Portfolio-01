@@ -1,66 +1,68 @@
+let debounceTimer = null;
+
+const PLACEHOLDERS = [
+  'Search by name…',
+  'Search by technology…',
+  'Search by category…',
+  'Search by framework…',
+];
+
 /**
- * SearchBar component rendering an input box with custom debounce events.
+ * Premium search bar with icon, clear button, and debounced input.
  */
 export class SearchBar {
-  /**
-   * Render the HTML string for the search bar.
-   * @returns {string} SearchBar HTML markup.
-   */
   render() {
     return `
-      <div class="relative w-full md:max-w-md">
-        <input type="text" id="project-search" placeholder="Search by name, tech, topics..." 
-               class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 pl-10 text-sm focus:outline-none focus:border-primary text-gray-100 transition-colors placeholder-gray-500 spotlight-card"
-               style="background: rgba(22, 27, 34, 0.5);">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-500 text-sm"></i>
-        <button id="search-clear-btn" class="absolute right-3.5 top-3 text-gray-500 hover:text-white hidden transition-colors">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-    `;
+    <div class="premium-search-wrap w-full xl:w-72">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        id="projects-search-input"
+        class="premium-search-input"
+        type="text"
+        placeholder="${PLACEHOLDERS[0]}"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="search-clear-btn" id="search-clear-btn" aria-label="Clear search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>`;
   }
 
-  /**
-   * Setup search listeners, debouncing, and custom events.
-   * @param {HTMLElement} container - Parent container.
-   * @param {function} onSearch - Callback to fire on search query change.
-   */
-  setup(container, onSearch) {
-    if (!container) return;
-
-    const input = container.querySelector('#project-search');
+  setup(container, onChange) {
+    const input   = container.querySelector('#projects-search-input');
     const clearBtn = container.querySelector('#search-clear-btn');
-    if (!input) return;
+    if (!input || !clearBtn) return;
 
-    let timeout = null;
-
-    const handleSearchChange = (val) => {
-      // Toggle clear button
-      if (clearBtn) {
-        if (val) {
-          clearBtn.classList.remove('hidden');
-        } else {
-          clearBtn.classList.add('hidden');
-        }
+    // Rotate placeholder
+    let pIdx = 0;
+    const rotatePlaceholder = setInterval(() => {
+      pIdx = (pIdx + 1) % PLACEHOLDERS.length;
+      if (document.activeElement !== input) {
+        input.placeholder = PLACEHOLDERS[pIdx];
       }
+    }, 3000);
 
-      // Debounce callback
-      if (timeout) clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        onSearch(val);
-      }, 250); // 250ms debounce
+    // Clear button
+    const updateClear = () => {
+      clearBtn.classList.toggle('visible', input.value.length > 0);
     };
 
-    input.addEventListener('input', (e) => {
-      handleSearchChange(e.target.value);
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      updateClear();
+      onChange('');
+      input.focus();
     });
 
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        input.value = '';
-        handleSearchChange('');
-        input.focus();
-      });
-    }
+    // Debounced change
+    input.addEventListener('input', () => {
+      updateClear();
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => onChange(input.value.trim()), 280);
+    });
+
+    // Cleanup on SPA nav
+    window._searchCleanup = () => clearInterval(rotatePlaceholder);
   }
 }

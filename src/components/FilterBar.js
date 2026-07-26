@@ -1,53 +1,31 @@
+const FILTERS = [
+  { id: 'all',      label: 'All',              icon: 'fa-layer-group'  },
+  { id: 'featured', label: 'Featured',         icon: 'fa-star'         },
+  { id: 'solo',     label: 'Solo',             icon: 'fa-user'         },
+  { id: 'group',    label: 'Group',            icon: 'fa-users'        },
+  { id: 'recent',   label: 'Recent',           icon: 'fa-clock-rotate-left' },
+  { id: 'popular',  label: 'Popular',          icon: 'fa-fire'         },
+];
+
 /**
- * FilterBar component for selecting project filters (All, Featured, Solo, Group, etc.).
+ * Animated filter chip bar.
  */
 export class FilterBar {
-  /**
-   * Render the HTML string for the filter pills.
-   * @param {string} activeFilter - Currently active filter slug.
-   * @returns {string} FilterBar HTML.
-   */
   render(activeFilter = 'all') {
-    const filters = [
-      { slug: 'all', label: 'All', icon: '' },
-      { slug: 'featured', label: 'Featured', icon: '⭐ ' },
-      { slug: 'solo', label: 'Solo Projects', icon: '👤 ' },
-      { slug: 'group', label: 'Group Projects', icon: '👥 ' },
-      { slug: 'recently-updated', label: 'Recently Updated', icon: '📅 ' },
-      { slug: 'popular', label: 'Popular', icon: '🔥 ' }
-    ];
+    const chips = FILTERS.map(f => `
+      <button class="filter-chip ${f.id === activeFilter ? 'active' : ''}"
+              data-filter="${f.id}"
+              type="button">
+        <i class="fa-solid ${f.icon} text-[9px]"></i>${f.label}
+      </button>`).join('');
 
-    return `
-      <div class="flex flex-wrap gap-2 items-center overflow-x-auto select-none no-scrollbar py-1">
-        ${filters.map(f => {
-          const isActive = f.slug === activeFilter;
-          const activeClasses = isActive 
-            ? 'bg-gradient-to-r from-primary to-secondary text-white border-transparent shadow-lg shadow-primary/10'
-            : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20';
-
-          return `
-            <button class="px-4 py-2 text-xs font-semibold rounded-xl border font-jakarta transition-all duration-300 filter-pill ${activeClasses}" 
-                    data-filter="${f.slug}">
-              ${f.icon}${f.label}
-            </button>
-          `;
-        }).join('')}
-      </div>
-    `;
+    return `<div class="flex items-center gap-2 flex-wrap">${chips}</div>`;
   }
 
-  /**
-   * Setup click listeners on filter buttons.
-   * @param {HTMLElement} container - The wrapper element.
-   * @param {function} onFilter - Callback that receives the selected filter slug.
-   */
-  setup(container, onFilter) {
-    if (!container) return;
-
-    container.querySelectorAll('[data-filter]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const filterVal = btn.getAttribute('data-filter');
-        onFilter(filterVal);
+  setup(container, onChange) {
+    container.querySelectorAll('.filter-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        onChange(btn.dataset.filter);
       });
     });
   }

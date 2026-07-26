@@ -197,7 +197,8 @@ function initIntersectionObservers() {
  */
 function initMouseSpotlight() {
   document.addEventListener('mousemove', (e) => {
-    document.querySelectorAll('.spotlight-card').forEach(card => {
+    // spotlight-card (detail view) + flip-card-front
+    document.querySelectorAll('.spotlight-card, .flip-card-front').forEach(card => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -206,6 +207,7 @@ function initMouseSpotlight() {
     });
   });
 }
+
 
 /**
  * Initialize loading preloader progression page overlays.

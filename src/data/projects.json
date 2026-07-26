@@ -4,8 +4,7 @@
     "type": "solo",
     "live": "https://taxi-price-prediction.netlify.app/",
     "featured": true,
-    "category": "Machine Learning",
-    "description": "Predicting taxi fare amounts using machine learning regression models based on trip parameters."
+    "category": "Machine Learning"
   },
   {
     "repo": "Food_Delivery_Time-Using-ML",
@@ -26,7 +25,7 @@
     "type": "solo",
     "live": "",
     "featured": false,
-    "category": "Web Development"
+    "category": "Normal Projects"
   },
   {
     "repo": "Fake-News-Detection-Using-ML-Real-time",
@@ -40,14 +39,14 @@
     "type": "solo",
     "live": "",
     "featured": false,
-    "category": "Others"
+    "category": "Python Concepts"
   },
   {
     "repo": "neuro-os",
     "type": "group",
     "live": "",
     "featured": false,
-    "category": "Web Development"
+    "category": "Normal Projects"
   },
   {
     "repo": "Job-Analysis-Dashboard",
