@@ -2,71 +2,62 @@ import { Home } from './pages/Home.js';
 import { Projects } from './pages/Projects.js';
 import { ProjectDetails } from './pages/ProjectDetails.js';
 import { slugify } from './utils/helpers.js';
+import { getAllCategories } from './utils/categorize.js';
 
-// Instantiate pages
+// Instantiate pages (singleton)
 const homePage = new Home();
 const projectsPage = new Projects();
 const detailsPage = new ProjectDetails();
 
-const CATEGORY_SLUGS = [
-  'machine-learning',
-  'deep-learning',
-  'rag',
-  'generative-ai',
-  'nlp',
-  'computer-vision',
-  'data-science',
-  'ai-agents',
-  'mlops',
-  'web-development',
-  'others'
-];
+/**
+ * Check whether a slug belongs to a category or a project detail page.
+ * Uses live data to detect any dynamically added categories.
+ * @param {string} slug - URL slug to test.
+ * @returns {'category'|'project'} Route type.
+ */
+function resolveProjectsSubroute(slug) {
+  const repos = window.portfolioData?.repos || [];
+  const categories = getAllCategories(repos);
+  const isCategorySlug = categories.some(c => c.slug === slug);
+  return isCategorySlug ? 'category' : 'project';
+}
 
 /**
  * Match a URL pathname to a route.
  * @param {string} path - URL path.
- * @returns {object} Router match details containing page route name and route parameters.
+ * @returns {object} Router match details.
  */
 export function matchRoute(path) {
-  let cleanPath = path.replace(/\/$/, ''); // Trim trailing slash
-  if (cleanPath === '' || cleanPath === '/index.html') {
-    cleanPath = '/';
-  }
+  let cleanPath = path.replace(/\/$/, '');
+  if (cleanPath === '' || cleanPath === '/index.html') cleanPath = '/';
 
-  if (cleanPath === '/') {
-    return { route: 'home', params: {} };
-  }
+  if (cleanPath === '/') return { route: 'home', params: {} };
+  if (cleanPath === '/projects') return { route: 'projects-index', params: {} };
 
-  if (cleanPath === '/projects') {
-    return { route: 'projects-index', params: {} };
-  }
-
-  // Pattern /projects/:slug
   const projectsMatch = cleanPath.match(/^\/projects\/([a-zA-Z0-9_\-]+)$/);
   if (projectsMatch) {
     const slug = projectsMatch[1].toLowerCase();
-    if (CATEGORY_SLUGS.includes(slug)) {
+    const type = resolveProjectsSubroute(slug);
+    if (type === 'category') {
       return { route: 'projects-category', params: { categorySlug: slug } };
     } else {
       return { route: 'project-details', params: { projectSlug: slug } };
     }
   }
 
-  // Fallback to home page
   return { route: 'home', params: {} };
 }
 
 /**
- * Global navigation driver.
- * Updates history state and performs dynamic DOM swapping with GSAP fade transitions.
+ * Swap page content in the #page-content container with a GSAP transition.
+ * Always calls initializeObservers() after every swap to re-register scroll-reveals.
  *
  * @param {string} path - Path to navigate to.
  * @param {boolean} [pushState=true] - Whether to push state to window.history.
- * @returns {Promise<void>}
  */
 export async function navigate(path, pushState = true) {
   const match = matchRoute(path);
-  
+
   if (pushState) {
     window.history.pushState(null, '', path);
   }
@@ -74,99 +65,89 @@ export async function navigate(path, pushState = true) {
   const container = document.getElementById('page-content');
   if (!container) return;
 
-  // Retrieve global repository data
   const repos = window.portfolioData?.repos || [];
-  const meta = window.portfolioData?.meta || [];
+  const meta  = window.portfolioData?.meta  || [];
 
   let html = '';
-  let pageInstance = null;
   let setupFn = () => {};
 
   switch (match.route) {
     case 'home':
-      html = homePage.render();
-      pageInstance = homePage;
+      html    = homePage.render();
       setupFn = () => homePage.setup(repos, meta);
       break;
 
     case 'projects-index':
-      html = projectsPage.render(null);
-      pageInstance = projectsPage;
+      html    = projectsPage.render(null);
       setupFn = () => projectsPage.setup(repos, meta, null);
       break;
 
     case 'projects-category':
-      html = projectsPage.render(match.params.categorySlug);
-      pageInstance = projectsPage;
+      html    = projectsPage.render(match.params.categorySlug);
       setupFn = () => projectsPage.setup(repos, meta, match.params.categorySlug);
       break;
 
     case 'project-details': {
-      // Find the repository matching the slugified name
-      const targetSlug = match.params.projectSlug;
-      const repo = repos.find(r => slugify(r.name) === targetSlug);
-      
-      html = detailsPage.render(repo, meta);
-      pageInstance = detailsPage;
+      const slug = match.params.projectSlug;
+      const repo = repos.find(r => slugify(r.name) === slug);
+      html    = detailsPage.render(repo, meta);
       setupFn = () => detailsPage.setup(repo);
       break;
     }
   }
 
-  // Page Transitions (GSAP animation swap)
+  // --- Page transition with GSAP ---
+  const swapContent = () => {
+    container.innerHTML = html;
+    setupFn();
+    window.scrollTo(0, 0);
+    // Guarantee every page's scroll-reveal elements are observed
+    if (window.initializeObservers) window.initializeObservers();
+  };
+
   if (typeof gsap !== 'undefined') {
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       gsap.to(container, {
         opacity: 0,
         y: -10,
-        duration: 0.2,
+        duration: 0.18,
         ease: 'power2.in',
         onComplete: () => {
-          container.innerHTML = html;
-          setupFn();
-          window.scrollTo(0, 0);
+          swapContent();
           resolve();
         }
       });
     });
-
-    gsap.to(container, {
-      opacity: 1,
-      y: 0,
-      duration: 0.3,
-      ease: 'power2.out'
-    });
+    gsap.to(container, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' });
   } else {
-    container.innerHTML = html;
-    setupFn();
-    window.scrollTo(0, 0);
+    swapContent();
   }
 }
 
 /**
- * Initialize global router event listeners (popstate & click intercepts).
+ * Bootstrap the router: popstate listener + global link click interceptor.
  */
 export function initRouter() {
-  // Listen for back/forward browser navigation actions
   window.addEventListener('popstate', () => {
     navigate(window.location.pathname, false);
   });
 
-  // Intercept all anchor link clicks for local SPA routes
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', e => {
     const target = e.target.closest('a');
     if (!target) return;
-
     const href = target.getAttribute('href');
     if (!href) return;
-
-    // Check if the link is a relative SPA route (starts with '/' and not external/hash)
-    if (href.startsWith('/') && !href.startsWith('//') && !target.hasAttribute('download') && target.getAttribute('target') !== '_blank') {
+    if (
+      href.startsWith('/') &&
+      !href.startsWith('//') &&
+      !target.hasAttribute('download') &&
+      target.getAttribute('target') !== '_blank'
+    ) {
       e.preventDefault();
       navigate(href);
     }
   });
 
-  // Load active route immediately
+  // Render the current route on first load
   navigate(window.location.pathname, false);
 }

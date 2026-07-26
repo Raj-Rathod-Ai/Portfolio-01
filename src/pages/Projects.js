@@ -36,7 +36,7 @@ export class Projects {
     if (!categorySlug) {
       // 1. Render Categories landing layout
       return `
-        <section id="projects" class="py-24 px-6 max-w-7xl mx-auto w-full scroll-reveal reveal-zoom-fade min-h-[70vh]">
+        <section id="projects" class="py-24 px-6 max-w-7xl mx-auto w-full min-h-[70vh]">
           <div class="text-center space-y-3 mb-14">
             <span class="font-mono text-xs text-primary uppercase tracking-widest">Work</span>
             <h2 class="text-3xl sm:text-5xl font-jakarta font-extrabold">Project Categories</h2>
@@ -114,6 +114,8 @@ export class Projects {
         grid.innerHTML = categories.map(cat => this.categoryCard.render(cat)).join('');
         this.categoryCard.setup(grid);
       }
+      // Always trigger observers after DOM update
+      if (window.initializeObservers) window.initializeObservers();
       return;
     }
 
