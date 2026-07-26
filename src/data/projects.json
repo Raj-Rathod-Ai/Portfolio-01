@@ -1,0 +1,66 @@
+[
+  {
+    "repo": "Taxi-Fare-Prediction",
+    "type": "solo",
+    "live": "https://taxi-price-prediction.netlify.app/",
+    "featured": true,
+    "category": "Machine Learning",
+    "description": "Predicting taxi fare amounts using machine learning regression models based on trip parameters."
+  },
+  {
+    "repo": "Food_Delivery_Time-Using-ML",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Discover-Your-True-Personality",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Library-Mangement",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Web Development"
+  },
+  {
+    "repo": "Fake-News-Detection-Using-ML-Real-time",
+    "type": "group",
+    "live": "",
+    "featured": true,
+    "category": "NLP"
+  },
+  {
+    "repo": "stone-paper-scissors-python",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Others"
+  },
+  {
+    "repo": "neuro-os",
+    "type": "group",
+    "live": "",
+    "featured": false,
+    "category": "Web Development"
+  },
+  {
+    "repo": "Job-Analysis-Dashboard",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Data Science"
+  },
+  {
+    "repo": "FlowerDiseaseSystem",
+    "type": "group",
+    "live": "",
+    "featured": true,
+    "category": "Deep Learning"
+  }
+]
