@@ -295,10 +295,10 @@ CRITICAL INSTRUCTIONS:
     const sorted = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
 
     // 0. Greeting Check (e.g. "hi", "hello", "hey", "how are you")
-    const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'how are you'];
+    const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'how are you', 'who are you', 'what is your name'];
     const cleanText = text.replace(/[^a-z\s]/g, '').trim();
     if (greetings.some(g => cleanText === g || cleanText.startsWith(g + ' ') || cleanText.endsWith(' ' + g))) {
-      return `Hello! 👋 How are you doing today?\n\nI'm **Rudra**, Raj Rathod's custom AI Assistant. How can I help you explore Raj's **ML/AI projects**, **technical skills**, **education**, or **certifications** today?`;
+      return `Hello! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant of **Raj Rathod**. How can I help you explore Raj's **ML/AI projects**, **education & university**, **skills**, or **contact links** today?`;
     }
 
     // 0. Last working / Latest Project query
@@ -391,9 +391,18 @@ CRITICAL INSTRUCTIONS:
              `Click **Live Preview** on any certificate in the Certifications section to preview it!`;
     }
 
-    // 8. Education / LeetCode query
-    if (text.includes('education') || text.includes('cgpa') || text.includes('college') || text.includes('university') || text.includes('degree') || text.includes('leetcode')) {
-      return `Raj is pursuing a **B.Tech in Computer Science & Engineering (AI Specialization)** at **Parul University**, Vadodara (2023 - 2027) with a **7.66 CGPA**. He has also solved **350+ problems on LeetCode**!`;
+    // 8. Education / University / Address / Profile query
+    if (text.includes('education') || text.includes('cgpa') || text.includes('college') || text.includes('university') || text.includes('parul') || text.includes('degree') || text.includes('leetcode') || text.includes('where') || text.includes('address') || text.includes('location')) {
+      return `Raj's Education, University & Profile Details:\n\n` +
+             `🎓 **Degree**: B.Tech in Computer Science & Engineering (AI Specialization)\n` +
+             `🏫 **University**: [Parul University](https://paruluniversity.ac.in), Vadodara, Gujarat (2023 - 2027)\n` +
+             `📍 **University Address / Location**: P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760, India\n` +
+             `📈 **Academic Performance**: **7.66 CGPA**\n` +
+             `💻 **LeetCode Record**: Solved **350+ problems** ([leetcode.com/u/Raj-Rathod](https://leetcode.com))\n\n` +
+             `🔗 **Raj's Official Profiles & Contact**:\n` +
+             `• **Email**: rathodraj1504@gmail.com\n` +
+             `• **GitHub Profile**: [github.com/Raj-Rathod-Ai](https://github.com/Raj-Rathod-Ai)\n` +
+             `• **LinkedIn Profile**: [linkedin.com/in/raj-rathod-ai](https://linkedin.com/in/raj-rathod-ai)`;
     }
 
     // 9. Skills query
@@ -413,7 +422,7 @@ CRITICAL INSTRUCTIONS:
              `Or scroll to the **Contact** section to send a message directly!`;
     }
 
-    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in GenAI, NLP, Computer Vision, and Predictive Modeling. Ask me about his **last working project**, **NLP projects**, **skills**, **education**, or **certifications**!`;
+    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in GenAI, NLP, Computer Vision, and Predictive Modeling. Ask me about his **university & education**, **last working project**, **NLP projects**, **skills**, or **certifications**!`;
   }
 
   /**
