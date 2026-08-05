@@ -247,9 +247,11 @@ Contact Details:
 - LinkedIn: https://linkedin.com/in/raj-rathod-ai
 
 CRITICAL INSTRUCTIONS:
-- If asked "which project raj do in recent" / "last working project" / "latest project" / "what did Raj work on recently", state clearly that the last working project is ${latestProject ? latestProject.name : 'Taxi-Fare-Prediction'}, and explain its description, tech stack, and GitHub link!
-- If asked specifically for "NLP project", focus on "Fake-News-Detection-Using-ML-Real-time" and prompt engineering.
+- If the user sends a simple greeting like "hi", "hello", "hey", or "how are you", reply warmly with a friendly greeting (e.g. "Hello! 👋 How are you doing today? I'm Rudra, Raj's AI Assistant. How can I help you explore Raj's portfolio?"). Do NOT dump project lists on simple greetings!
+- If the user asks "which project raj do in recent" / "last working project" / "latest project" / "what did Raj work on recently", state clearly that the last working project is ${latestProject ? latestProject.name : 'Taxi-Fare-Prediction'}, and explain its description, tech stack, and GitHub link!
+- If the user asks specifically for "NLP project", focus on "Fake-News-Detection-Using-ML-Real-time" and prompt engineering.
 - If asked for "Deep Learning" or "Computer Vision", focus on "FlowerDiseaseSystem".
+- When detailed information is requested, provide comprehensive bullet points with exact links.
 - Use clean markdown formatting (bolding, bullet points).`;
 
       const apiMessages = [{ role: 'system', content: systemPrompt }];
@@ -288,9 +290,16 @@ CRITICAL INSTRUCTIONS:
    * @returns {string}
    */
   getOfflineFallback(input) {
-    const text = input.toLowerCase();
+    const text = input.toLowerCase().trim();
     const repos = window.portfolioData?.repos || [];
     const sorted = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+
+    // 0. Greeting Check (e.g. "hi", "hello", "hey", "how are you")
+    const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'how are you'];
+    const cleanText = text.replace(/[^a-z\s]/g, '').trim();
+    if (greetings.some(g => cleanText === g || cleanText.startsWith(g + ' ') || cleanText.endsWith(' ' + g))) {
+      return `Hello! 👋 How are you doing today?\n\nI'm **Rudra**, Raj Rathod's custom AI Assistant. How can I help you explore Raj's **ML/AI projects**, **technical skills**, **education**, or **certifications** today?`;
+    }
 
     // 0. Last working / Latest Project query
     if (text.includes('last working') || text.includes('latest project') || text.includes('last project') || text.includes('most recent') || text.includes('recent project') || (text.includes('recent') && text.includes('project')) || (text.includes('do in recent') || text.includes('doing recent'))) {
