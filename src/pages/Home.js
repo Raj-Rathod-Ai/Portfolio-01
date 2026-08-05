@@ -883,14 +883,12 @@ export class Home {
       if (descEl) descEl.textContent = desc;
       modal.classList.remove('hidden');
       modal.classList.add('flex');
-      document.documentElement.classList.add('noscroll');
     };
 
     const closeModal = () => {
       if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
-        document.documentElement.classList.remove('noscroll');
       }
     };
 
@@ -916,7 +914,6 @@ export class Home {
       if (certModal) {
         certModal.classList.add('hidden');
         certModal.classList.remove('flex');
-        document.documentElement.classList.remove('noscroll');
         const bodyEl = document.getElementById('cert-modal-body');
         if (bodyEl) bodyEl.innerHTML = '';
       }
@@ -996,7 +993,6 @@ export class Home {
         if (certModal) {
           certModal.classList.remove('hidden');
           certModal.classList.add('flex');
-          document.documentElement.classList.add('noscroll');
         }
       });
     });
