@@ -26,9 +26,21 @@ export class Projects {
   render(categorySlug = null) {
     if (!categorySlug) {
       return `
-      <section id="projects" class="py-24 px-6 max-w-7xl mx-auto w-full min-h-[70vh]">
+      <section id="projects" class="py-16 sm:py-24 px-6 max-w-7xl mx-auto w-full min-h-[70vh]">
+        <!-- Navigation Back Bar -->
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+          <a href="/"
+             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-primary/50 text-xs font-mono text-gray-300 hover:text-white transition-all select-none group shadow-sm">
+            <i class="fa-solid fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
+            <span>Back to Home</span>
+          </a>
+          <span class="font-mono text-xs text-gray-500 flex items-center gap-1.5">
+            <i class="fa-solid fa-folder-open text-primary"></i><span>Categories View</span>
+          </span>
+        </div>
+
         <!-- Section header -->
-        <div class="text-center space-y-4 mb-16">
+        <div class="text-center space-y-4 mb-14">
           <span class="font-mono text-xs text-primary uppercase tracking-widest">Portfolio</span>
           <h2 class="text-4xl sm:text-5xl font-jakarta font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400" style="background-size:200%;animation:gradientMove 6s ease infinite">
             Project Categories
@@ -64,24 +76,30 @@ export class Projects {
 
     // Category-specific workspace
     return `
-    <section id="projects" class="py-20 px-6 max-w-7xl mx-auto w-full min-h-[80vh]">
+    <section id="projects" class="py-16 sm:py-20 px-6 max-w-7xl mx-auto w-full min-h-[80vh]">
       <!-- Breadcrumb + heading -->
-      <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 justify-between">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 justify-between pb-4 border-b border-white/5">
         <div class="flex items-center gap-3 flex-wrap">
+          <a href="/"
+             class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-mono text-gray-400 hover:text-white hover:border-white/20 transition-all select-none"
+             style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08)">
+            <i class="fa-solid fa-house text-[11px]"></i><span>Home</span>
+          </a>
+          <span class="text-gray-600 font-mono text-xs">/</span>
           <a href="/projects"
-             class="flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold text-gray-300 hover:text-white hover:border-primary/50 transition-all select-none"
-             style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08)">
-            <i class="fa-solid fa-arrow-left text-[10px]"></i>Categories
+             class="flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold text-gray-200 hover:text-white hover:border-primary/50 transition-all select-none"
+             style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1)">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i><span>Categories</span>
           </a>
           <div>
             <h2 id="active-category-title" class="text-2xl sm:text-3xl font-jakarta font-extrabold text-gray-100">
               Category
             </h2>
-            <p class="text-xs font-mono text-gray-600 mt-0.5">Auto-fetched from GitHub</p>
+            <p class="text-xs font-mono text-gray-500 mt-0.5">Auto-fetched from GitHub</p>
           </div>
         </div>
         <span id="active-category-count"
-              class="px-3 py-1.5 rounded-xl border text-xs font-mono"
+              class="px-3.5 py-1.5 rounded-xl border text-xs font-mono self-start sm:self-auto"
               style="background:rgba(20,184,166,0.06);border-color:rgba(20,184,166,0.2);color:#2dd4bf">
           0 Projects
         </span>
