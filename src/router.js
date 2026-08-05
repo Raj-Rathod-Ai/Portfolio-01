@@ -98,6 +98,8 @@ export async function navigate(path, pushState = true) {
 
   // --- Page transition with GSAP ---
   const swapContent = () => {
+    document.documentElement.classList.remove('noscroll');
+    if (document.body) document.body.classList.remove('noscroll');
     container.innerHTML = html;
     container.style.opacity = '1';
     setupFn();

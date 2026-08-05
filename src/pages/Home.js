@@ -552,7 +552,6 @@ export class Home {
               </a>
             </div>
           </div>
-          </div>
 
         </div>
       </section>
