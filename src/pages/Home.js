@@ -953,11 +953,41 @@ export class Home {
 
         if (bodyEl) {
           if (certData.type === 'iframe') {
-            bodyEl.innerHTML = `<iframe src="${certData.previewUrl}" class="w-full h-full rounded-xl border-0 bg-white shadow-inner" title="${certData.title}"></iframe>`;
+            bodyEl.innerHTML = `
+              <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-5 bg-gradient-to-b from-white/3 to-black/60 rounded-xl overflow-y-auto">
+                <div class="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-3xl shadow-xl shadow-amber-500/10">
+                  <i class="fa-solid fa-award"></i>
+                </div>
+                <div class="space-y-2 max-w-lg">
+                  <span class="px-3 py-1 rounded-full text-xs font-mono bg-amber-500/10 border border-amber-500/30 text-amber-300">Official Accreditation</span>
+                  <h3 class="font-jakarta font-extrabold text-2xl text-gray-100">${certData.title}</h3>
+                  <p class="text-xs text-gray-400 font-mono">${certData.issuer}</p>
+                  <p class="text-xs text-gray-400">Student: <strong class="text-gray-200">Rathod Raj</strong> · Cert ID: <code class="text-amber-400 font-mono bg-amber-500/10 px-2 py-0.5 rounded">311726923637568120a0faf6</code></p>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-jakarta text-xs font-bold text-black shadow-lg shadow-amber-500/20 hover:scale-105 transition-all flex items-center gap-2">
+                    <span>Open Live Certificate Portal</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                  </a>
+                </div>
+                <div class="w-full max-w-2xl h-64 mt-4 rounded-xl overflow-hidden border border-white/10 relative bg-black/40">
+                  <iframe src="${certData.previewUrl}" class="w-full h-full border-0 bg-white" title="${certData.title}"></iframe>
+                </div>
+              </div>`;
           } else if (certData.type === 'image') {
-            bodyEl.innerHTML = `<div class="w-full h-full flex items-center justify-center p-2"><img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl border border-white/10"></div>`;
+            bodyEl.innerHTML = `
+              <div class="w-full h-full flex items-center justify-center p-2 relative group">
+                <img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl border border-white/10">
+              </div>`;
           } else if (certData.type === 'pdf') {
-            bodyEl.innerHTML = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(certData.previewUrl)}&embedded=true" class="w-full h-full rounded-xl border-0 bg-white" title="${certData.title}"></iframe>`;
+            bodyEl.innerHTML = `
+              <div class="w-full h-full flex flex-col items-center justify-center p-4 text-center space-y-4">
+                <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(certData.previewUrl)}&embedded=true" class="w-full h-[80vh] rounded-xl border border-white/10 bg-white" title="${certData.title}"></iframe>
+                <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-5 py-2 rounded-xl bg-primary/20 border border-primary/40 text-xs font-mono text-primary hover:bg-primary/30 transition-all flex items-center gap-2">
+                  <span>Open Full PDF Document</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                </a>
+              </div>`;
           } else {
             bodyEl.innerHTML = `<a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="text-primary underline font-mono text-sm">Open Official Certificate Link</a>`;
           }
