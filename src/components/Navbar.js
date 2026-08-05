@@ -40,6 +40,9 @@ export class Navbar {
         </div>
       </header>
 
+      <!-- Mobile Overlay Backdrop -->
+      <div id="mobile-menu-backdrop" class="fixed inset-0 z-[45] bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"></div>
+
       <!-- Mobile navigation panel -->
       <div id="mobile-menu" class="fixed inset-y-0 right-0 z-[50] w-72 bg-[#0d1117] border-l border-white/10 p-6 flex flex-col transform translate-x-full transition-transform duration-300">
         <div class="flex justify-between items-center mb-8">
@@ -68,21 +71,27 @@ export class Navbar {
     const mobileMenu = document.getElementById('mobile-menu');
     const mobileBtn = document.getElementById('mobile-menu-btn');
     const mobileClose = document.getElementById('mobile-menu-close');
+    const backdrop = document.getElementById('mobile-menu-backdrop');
 
-    // Toggle mobile menu panel
-    if (mobileBtn && mobileMenu) {
-      mobileBtn.addEventListener('click', () => {
-        mobileMenu.classList.remove('translate-x-full');
-      });
-    }
+    const openMobileMenu = () => {
+      if (mobileMenu) mobileMenu.classList.remove('translate-x-full');
+      if (backdrop) {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+      }
+    };
 
     const closeMobileMenu = () => {
       if (mobileMenu) mobileMenu.classList.add('translate-x-full');
+      if (backdrop) {
+        backdrop.classList.add('opacity-0');
+        setTimeout(() => backdrop.classList.add('hidden'), 300);
+      }
     };
 
-    if (mobileClose) {
-      mobileClose.addEventListener('click', closeMobileMenu);
-    }
+    if (mobileBtn) mobileBtn.addEventListener('click', openMobileMenu);
+    if (mobileClose) mobileClose.addEventListener('click', closeMobileMenu);
+    if (backdrop) backdrop.addEventListener('click', closeMobileMenu);
 
     // Intercept clicks on logo
     document.querySelectorAll('.logo-nav-btn').forEach(btn => {

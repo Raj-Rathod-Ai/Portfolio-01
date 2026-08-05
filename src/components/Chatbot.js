@@ -22,15 +22,15 @@ export class Chatbot {
     return `
       <!-- Floating Chatbot Trigger Button -->
       <button id="chatbot-toggle-btn"
-              class="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/25 hover:scale-110 active:scale-95 transition-all flex items-center justify-center border border-white/20 group"
+              class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[60] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/25 hover:scale-110 active:scale-95 transition-all flex items-center justify-center border border-white/20 group"
               title="Chat with Rudra (AI Assistant)" aria-label="Open AI Chatbot">
-        <span class="absolute -top-1 -right-1 w-4 h-4 bg-teal-400 border-2 border-[#0d1117] rounded-full animate-pulse"></span>
-        <i class="fa-solid fa-robot text-xl group-hover:rotate-12 transition-transform"></i>
+        <span class="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-teal-400 border-2 border-[#0d1117] rounded-full animate-pulse"></span>
+        <i class="fa-solid fa-robot text-lg sm:text-xl group-hover:rotate-12 transition-transform"></i>
       </button>
 
       <!-- Floating Chatbot Window -->
       <div id="chatbot-window"
-           class="fixed bottom-24 right-6 w-[380px] max-w-[calc(100vw-2rem)] h-[530px] max-h-[80vh] z-[60] rounded-2xl flex flex-col overflow-hidden border border-white/10 shadow-2xl backdrop-blur-2xl transition-all duration-300 transform scale-90 opacity-0 pointer-events-none"
+           class="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 w-[calc(100vw-2rem)] sm:w-[380px] h-[520px] max-h-[82vh] z-[60] rounded-2xl flex flex-col overflow-hidden border border-white/10 shadow-2xl backdrop-blur-2xl transition-all duration-300 transform scale-90 opacity-0 pointer-events-none"
            style="background: rgba(13, 17, 23, 0.95);">
         
         <!-- Header -->
