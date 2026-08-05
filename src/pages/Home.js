@@ -79,11 +79,11 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-secondary bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-secondary/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-secondary">2021 — 2023</span>
+                    <span class="font-mono text-xs text-secondary">2022 — 2023</span>
                     <span class="px-2 py-0.5 rounded-md bg-secondary/10 text-[10px] text-secondary font-mono border border-secondary/20">60.61%</span>
                   </div>
                   <h3 class="font-jakarta font-bold text-gray-100">HSC — Science Stream</h3>
-                  <p class="text-sm text-gray-500 mt-0.5">Sigma School, Porbandar</p>
+                  <p class="text-sm text-gray-500 mt-0.5">Shri Rajshakha School, Porbandar</p>
                 </div>
               </div>
 
