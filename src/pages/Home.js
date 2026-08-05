@@ -882,12 +882,14 @@ export class Home {
       if (descEl) descEl.textContent = desc;
       modal.classList.remove('hidden');
       modal.classList.add('flex');
+      document.documentElement.classList.add('noscroll');
     };
 
     const closeModal = () => {
       if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+        document.documentElement.classList.remove('noscroll');
       }
     };
 
@@ -913,6 +915,7 @@ export class Home {
       if (certModal) {
         certModal.classList.add('hidden');
         certModal.classList.remove('flex');
+        document.documentElement.classList.remove('noscroll');
         const bodyEl = document.getElementById('cert-modal-body');
         if (bodyEl) bodyEl.innerHTML = '';
       }
@@ -949,19 +952,23 @@ export class Home {
 
         if (bodyEl) {
           if (certData.type === 'iframe') {
-            bodyEl.innerHTML = `<iframe src="${certData.previewUrl}" class="w-full h-[500px] rounded-lg border-0 bg-white" title="${certData.title}"></iframe>`;
+            bodyEl.innerHTML = `<iframe src="${certData.previewUrl}" class="w-full h-[520px] rounded-xl border-0 bg-white" title="${certData.title}"></iframe>`;
           } else if (certData.type === 'image') {
-            bodyEl.innerHTML = `<img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-2xl">`;
+            bodyEl.innerHTML = `<div class="w-full h-full flex items-center justify-center p-2"><img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-[70vh] object-contain rounded-xl shadow-2xl border border-white/10"></div>`;
           } else if (certData.type === 'pdf') {
-            bodyEl.innerHTML = `<iframe src="https://docs.google.com/gview?url=${encodeURIComponent(certData.previewUrl)}&embedded=true" class="w-full h-[500px] rounded-lg border-0" title="${certData.title}"></iframe>`;
+            bodyEl.innerHTML = `
+              <div class="w-full flex flex-col items-center justify-center space-y-3 p-2">
+                <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(certData.previewUrl)}&embedded=true" class="w-full h-[480px] rounded-xl border border-white/10" title="${certData.title}"></iframe>
+              </div>`;
           } else {
-            bodyEl.innerHTML = `<a href="${certData.verifyUrl}" target="_blank" class="text-primary underline font-mono text-sm">Open Official Certificate Link</a>`;
+            bodyEl.innerHTML = `<a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="text-primary underline font-mono text-sm">Open Official Certificate Link</a>`;
           }
         }
 
         if (certModal) {
           certModal.classList.remove('hidden');
           certModal.classList.add('flex');
+          document.documentElement.classList.add('noscroll');
         }
       });
     });

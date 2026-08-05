@@ -61,20 +61,20 @@ export class Chatbot {
               <i class="fa-solid fa-robot"></i>
             </div>
             <div class="bg-white/5 border border-white/8 rounded-2xl rounded-tl-none p-3 max-w-[85%] text-gray-200 shadow-sm">
-              <p>Hi! 👋 I'm <strong>Rudra</strong>, Raj Rathod's custom AI Assistant. Ask me anything about Raj's ML/AI projects, technical skills, education, or certifications!</p>
+              <p>Hi! 👋 I'm <strong>Rudra</strong>, Raj Rathod's custom AI Assistant. Ask me anything about Raj's ML/AI projects, latest repository updates, technical skills, or education!</p>
             </div>
           </div>
 
           <!-- Quick Suggestion Chips -->
           <div id="chatbot-quick-chips" class="flex flex-wrap gap-1.5 pt-1 pl-9">
             <button class="chat-chip px-3 py-1.5 rounded-xl border text-[11px] font-mono transition-all hover:scale-105" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.25);color:#a5b4fc">
-              🚀 Top Projects
+              🚀 Latest Working Project
             </button>
             <button class="chat-chip px-3 py-1.5 rounded-xl border text-[11px] font-mono transition-all hover:scale-105" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.25);color:#2dd4bf">
-              🎓 Education & CGPA
+              🧠 NLP Projects
             </button>
             <button class="chat-chip px-3 py-1.5 rounded-xl border text-[11px] font-mono transition-all hover:scale-105" style="background:rgba(244,63,94,0.1);border-color:rgba(244,63,94,0.25);color:#fda4af">
-              📬 Contact Info
+              🎓 Education & CGPA
             </button>
           </div>
         </div>
@@ -183,12 +183,26 @@ export class Chatbot {
    * @returns {Promise<string>}
    */
   async getBotReply(prompt) {
+    // Extract live repos from window.portfolioData
+    const repos = window.portfolioData?.repos || [];
+    const sortedRepos = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+    
+    // Format full repo metadata for context
+    const repoListText = sortedRepos.length > 0
+      ? sortedRepos.map((r, idx) => `${idx + 1}. ${r.name} (Category: ${r.category || 'ML/AI'}, Lang: ${r.language || 'Python'}, Updated: ${r.updated_at ? new Date(r.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}) - Description: ${r.description || 'N/A'} [Topics: ${(r.topics || []).join(', ')}] URL: ${r.html_url}`).join('\n')
+      : `- Taxi-Fare-Prediction (Category: Machine Learning, Lang: Python, Updated: 12 Jun 2026): Regression model predicting fares.\n- Food_Delivery_Time-Using-ML (Category: Machine Learning, Lang: Python): Delivery predictor.\n- Discover-Your-True-Personality (Category: Machine Learning, Lang: Python): Classification system.\n- Library-Mangement (Category: Normal Projects, Lang: Python): Library records system.\n- Fake-News-Detection-Using-ML-Real-time (Category: NLP, Lang: Python): Real-time NLP classifier.\n- FlowerDiseaseSystem (Category: Deep Learning, Lang: Python): CNN plant leaf classifier.\n- Job-Analysis-Dashboard (Category: Data Science, Lang: Power BI): Market analytics dashboard.`;
+
+    const latestProject = sortedRepos[0];
+    const latestProjSummary = latestProject
+      ? `MOST RECENT / LAST WORKING PROJECT: ${latestProject.name} (Updated: ${latestProject.updated_at ? new Date(latestProject.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}). Category: ${latestProject.category}, Language: ${latestProject.language}, Description: ${latestProject.description}, Link: ${latestProject.html_url}`
+      : `MOST RECENT / LAST WORKING PROJECT: Taxi-Fare-Prediction (Updated: 12 Jun 2026). Category: Machine Learning, Language: Python, Description: Predicting taxi fare amounts using machine learning regression models.`;
+
     // Attempt 1: Portfolio backend Express API endpoint
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: prompt, history: this.history })
+        body: JSON.stringify({ message: prompt, history: this.history, repoContext: repoListText, latestProject: latestProjSummary })
       });
       if (res.ok) {
         const data = await res.json();
@@ -203,16 +217,10 @@ export class Chatbot {
       const key = getMistralKey();
       if (!key) throw new Error('No Mistral API key found');
 
-      // Dynamically extract live projects list if loaded into portfolioData
-      const repos = window.portfolioData?.repos || [];
-      const repoListText = repos.length > 0
-        ? repos.map(r => `- ${r.name} (${r.category || 'ML/AI'}): ${r.description || ''} [Topics: ${(r.topics || []).join(', ')}]`).join('\n')
-        : `- FlowerDiseaseSystem (Deep Learning/CNN): Plant leaf disease classifier.\n- Fake-News-Detection-Using-ML-Real-time (NLP): Real-time NLP classifier.\n- Taxi-Fare-Prediction (ML): Regression model.\n- Food_Delivery_Time-Using-ML (ML): Delivery duration predictor.\n- Discover-Your-True-Personality (ML): Personality traits classifier.\n- Job-Analysis-Dashboard (Data Science): Power BI dashboard.`;
-
       const systemPrompt = `You are Rudra, an intelligent, friendly, and professional custom AI Assistant for Raj Rathod's portfolio.
 Answer user questions naturally, accurately, and concisely (2-4 sentences max unless detailed project lists are explicitly requested).
 
-RAJ RATHOD'S COMPLETE PROFILE DATA:
+RAJ RATHOD'S PROFILE DATA:
 - Role: AI & Machine Learning Developer.
 - Education: B.Tech in Computer Science & Engineering with AI specialization at Parul University, Vadodara (2023 - 2027). CGPA: 7.66.
 - Coding Achievements: Solved 350+ problems on LeetCode.
@@ -220,23 +228,29 @@ RAJ RATHOD'S COMPLETE PROFILE DATA:
   * Languages: Python, Java, C/C++, SQL, JavaScript, HTML/CSS.
   * AI/ML/DL Frameworks: PyTorch, TensorFlow, Scikit-Learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit.
   * Tools & Platforms: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
-- All Projects & Repositories:
-${repoListText}
-- Certifications & Accreditations:
-  1. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
-  2. Java Programming Certification.
-  3. Prompt Engineering & GenAI Certification.
-  4. Python Programming Certification.
-  5. Networks & Protocols (NPTEL IIT).
-- Contact Details:
-  * Email: rathodraj1504@gmail.com
-  * GitHub: https://github.com/Raj-Rathod-Ai
-  * LinkedIn: https://linkedin.com/in/raj-rathod-ai
 
-Instructions:
-- If asked specifically about NLP projects, focus on "Fake News Detection Using ML Real-time" and prompt engineering.
-- If asked about recent projects, mention "Data Science & Analytics with GenAI", "Flower Disease System", and "Fake News Detection".
-- Be friendly, polite, and technical. Use clean markdown formatting (bolding, lists).`;
+${latestProjSummary}
+
+ALL REPOSITORIES & PROJECTS (ORDERED FROM MOST RECENT TO OLDEST):
+${repoListText}
+
+Certifications & Accreditations:
+1. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
+2. Java Programming Certification.
+3. Prompt Engineering & GenAI Certification.
+4. Python Programming Certification.
+5. Networks & Protocols (NPTEL IIT).
+
+Contact Details:
+- Email: rathodraj1504@gmail.com
+- GitHub: https://github.com/Raj-Rathod-Ai
+- LinkedIn: https://linkedin.com/in/raj-rathod-ai
+
+CRITICAL INSTRUCTIONS:
+- If asked "which project raj do in recent" / "last working project" / "latest project" / "what did Raj work on recently", state clearly that the last working project is ${latestProject ? latestProject.name : 'Taxi-Fare-Prediction'}, and explain its description, tech stack, and GitHub link!
+- If asked specifically for "NLP project", focus on "Fake-News-Detection-Using-ML-Real-time" and prompt engineering.
+- If asked for "Deep Learning" or "Computer Vision", focus on "FlowerDiseaseSystem".
+- Use clean markdown formatting (bolding, bullet points).`;
 
       const apiMessages = [{ role: 'system', content: systemPrompt }];
       this.history.slice(-4).forEach(h => apiMessages.push(h));
@@ -275,27 +289,48 @@ Instructions:
    */
   getOfflineFallback(input) {
     const text = input.toLowerCase();
+    const repos = window.portfolioData?.repos || [];
+    const sorted = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+
+    // 0. Last working / Latest Project query
+    if (text.includes('last working') || text.includes('latest project') || text.includes('last project') || text.includes('most recent') || text.includes('recent project') || (text.includes('recent') && text.includes('project')) || (text.includes('do in recent') || text.includes('doing recent'))) {
+      if (sorted.length > 0) {
+        const top = sorted[0];
+        const top2 = sorted[1];
+        const dateStr = top.updated_at ? new Date(top.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'June 2026';
+        
+        return `Raj's **last working / most recent project** is **${top.name.replace(/[-_]/g, ' ')}** (Last updated: ${dateStr})!\n\n` +
+               `• **Domain / Category**: ${top.category || 'Machine Learning'}\n` +
+               `• **Tech Stack**: ${top.language || 'Python'}${top.topics?.length ? ` (${top.topics.slice(0, 4).join(', ')})` : ''}\n` +
+               `• **Description**: ${top.description || 'Predictive modeling application.'}\n` +
+               (top.html_url ? `• **Repository Link**: [View on GitHub](${top.html_url})\n\n` : '\n\n') +
+               (top2 ? `Directly before this, Raj also updated **${top2.name.replace(/[-_]/g, ' ')}** (${top2.category || 'AI/ML'}).` : '');
+      }
+
+      return `Raj's **last working / most recent project** is **Taxi Fare Prediction** (Updated: 12 Jun 2026)!\n\n` +
+             `• **Domain**: Machine Learning\n` +
+             `• **Tech Stack**: Python, Scikit-Learn, Regression Modeling\n` +
+             `• **Description**: Predicting taxi fare amounts using trip parameters, distance, and time metrics.\n` +
+             `• **Repository**: [GitHub Link](https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction)\n\n` +
+             `He also recently completed **Data Science & Analytics with GenAI** certification (July 2026)!`;
+    }
 
     // 1. NLP / Text Mining queries
     if (text.includes('nlp') || text.includes('text') || text.includes('sentiment') || text.includes('language') || text.includes('fake news') || text.includes('bert') || text.includes('natural language')) {
-      return `Raj has developed several high-level **Natural Language Processing (NLP)** projects:\n\n` +
-             `• **Fake News Detection (Real-Time NLP)**: Built using Python, Scikit-Learn, TF-IDF vectorizers, and NLTK to classify and detect fake news in textual articles.\n` +
-             `• **Prompt Engineering & GenAI**: Advanced query optimization, LLM prompt tuning, zero/few-shot prompt templates, and GenAI integrations.\n\n` +
-             `You can inspect the source code and details under the **NLP** category in the Projects section!`;
+      const nlpRepos = repos.filter(r => (r.category || '').toLowerCase() === 'nlp' || (r.topics || []).some(t => t.toLowerCase().includes('nlp') || t.toLowerCase().includes('text')));
+      
+      let repoList = '• **Fake News Detection (Real-Time NLP)**: Built using Python, Scikit-Learn, TF-IDF vectorizers, and NLTK to classify and detect fake news in textual articles.\n';
+      if (nlpRepos.length > 0) {
+        repoList = nlpRepos.map(r => `• **${r.name.replace(/[-_]/g, ' ')}**: ${r.description || 'NLP classification model.'} [View GitHub](${r.html_url})`).join('\n');
+      }
+
+      return `Here are Raj's **Natural Language Processing (NLP)** projects:\n\n` +
+             repoList + `\n` +
+             `• **Prompt Engineering & GenAI**: Advanced query optimization, LLM prompt tuning, and zero/few-shot prompt templates.\n\n` +
+             `You can inspect the code under the **NLP** category in the Projects section!`;
     }
 
-    // 2. Recent / Latest Projects queries
-    if (text.includes('recent') || text.includes('latest') || text.includes('new') || text.includes('current')) {
-      return `Raj's most recent projects and accreditations include:\n\n` +
-             `• **Data Science & Analytics with GenAI**: Sheryians GenAI integration & problem-solving accreditation (July 2026).\n` +
-             `• **Flower Disease System**: Computer vision CNN model detecting leaf diseases in real-time.\n` +
-             `• **Fake News Detection**: Real-time NLP classifier for news text verification.\n` +
-             `• **Taxi Price Prediction**: Machine learning regression model predicting fare rates.\n` +
-             `• **Discover Your True Personality**: Classification system analyzing questionnaire traits.\n\n` +
-             `All projects are auto-synced from GitHub!`;
-    }
-
-    // 3. Deep Learning / Computer Vision / CNN queries
+    // 2. Deep Learning / Computer Vision / CNN queries
     if (text.includes('deep learning') || text.includes('vision') || text.includes('cnn') || text.includes('image') || text.includes('flower') || text.includes('opencv') || text.includes('pytorch') || text.includes('tensorflow')) {
       return `Raj's **Computer Vision & Deep Learning** projects:\n\n` +
              `• **Flower Disease System**: A Convolutional Neural Network (CNN) built with PyTorch and OpenCV to detect and classify diseases in plant/flower leaves.\n` +
@@ -303,7 +338,7 @@ Instructions:
              `Explore the **Deep Learning** category for interactive details!`;
     }
 
-    // 4. Machine Learning / Regression / Predictive queries
+    // 3. Machine Learning / Regression / Predictive queries
     if (text.includes('machine learning') || text.includes('regression') || text.includes('predict') || text.includes('taxi') || text.includes('food') || text.includes('personality')) {
       return `Raj's **Machine Learning** projects include:\n\n` +
              `• **Taxi Fare Prediction**: ML regression models predicting ride fares based on trip distance, duration, and time parameters.\n` +
@@ -311,21 +346,21 @@ Instructions:
              `• **Discover Your True Personality**: Classification model analyzing user responses to determine personality traits.`;
     }
 
-    // 5. Data Science / Analytics / Power BI queries
+    // 4. Data Science / Analytics / Power BI queries
     if (text.includes('data science') || text.includes('analytic') || text.includes('dashboard') || text.includes('power bi') || text.includes('job')) {
       return `Raj's **Data Science & Analytics** portfolio includes:\n\n` +
              `• **Job Analysis Dashboard**: Interactive Power BI dashboard evaluating job market trends, salary distributions, and skill demands.\n` +
              `• **Data Science & Analytics with GenAI**: Sheryians certification in data analytics and GenAI application development.`;
     }
 
-    // 6. Python / Scripting / Games queries
+    // 5. Python / Scripting / Games queries
     if (text.includes('python game') || text.includes('basics') || text.includes('stone') || text.includes('library') || text.includes('script')) {
       return `Raj's Python & software management projects include:\n\n` +
              `• **Library Management System**: Python & database system for catalog management, book checkout, and user records.\n` +
              `• **Stone Paper Scissors**: Interactive Python game implementation.`;
     }
 
-    // 7. General Projects query
+    // 6. General Projects query
     if (text.includes('project') || text.includes('work') || text.includes('build') || text.includes('repo')) {
       return `Raj has built high-impact projects across multiple domains:\n\n` +
              `• **GenAI / RAG**: Data Science with GenAI, Prompt Engineering.\n` +
@@ -336,7 +371,7 @@ Instructions:
              `Click on any category in the **Projects** section to view code & live demos!`;
     }
 
-    // 8. Certifications query
+    // 7. Certifications query
     if (text.includes('certificat') || text.includes('credential') || text.includes('accreditat')) {
       return `Raj holds several verified certifications:\n\n` +
              `🏆 **Data Science & Analytics with GenAI** - Sheryians Coding School (Cert ID: 311726923637568120a0faf6)\n` +
@@ -347,12 +382,12 @@ Instructions:
              `Click **Live Preview** on any certificate in the Certifications section to preview it!`;
     }
 
-    // 9. Education / LeetCode query
+    // 8. Education / LeetCode query
     if (text.includes('education') || text.includes('cgpa') || text.includes('college') || text.includes('university') || text.includes('degree') || text.includes('leetcode')) {
       return `Raj is pursuing a **B.Tech in Computer Science & Engineering (AI Specialization)** at **Parul University**, Vadodara (2023 - 2027) with a **7.66 CGPA**. He has also solved **350+ problems on LeetCode**!`;
     }
 
-    // 10. Skills query
+    // 9. Skills query
     if (text.includes('skill') || text.includes('technolog') || text.includes('python') || text.includes('java') || text.includes('stack') || text.includes('framework')) {
       return `Here are Raj's core technical skills:\n\n` +
              `• **Languages**: Python, Java, C/C++, SQL, JavaScript.\n` +
@@ -360,7 +395,7 @@ Instructions:
              `• **Tools**: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.`;
     }
 
-    // 11. Contact query
+    // 10. Contact query
     if (text.includes('contact') || text.includes('email') || text.includes('reach') || text.includes('hire') || text.includes('message')) {
       return `You can reach Raj via:\n\n` +
              `📧 **Email**: rathodraj1504@gmail.com\n` +
@@ -369,7 +404,7 @@ Instructions:
              `Or scroll to the **Contact** section to send a message directly!`;
     }
 
-    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in GenAI, NLP, Computer Vision, and Predictive Modeling. Ask me about his **NLP projects**, **recent work**, **skills**, **education**, or **certifications**!`;
+    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in GenAI, NLP, Computer Vision, and Predictive Modeling. Ask me about his **last working project**, **NLP projects**, **skills**, **education**, or **certifications**!`;
   }
 
   /**
