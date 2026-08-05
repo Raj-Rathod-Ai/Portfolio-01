@@ -44,7 +44,7 @@ export class Chatbot {
               <h4 class="font-jakarta font-bold text-sm text-gray-100 flex items-center gap-1.5">
                 Rudra <span class="px-2 py-0.2 rounded text-[9px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">AI</span>
               </h4>
-              <p class="font-mono text-[10px] text-gray-400">Mistral-Powered Assistant</p>
+              <p class="font-mono text-[10px] text-teal-400">Raj's Personal AI Engine</p>
             </div>
           </div>
           
