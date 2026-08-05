@@ -376,6 +376,88 @@ app.post('/api/contact', async (req, res) => {
     console.error('Contact endpoint error:', err.message);
     res.status(500).json({ error: err.message });
   }
+// POST /api/chat - AI Chatbot endpoint powered by Mistral AI LLM
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, history } = req.body;
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ error: 'Message text is required.' });
+    }
+
+    const mistralKey = process.env.MISTRAL_API_KEY || 'wFYeHbIkn77JZGephm2MwS6RfWJ5LQAR';
+    
+    const systemPrompt = `You are Rudra, an intelligent, friendly, and professional custom AI Assistant for Raj Rathod's portfolio.
+Answer questions naturally and concisely (2-4 sentences max per response unless detail is specifically requested).
+
+RAJ RATHOD'S PROFILE DATA:
+- Role: AI & Machine Learning Developer.
+- Education: B.Tech in Computer Science & Engineering with AI specialization at Parul University, Vadodara (2023 - 2027). CGPA: 7.66.
+- Coding Achievements: Solved 350+ problems on LeetCode.
+- Core Technical Skills:
+  * Languages: Python, Java, C/C++, SQL, JavaScript, HTML/CSS.
+  * AI/ML/DL Frameworks: TensorFlow, PyTorch, Scikit-learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit.
+  * Tools: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
+- Key Projects:
+  1. Flower Disease System: CNN classifier detecting diseases in plant leaves (PyTorch/Streamlit).
+  2. Fake News Detection: Real-time NLP text classifier (Scikit-learn/NLTK).
+  3. Taxi Price Prediction: Regression models for fare amounts.
+  4. Food Delivery Time: Streamlit ML app predicting delivery duration.
+  5. Discover Your True Personality: Personality classification model.
+  6. Job Analysis Dashboard: Power BI analytics dashboard.
+  7. Neuro OS: Creative front-end Web OS concept.
+- Contact Details:
+  * Email: rathodraj1504@gmail.com
+  * GitHub: https://github.com/Raj-Rathod-Ai
+  * LinkedIn: https://linkedin.com/in/raj-rathod-ai
+  * Resume: Available for download on the portfolio navbar (RATHOD_RAJ.pdf).
+
+Instructions:
+- Be polite, helpful, and technically accurate.
+- If asked about contacting Raj, provide his email (rathodraj1504@gmail.com) and mention the contact form on the site.
+- Format responses cleanly with markdown formatting (bold text, bullet points) when listing details.`;
+
+    const messages = [
+      { role: 'system', content: systemPrompt }
+    ];
+
+    if (Array.isArray(history)) {
+      history.slice(-6).forEach(h => {
+        if (h.role && h.content) {
+          messages.push({ role: h.role === 'user' ? 'user' : 'assistant', content: h.content });
+        }
+      });
+    }
+
+    messages.push({ role: 'user', content: message });
+
+    const mistralRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${mistralKey}`
+      },
+      body: JSON.stringify({
+        model: 'mistral-small-latest',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 500
+      })
+    });
+
+    if (!mistralRes.ok) {
+      const errBody = await mistralRes.text();
+      console.warn(`Mistral API call error (${mistralRes.status}):`, errBody);
+      throw new Error(`Mistral API returned status ${mistralRes.status}`);
+    }
+
+    const mistralData = await mistralRes.json();
+    const reply = mistralData.choices?.[0]?.message?.content || 'I am here to assist with information about Raj Rathod. How can I help you?';
+
+    res.json({ reply });
+  } catch (err) {
+    console.error('API /api/chat error:', err.message);
+    res.status(500).json({ error: 'Chat API error', message: err.message });
+  }
 });
 
 // GET /api/health - Diagnostic endpoint for validating configurations

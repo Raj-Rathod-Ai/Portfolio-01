@@ -167,9 +167,23 @@ export class ProjectDetails {
   }
 
   /**
-   * No local event binding required. Clean native navigation intercepted globally.
+   * Bind event listeners for project details page (smart back navigation).
    */
   setup(repo) {
     if (window.initializeObservers) window.initializeObservers();
+
+    // Smart Back button click interceptor
+    document.querySelectorAll('.back-to-projects-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const hasHistory = window.history.length > 1 && document.referrer.includes(window.location.host);
+        if (hasHistory) {
+          window.history.back();
+        } else {
+          const href = btn.getAttribute('href') || '/projects';
+          import('../router.js').then(m => m.navigate(href));
+        }
+      });
+    });
   }
 }

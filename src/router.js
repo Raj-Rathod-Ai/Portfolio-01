@@ -99,6 +99,7 @@ export async function navigate(path, pushState = true) {
   // --- Page transition with GSAP ---
   const swapContent = () => {
     container.innerHTML = html;
+    container.style.opacity = '1';
     setupFn();
     window.scrollTo(0, 0);
     // Guarantee every page's scroll-reveal elements are observed
@@ -106,11 +107,12 @@ export async function navigate(path, pushState = true) {
   };
 
   if (typeof gsap !== 'undefined') {
+    gsap.killTweensOf(container);
     await new Promise(resolve => {
       gsap.to(container, {
         opacity: 0,
         y: -10,
-        duration: 0.18,
+        duration: 0.14,
         ease: 'power2.in',
         onComplete: () => {
           swapContent();
@@ -118,7 +120,7 @@ export async function navigate(path, pushState = true) {
         }
       });
     });
-    gsap.to(container, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' });
+    gsap.to(container, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' });
   } else {
     swapContent();
   }

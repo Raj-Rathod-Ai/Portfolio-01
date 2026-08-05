@@ -4,10 +4,12 @@ import { isGroupProject } from './utils/helpers.js';
 import { initRouter } from './router.js';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
+import { Chatbot } from './components/Chatbot.js';
 
-// Global navbar/footer instances
+// Global navbar/footer/chatbot instances
 const navbar = new Navbar();
 const footer = new Footer();
+const chatbot = new Chatbot();
 
 /**
  * Initialize HTML5 Canvas backdrop node-vertex particles animation.
@@ -300,9 +302,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Trigger preloader and start routing on completion
   initPreloader(() => {
-    // Setup navbar & footer click listeners
+    // Setup navbar, footer, and AI Chatbot
     navbar.setup();
     footer.setup();
+
+    const chatMount = document.createElement('div');
+    chatMount.id = 'chatbot-mount';
+    chatMount.innerHTML = chatbot.render();
+    document.body.appendChild(chatMount);
+    chatbot.setup();
 
     // Register animations and routes
     initIntersectionObservers();
