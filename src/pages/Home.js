@@ -739,10 +739,12 @@ export class Home {
         </div>
       </div>
 
-      <!-- Certificate Live Preview Modal -->
-      <div id="cert-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-xl transition-all duration-300">
-        <div class="max-w-4xl w-full rounded-2xl border border-white/10 p-5 space-y-4 relative flex flex-col h-[85vh] max-h-[800px]" style="background: rgba(22, 27, 34, 0.95);">
-          <div class="flex items-center justify-between border-b border-white/10 pb-3 shrink-0">
+      <!-- Certificate Live Preview Modal (Full Page Glass Modal) -->
+      <div id="cert-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-2xl transition-all duration-300">
+        <div class="w-full max-w-6xl h-[92vh] max-h-[900px] rounded-2xl border border-white/15 p-4 sm:p-5 relative flex flex-col shadow-2xl overflow-hidden" style="background: rgba(13, 17, 23, 0.96);">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-3 shrink-0">
             <div class="flex items-center gap-3 min-w-0">
               <div id="cert-modal-icon" class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"></div>
               <div class="min-w-0">
@@ -751,18 +753,18 @@ export class Home {
               </div>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-              <a id="cert-modal-verify-btn" href="#" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-xl bg-primary/20 border border-primary/40 text-xs font-mono text-primary hover:bg-primary/30 transition-all flex items-center gap-1.5">
+              <a id="cert-modal-verify-btn" href="#" target="_blank" rel="noopener" class="px-3.5 py-1.5 rounded-xl bg-primary/20 border border-primary/40 text-xs font-mono text-primary hover:bg-primary/30 transition-all flex items-center gap-1.5">
                 <span>Verify Official</span>
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
               </a>
               <button id="cert-modal-close-btn" class="w-9 h-9 rounded-xl border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
-                <i class="fa-solid fa-xmark text-sm"></i>
+                <i class="fa-solid fa-xmark text-base"></i>
               </button>
             </div>
           </div>
           
           <!-- Preview Container Body -->
-          <div id="cert-modal-body" class="flex-1 w-full overflow-hidden rounded-xl border border-white/5 bg-black/40 flex items-center justify-center p-1 relative">
+          <div id="cert-modal-body" class="flex-1 w-full h-full overflow-hidden rounded-xl border border-white/5 bg-black/60 flex items-center justify-center relative">
           </div>
         </div>
       </div>
