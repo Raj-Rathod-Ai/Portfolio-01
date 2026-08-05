@@ -219,6 +219,12 @@ RAJ RATHOD'S PROFILE DATA:
   5. Discover Your True Personality: Personality classification model.
   6. Job Analysis Dashboard: Power BI analytics dashboard.
   7. Neuro OS: Creative front-end Web OS concept.
+- Certifications:
+  1. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
+  2. Java Programming Certification.
+  3. Prompt Engineering & GenAI Certification.
+  4. Python Programming Certification.
+  5. Networks & Protocols (NPTEL IIT).
 - Contact Details:
   * Email: rathodraj1504@gmail.com
   * GitHub: https://github.com/Raj-Rathod-Ai
@@ -269,6 +275,16 @@ RAJ RATHOD'S PROFILE DATA:
              `• **Taxi Price Prediction**: Regression modeling app.\n` +
              `• **Job Analysis Dashboard**: Power BI analytical insights.\n\n` +
              `Check the **Projects** section on the main page to explore all repositories!`;
+    }
+
+    if (text.includes('certificat') || text.includes('credential') || text.includes('accreditat')) {
+      return `Raj holds several prestigious certifications & accreditations:\n\n` +
+             `🏆 **Data Science & Analytics with GenAI** - Sheryians Coding School (Cert ID: 311726923637568120a0faf6)\n` +
+             `🏆 **Prompt Engineering & GenAI** - Advanced LLM Tuning\n` +
+             `🏆 **Java Programming** - Core OOP & Algorithms\n` +
+             `🏆 **Python Programming** - Data Analysis & Scripting\n` +
+             `🏆 **Networks & Protocols** - NPTEL IIT\n\n` +
+             `You can click **Live Preview** on any certificate in the Certifications section to view it!`;
     }
 
     if (text.includes('education') || text.includes('cgpa') || text.includes('college') || text.includes('university') || text.includes('degree')) {

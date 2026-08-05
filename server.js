@@ -404,7 +404,12 @@ RAJ RATHOD'S PROFILE DATA:
   4. Food Delivery Time: Streamlit ML app predicting delivery duration.
   5. Discover Your True Personality: Personality classification model.
   6. Job Analysis Dashboard: Power BI analytics dashboard.
-  7. Neuro OS: Creative front-end Web OS concept.
+- Certifications:
+  1. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
+  2. Java Programming Certification.
+  3. Prompt Engineering & GenAI Certification.
+  4. Python Programming Certification.
+  5. Networks & Protocols (NPTEL IIT).
 - Contact Details:
   * Email: rathodraj1504@gmail.com
   * GitHub: https://github.com/Raj-Rathod-Ai
