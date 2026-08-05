@@ -206,20 +206,22 @@ export class ProjectCard {
         </div>
 
         <!-- ===== BACK ===== -->
-        <div class="flip-card-back p-5 flex flex-col justify-between">
+        <div class="flip-card-back p-5 flex flex-col justify-between h-full">
           <!-- Unflip trigger button (top-right corner) -->
           <button class="flip-btn" title="Go back" aria-label="Flip back">
             <i class="fa-solid fa-xmark"></i>
           </button>
-          <div class="space-y-3">
+
+          <!-- Scrollable Content Body -->
+          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1">
             <!-- Back header -->
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 pr-6">
               <div class="w-7 h-7 rounded-lg ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
                 <i class="fa-solid ${iconData.icon} ${iconData.color} text-xs"></i>
               </div>
-              <div>
-                <h3 class="font-jakarta font-bold text-sm text-gray-100 leading-tight">${title}</h3>
-                <span class="text-[9px] font-mono text-gray-600">${repo.category}</span>
+              <div class="min-w-0 flex-1">
+                <h3 class="font-jakarta font-bold text-sm text-gray-100 leading-tight truncate" title="${title}">${title}</h3>
+                <span class="text-[9px] font-mono text-gray-600 block truncate">${repo.category}</span>
               </div>
             </div>
 
@@ -240,8 +242,8 @@ export class ProjectCard {
             ${frameworkBadge}
           </div>
 
-          <!-- Back actions -->
-          <div class="flex items-center gap-2 pt-3 mt-2 border-t" style="border-color:rgba(255,255,255,0.05)">
+          <!-- Back actions (Pinned to bottom) -->
+          <div class="flex items-center gap-2 pt-2.5 mt-1 border-t shrink-0" style="border-color:rgba(255,255,255,0.05)">
             <a href="/projects/${slug}"
                class="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[11px] font-semibold font-jakarta transition-all hover:scale-105 active:scale-95"
                style="background:linear-gradient(135deg,rgba(99,102,241,0.3),rgba(139,92,246,0.25));border:1px solid rgba(99,102,241,0.4);color:#c7d2fe">

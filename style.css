@@ -428,9 +428,25 @@ body {
 
 .flip-card-back {
   transform: rotateY(180deg);
-  background: rgba(16, 20, 30, 0.92);
+  background: rgba(16, 20, 30, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* Custom smooth thin scrollbar for flip-card-back content */
+.flip-card-back .scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.flip-card-back .scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+.flip-card-back .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 4px;
+}
+.flip-card-back .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.8);
 }
 
 .flip-card:hover .flip-card-front,
