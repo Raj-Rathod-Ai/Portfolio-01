@@ -423,9 +423,8 @@ export class Home {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
           <!-- 1. Sheryians GenAI Certificate -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-amber-500/40 hover:bg-amber-500/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-56 spotlight-card relative overflow-hidden">
+          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-amber-500/40 hover:bg-amber-500/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
@@ -451,7 +450,7 @@ export class Home {
           </div>
 
           <!-- 2. Java Programming -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-primary/40 hover:bg-primary/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-56 spotlight-card relative overflow-hidden">
+          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-primary/40 hover:bg-primary/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
@@ -477,7 +476,7 @@ export class Home {
           </div>
 
           <!-- 3. Prompt Engineering -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-secondary/40 hover:bg-secondary/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-56 spotlight-card relative overflow-hidden">
+          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-secondary/40 hover:bg-secondary/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
@@ -503,7 +502,7 @@ export class Home {
           </div>
 
           <!-- 4. Python Programming -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-teal/40 hover:bg-teal/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-56 spotlight-card relative overflow-hidden">
+          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-teal/40 hover:bg-teal/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-teal/10 border border-teal/20 flex items-center justify-center text-teal group-hover:scale-110 transition-transform">
@@ -529,7 +528,7 @@ export class Home {
           </div>
 
           <!-- 5. Computer Networks & Protocols -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-rose/40 hover:bg-rose/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-56 spotlight-card relative overflow-hidden">
+          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-rose/40 hover:bg-rose/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-rose/10 border border-rose/20 flex items-center justify-center text-rose group-hover:scale-110 transition-transform">
@@ -549,9 +548,10 @@ export class Home {
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://github.com/Raj-Rathod-Ai/CERTIFICATE/blob/main/Computer%20Networks%20And%20Internet%20Protocol-1.pdf" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
-                <span>Verify PDF</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                <span>Verify</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
               </a>
             </div>
+          </div>
           </div>
 
         </div>
@@ -741,18 +741,18 @@ export class Home {
       </div>
 
       <!-- Certificate Live Preview Modal -->
-      <div id="cert-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-xl transition-all duration-300">
-        <div class="max-w-4xl w-full rounded-2xl border border-white/10 p-6 space-y-4 relative flex flex-col max-h-[90vh]" style="background: rgba(22, 27, 34, 0.95);">
-          <div class="flex items-center justify-between border-b border-white/10 pb-4">
+      <div id="cert-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-xl transition-all duration-300">
+        <div class="max-w-4xl w-full rounded-2xl border border-white/10 p-5 space-y-4 relative flex flex-col h-[85vh] max-h-[800px]" style="background: rgba(22, 27, 34, 0.95);">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3 shrink-0">
             <div class="flex items-center gap-3 min-w-0">
               <div id="cert-modal-icon" class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"></div>
               <div class="min-w-0">
-                <h3 id="cert-modal-title" class="font-jakarta font-bold text-lg text-gray-100 truncate">Certificate Preview</h3>
-                <p id="cert-modal-issuer" class="font-mono text-xs text-gray-400"></p>
+                <h3 id="cert-modal-title" class="font-jakarta font-bold text-base sm:text-lg text-gray-100 truncate">Certificate Preview</h3>
+                <p id="cert-modal-issuer" class="font-mono text-xs text-gray-400 truncate"></p>
               </div>
             </div>
-            <div class="flex items-center gap-2">
-              <a id="cert-modal-verify-btn" href="#" target="_blank" rel="noopener" class="px-3.5 py-1.5 rounded-xl bg-primary/20 border border-primary/40 text-xs font-mono text-primary hover:bg-primary/30 transition-all flex items-center gap-1.5">
+            <div class="flex items-center gap-2 shrink-0">
+              <a id="cert-modal-verify-btn" href="#" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-xl bg-primary/20 border border-primary/40 text-xs font-mono text-primary hover:bg-primary/30 transition-all flex items-center gap-1.5">
                 <span>Verify Official</span>
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
               </a>
@@ -763,7 +763,7 @@ export class Home {
           </div>
           
           <!-- Preview Container Body -->
-          <div id="cert-modal-body" class="flex-1 overflow-auto rounded-xl border border-white/5 bg-black/40 min-h-[350px] flex items-center justify-center p-2 relative">
+          <div id="cert-modal-body" class="flex-1 w-full overflow-hidden rounded-xl border border-white/5 bg-black/40 flex items-center justify-center p-1 relative">
           </div>
         </div>
       </div>
@@ -952,14 +952,11 @@ export class Home {
 
         if (bodyEl) {
           if (certData.type === 'iframe') {
-            bodyEl.innerHTML = `<iframe src="${certData.previewUrl}" class="w-full h-[520px] rounded-xl border-0 bg-white" title="${certData.title}"></iframe>`;
+            bodyEl.innerHTML = `<iframe src="${certData.previewUrl}" class="w-full h-full rounded-xl border-0 bg-white shadow-inner" title="${certData.title}"></iframe>`;
           } else if (certData.type === 'image') {
-            bodyEl.innerHTML = `<div class="w-full h-full flex items-center justify-center p-2"><img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-[70vh] object-contain rounded-xl shadow-2xl border border-white/10"></div>`;
+            bodyEl.innerHTML = `<div class="w-full h-full flex items-center justify-center p-2"><img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl border border-white/10"></div>`;
           } else if (certData.type === 'pdf') {
-            bodyEl.innerHTML = `
-              <div class="w-full flex flex-col items-center justify-center space-y-3 p-2">
-                <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(certData.previewUrl)}&embedded=true" class="w-full h-[480px] rounded-xl border border-white/10" title="${certData.title}"></iframe>
-              </div>`;
+            bodyEl.innerHTML = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(certData.previewUrl)}&embedded=true" class="w-full h-full rounded-xl border-0 bg-white" title="${certData.title}"></iframe>`;
           } else {
             bodyEl.innerHTML = `<a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="text-primary underline font-mono text-sm">Open Official Certificate Link</a>`;
           }
