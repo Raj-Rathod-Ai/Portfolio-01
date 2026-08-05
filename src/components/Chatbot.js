@@ -247,12 +247,13 @@ Contact Details:
 - LinkedIn: https://linkedin.com/in/raj-rathod-ai
 
 CRITICAL INSTRUCTIONS:
-- If the user sends a simple greeting like "hi", "hello", "hey", or "how are you", reply warmly with a friendly greeting (e.g. "Hello! 👋 How are you doing today? I'm Rudra, Raj's AI Assistant. How can I help you explore Raj's portfolio?"). Do NOT dump project lists on simple greetings!
+- If the user sends a simple greeting like "hi", "hello", "hey", or "how are you", reply warmly with a friendly greeting (e.g. "Hello! 👋 I'm doing great! I am Rudra, the custom AI Assistant of Raj Rathod. How can I help you explore Raj's portfolio?"). Do NOT dump project lists on simple greetings!
+- If the user asks about location / where Raj lives / map, state: "Raj is based in Vadodara, Gujarat, India. He studies at Parul University (P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760)." and include the Google Maps link: [View on Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)!
+- If the user asks about college result, CGPA, or marks, state clearly: "Raj's academic result in B.Tech CSE (AI Specialization) at Parul University is 7.66 CGPA." Do NOT tell the user to check university portals or contact academic departments!
 - If the user asks "which project raj do in recent" / "last working project" / "latest project" / "what did Raj work on recently", state clearly that the last working project is ${latestProject ? latestProject.name : 'Taxi-Fare-Prediction'}, and explain its description, tech stack, and GitHub link!
 - If the user asks specifically for "NLP project", focus on "Fake-News-Detection-Using-ML-Real-time" and prompt engineering.
 - If asked for "Deep Learning" or "Computer Vision", focus on "FlowerDiseaseSystem".
-- When detailed information is requested, provide comprehensive bullet points with exact links.
-- Use clean markdown formatting (bolding, bullet points).`;
+- Use clean markdown formatting (bolding, bullet points, links).`;
 
       const apiMessages = [{ role: 'system', content: systemPrompt }];
       this.history.slice(-4).forEach(h => apiMessages.push(h));
@@ -301,7 +302,25 @@ CRITICAL INSTRUCTIONS:
       return `Hello! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant of **Raj Rathod**. How can I help you explore Raj's **ML/AI projects**, **education & university**, **skills**, or **contact links** today?`;
     }
 
-    // 0. Last working / Latest Project query
+    // 0.1 Location & Map query
+    if (text.includes('location') || text.includes('where') || text.includes('place') || text.includes('city') || text.includes('map') || text.includes('live') || text.includes('address')) {
+      return `📍 **Current Location**: Vadodara, Gujarat, India\n\n` +
+             `🏫 **University Campus**: [Parul University](https://paruluniversity.ac.in), Vadodara, Gujarat (2023 - 2027)\n` +
+             `📍 **Full Address**: P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760, India\n` +
+             `🗺️ **Google Maps**: [View on Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)\n\n` +
+             `🔗 **Connect with Raj**: [LinkedIn Profile](https://linkedin.com/in/raj-rathod-ai) | [GitHub Profile](https://github.com/Raj-Rathod-Ai)`;
+    }
+
+    // 0.2 College Results & CGPA query
+    if (text.includes('result') || text.includes('cgpa') || text.includes('marks') || text.includes('grade') || text.includes('score') || text.includes('clg result')) {
+      return `🎓 **Degree Program**: B.Tech in Computer Science & Engineering (AI Specialization)\n` +
+             `🏫 **University**: [Parul University](https://paruluniversity.ac.in), Vadodara, Gujarat\n` +
+             `📈 **Academic Performance / CGPA**: **7.66 CGPA**\n` +
+             `💻 **LeetCode Record**: **350+ Problems Solved** ([leetcode.com/u/Raj-Rathod](https://leetcode.com))\n\n` +
+             `For academic inquiries or detailed transcripts, you can reach Raj directly at rathodraj1504@gmail.com.`;
+    }
+
+    // 0.3 Last working / Latest Project query
     if (text.includes('last working') || text.includes('latest project') || text.includes('last project') || text.includes('most recent') || text.includes('recent project') || (text.includes('recent') && text.includes('project')) || (text.includes('do in recent') || text.includes('doing recent'))) {
       if (sorted.length > 0) {
         const top = sorted[0];
