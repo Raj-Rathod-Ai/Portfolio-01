@@ -327,14 +327,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     UPCOMING_PROJECTS.forEach(up => {
       const exists = repos.some(r => {
         const rName = r.name.toLowerCase();
-        return rName.includes('discord') && up.name.toLowerCase().includes('discord') ||
-               rName.includes('reviewer') && up.name.toLowerCase().includes('reviewer') ||
-               rName.includes('news') && up.name.toLowerCase().includes('news');
+        return (rName.includes('discord') && up.name.toLowerCase().includes('discord')) ||
+               (rName.includes('reviewer') && up.name.toLowerCase().includes('reviewer')) ||
+               (rName.includes('news') && up.name.toLowerCase().includes('news'));
       });
       if (!exists) {
         repos.unshift(up);
       }
-    });
     });
   } catch (err) {
     console.error('Failed fetching repository datasets:', err.message);
