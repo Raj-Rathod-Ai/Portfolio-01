@@ -325,12 +325,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     // Merge upcoming projects (only if not already uploaded on GitHub)
     UPCOMING_PROJECTS.forEach(up => {
-      const exists = repos.some(r => {
-        const rName = r.name.toLowerCase();
-        return (rName.includes('discord') && up.name.toLowerCase().includes('discord')) ||
-               (rName.includes('reviewer') && up.name.toLowerCase().includes('reviewer')) ||
-               (rName.includes('news') && up.name.toLowerCase().includes('news'));
-      });
+      const exists = repos.some(r => r.name.toLowerCase() === up.name.toLowerCase());
       if (!exists) {
         repos.unshift(up);
       }

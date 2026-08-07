@@ -19,85 +19,81 @@ const CAT_BADGE = {
 
 /* ── Category icon lookup ──────────────────────────────────── */
 const CAT_ICON = {
-  'Generative AI':    { icon: 'fa-wand-magic-sparkles', bg: 'bg-indigo-500/15',  border: 'border-indigo-500/25', color: 'text-indigo-400'  },
-  'RAG':              { icon: 'fa-magnifying-glass-chart', bg: 'bg-rose-500/15', border: 'border-rose-500/25',   color: 'text-rose-400'    },
-  'Full Stack':       { icon: 'fa-layer-group',       bg: 'bg-emerald-500/15',   border: 'border-emerald-500/25',color: 'text-emerald-400' },
-  'Deep Learning':    { icon: 'fa-brain',             bg: 'bg-teal-500/15',      border: 'border-teal-500/25',   color: 'text-teal-400'    },
-  'NLP':              { icon: 'fa-language',          bg: 'bg-purple-500/15',    border: 'border-purple-500/25', color: 'text-purple-400'  },
-  'Machine Learning': { icon: 'fa-chart-line',        bg: 'bg-blue-500/15',      border: 'border-blue-500/25',   color: 'text-blue-400'    },
-  'Data Science':     { icon: 'fa-chart-pie',         bg: 'bg-amber-500/15',     border: 'border-amber-500/25',  color: 'text-amber-400'   },
-  'Computer Vision':  { icon: 'fa-eye',               bg: 'bg-cyan-500/15',      border: 'border-cyan-500/25',   color: 'text-cyan-400'    },
-  'AI Agents':        { icon: 'fa-robot',             bg: 'bg-pink-500/15',      border: 'border-pink-500/25',   color: 'text-pink-400'    },
-  'MLOps':            { icon: 'fa-gears',             bg: 'bg-slate-500/15',     border: 'border-slate-500/25',  color: 'text-slate-400'   },
-  'Normal Projects':  { icon: 'fa-folder-open',       bg: 'bg-green-500/15',     border: 'border-green-500/25',  color: 'text-green-400'   },
-  'Python Concepts':  { icon: 'fa-snake',             bg: 'bg-yellow-500/15',    border: 'border-yellow-500/25', color: 'text-yellow-400'  },
-  'Java Projects':    { icon: 'fa-mug-hot',           bg: 'bg-orange-500/15',    border: 'border-orange-500/25', color: 'text-orange-400'  },
-  'C Programming':    { icon: 'fa-c',                 bg: 'bg-sky-500/15',       border: 'border-sky-500/25',    color: 'text-sky-400'     },
-  'JavaScript Projects': { icon: 'fa-js',             bg: 'bg-yellow-400/15',    border: 'border-yellow-400/25', color: 'text-yellow-300'  },
-  'Utilities':        { icon: 'fa-wrench',            bg: 'bg-gray-500/15',      border: 'border-gray-500/25',   color: 'text-gray-400'    },
-  'Tools':            { icon: 'fa-screwdriver-wrench',bg: 'bg-teal-600/15',      border: 'border-teal-600/25',   color: 'text-teal-300'    },
-  'Automation':       { icon: 'fa-bolt',              bg: 'bg-violet-500/15',    border: 'border-violet-500/25', color: 'text-violet-400'  },
-  'Others':           { icon: 'fa-box-open',          bg: 'bg-gray-500/15',      border: 'border-gray-500/25',   color: 'text-gray-400'    },
+  'RAG':              { icon: 'fa-magnifying-glass-chart', color: 'text-rose-400',    bg: 'bg-rose-500/10',    border: 'border-rose-500/20' },
+  'Generative AI':    { icon: 'fa-wand-magic-sparkles',    color: 'text-indigo-400',  bg: 'bg-indigo-500/10',  border: 'border-indigo-500/20' },
+  'Full Stack':       { icon: 'fa-layer-group',          color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+  'Deep Learning':    { icon: 'fa-brain',                color: 'text-teal-400',    bg: 'bg-teal-500/10',    border: 'border-teal-500/20' },
+  'NLP':              { icon: 'fa-language',             color: 'text-purple-400',  bg: 'bg-purple-500/10',  border: 'border-purple-500/20' },
+  'Machine Learning': { icon: 'fa-chart-line',           color: 'text-blue-400',    bg: 'bg-blue-500/10',    border: 'border-blue-500/20' },
+  'Data Science':     { icon: 'fa-chart-pie',            color: 'text-amber-400',   bg: 'bg-amber-500/10',   border: 'border-amber-500/20' },
+  'Computer Vision':  { icon: 'fa-eye',                  color: 'text-cyan-400',    bg: 'bg-cyan-500/10',    border: 'border-cyan-500/20' },
+  'AI Agents':        { icon: 'fa-robot',                color: 'text-pink-400',    bg: 'bg-pink-500/10',    border: 'border-pink-500/20' },
+  'MLOps':            { icon: 'fa-gears',                color: 'text-slate-400',   bg: 'bg-slate-500/10',   border: 'border-slate-500/20' },
+  'Normal Projects':  { icon: 'fa-folder-open',          color: 'text-green-400',   bg: 'bg-green-500/10',   border: 'border-green-500/20' },
+  'Python Concepts':  { icon: 'fa-snake',                color: 'text-yellow-400',  bg: 'bg-yellow-500/10',  border: 'border-yellow-500/20' },
 };
 
-function getIconData(category) {
-  return CAT_ICON[category] || CAT_ICON['Others'];
-}
+function getBadgeClass(cat) { return CAT_BADGE[cat] || 'cat-badge-others'; }
+function getIconData(cat)   { return CAT_ICON[cat]  || { icon: 'fa-code', color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' }; }
 
-function getBadgeClass(category) {
-  return CAT_BADGE[category] || 'cat-badge-others';
+/**
+ * Format raw GitHub repo names into title format.
+ */
+function repoTitle(name = '') {
+  return name
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
 
 /**
- * Extract up to 5 key feature bullets from description + topics.
+ * Derive 2-3 feature bullets from description or topics.
  */
 function extractFeatures(repo) {
+  const desc   = repo.description || '';
+  const topics = repo.topics || [];
   const bullets = [];
-  const desc = repo.description || '';
-  const topics = (repo.topics || []);
 
-  // Split description into sentences and pick first 2 meaningful ones
-  const sentences = desc.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 15);
-  sentences.slice(0, 2).forEach(s => bullets.push(s));
+  if (desc) {
+    const parts = desc.split(/[.;!]/).map(s => s.trim()).filter(Boolean);
+    parts.slice(0, 2).forEach(p => { if (p.length > 10) bullets.push(p); });
+  }
 
-  // Add topics as "technology" bullets
-  const techTopics = topics.filter(t =>
-    !['machine-learning','deep-learning','nlp','rag','genai','python','web-app','basics'].includes(t)
-  ).slice(0, 3);
-  if (techTopics.length) bullets.push(`Technologies: ${techTopics.map(t => t.replace(/-/g,' ')).join(', ')}`);
+  if (bullets.length < 2 && topics.length) {
+    topics.slice(0, 2).forEach(t => {
+      const formatted = t.replace(/[-_]/g, ' ');
+      bullets.push(`Focus area: ${formatted.charAt(0).toUpperCase() + formatted.slice(1)}`);
+    });
+  }
 
-  return bullets.slice(0, 4);
+  return bullets.slice(0, 3);
 }
 
 /**
- * Detect the primary framework/AI model from topics and language.
+ * Detect main framework or stack used.
  */
 function detectFramework(repo) {
   const topics = (repo.topics || []).map(t => t.toLowerCase());
-  const frameworks = [
-    ['langchain', 'LangChain'], ['openai', 'OpenAI API'], ['gemini', 'Gemini API'],
-    ['pytorch', 'PyTorch'], ['tensorflow', 'TensorFlow'], ['keras', 'Keras'],
-    ['scikit-learn', 'Scikit-Learn'], ['huggingface', 'HuggingFace'], ['streamlit', 'Streamlit'],
-    ['fastapi', 'FastAPI'], ['flask', 'Flask'], ['opencv', 'OpenCV'],
-    ['xgboost', 'XGBoost'], ['bert', 'BERT'], ['llama', 'LLaMA']
-  ];
-  for (const [topic, label] of frameworks) {
-    if (topics.includes(topic)) return label;
-  }
-  return repo.language || null;
-}
+  const desc   = (repo.description || '').toLowerCase();
+  const lang   = (repo.language || '').toLowerCase();
 
-/**
- * Format repo name to a readable title.
- */
-function repoTitle(name) {
-  return name.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  if (topics.includes('pytorch') || desc.includes('pytorch')) return 'PyTorch';
+  if (topics.includes('tensorflow') || desc.includes('tensorflow')) return 'TensorFlow';
+  if (topics.includes('scikit-learn') || topics.includes('sklearn') || desc.includes('scikit-learn')) return 'Scikit-Learn';
+  if (topics.includes('langchain') || desc.includes('langchain')) return 'LangChain';
+  if (topics.includes('openai') || desc.includes('openai')) return 'OpenAI API';
+  if (topics.includes('fastapi') || desc.includes('fastapi')) return 'FastAPI';
+  if (topics.includes('flask') || desc.includes('flask')) return 'Flask';
+  if (topics.includes('react') || desc.includes('react')) return 'React';
+  if (lang === 'python') return 'Python';
+  if (lang === 'java') return 'Java';
+  if (lang === 'c') return 'C Language';
+  return null;
 }
 
 export class ProjectCard {
   /**
-   * Render a single flip card for a repo.
-   * @param {object} repo        - GitHub repo object (with .category, .isGroup, .featured pre-merged).
+   * Render a project card.
+   * @param {object} repo        - GitHub repo object.
    * @param {number} idx         - Grid index for stagger delay.
    * @param {Array}  localMeta   - projects.json entries.
    * @returns {string} HTML string.
@@ -138,34 +134,21 @@ export class ProjectCard {
       : `<span class="px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.25);color:#2dd4bf">Solo</span>`;
 
     const isUpcoming   = repo.isUpcoming || false;
-    const numberBadge  = repo.numberBadge ? `<span class="font-mono text-xs font-bold text-amber-400/80 mb-1 block">(${repo.numberBadge})</span>` : '';
     const displayTitle = repo.displayTitle || title;
 
-    // Masked details for upcoming project cards
-    const cardDesc = isUpcoming
-      ? '🔒 [CLASSIFIED PROJECT DETAILS] — System architecture, documentation, and live preview will reveal automatically when published to GitHub.'
-      : desc;
+    // Normal topics HTML
+    const topicsHTML = topics.length
+      ? topics.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#6b7280">${t}</span>`).join('')
+      : '';
 
-    const topicsHTML = isUpcoming
-      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono border bg-amber-500/10 border-amber-500/25 text-amber-300/80"><i class="fa-solid fa-lock text-[8px]"></i>Secret Tech Stack</span>
-         <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-mono border border-white/10 text-gray-400">Coming Very Soon</span>`
-      : (topics.length
-        ? topics.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#6b7280">${t}</span>`).join('')
-        : '');
-
-    // Back: feature bullets or locked mystery box
-    const bulletsHTML = isUpcoming
-      ? `<div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-mono space-y-1">
-           <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-amber-400"></i>CLASSIFIED REPOSITORY</p>
-           <p class="text-[10px] text-gray-400 leading-relaxed">Raj Rathod is actively building this system. Source code, AI architecture, and live demo will automatically sync as soon as it is uploaded to GitHub.</p>
-         </div>`
-      : (features.length
-        ? `<ul class="space-y-1.5 mt-1">${features.map(f =>
-            `<li class="flex items-start gap-2 text-[11px] text-gray-400 leading-snug">
-               <i class="fa-solid fa-circle-dot text-indigo-500 mt-0.5 flex-shrink-0 text-[7px]"></i>
-               <span>${f}</span>
-             </li>`).join('')}</ul>`
-        : `<p class="text-[11px] text-gray-500 italic mt-1">See GitHub for full project description.</p>`);
+    // Back bullets HTML
+    const bulletsHTML = features.length
+      ? `<ul class="space-y-1.5 mt-1">${features.map(f =>
+          `<li class="flex items-start gap-2 text-[11px] text-gray-400 leading-snug">
+             <i class="fa-solid fa-circle-dot text-indigo-500 mt-0.5 flex-shrink-0 text-[7px]"></i>
+             <span>${f}</span>
+           </li>`).join('')}</ul>`
+      : `<p class="text-[11px] text-gray-500 italic mt-1">See GitHub for full project description.</p>`;
 
     const frameworkBadge = framework
       ? `<div class="flex items-center gap-2 mt-3 pt-3 border-t" style="border-color:rgba(255,255,255,0.05)">
@@ -174,15 +157,15 @@ export class ProjectCard {
          </div>`
       : '';
 
-    // Upcoming locked badges
+    // Upcoming badge (clean normal text, no lock icon)
     const upcomingBadge = isUpcoming
-      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono border bg-amber-500/15 border-amber-500/30 text-amber-300 animate-pulse"><i class="fa-solid fa-lock text-[8px]"></i>Coming Soon</span>`
+      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono border bg-amber-500/15 border-amber-500/30 text-amber-300">Coming Soon</span>`
       : '';
 
-    // Action buttons
+    // Action buttons (clean normal text, no lock icon)
     const actionBtnsHTML = isUpcoming
-      ? `<button type="button" class="upcoming-lock-btn flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:scale-105 transition-all cursor-pointer" data-title="${displayTitle}">
-           <i class="fa-solid fa-lock text-[9px]"></i>🔒 Raj Working On It
+      ? `<button type="button" class="upcoming-lock-btn flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-all cursor-pointer" data-title="${displayTitle}">
+           Coming Soon
          </button>`
       : `<a href="${repo.html_url}" target="_blank" rel="noopener"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all hover:scale-105 active:scale-95"
@@ -206,21 +189,29 @@ export class ProjectCard {
       </div>
     ` : '';
 
+    // Glassmorphism Blur Overlay for Upcoming Projects
+    const blurOverlayHTML = isUpcoming ? `
+      <div class="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 bg-black/45 backdrop-blur-[5px] rounded-2xl pointer-events-none select-none">
+        <span class="px-4 py-1.5 rounded-xl text-xs font-mono font-medium bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-xl tracking-wider uppercase">Coming Soon</span>
+      </div>
+    ` : '';
+
     return `
     <div class="flip-card scroll-reveal reveal-zoom-fade stagger-${staggerN}" data-project-slug="${slug}">
       <div class="flip-card-inner">
 
         <!-- ===== FRONT ===== -->
-        <div class="flip-card-front ${isFeatured ? 'is-featured' : ''} ${isUpcoming ? 'border-amber-500/20 bg-amber-950/5' : ''} p-5 flex flex-col justify-between">
+        <div class="flip-card-front relative overflow-hidden ${isFeatured ? 'is-featured' : ''} ${isUpcoming ? 'border-amber-500/20 bg-amber-950/5' : ''} p-5 flex flex-col justify-between">
+          ${blurOverlayHTML}
           <!-- Flip trigger button (top-right corner) -->
-          <button class="flip-btn" title="See project details" aria-label="Flip card">
+          <button class="flip-btn z-30" title="See project details" aria-label="Flip card">
             <i class="fa-solid fa-rotate"></i>
           </button>
           <!-- Header row -->
-          <div class="space-y-3">
+          <div class="space-y-3 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
             <div class="flex items-start justify-between gap-3">
               <div class="w-10 h-10 rounded-xl ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid ${isUpcoming ? 'fa-lock text-amber-400' : `${iconData.icon} ${iconData.color}`} text-base"></i>
+                <i class="fa-solid ${iconData.icon} ${iconData.color} text-base"></i>
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="font-jakarta font-bold text-sm text-gray-100 leading-tight line-clamp-2" title="${displayTitle}">${displayTitle}</h3>
@@ -232,14 +223,14 @@ export class ProjectCard {
             </div>
 
             <!-- Description -->
-            <p class="text-[11px] ${isUpcoming ? 'text-amber-300/80 font-mono italic' : 'text-gray-500'} leading-relaxed" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${cardDesc}</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${desc}</p>
 
             <!-- Topics -->
             <div class="flex flex-wrap gap-1">${topicsHTML}</div>
           </div>
 
           <!-- Footer badges + actions -->
-          <div class="space-y-3 mt-3">
+          <div class="space-y-3 mt-3 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
             <div class="flex flex-wrap items-center gap-1.5">
               <span class="px-2 py-0.5 rounded-md text-[9px] font-mono border ${badgeClass}">${repo.category}</span>
               ${upcomingBadge}
@@ -254,21 +245,22 @@ export class ProjectCard {
         </div>
 
         <!-- ===== BACK ===== -->
-        <div class="flip-card-back p-5 flex flex-col justify-between h-full">
+        <div class="flip-card-back relative overflow-hidden p-5 flex flex-col justify-between h-full">
+          ${blurOverlayHTML}
           <!-- Unflip trigger button (top-right corner) -->
-          <button class="flip-btn" title="Go back" aria-label="Flip back">
+          <button class="flip-btn z-30" title="Go back" aria-label="Flip back">
             <i class="fa-solid fa-xmark"></i>
           </button>
 
           <!-- Scrollable Content Body -->
-          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1">
+          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
             <!-- Back header -->
             <div class="flex items-center gap-2 pr-6">
               <div class="w-7 h-7 rounded-lg ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
                 <i class="fa-solid ${iconData.icon} ${iconData.color} text-xs"></i>
               </div>
               <div class="min-w-0 flex-1">
-                <h3 class="font-jakarta font-bold text-sm text-gray-100 leading-tight truncate" title="${title}">${title}</h3>
+                <h3 class="font-jakarta font-bold text-sm text-gray-100 leading-tight truncate" title="${displayTitle}">${displayTitle}</h3>
                 <span class="text-[9px] font-mono text-gray-600 block truncate">${repo.category}</span>
               </div>
             </div>
@@ -291,42 +283,22 @@ export class ProjectCard {
           </div>
 
           <!-- Back actions (Pinned to bottom) -->
-          <div class="flex items-center gap-2 pt-2.5 mt-1 border-t shrink-0" style="border-color:rgba(255,255,255,0.05)">
+          <div class="flex items-center gap-2 pt-2.5 mt-1 border-t shrink-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}" style="border-color:rgba(255,255,255,0.05)">
             <a href="/projects/${slug}"
                class="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[11px] font-semibold font-jakarta transition-all hover:scale-105 active:scale-95"
                style="background:linear-gradient(135deg,rgba(99,102,241,0.3),rgba(139,92,246,0.25));border:1px solid rgba(99,102,241,0.4);color:#c7d2fe">
               <i class="fa-solid fa-circle-info text-xs"></i>View Details
             </a>
             <a href="${repo.html_url}" target="_blank" rel="noopener"
-               class="p-2 rounded-xl border transition-all hover:scale-105 active:scale-95"
-               style="border-color:rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#6b7280">
+               class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-mono border transition-all hover:scale-105 active:scale-95"
+               style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:#9ca3af">
               <i class="fa-brands fa-github text-sm"></i>
             </a>
-            ${liveUrl ? `<a href="${liveUrl}" target="_blank" rel="noopener"
-               class="p-2 rounded-xl border transition-all hover:scale-105 active:scale-95"
-               style="border-color:rgba(99,102,241,0.25);background:rgba(99,102,241,0.08);color:#818cf8">
-              <i class="fa-solid fa-arrow-up-right-from-square text-sm"></i>
-            </a>` : ''}
           </div>
         </div>
 
       </div>
-    </div>`;
-  }
-
-  /**
-   * Wire up click-only flip toggle via dedicated .flip-btn buttons.
-   * Links (Live Demo, GitHub, View Details) always work without flipping.
-   * @param {HTMLElement} container
-   */
-  setup(container) {
-    container.querySelectorAll('.flip-card').forEach(card => {
-      card.querySelectorAll('.flip-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation(); // Don't bubble to any parent handlers
-          card.classList.toggle('is-flipped');
-        });
-      });
-    });
+    </div>
+    `;
   }
 }
