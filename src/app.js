@@ -294,9 +294,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     footerPlaceholder.innerHTML = footer.render();
   }
 
-  // Bind active spotlight glows and background particles canvas immediately
+  // Bind active spotlight glows, background particles canvas, and Lenis smooth scroll
   initNeuralCanvas();
   initMouseSpotlight();
+  initLenisSmoothScroll();
 
   // Load and merge local database with live API repositories
   let repos = [];

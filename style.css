@@ -393,8 +393,8 @@ html.noscroll, body.noscroll, .noscroll {
 
 /* --- 3D Flip Card Container --- */
 .flip-card {
-  perspective: 1000px;
-  height: 360px;
+  perspective: 1200px;
+  height: 380px;
   cursor: pointer;
 }
 
@@ -403,11 +403,11 @@ html.noscroll, body.noscroll, .noscroll {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }
 
-/* Desktop: flip ONLY via .is-flipped (set by flip button click, not hover) */
+/* Desktop: flip ONLY via .is-flipped */
 .flip-card.is-flipped .flip-card-inner {
   transform: rotateY(180deg);
 }
@@ -421,17 +421,36 @@ html.noscroll, body.noscroll, .noscroll {
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(22, 27, 34, 0.75);
+  background: rgba(22, 27, 34, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
 }
 
 .flip-card-back {
   transform: rotateY(180deg);
-  background: rgba(16, 20, 30, 0.95);
+  background: rgba(16, 20, 30, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* Bulletproof face visibility toggle to prevent backdrop-filter bleed-through */
+.flip-card:not(.is-flipped) .flip-card-back {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.flip-card.is-flipped .flip-card-front {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.flip-card.is-flipped .flip-card-back {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 /* Custom smooth thin scrollbar for flip-card-back content */
