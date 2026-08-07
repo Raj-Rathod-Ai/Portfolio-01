@@ -156,10 +156,6 @@ export class ProjectCard {
          </div>`
       : '';
 
-    const isUpcoming   = repo.isUpcoming || false;
-    const numberBadge  = repo.numberBadge ? `<span class="font-mono text-xs font-bold text-amber-400/80 mb-1 block">(${repo.numberBadge})</span>` : '';
-    const displayTitle = repo.displayTitle || title;
-
     // Upcoming locked badges
     const upcomingBadge = isUpcoming
       ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono border bg-amber-500/15 border-amber-500/30 text-amber-300 animate-pulse"><i class="fa-solid fa-lock text-[8px]"></i>Coming Soon</span>`
