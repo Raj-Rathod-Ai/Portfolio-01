@@ -50,6 +50,8 @@ const Contact = mongoose.model('Contact', ContactSchema);
 
 const VisitSchema = new mongoose.Schema({
   visitorId: { type: String, required: true },
+  visitorName: { type: String },
+  ipAddress: { type: String },
   visitCount: { type: Number, default: 1 },
   pagesViewed: [{ path: String, timestamp: { type: Date, default: Date.now } }],
   lastVisit: { type: Date, default: Date.now },
@@ -64,6 +66,7 @@ const VisitorProfileSchema = new mongoose.Schema({
   role: { type: String },
   isStudent: { type: Boolean },
   contactDetails: { type: String },
+  ipAddress: { type: String },
   chatHistory: [{ role: String, content: String, timestamp: Date }],
   updatedAt: { type: Date, default: Date.now }
 });
@@ -220,6 +223,25 @@ app.post('/api/reviews', async (req, res) => {
     const newReview = new Review(newReviewData);
     await newReview.save();
     console.log(`New review saved for: ${name}`);
+
+    // Automatically link reviewer name to visitor profile if visitorId provided
+    const visitorId = req.body.visitorId;
+    if (visitorId) {
+      try {
+        await VisitorProfile.findOneAndUpdate(
+          { visitorId },
+          { name, updatedAt: new Date() },
+          { upsert: true }
+        );
+        await Visit.updateMany(
+          { visitorId },
+          { visitorName: name }
+        );
+      } catch (linkErr) {
+        console.warn('Could not auto-link reviewer profile:', linkErr.message);
+      }
+    }
+
     res.status(201).json(newReview);
   } catch (err) {
     console.error('POST review error:', err);
@@ -463,22 +485,28 @@ app.post('/api/contact', async (req, res) => {
 // POST /api/analytics/visit - Record silent visitor analytics session
 app.post('/api/analytics/visit', async (req, res) => {
   try {
-    const { visitorId, path, visitCount, userAgent } = req.body;
+    const { visitorId, path, visitCount, userAgent, visitorName } = req.body;
     if (!visitorId) {
       return res.status(400).json({ error: 'visitorId is required' });
     }
+
+    const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || req.ip;
 
     if (mongoose.connection.readyState === 1) {
       let visitDoc = await Visit.findOne({ visitorId });
       if (visitDoc) {
         visitDoc.visitCount = Math.max(visitDoc.visitCount || 1, visitCount || 1);
         visitDoc.lastVisit = new Date();
+        if (clientIp) visitDoc.ipAddress = clientIp;
+        if (visitorName) visitDoc.visitorName = visitorName;
         if (path) visitDoc.pagesViewed.push({ path, timestamp: new Date() });
         if (visitDoc.pagesViewed.length > 100) visitDoc.pagesViewed = visitDoc.pagesViewed.slice(-100);
         await visitDoc.save();
       } else {
         visitDoc = new Visit({
           visitorId,
+          visitorName,
+          ipAddress: clientIp,
           visitCount: visitCount || 1,
           pagesViewed: path ? [{ path, timestamp: new Date() }] : [],
           lastVisit: new Date(),
@@ -503,6 +531,8 @@ app.post('/api/analytics/profile', async (req, res) => {
       return res.status(400).json({ error: 'visitorId is required' });
     }
 
+    const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || req.ip;
+
     if (mongoose.connection.readyState === 1) {
       let profile = await VisitorProfile.findOne({ visitorId });
       if (profile) {
@@ -510,6 +540,7 @@ app.post('/api/analytics/profile', async (req, res) => {
         if (role) profile.role = role;
         if (typeof isStudent === 'boolean') profile.isStudent = isStudent;
         if (contactDetails) profile.contactDetails = contactDetails;
+        if (clientIp) profile.ipAddress = clientIp;
         if (Array.isArray(chatHistory)) profile.chatHistory = chatHistory.slice(-50);
         profile.updatedAt = new Date();
         await profile.save();
@@ -520,6 +551,7 @@ app.post('/api/analytics/profile', async (req, res) => {
           role,
           isStudent,
           contactDetails,
+          ipAddress: clientIp,
           chatHistory: Array.isArray(chatHistory) ? chatHistory.slice(-50) : [],
           updatedAt: new Date()
         });

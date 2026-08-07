@@ -1,10 +1,10 @@
 /**
  * Personal AI Chatbot Component (Rudra)
  * Powered by Mistral AI LLM with persistent visitor onboarding, profile recognition,
- * local storage chat memory, and backend fallback sync.
+ * local storage chat memory, reviewer-name linking, and smart first-time suggestions.
  */
 
-import { getVisitorId } from '../utils/analytics.js';
+import { getVisitorId, hasVisitorName, getVisitorProfile } from '../utils/analytics.js';
 
 // Dynamically read runtime client API key (decoded safely to avoid raw scanner triggers)
 const MISTRAL_KEY = atob('d0ZZZUhiSWtuNzdKWkdlcGhtMk13UzZSZldKNUxRQVI=');
@@ -56,6 +56,9 @@ export class Chatbot {
         })
       }).catch(() => {});
     } catch (e) {}
+
+    this.hideSuggestionTooltip();
+    this.updateHeaderProfileBadge();
   }
 
   /**
@@ -109,11 +112,24 @@ export class Chatbot {
   }
 
   /**
-   * Render chatbot HTML shell (Floating button + Chat Drawer).
+   * Render chatbot HTML shell (Floating button + Chat Drawer + Suggestion Bubble).
    * @returns {string} HTML markup.
    */
   render() {
     return `
+      <!-- Floating First-Time Chatbot Suggestion Tooltip -->
+      <div id="chatbot-suggestion-tooltip"
+           class="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-[59] hidden items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 border border-indigo-500/40 shadow-2xl backdrop-blur-xl text-xs font-medium text-gray-100 max-w-[290px] cursor-pointer hover:border-indigo-400/60 transition-all select-none">
+        <span class="text-base animate-pulse">💬</span>
+        <div class="flex-1 min-w-0">
+          <p class="font-jakarta font-bold text-[11px] text-indigo-200 leading-tight">First time visiting?</p>
+          <p class="text-[10px] text-gray-300 truncate">Chat with Rudra (Raj's AI Assistant)</p>
+        </div>
+        <button id="chatbot-suggestion-close" class="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center text-[10px] shrink-0">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
       <!-- Floating Chatbot Trigger Button -->
       <button id="chatbot-toggle-btn"
               class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[60] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/25 hover:scale-110 active:scale-95 transition-all flex items-center justify-center border border-white/20 group"
@@ -181,18 +197,21 @@ export class Chatbot {
    * Bind events and initialize chatbot logic.
    */
   setup() {
-    const toggleBtn = document.getElementById('chatbot-toggle-btn');
-    const closeBtn  = document.getElementById('chatbot-close-btn');
-    const resetBtn  = document.getElementById('chatbot-reset-btn');
-    const win       = document.getElementById('chatbot-window');
-    const form      = document.getElementById('chatbot-form');
-    const input     = document.getElementById('chatbot-input');
+    const toggleBtn   = document.getElementById('chatbot-toggle-btn');
+    const closeBtn    = document.getElementById('chatbot-close-btn');
+    const resetBtn    = document.getElementById('chatbot-reset-btn');
+    const win         = document.getElementById('chatbot-window');
+    const form        = document.getElementById('chatbot-form');
+    const input       = document.getElementById('chatbot-input');
+    const tooltip     = document.getElementById('chatbot-suggestion-tooltip');
+    const tooltipClose= document.getElementById('chatbot-suggestion-close');
 
     if (!toggleBtn || !win) return;
 
     const toggleChat = (show) => {
       this.isOpen = typeof show === 'boolean' ? show : !this.isOpen;
       if (this.isOpen) {
+        this.hideSuggestionTooltip();
         win.classList.remove('opacity-0', 'pointer-events-none', 'scale-90');
         win.classList.add('opacity-100', 'pointer-events-auto', 'scale-100');
         input?.focus();
@@ -216,6 +235,28 @@ export class Chatbot {
       }
     });
 
+    // Tooltip suggestion handlers
+    if (tooltip) {
+      tooltip.addEventListener('click', (e) => {
+        if (e.target.closest('#chatbot-suggestion-close')) return;
+        toggleChat(true);
+      });
+    }
+    tooltipClose?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.hideSuggestionTooltip();
+    });
+
+    // Show suggestion tooltip if first-time visitor without a name
+    if (!hasVisitorName() && !this.userProfile?.name) {
+      setTimeout(() => {
+        if (!this.isOpen && !hasVisitorName()) {
+          tooltip?.classList.remove('hidden');
+          tooltip?.classList.add('flex');
+        }
+      }, 2500);
+    }
+
     // Handle Form Submit
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -226,7 +267,25 @@ export class Chatbot {
       }
     });
 
+    // Listen for profile update from Review submission
+    window.addEventListener('visitorProfileUpdated', (e) => {
+      this.userProfile = this.loadProfile();
+      this.updateHeaderProfileBadge();
+      this.hideSuggestionTooltip();
+    });
+
     this.updateHeaderProfileBadge();
+  }
+
+  /**
+   * Hide first-time visitor suggestion tooltip.
+   */
+  hideSuggestionTooltip() {
+    const tooltip = document.getElementById('chatbot-suggestion-tooltip');
+    if (tooltip) {
+      tooltip.classList.add('hidden');
+      tooltip.classList.remove('flex');
+    }
   }
 
   /**
@@ -262,7 +321,7 @@ export class Chatbot {
         // Render welcoming chip bar
         this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
       } else {
-        const welcomeText = `Welcome back, **${this.userProfile.name}**! 👋 Great to see you again.${this.userProfile.role ? ` (Role: ${this.userProfile.role})` : ''}\n\nI am **Rudra**, Raj Rathod's custom AI Assistant. How can I help you today?`;
+        const welcomeText = `Welcome back, **${this.userProfile.name}**! 👋 Great to see you here again.${this.userProfile.role ? ` (Role: ${this.userProfile.role})` : ''}\n\nI am **Rudra**, Raj Rathod's custom AI Assistant. How can I help you today?`;
         this.appendMessage('bot', welcomeText);
         this.history.push({ role: 'assistant', content: welcomeText });
         this.saveHistory();

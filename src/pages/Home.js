@@ -2,6 +2,8 @@ import { Hero } from '../components/Hero.js';
 import { CategoryCard } from '../components/CategoryCard.js';
 import { getAllCategories } from '../utils/categorize.js';
 import { containsAbusiveContent } from '../utils/profanityFilter.js';
+import { setVisitorName, getVisitorId } from '../utils/analytics.js';
+
 
 
 /**
@@ -1139,7 +1141,12 @@ export class Home {
         }
 
         const formattedDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-        const bodyData = { name: nameVal, rating: ratingVal, review: reviewVal, date: formattedDate };
+        const currentVisitorId = getVisitorId();
+        const bodyData = { name: nameVal, rating: ratingVal, review: reviewVal, date: formattedDate, visitorId: currentVisitorId };
+
+        // Save visitor name to device profile & notify DB
+        setVisitorName(nameVal, 'review');
+        window.dispatchEvent(new CustomEvent('visitorProfileUpdated', { detail: { name: nameVal } }));
 
         // Save locally if valid
         const reviews = JSON.parse(localStorage.getItem('portfolioReviews') || '[]');
