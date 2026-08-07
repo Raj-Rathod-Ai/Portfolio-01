@@ -428,11 +428,9 @@ html.noscroll, body.noscroll, .noscroll {
   transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hover lift — on inner, only when NOT flipped. Fast 0.3s lift, no rotateY */
-.flip-card:not(.is-flipped):hover .flip-card-inner {
-  transform: translateY(-4px);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
+/* NOTE: No hover translateY on flip-card-inner — it causes a visible drop
+   when the Y-offset resets to 0 simultaneously with the rotateY starting */
+
 
 .flip-card-front,
 .flip-card-back {
@@ -447,6 +445,12 @@ html.noscroll, body.noscroll, .noscroll {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+}
+
+/* Hover: glow border on front face only — no transform, no jump */
+.flip-card:not(.is-flipped):hover .flip-card-front {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.15), 0 8px 32px -8px rgba(99,102,241,0.2);
 }
 
 .flip-card-back {
