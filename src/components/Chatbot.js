@@ -22,6 +22,7 @@ export class Chatbot {
     this.userProfile = this.loadProfile();
     this.onboardingStep = null; // null | 'ask_name' | 'ask_role' | 'ask_contact' | 'ask_boss_password' | 'change_password_new'
     this.tempProfile = {};
+    this.bossAttempts = 0;
   }
 
   /**
@@ -399,6 +400,7 @@ export class Chatbot {
       this.appendMessage('user', text);
       const authResult = await authenticateBoss(cleanInput);
       if (authResult.success) {
+        this.bossAttempts = 0;
         this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '' };
         this.saveProfile(this.userProfile);
         this.updateHeaderProfileBadge();
@@ -411,13 +413,29 @@ export class Chatbot {
         this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
         return;
       } else {
-        this.onboardingStep = 'ask_name';
-        const failMsg = `❌ **Incorrect Master Password.** Access denied. Your device was NOT registered as Boss.\n\nPlease enter your actual name to explore as visitor:`;
-        this.appendMessage('bot', failMsg);
-        this.history.push({ role: 'assistant', content: failMsg });
-        this.saveHistory();
-        this.renderQuickChips(['⏩ Skip Intro']);
-        return;
+        this.bossAttempts = (this.bossAttempts || 0) + 1;
+        if (this.bossAttempts === 1) {
+          const failMsg = `❌ **Incorrect Master Password (Attempt 1/3).** Please try again or enter your actual name:`;
+          this.appendMessage('bot', failMsg);
+          this.history.push({ role: 'assistant', content: failMsg });
+          this.saveHistory();
+          return;
+        } else if (this.bossAttempts === 2) {
+          const failMsg = `❌ **Incorrect Master Password (Attempt 2/3).** 1 attempt remaining. Please enter your Master Password or actual name:`;
+          this.appendMessage('bot', failMsg);
+          this.history.push({ role: 'assistant', content: failMsg });
+          this.saveHistory();
+          return;
+        } else {
+          this.bossAttempts = 0;
+          this.onboardingStep = 'ask_name';
+          const failMsg = `❌ **Maximum password attempts reached (3/3).** Boss access denied. Your device was NOT registered as Boss.\n\nPlease enter your actual name to explore as visitor:`;
+          this.appendMessage('bot', failMsg);
+          this.history.push({ role: 'assistant', content: failMsg });
+          this.saveHistory();
+          this.renderQuickChips(['⏩ Skip Intro']);
+          return;
+        }
       }
     }
 
@@ -526,6 +544,7 @@ export class Chatbot {
         }
 
         // Require password before granting Boss access or storing as Boss!
+        this.bossAttempts = 0;
         this.onboardingStep = 'ask_boss_password';
         const passPrompt = `🔒 **Master Boss Password Required**\n\nTo verify identity and claim Boss access, please enter your **Master Password**:`;
         this.appendMessage('bot', passPrompt);
