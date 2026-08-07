@@ -1092,8 +1092,8 @@ export class Home {
       );
 
       const isMaster = isBossDevice();
-      container.innerHTML = cleanReviews.map(r => {
-        const revId = r._id || r.id;
+      container.innerHTML = cleanReviews.map((r, idx) => {
+        const revId = r._id || r.id || `rev_${idx}_${Date.now()}`;
         return `
           <div class="rounded-xl border border-white/8 p-5 bg-white/3 space-y-3 relative group">
             <div class="flex justify-between items-start gap-2">
@@ -1103,8 +1103,8 @@ export class Home {
               </div>
               <div class="flex items-center gap-2">
                 <div class="flex gap-0.5 flex-shrink-0">${'<i class="fa-solid fa-star text-accent text-xs"></i>'.repeat(r.rating)}</div>
-                ${isMaster && revId ? `
-                  <button class="delete-review-btn text-rose-400/70 hover:text-rose-400 text-xs px-1.5 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 transition-colors" data-id="${revId}" title="Master Boss: Delete Review">
+                ${isMaster ? `
+                  <button class="delete-review-btn text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-500/15 border border-rose-500/30 transition-all hover:scale-105 shrink-0" data-index="${idx}" data-id="${revId}" title="Master Boss: Delete Review">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
                 ` : ''}
@@ -1121,14 +1121,27 @@ export class Home {
           btn.addEventListener('click', async (e) => {
             e.preventDefault();
             const id = btn.dataset.id;
-            if (!id) return;
-            if (confirm('Master Boss: Permanently delete this review from database?')) {
+            const idx = parseInt(btn.dataset.index, 10);
+            if (confirm('Master Boss: Permanently delete this review from frontend & database?')) {
               try {
-                await fetch(`/api/reviews/${id}?password=${encodeURIComponent(getMasterPassword())}`, {
-                  method: 'DELETE',
-                  headers: { 'x-admin-key': getMasterPassword() }
-                });
+                // Update local storage review list
+                const localRevStr = localStorage.getItem('portfolioReviews');
+                if (localRevStr) {
+                  const localRevs = JSON.parse(localRevStr);
+                  localRevs.splice(idx, 1);
+                  localStorage.setItem('portfolioReviews', JSON.stringify(localRevs));
+                }
               } catch (err) {}
+
+              try {
+                if (id && !id.startsWith('rev_')) {
+                  await fetch(`/api/reviews/${id}?password=${encodeURIComponent(getMasterPassword())}`, {
+                    method: 'DELETE',
+                    headers: { 'x-admin-key': getMasterPassword() }
+                  });
+                }
+              } catch (err) {}
+
               renderReviewsList();
             }
           });

@@ -326,9 +326,9 @@ export class Chatbot {
         this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '' };
         this.saveProfile(this.userProfile);
       }
-      const bossWelcome = `👑 **Welcome Boss!** Master Admin mode is active on this device.\n\nYou have full access to live database analytics, review deletion, and master password management.`;
+      const bossWelcome = `👑 **Welcome Boss!** Master Admin mode is active on this device.\n\nDirect review deletion trash icons [🗑️] are unlocked for you on the portfolio home page.`;
       this.appendMessage('bot', bossWelcome);
-      this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+      this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
       return;
     }
 
@@ -406,11 +406,11 @@ export class Chatbot {
         this.updateHeaderProfileBadge();
         this.onboardingStep = null;
 
-        const bossReply = `👑 **Master Access Granted!** Welcome Boss.\n\nYour device is now authenticated as Master Owner. You can inspect live database analytics, delete reviews, or change your master password below.`;
+        const bossReply = `👑 **Master Access Granted!** Welcome Boss.\n\nYour device is now authenticated as Master Owner. Direct review deletion trash icons [🗑️] are now unlocked on the portfolio home page.`;
         this.appendMessage('bot', bossReply);
         this.history.push({ role: 'assistant', content: bossReply });
         this.saveHistory();
-        this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
         return;
       } else {
         this.bossAttempts = (this.bossAttempts || 0) + 1;
@@ -448,11 +448,11 @@ export class Chatbot {
         this.updateHeaderProfileBadge();
         this.onboardingStep = null;
 
-        const bossReply = `👑 **Master Access Granted!** Welcome Boss.\n\nYour device is authenticated as Master Owner. You can inspect live database analytics, delete reviews, or change your master password below.`;
+        const bossReply = `👑 **Master Access Granted!** Welcome Boss.\n\nYour device is authenticated as Master Owner. Direct review deletion trash icons [🗑️] are now unlocked on the portfolio home page.`;
         this.appendMessage('bot', bossReply);
         this.history.push({ role: 'assistant', content: bossReply });
         this.saveHistory();
-        this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
         return;
       }
     }
@@ -755,7 +755,7 @@ export class Chatbot {
     } finally {
       this.isTyping = false;
       if (isBossDevice()) {
-        this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
       } else {
         this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
       }
