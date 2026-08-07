@@ -427,6 +427,12 @@ html.noscroll, body.noscroll, .noscroll {
   transform: rotateY(180deg);
 }
 
+/* Premium micro-hover lift — applied on the OUTER card, not the inner 3D element */
+.flip-card:hover {
+  transform: translateY(-3px);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .flip-card-front,
 .flip-card-back {
   position: absolute;
@@ -783,14 +789,6 @@ html.noscroll, body.noscroll, .noscroll {
   height: 380px;
 }
 
-/* Premium micro-hover lift for project cards */
-.flip-card:not(.is-flipped):hover .flip-card-inner {
-  transform: translateY(-3px);
-}
-.flip-card.is-flipped .flip-card-inner {
-  transform: rotateY(180deg) translateY(-2px);
-}
-
 /* Smooth hover glow pulse on Featured cards */
 .flip-card-front.is-featured {
   box-shadow: 0 0 0 1px rgba(99,102,241,0.25), 0 8px 32px -8px rgba(99,102,241,0.2);
@@ -800,7 +798,7 @@ html.noscroll, body.noscroll, .noscroll {
   transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Upcoming card — pointer events on overlay only, not card */
-.flip-card:has([class*="blur-overlay"]) {
+/* Upcoming card — default cursor since no flip */
+.flip-card-upcoming {
   cursor: default;
 }

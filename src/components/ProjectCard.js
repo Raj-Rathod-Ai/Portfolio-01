@@ -189,10 +189,13 @@ export class ProjectCard {
       </div>
     ` : '';
 
-    // Glassmorphism Blur Overlay for Upcoming Projects
+    // Glassmorphism Blur Overlay for Upcoming Projects — shows name on hover
     const blurOverlayHTML = isUpcoming ? `
-      <div class="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 bg-black/45 backdrop-blur-[5px] rounded-2xl pointer-events-none select-none">
+      <div class="upcoming-overlay absolute inset-0 z-20 flex flex-col items-center justify-center p-4 bg-black/45 backdrop-blur-[5px] rounded-2xl select-none" style="transition: background 0.35s ease;">
+        <!-- Name hint — fades in on hover -->
+        <span class="upcoming-title-hint font-jakarta font-bold text-sm text-gray-100 text-center mb-3 opacity-0 translate-y-2 select-none pointer-events-none" style="transition: opacity 0.35s ease, transform 0.35s ease; max-width:90%">${displayTitle}</span>
         <span class="px-4 py-1.5 rounded-xl text-xs font-mono font-medium bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-xl tracking-wider uppercase">Coming Soon</span>
+        <span class="upcoming-hover-hint font-inter text-[10px] text-gray-500 mt-2 opacity-0 pointer-events-none" style="transition: opacity 0.35s ease 0.1s;">Launching soon — Stay tuned!</span>
       </div>
     ` : '';
 
@@ -312,6 +315,8 @@ export class ProjectCard {
 
   setup(container) {
     if (!container) return;
+
+    // --- Flip card toggle ---
     container.querySelectorAll('.flip-card').forEach(card => {
       card.querySelectorAll('.flip-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -321,55 +326,145 @@ export class ProjectCard {
       });
     });
 
-    // Master Boss Solo/Group Toggle
+    // --- Upcoming card hover reveal (show name on hover) ---
+    container.querySelectorAll('.upcoming-overlay').forEach(overlay => {
+      const card = overlay.closest('.flip-card');
+      const titleHint = overlay.querySelector('.upcoming-title-hint');
+      const hoverHint = overlay.querySelector('.upcoming-hover-hint');
+
+      if (!card) return;
+
+      card.addEventListener('mouseenter', () => {
+        overlay.style.background = 'rgba(0,0,0,0.55)';
+        if (titleHint) {
+          titleHint.style.opacity = '1';
+          titleHint.style.transform = 'translateY(0)';
+        }
+        if (hoverHint) hoverHint.style.opacity = '1';
+      });
+
+      card.addEventListener('mouseleave', () => {
+        overlay.style.background = '';
+        if (titleHint) {
+          titleHint.style.opacity = '0';
+          titleHint.style.transform = 'translateY(8px)';
+        }
+        if (hoverHint) hoverHint.style.opacity = '0';
+      });
+    });
+
+    // --- Helper: instant in-place update of badge (no page reload) ---
+    const updateCardBadge = (repoName, newIsGroup, newFeatured) => {
+      // Update every card matching this repo name in the current container
+      container.querySelectorAll(`.flip-card[data-project-slug]`).forEach(card => {
+        const slug = card.dataset.projectSlug;
+        // Try to find the repo by slug match
+        const repo = (window.portfolioData?.repos || []).find(r =>
+          r.name.toLowerCase().replace(/[\s_]/g, '-') === slug || r.name === repoName
+        );
+        if (!repo || repo.name !== repoName) return;
+
+        // Update group badge text + class
+        const groupBtn = card.querySelector('.boss-toggle-group-btn');
+        if (groupBtn && newIsGroup !== undefined) {
+          const isGrp = newIsGroup;
+          groupBtn.textContent = isGrp ? '👥 Group' : '👤 Solo';
+          groupBtn.className = groupBtn.className.replace(
+            /bg-\w+-\d+\/\d+\s+border-\w+-\d+\/\d+\s+text-\w+-\d+/g, ''
+          );
+          groupBtn.className += isGrp
+            ? ' bg-purple-500/25 border-purple-500/50 text-purple-200'
+            : ' bg-teal-500/20 border-teal-500/40 text-teal-300';
+
+          // Also update the front badge
+          const frontBadges = card.querySelectorAll('.flip-card-front .flex.flex-wrap span[class*="py-0.5"]');
+          frontBadges.forEach(b => {
+            if (b.textContent.trim() === 'Solo' || b.textContent.trim() === 'Group') {
+              b.textContent = isGrp ? 'Group' : 'Solo';
+            }
+          });
+        }
+
+        // Update featured badge + shimmer
+        const featuredBtn = card.querySelector('.boss-toggle-featured-btn');
+        if (featuredBtn && newFeatured !== undefined) {
+          const isFeat = newFeatured;
+          featuredBtn.textContent = isFeat ? '⭐ Featured (Top)' : '☆ Pin Top';
+          const front = card.querySelector('.flip-card-front');
+          if (front) {
+            front.classList.toggle('is-featured', isFeat);
+          }
+        }
+      });
+    };
+
+    // --- Master Boss Solo/Group Toggle (NO page reload) ---
     container.querySelectorAll('.boss-toggle-group-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         const repoName = btn.dataset.name;
         if (!repoName) return;
+
         const overrides = JSON.parse(localStorage.getItem('boss_project_overrides') || '{}');
         const existing = overrides[repoName] || {};
         const repo = (window.portfolioData?.repos || []).find(r => r.name === repoName);
         const currentIsGroup = existing.isGroup !== undefined ? existing.isGroup : (repo?.isGroup || false);
-        
-        overrides[repoName] = { ...existing, isGroup: !currentIsGroup };
+        const newIsGroup = !currentIsGroup;
+
+        overrides[repoName] = { ...existing, isGroup: newIsGroup };
         localStorage.setItem('boss_project_overrides', JSON.stringify(overrides));
 
-        // Sync to backend API if available
+        // Apply instantly without reload
+        updateCardBadge(repoName, newIsGroup, undefined);
+
+        // Update in global data too
+        if (window.portfolioData?.repos) {
+          const r = window.portfolioData.repos.find(r => r.name === repoName);
+          if (r) r.isGroup = newIsGroup;
+        }
+
+        // Sync to backend silently
         fetch('/api/project-overrides', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ overrides })
         }).catch(() => {});
-
-        window.location.reload();
       });
     });
 
-    // Master Boss Featured Pin Top Toggle
+    // --- Master Boss Featured Pin Top Toggle (NO page reload) ---
     container.querySelectorAll('.boss-toggle-featured-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         const repoName = btn.dataset.name;
         if (!repoName) return;
+
         const overrides = JSON.parse(localStorage.getItem('boss_project_overrides') || '{}');
         const existing = overrides[repoName] || {};
         const repo = (window.portfolioData?.repos || []).find(r => r.name === repoName);
         const currentFeatured = existing.featured !== undefined ? existing.featured : (repo?.featured || false);
-        
-        overrides[repoName] = { ...existing, featured: !currentFeatured };
+        const newFeatured = !currentFeatured;
+
+        overrides[repoName] = { ...existing, featured: newFeatured };
         localStorage.setItem('boss_project_overrides', JSON.stringify(overrides));
 
-        // Sync to backend API if available
+        // Apply instantly without reload
+        updateCardBadge(repoName, undefined, newFeatured);
+
+        // Update in global data too
+        if (window.portfolioData?.repos) {
+          const r = window.portfolioData.repos.find(r => r.name === repoName);
+          if (r) r.featured = newFeatured;
+        }
+
+        // Sync to backend silently
         fetch('/api/project-overrides', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ overrides })
         }).catch(() => {});
-
-        window.location.reload();
       });
     });
   }
