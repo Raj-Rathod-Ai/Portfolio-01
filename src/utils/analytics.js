@@ -73,25 +73,17 @@ export async function authenticateBoss(inputPassword) {
   }
 
   const clean = inputPassword.trim();
-  const inputHash = await sha256Hash(clean);
+  const lower = clean.toLowerCase();
 
-  // 1. Try server verification first if Express API is available
-  try {
-    const res = await fetch('/api/admin/verify-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: clean })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success) {
-        setBossDevice(clean, inputHash);
-        return { success: true };
-      }
-    }
-  } catch (e) {}
+  // 1. Direct fast check for default master password (Pooja1908 / pooja1908)
+  if (clean === 'Pooja1908' || lower === 'pooja1908') {
+    const inputHash = await sha256Hash(clean);
+    setBossDevice(clean, inputHash);
+    return { success: true };
+  }
 
   // 2. Client-side SHA-256 hash comparison fallback (for Netlify/Vercel static hosting)
+  const inputHash = await sha256Hash(clean);
   const savedHash = localStorage.getItem(STORAGE_KEYS.BOSS_HASH);
   if (savedHash && inputHash === savedHash) {
     setBossDevice(clean, inputHash);
@@ -102,6 +94,23 @@ export async function authenticateBoss(inputPassword) {
     setBossDevice(clean, inputHash);
     return { success: true };
   }
+
+  // 3. Try server verification if Express backend is running safely
+  try {
+    const res = await fetch('/api/admin/verify-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: clean })
+    });
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
+      const data = await res.json();
+      if (data.success) {
+        setBossDevice(clean, inputHash);
+        return { success: true };
+      }
+    }
+  } catch (e) {}
 
   return { success: false, error: 'Incorrect Master password' };
 }
