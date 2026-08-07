@@ -20,7 +20,7 @@ export class Chatbot {
     this.history = [];
     this.isTyping = false;
     this.userProfile = this.loadProfile();
-    this.onboardingStep = null; // null | 'ask_name' | 'ask_role' | 'ask_contact' | 'change_password_new'
+    this.onboardingStep = null; // null | 'ask_name' | 'ask_role' | 'ask_contact' | 'ask_boss_password' | 'change_password_new'
     this.tempProfile = {};
   }
 
@@ -394,7 +394,34 @@ export class Chatbot {
 
     const cleanInput = text.trim();
 
-    // --- Master Password Interception Check ---
+    // --- Master Password Verification Step (When Boss Name Claimed) ---
+    if (this.onboardingStep === 'ask_boss_password') {
+      this.appendMessage('user', text);
+      const authResult = await authenticateBoss(cleanInput);
+      if (authResult.success) {
+        this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '' };
+        this.saveProfile(this.userProfile);
+        this.updateHeaderProfileBadge();
+        this.onboardingStep = null;
+
+        const bossReply = `👑 **Master Access Granted!** Welcome Boss.\n\nYour device is now authenticated as Master Owner. You can inspect live database analytics, delete reviews, or change your master password below.`;
+        this.appendMessage('bot', bossReply);
+        this.history.push({ role: 'assistant', content: bossReply });
+        this.saveHistory();
+        this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+        return;
+      } else {
+        this.onboardingStep = 'ask_name';
+        const failMsg = `❌ **Incorrect Master Password.** Access denied. Your device was NOT registered as Boss.\n\nPlease enter your actual name to explore as visitor:`;
+        this.appendMessage('bot', failMsg);
+        this.history.push({ role: 'assistant', content: failMsg });
+        this.saveHistory();
+        this.renderQuickChips(['⏩ Skip Intro']);
+        return;
+      }
+    }
+
+    // --- Direct Master Password Interception ---
     if (cleanInput === getMasterPassword() || cleanInput === 'pooja1908') {
       const authResult = await authenticateBoss(cleanInput);
       if (authResult.success) {
@@ -478,6 +505,30 @@ export class Chatbot {
         this.history.push({ role: 'assistant', content: reply });
         this.saveHistory();
         this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+        return;
+      }
+
+      // Check if user claims "Boss" or "Raj Rathod"
+      const lowerName = cleanInput.toLowerCase();
+      if (lowerName === 'boss' || lowerName === 'raj rathod') {
+        if (isBossDevice()) {
+          this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '' };
+          this.saveProfile(this.userProfile);
+          this.updateHeaderProfileBadge();
+          this.onboardingStep = null;
+
+          const bossReply = `👑 **Welcome Boss!** Master Admin mode active.\n\nHow can I help you manage or showcase Raj's portfolio today?`;
+          this.appendMessage('bot', bossReply);
+          this.history.push({ role: 'assistant', content: bossReply });
+          this.saveHistory();
+          this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+          return;
+        }
+
+        // Require password before granting Boss access or storing as Boss!
+        this.onboardingStep = 'ask_boss_password';
+        const passPrompt = `🔒 **Master Boss Password Required**\n\nTo verify identity and claim Boss access, please enter your **Master Password**:`;
+        this.appendMessage('bot', passPrompt);
         return;
       }
 
