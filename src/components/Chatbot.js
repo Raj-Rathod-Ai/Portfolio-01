@@ -97,6 +97,36 @@ export class Chatbot {
 
   /**
    * Reset visitor profile and chat history.
+  /**
+   * Reset ONLY chat history — keeps visitor name/profile intact.
+   * Asks if user wants to change their name after reset.
+   */
+  resetChatOnly() {
+    // Only clear the chat messages, NOT the profile
+    localStorage.removeItem(STORAGE_KEY_HISTORY);
+    this.history = [];
+    this.onboardingStep = null;
+    this.tempProfile = {};
+
+    const container = document.getElementById('chatbot-messages');
+    if (container) container.innerHTML = '';
+    
+    this.updateHeaderProfileBadge();
+
+    // After clearing, ask if they want to change their name
+    const name = this.userProfile?.name;
+    if (name && !isBossDevice()) {
+      setTimeout(() => {
+        this.appendMessage('bot', `Chat cleared! 🗑️\n\nYour profile name is still saved as **${name}**.\n\nWould you like to **change your name** or continue as **${name}**?`);
+        this.renderQuickChips([`Continue as ${name}`, 'Change My Name', '🚀 Latest Project']);
+      }, 100);
+    } else {
+      this.startConversation();
+    }
+  }
+
+  /**
+   * Full reset of profile and chat (admin/boss use).
    */
   resetProfileAndHistory() {
     localStorage.removeItem(STORAGE_KEY_PROFILE);
@@ -233,8 +263,8 @@ export class Chatbot {
     toggleBtn.addEventListener('click', () => toggleChat());
     closeBtn?.addEventListener('click', () => toggleChat(false));
     resetBtn?.addEventListener('click', () => {
-      if (confirm('Reset chatbot history and visitor profile?')) {
-        this.resetProfileAndHistory();
+      if (confirm('Reset chat? Your name will be kept, only messages are cleared.')) {
+        this.resetChatOnly();
       }
     });
 
@@ -394,6 +424,35 @@ export class Chatbot {
     this.clearQuickChips();
 
     const cleanInput = text.trim();
+
+    // --- Post-Reset Name Choice Handler ---
+    // Handles "Continue as [name]" and "Change My Name" chips
+    const continuePfx = 'continue as ';
+    if (cleanInput.toLowerCase().startsWith(continuePfx)) {
+      // User wants to keep their name — just resume
+      this.appendMessage('user', text);
+      const reply = `Welcome back, **${this.userProfile?.name}**! 👋 Happy to continue. Ask me anything about Raj's portfolio!`;
+      this.appendMessage('bot', reply);
+      this.history.push({ role: 'user', content: text }, { role: 'assistant', content: reply });
+      this.saveHistory();
+      this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      return;
+    }
+
+    if (cleanInput.toLowerCase() === 'change my name') {
+      this.appendMessage('user', text);
+      // Wipe the old name from profile but keep role/contact
+      const oldProfile = { ...(this.userProfile || {}) };
+      delete oldProfile.name;
+      this.userProfile = oldProfile;
+      this.saveProfile(this.userProfile);
+      this.onboardingStep = 'ask_name';
+      const prompt = `Sure! What would you like to be called? Please enter your name:`;
+      this.appendMessage('bot', prompt);
+      this.history.push({ role: 'user', content: text }, { role: 'assistant', content: prompt });
+      this.saveHistory();
+      return;
+    }
 
     // --- Master Password Verification Step (When Boss Name Claimed) ---
     if (this.onboardingStep === 'ask_boss_password') {
@@ -1070,7 +1129,8 @@ CRITICAL INSTRUCTIONS:
     }
 
     container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
+    // Smooth auto-scroll to the newest message
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   }
 
   /**
@@ -1095,7 +1155,8 @@ CRITICAL INSTRUCTIONS:
       </div>
     `;
     container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
+    // Smooth auto-scroll to typing indicator
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
     return id;
   }
 

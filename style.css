@@ -422,15 +422,16 @@ html.noscroll, body.noscroll, .noscroll {
   will-change: transform;
 }
 
-/* Desktop: flip ONLY via .is-flipped */
+/* Desktop: flip ONLY via .is-flipped — explicit 0.65s flip, no Y-offset */
 .flip-card.is-flipped .flip-card-inner {
   transform: rotateY(180deg);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Premium micro-hover lift — applied on the OUTER card, not the inner 3D element */
-.flip-card:hover {
-  transform: translateY(-3px);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+/* Hover lift — on inner, only when NOT flipped. Fast 0.3s lift, no rotateY */
+.flip-card:not(.is-flipped):hover .flip-card-inner {
+  transform: translateY(-4px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .flip-card-front,
