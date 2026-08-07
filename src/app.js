@@ -308,6 +308,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Failed to load local projects metadata:', err.message);
   }
 
+  // Load global database project overrides if backend connected
+  try {
+    const overrideRes = await fetch('/api/project-overrides');
+    if (overrideRes.ok && overrideRes.headers.get('content-type')?.includes('application/json')) {
+      const data = await overrideRes.json();
+      if (data && data.overrides && Object.keys(data.overrides).length > 0) {
+        localStorage.setItem('boss_project_overrides', JSON.stringify(data.overrides));
+      }
+    }
+  } catch (err) {}
+
   try {
     const githubRepos = await fetchGitHubRepositories();
     // Merge database categories, types, and featured overrides

@@ -226,6 +226,43 @@ app.get('/api/reviews', async (req, res) => {
   }
 });
 
+// GET /api/project-overrides - Retrieve global project overrides (Solo/Group & Featured top pins)
+app.get('/api/project-overrides', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const setting = await AdminSetting.findOne({ key: 'boss_project_overrides' });
+      if (setting && setting.value) {
+        return res.json({ overrides: setting.value });
+      }
+    }
+    res.json({ overrides: {} });
+  } catch (err) {
+    res.json({ overrides: {} });
+  }
+});
+
+// POST /api/project-overrides - Update global project overrides (Boss only)
+app.post('/api/project-overrides', async (req, res) => {
+  try {
+    const { overrides } = req.body;
+    if (!overrides || typeof overrides !== 'object') {
+      return res.status(400).json({ error: 'Invalid overrides dataset.' });
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      await AdminSetting.findOneAndUpdate(
+        { key: 'boss_project_overrides' },
+        { value: overrides, updatedAt: new Date() },
+        { upsert: true, new: true }
+      );
+      return res.json({ success: true, message: 'Global project overrides synced successfully.' });
+    }
+    res.json({ success: true, message: 'Saved.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/reviews - Add a new review with profanity check
 app.post('/api/reviews', async (req, res) => {
   try {

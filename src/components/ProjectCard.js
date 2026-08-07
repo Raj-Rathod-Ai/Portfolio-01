@@ -301,4 +301,16 @@ export class ProjectCard {
     </div>
     `;
   }
+
+  setup(container) {
+    if (!container) return;
+    container.querySelectorAll('.flip-card').forEach(card => {
+      card.querySelectorAll('.flip-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          card.classList.toggle('is-flipped');
+        });
+      });
+    });
+  }
 }
