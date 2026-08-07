@@ -1,4 +1,5 @@
 import { getLiveUrl, formatDate, slugify } from '../utils/helpers.js';
+import { isBossDevice } from '../utils/analytics.js';
 
 /* ── Badge CSS class lookup ──────────────────────────────────── */
 const CAT_BADGE = {
@@ -178,6 +179,21 @@ export class ProjectCard {
          </a>
          ${liveBtnHTML}`;
 
+    const isMaster = isBossDevice();
+    const masterControlsHTML = isMaster ? `
+      <div class="flex items-center justify-between gap-1.5 pt-2 border-t border-amber-500/20 bg-amber-950/20 -mx-5 -mb-2 px-5 py-1.5 mt-2">
+        <span class="text-[8px] font-mono text-amber-400 font-bold tracking-wider">👑 MASTER:</span>
+        <div class="flex items-center gap-1">
+          <button type="button" class="boss-toggle-group-btn px-2 py-0.5 rounded text-[9px] font-mono border transition-all hover:scale-105 ${isGroup ? 'bg-purple-500/25 border-purple-500/50 text-purple-200' : 'bg-teal-500/20 border-teal-500/40 text-teal-300'}" data-name="${repo.name}">
+            ${isGroup ? '👥 Group' : '👤 Solo'}
+          </button>
+          <button type="button" class="boss-toggle-featured-btn px-2 py-0.5 rounded text-[9px] font-mono border transition-all hover:scale-105 ${isFeatured ? 'bg-amber-500/30 border-amber-500/60 text-amber-200 font-bold' : 'bg-white/5 border-white/10 text-gray-400'}" data-name="${repo.name}">
+            ${isFeatured ? '⭐ Featured (Top)' : '☆ Pin Top'}
+          </button>
+        </div>
+      </div>
+    ` : '';
+
     return `
     <div class="flip-card scroll-reveal reveal-zoom-fade stagger-${staggerN}" data-project-slug="${slug}">
       <div class="flip-card-inner">
@@ -195,7 +211,6 @@ export class ProjectCard {
                 <i class="fa-solid ${isUpcoming ? 'fa-lock text-amber-400' : `${iconData.icon} ${iconData.color}`} text-base"></i>
               </div>
               <div class="flex-1 min-w-0">
-                ${numberBadge}
                 <h3 class="font-jakarta font-bold text-sm text-gray-100 leading-tight line-clamp-2" title="${displayTitle}">${displayTitle}</h3>
                 <div class="flex items-center gap-1.5 mt-1 flex-wrap">
                   ${starsHTML}
@@ -222,6 +237,7 @@ export class ProjectCard {
             <div class="flex items-center gap-2 pt-2 border-t" style="border-color:rgba(255,255,255,0.05)">
               ${actionBtnsHTML}
             </div>
+            ${masterControlsHTML}
           </div>
         </div>
 

@@ -234,8 +234,7 @@ const DETECTION_RULES = [
 export const UPCOMING_PROJECTS = [
   {
     name: 'AI-Powered-Discord-Assistant',
-    displayTitle: 'AI POWERED DISCORD ASSISTANT',
-    numberBadge: '01',
+    displayTitle: 'AI Powered Discord Assistant',
     html_url: '#',
     description: 'The AI-Powered Discord Server Assistant is a next-generation project that brings the power of Generative AI directly into a Discord environment — transforming the platform into an intelligent, multimodal assistant hub.',
     category: 'Generative AI',
@@ -250,8 +249,7 @@ export const UPCOMING_PROJECTS = [
   },
   {
     name: 'AI-Code-Reviewer',
-    displayTitle: 'AI CODE REVIEWER',
-    numberBadge: '02',
+    displayTitle: 'AI Code Reviewer',
     html_url: '#',
     description: 'The AI Developer Code Reviewer is an automated system that reviews code using AI-powered multi-agent analysis.',
     category: 'Generative AI',
@@ -266,8 +264,7 @@ export const UPCOMING_PROJECTS = [
   },
   {
     name: 'AI-News-Research-Curation',
-    displayTitle: 'AI NEWS RESEARCH & CURATION',
-    numberBadge: '03',
+    displayTitle: 'AI News Research & Curation',
     html_url: '#',
     description: 'The Automated News Research and Curation system aggregates daily updates from sources like Netflix Developer Blog, GitHub Blogs, and Daily.dev using their RSS or API feeds.',
     category: 'RAG',

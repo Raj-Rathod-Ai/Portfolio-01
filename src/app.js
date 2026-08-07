@@ -13,6 +13,34 @@ const navbar = new Navbar();
 const footer = new Footer();
 const chatbot = new Chatbot();
 
+export function applyBossOverrides(reposList) {
+  try {
+    const raw = localStorage.getItem('boss_project_overrides');
+    if (!raw) return reposList;
+    const overrides = JSON.parse(raw);
+    return reposList.map(r => {
+      const match = overrides[r.name] || overrides[r.name.toLowerCase()];
+      if (match) {
+        return {
+          ...r,
+          isGroup: typeof match.isGroup === 'boolean' ? match.isGroup : r.isGroup,
+          featured: typeof match.featured === 'boolean' ? match.featured : r.featured
+        };
+      }
+      return r;
+    });
+  } catch (e) {
+    return reposList;
+  }
+}
+
+export function sortReposWithFeaturedTop(reposList) {
+  const overridesApplied = applyBossOverrides(reposList);
+  const featured = overridesApplied.filter(r => r.featured);
+  const nonFeatured = overridesApplied.filter(r => !r.featured);
+  return [...featured, ...nonFeatured];
+}
+
 /**
  * Initialize HTML5 Canvas backdrop node-vertex particles animation.
  */
@@ -307,13 +335,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         repos.unshift(up);
       }
     });
+    });
   } catch (err) {
     console.error('Failed fetching repository datasets:', err.message);
     repos = [...UPCOMING_PROJECTS];
   }
 
+  // Apply Master Boss overrides & pin Featured projects on top
+  const finalRepos = sortReposWithFeaturedTop(repos);
+
   // Save merged state globally for router access
-  window.portfolioData = { repos, meta };
+  window.portfolioData = { repos: finalRepos, meta };
 
   // Trigger preloader and start routing on completion
   initPreloader(() => {
