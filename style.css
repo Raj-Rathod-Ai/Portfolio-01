@@ -24,8 +24,9 @@ body {
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-.noscroll {
-  overflow: hidden;
+html.noscroll, body.noscroll, .noscroll {
+  overflow: hidden !important;
+  touch-action: none;
 }
 
 /* ===== SCROLLBAR ===== */

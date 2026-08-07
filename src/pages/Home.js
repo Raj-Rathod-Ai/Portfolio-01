@@ -866,9 +866,19 @@ export class Home {
 
     fetchGitHubData();
 
-    // 4. Modal Handlers
+    // 4. Modal Handlers (Root Body Mounting & Viewport Scroll Locking)
     const modal = document.getElementById('transmission-modal');
     const modalCloseBtn = document.getElementById('transmission-close-btn');
+    const certModal = document.getElementById('cert-modal');
+    const certCloseBtn = document.getElementById('cert-modal-close-btn');
+
+    // Mount modals directly to body root to prevent CSS transform displacement
+    if (modal && modal.parentElement !== document.body) {
+      document.body.appendChild(modal);
+    }
+    if (certModal && certModal.parentElement !== document.body) {
+      document.body.appendChild(certModal);
+    }
 
     const showModal = (type, title, desc) => {
       const iconContainer = document.getElementById('transmission-icon-container');
@@ -883,12 +893,17 @@ export class Home {
       }
       if (titleEl) titleEl.textContent = title;
       if (descEl) descEl.textContent = desc;
+
+      document.documentElement.classList.add('noscroll');
+      document.body.classList.add('noscroll');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     };
 
     const closeModal = () => {
       if (modal) {
+        document.documentElement.classList.remove('noscroll');
+        document.body.classList.remove('noscroll');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
       }
@@ -904,16 +919,11 @@ export class Home {
       });
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
-    });
-
     // 4.1 Certificate Preview Modal Handlers
-    const certModal = document.getElementById('cert-modal');
-    const certCloseBtn = document.getElementById('cert-modal-close-btn');
-
     const closeCertModal = () => {
       if (certModal) {
+        document.documentElement.classList.remove('noscroll');
+        document.body.classList.remove('noscroll');
         certModal.classList.add('hidden');
         certModal.classList.remove('flex');
         const bodyEl = document.getElementById('cert-modal-body');
@@ -929,7 +939,10 @@ export class Home {
     }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeCertModal();
+      if (e.key === 'Escape') {
+        closeModal();
+        closeCertModal();
+      }
     });
 
     document.querySelectorAll('.cert-preview-btn').forEach(btn => {
@@ -993,6 +1006,8 @@ export class Home {
         }
 
         if (certModal) {
+          document.documentElement.classList.add('noscroll');
+          document.body.classList.add('noscroll');
           certModal.classList.remove('hidden');
           certModal.classList.add('flex');
         }
