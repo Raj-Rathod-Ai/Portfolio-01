@@ -968,6 +968,13 @@ export class Home {
         
         overrides[repoName] = { ...existing, isGroup: !currentIsGroup };
         localStorage.setItem('boss_project_overrides', JSON.stringify(overrides));
+
+        // Sync to backend database
+        fetch('/api/project-overrides', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ overrides })
+        }).catch(() => {});
         
         window.location.reload();
       });
@@ -986,6 +993,13 @@ export class Home {
         
         overrides[repoName] = { ...existing, featured: !currentFeatured };
         localStorage.setItem('boss_project_overrides', JSON.stringify(overrides));
+
+        // Sync to backend database
+        fetch('/api/project-overrides', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ overrides })
+        }).catch(() => {});
         
         window.location.reload();
       });

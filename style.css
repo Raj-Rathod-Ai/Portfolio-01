@@ -11,8 +11,19 @@
 
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; — Lenis handles this */
   overflow-x: hidden;
+}
+
+/* Lenis smooth scroll integration */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
@@ -175,29 +186,33 @@ html.noscroll, body.noscroll, .noscroll {
 
 /* ===== UNIQUE SCROLL ANIMATIONS FOR EVERY SECTION ===== */
 
-/* Base transition parameters */
+/* Base transition parameters — ultra smooth spring easing */
 .scroll-reveal {
   opacity: 0;
-  filter: blur(12px);
+  filter: blur(6px);
   will-change: transform, opacity, filter;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
-              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), 
+              filter 0.7s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.scroll-reveal.active {
+  filter: blur(0) !important;
+  opacity: 1 !important;
 }
 
 /* Delay modifiers */
-.delay-100 { transition-delay: 0.1s; }
-.delay-200 { transition-delay: 0.2s; }
-.delay-300 { transition-delay: 0.3s; }
+.delay-100 { transition-delay: 0.05s; }
+.delay-200 { transition-delay: 0.12s; }
+.delay-300 { transition-delay: 0.2s; }
 
 /* 1. Zoom Fade (Hero / Reviews / Stats) */
 .reveal-zoom-fade {
-  transform: scale(0.92);
+  transform: scale(0.94) translateY(8px);
 }
 .reveal-zoom-fade.active {
   opacity: 1;
   filter: blur(0);
-  transform: scale(1);
+  transform: scale(1) translateY(0);
 }
 
 /* 2. Slide Left (About / Info) */
@@ -394,7 +409,7 @@ html.noscroll, body.noscroll, .noscroll {
 /* --- 3D Flip Card Container --- */
 .flip-card {
   perspective: 1200px;
-  height: 380px;
+  height: 360px;
   cursor: pointer;
 }
 
@@ -756,4 +771,36 @@ html.noscroll, body.noscroll, .noscroll {
     -webkit-backdrop-filter: none !important;
     background: rgba(22,27,34,0.97) !important;
   }
+
+  /* Adjust card height for boss control panel on mobile */
+  .flip-card {
+    height: 380px !important;
+  }
+}
+
+/* When master panel is shown, expand card to fit controls */
+.flip-card:has(.boss-toggle-group-btn) {
+  height: 380px;
+}
+
+/* Premium micro-hover lift for project cards */
+.flip-card:not(.is-flipped):hover .flip-card-inner {
+  transform: translateY(-3px);
+}
+.flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg) translateY(-2px);
+}
+
+/* Smooth hover glow pulse on Featured cards */
+.flip-card-front.is-featured {
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.25), 0 8px 32px -8px rgba(99,102,241,0.2);
+}
+.flip-card:hover .flip-card-front.is-featured {
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.4), 0 16px 48px -8px rgba(99,102,241,0.35);
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Upcoming card — pointer events on overlay only, not card */
+.flip-card:has([class*="blur-overlay"]) {
+  cursor: default;
 }

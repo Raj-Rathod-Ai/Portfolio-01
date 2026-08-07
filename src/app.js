@@ -209,15 +209,20 @@ function initIntersectionObservers() {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('active');
-      } else {
-        entry.target.classList.remove('active'); // Re-trigger on scroll back
       }
+      // Do NOT remove 'active' so cards stay revealed once seen
     });
-  }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+  }, { threshold: 0.03, rootMargin: '0px 0px -30px 0px' });
 
   window.initializeObservers = () => {
     document.querySelectorAll('.scroll-reveal').forEach(el => {
-      revealObserver.observe(el);
+      // If already in viewport on mount, immediately activate
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('active');
+      } else {
+        revealObserver.observe(el);
+      }
     });
   };
 
