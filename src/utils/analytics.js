@@ -19,11 +19,17 @@ const STORAGE_KEYS = {
  */
 export function isBossDevice() {
   try {
+    // URL trigger fallback (e.g. portfolio.com/?boss=true or #boss)
+    if (window.location.search.includes('boss=true') || window.location.hash.includes('boss')) {
+      setBossDevice();
+      return true;
+    }
+
     if (localStorage.getItem(STORAGE_KEYS.BOSS_MASTER) === 'true') return true;
     const profile = getVisitorProfile();
     if (profile && profile.name) {
       const lower = profile.name.trim().toLowerCase();
-      if (lower === 'boss' || lower === 'raj rathod' || lower === 'raj') {
+      if (lower === 'boss' || lower === 'raj rathod') {
         localStorage.setItem(STORAGE_KEYS.BOSS_MASTER, 'true');
         return true;
       }
@@ -38,6 +44,25 @@ export function isBossDevice() {
 export function setBossDevice() {
   try {
     localStorage.setItem(STORAGE_KEYS.BOSS_MASTER, 'true');
+    const existing = getVisitorProfile() || {};
+    existing.name = 'Boss';
+    existing.role = 'Portfolio Owner/Master';
+    existing.isStudent = false;
+    existing.updatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEYS.RUDRA_PROFILE, JSON.stringify(existing));
+
+    const visitorId = getVisitorId();
+    fetch('/api/analytics/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        visitorId,
+        name: 'Boss',
+        role: 'Portfolio Owner/Master',
+        isStudent: false,
+        contactDetails: 'Portfolio Owner'
+      })
+    }).catch(() => {});
   } catch (e) {}
 }
 
@@ -92,6 +117,7 @@ export function getVisitorId() {
  */
 export function hasVisitorName() {
   try {
+    if (isBossDevice()) return true;
     const raw = localStorage.getItem(STORAGE_KEYS.RUDRA_PROFILE);
     if (!raw) return false;
     const profile = JSON.parse(raw);
@@ -124,9 +150,10 @@ export function setVisitorName(name, source = 'review') {
   const cleanName = name.trim();
   if (!cleanName) return;
 
-  // Auto tag Boss device if user enters Boss
+  // Auto tag Boss device if user enters Boss or Raj Rathod
   if (cleanName.toLowerCase() === 'boss' || cleanName.toLowerCase() === 'raj rathod') {
     setBossDevice();
+    return;
   }
 
   let profile = getVisitorProfile() || {};
