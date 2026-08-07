@@ -181,11 +181,6 @@ const DETECTION_RULES = [
     keywords: ['generative ai', 'genai', 'llm', 'openai', 'prompt engineering', 'gpt', 'gemini', 'langchain', 'mistral', 'ollama', 'fine-tun']
   },
   {
-    category: 'Full Stack',
-    topics: ['fullstack', 'full-stack', 'react', 'node', 'express', 'vue', 'angular', 'nextjs', 'mongodb', 'management-system', 'web-app'],
-    keywords: ['full stack', 'fullstack', 'management system', 'web application', 'react node', 'express app']
-  },
-  {
     category: 'Deep Learning',
     topics: ['deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer', 'flower-disease', 'leaf-disease'],
     keywords: ['deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras', 'flower disease']
@@ -197,8 +192,8 @@ const DETECTION_RULES = [
   },
   {
     category: 'Machine Learning',
-    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality'],
-    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time']
+    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality', 'salary', 'salary-prediction'],
+    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time', 'salary']
   },
   {
     category: 'Data Science',
@@ -218,48 +213,74 @@ const DETECTION_RULES = [
   {
     category: 'MLOps',
     topics: ['mlops', 'dvc', 'mlflow', 'ci-cd', 'docker', 'kubernetes', 'pipeline', 'model-deployment'],
-    keywords: ['mlops', 'ml pipelines', 'mlflow', 'model deploy', 'ci/cd']
-  },
-  {
-    category: 'Python Concepts',
-    topics: ['python-game', 'python-basics', 'basics', 'beginner', 'python-practice', 'python-script', 'python-projects'],
-    keywords: ['python game', 'python basic', 'stone paper', 'calculator', 'number guess', 'hangman', 'snake game', 'tic tac']
-  },
-  {
-    category: 'Java Projects',
-    topics: ['java', 'spring-boot', 'maven', 'gradle', 'java-oop'],
-    keywords: []
-  },
-  {
-    category: 'C Programming',
-    topics: ['c-programming', 'c-language', 'pointers', 'data-structures-c'],
-    keywords: []
-  },
-  {
-    category: 'JavaScript Projects',
-    topics: ['javascript', 'nodejs', 'react', 'vue', 'angular', 'express', 'nextjs', 'typescript'],
-    keywords: []
-  },
-  {
-    category: 'Automation',
-    topics: ['automation', 'bot', 'scraper', 'selenium', 'playwright', 'puppeteer', 'scheduled', 'cron'],
-    keywords: ['automation', 'web scraper', 'selenium', 'playwright', 'puppeteer', 'bot']
-  },
-  {
-    category: 'Tools',
-    topics: ['cli', 'tool', 'converter', 'utility', 'productivity'],
-    keywords: ['cli tool', 'converter', 'productivity']
+    keywords: ['mlops', 'model deployment', 'mlflow', 'ci cd']
   },
   {
     category: 'Normal Projects',
-    topics: ['web-development', 'web', 'html', 'css', 'management-system', 'web-app', 'database', 'oop'],
-    keywords: ['website', 'management system', 'portfolio', 'creative coding']
+    topics: ['web-development', 'web', 'html', 'css', 'database', 'oop'],
+    keywords: ['website', 'portfolio', 'creative coding']
+  }
+];
+
+/**
+ * Static Upcoming Projects list provided by Raj Rathod.
+ * Automatically replaced when uploaded to GitHub.
+ */
+export const UPCOMING_PROJECTS = [
+  {
+    name: 'AI-Powered-Discord-Assistant',
+    displayTitle: 'AI POWERED DISCORD ASSISTANT',
+    numberBadge: '01',
+    html_url: '#',
+    description: 'The AI-Powered Discord Server Assistant is a next-generation project that brings the power of Generative AI directly into a Discord environment — transforming the platform into an intelligent, multimodal assistant hub.',
+    category: 'Generative AI',
+    language: 'Python',
+    topics: ['discord-bot', 'genai', 'llm', 'multimodal', 'upcoming'],
+    stargazers_count: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    isUpcoming: true,
+    isLocked: true,
+    lockedMessage: '🔒 Coming Soon — Raj Rathod is actively building this project! Full code & live demo will auto-sync when uploaded to GitHub.'
+  },
+  {
+    name: 'AI-Code-Reviewer',
+    displayTitle: 'AI CODE REVIEWER',
+    numberBadge: '02',
+    html_url: '#',
+    description: 'The AI Developer Code Reviewer is an automated system that reviews code using AI-powered multi-agent analysis.',
+    category: 'Generative AI',
+    language: 'Python',
+    topics: ['code-reviewer', 'ai-agents', 'multi-agent', 'llm', 'upcoming'],
+    stargazers_count: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    isUpcoming: true,
+    isLocked: true,
+    lockedMessage: '🔒 Coming Soon — Raj Rathod is actively building this project! Full code & live demo will auto-sync when uploaded to GitHub.'
+  },
+  {
+    name: 'AI-News-Research-Curation',
+    displayTitle: 'AI NEWS RESEARCH & CURATION',
+    numberBadge: '03',
+    html_url: '#',
+    description: 'The Automated News Research and Curation system aggregates daily updates from sources like Netflix Developer Blog, GitHub Blogs, and Daily.dev using their RSS or API feeds.',
+    category: 'RAG',
+    language: 'Python',
+    topics: ['news-curation', 'rag', 'rss-parser', 'automation', 'upcoming'],
+    stargazers_count: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    isUpcoming: true,
+    isLocked: true,
+    lockedMessage: '🔒 Coming Soon — Raj Rathod is actively building this project! Full code & live demo will auto-sync when uploaded to GitHub.'
   }
 ];
 
 /**
  * Determine the single highest-priority category for a repo.
- * Priority order: projects.json override → RAG/GenAI/FullStack topic detection → keyword detection → Others
+ * Rule 1: Neuro OS is the ONLY project allowed in 'Full Stack'.
+ * Rule 2: Salary is explicitly 'Machine Learning'.
  *
  * @param {object} repo - GitHub repo object.
  * @param {Array}  localMetadata - Entries from projects.json.
@@ -272,9 +293,23 @@ export function getProjectCategory(repo, localMetadata = []) {
   const lang   = (repo.language    || '').toLowerCase();
   const combined = `${name} ${desc}`;
 
-  // 1. Explicit override in projects.json (must match a known priority name)
+  // Rule 1: Neuro OS is the ONLY project in Full Stack
+  if (name.includes('neuro-os') || name.includes('neuro_os') || name.includes('neuro os') || name.includes('nuero-os') || name.includes('nuero_os') || name.includes('nuero os')) {
+    return 'Full Stack';
+  }
+
+  // Rule 2: Salary prediction is explicitly Machine Learning
+  if (name.includes('salary') || combined.includes('salary')) {
+    return 'Machine Learning';
+  }
+
+  // 1. Explicit override in projects.json (except Full Stack if not neuro-os)
   const meta = localMetadata.find(m => m.repo.toLowerCase() === name);
   if (meta?.category) {
+    if (meta.category.toLowerCase() === 'full stack') {
+      // Ignore full stack unless neuro os
+      return 'Normal Projects';
+    }
     const match = CATEGORY_PRIORITY.find(k => k.toLowerCase() === meta.category.toLowerCase());
     if (match) return match;
   }
@@ -286,28 +321,21 @@ export function getProjectCategory(repo, localMetadata = []) {
 
   // 3. Walk detection rules in PRIORITY order — first match wins
   for (const rule of DETECTION_RULES) {
-    // Check topics first (most reliable)
     if (rule.topics && rule.topics.some(t => topics.includes(t))) {
       return rule.category;
     }
-    // Check combined name+description keywords
     if (rule.keywords && rule.keywords.some(kw => combined.includes(kw))) {
       return rule.category;
     }
   }
 
-  // 4. Group Project Fallback → Full Stack
-  if (repo.isGroup || meta?.type === 'group') {
-    return 'Full Stack';
-  }
-
-  // 5. Language-based fallback
+  // 4. Language-based fallback
   if (lang === 'java')   return 'Java Projects';
   if (lang === 'c')      return 'C Programming';
   if (['javascript', 'typescript'].includes(lang)) return 'JavaScript Projects';
   if (lang === 'python') return 'Python Concepts';
 
-  return 'Others';
+  return 'Normal Projects';
 }
 
 /**
@@ -323,7 +351,6 @@ export function getCategoryDetails(categoryName) {
       ...CATEGORIES_CONFIG[categoryName]
     };
   }
-  // Dynamic fallback for any future custom category
   return {
     name: categoryName,
     slug: slugify(categoryName),

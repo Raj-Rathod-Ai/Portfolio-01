@@ -1,5 +1,5 @@
 import { fetchGitHubRepositories } from './api/github.js';
-import { getProjectCategory } from './utils/categorize.js';
+import { getProjectCategory, UPCOMING_PROJECTS } from './utils/categorize.js';
 import { isGroupProject } from './utils/helpers.js';
 import { initRouter } from './router.js';
 import { Navbar } from './components/Navbar.js';
@@ -295,8 +295,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         featured
       };
     });
+    // Merge upcoming projects (only if not already uploaded on GitHub)
+    UPCOMING_PROJECTS.forEach(up => {
+      const exists = repos.some(r => {
+        const rName = r.name.toLowerCase();
+        return rName.includes('discord') && up.name.toLowerCase().includes('discord') ||
+               rName.includes('reviewer') && up.name.toLowerCase().includes('reviewer') ||
+               rName.includes('news') && up.name.toLowerCase().includes('news');
+      });
+      if (!exists) {
+        repos.unshift(up);
+      }
+    });
   } catch (err) {
     console.error('Failed fetching repository datasets:', err.message);
+    repos = [...UPCOMING_PROJECTS];
   }
 
   // Save merged state globally for router access

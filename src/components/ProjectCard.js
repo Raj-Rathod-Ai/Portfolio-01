@@ -157,12 +157,33 @@ export class ProjectCard {
          </div>`
       : '';
 
+    const isUpcoming   = repo.isUpcoming || false;
+    const numberBadge  = repo.numberBadge ? `<span class="font-mono text-xs font-bold text-amber-400/80 mb-1 block">(${repo.numberBadge})</span>` : '';
+    const displayTitle = repo.displayTitle || title;
+
+    // Upcoming locked badges
+    const upcomingBadge = isUpcoming
+      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono border bg-amber-500/15 border-amber-500/30 text-amber-300 animate-pulse"><i class="fa-solid fa-lock text-[8px]"></i>Coming Soon</span>`
+      : '';
+
+    // Action buttons
+    const actionBtnsHTML = isUpcoming
+      ? `<button type="button" class="upcoming-lock-btn flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:scale-105 transition-all cursor-pointer" data-title="${displayTitle}">
+           <i class="fa-solid fa-lock text-[9px]"></i>🔒 Raj Working On It
+         </button>`
+      : `<a href="${repo.html_url}" target="_blank" rel="noopener"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all hover:scale-105 active:scale-95"
+            style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:#9ca3af">
+           <i class="fa-brands fa-github text-xs"></i>Code
+         </a>
+         ${liveBtnHTML}`;
+
     return `
     <div class="flip-card scroll-reveal reveal-zoom-fade stagger-${staggerN}" data-project-slug="${slug}">
       <div class="flip-card-inner">
 
         <!-- ===== FRONT ===== -->
-        <div class="flip-card-front ${isFeatured ? 'is-featured' : ''} p-5 flex flex-col justify-between">
+        <div class="flip-card-front ${isFeatured ? 'is-featured' : ''} ${isUpcoming ? 'border-amber-500/20 bg-amber-950/5' : ''} p-5 flex flex-col justify-between">
           <!-- Flip trigger button (top-right corner) -->
           <button class="flip-btn" title="See project details" aria-label="Flip card">
             <i class="fa-solid fa-rotate"></i>
@@ -171,13 +192,14 @@ export class ProjectCard {
           <div class="space-y-3">
             <div class="flex items-start justify-between gap-3">
               <div class="w-10 h-10 rounded-xl ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid ${iconData.icon} ${iconData.color} text-base"></i>
+                <i class="fa-solid ${isUpcoming ? 'fa-lock text-amber-400' : `${iconData.icon} ${iconData.color}`} text-base"></i>
               </div>
               <div class="flex-1 min-w-0">
-                <h3 class="font-jakarta font-bold text-sm text-gray-100 leading-tight line-clamp-2" title="${title}">${title}</h3>
+                ${numberBadge}
+                <h3 class="font-jakarta font-bold text-sm text-gray-100 leading-tight line-clamp-2" title="${displayTitle}">${displayTitle}</h3>
                 <div class="flex items-center gap-1.5 mt-1 flex-wrap">
                   ${starsHTML}
-                  <span class="text-[9px] font-mono text-gray-600">${lang} · ${updated}</span>
+                  <span class="text-[9px] font-mono text-gray-600">${lang} · ${isUpcoming ? 'In Progress' : updated}</span>
                 </div>
               </div>
             </div>
@@ -193,16 +215,12 @@ export class ProjectCard {
           <div class="space-y-3 mt-3">
             <div class="flex flex-wrap items-center gap-1.5">
               <span class="px-2 py-0.5 rounded-md text-[9px] font-mono border ${badgeClass}">${repo.category}</span>
+              ${upcomingBadge}
               ${groupBadge}
               ${featuredBadge}
             </div>
             <div class="flex items-center gap-2 pt-2 border-t" style="border-color:rgba(255,255,255,0.05)">
-              <a href="${repo.html_url}" target="_blank" rel="noopener"
-                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all hover:scale-105 active:scale-95"
-                 style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:#9ca3af">
-                <i class="fa-brands fa-github text-xs"></i>Code
-              </a>
-              ${liveBtnHTML}
+              ${actionBtnsHTML}
             </div>
           </div>
         </div>

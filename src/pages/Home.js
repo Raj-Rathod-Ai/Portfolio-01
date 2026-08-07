@@ -947,6 +947,14 @@ export class Home {
       }
     });
 
+    document.querySelectorAll('.upcoming-lock-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const title = btn.dataset.title || 'Upcoming Project';
+        showModal('info', `🔒 ${title}`, `Raj Rathod is actively developing this project! Full repository details, source code, and live preview links will automatically sync as soon as it is uploaded to GitHub.`);
+      });
+    });
+
     document.querySelectorAll('.cert-preview-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
