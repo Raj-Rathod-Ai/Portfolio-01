@@ -4,6 +4,7 @@ import { getLiveUrl, formatDate, slugify } from '../utils/helpers.js';
 const CAT_BADGE = {
   'Generative AI':    'cat-badge-genai',
   'RAG':              'cat-badge-rag',
+  'Full Stack':       'cat-badge-fullstack',
   'Deep Learning':    'cat-badge-dl',
   'NLP':              'cat-badge-nlp',
   'Machine Learning': 'cat-badge-ml',
@@ -19,6 +20,7 @@ const CAT_BADGE = {
 const CAT_ICON = {
   'Generative AI':    { icon: 'fa-wand-magic-sparkles', bg: 'bg-indigo-500/15',  border: 'border-indigo-500/25', color: 'text-indigo-400'  },
   'RAG':              { icon: 'fa-magnifying-glass-chart', bg: 'bg-rose-500/15', border: 'border-rose-500/25',   color: 'text-rose-400'    },
+  'Full Stack':       { icon: 'fa-layer-group',       bg: 'bg-emerald-500/15',   border: 'border-emerald-500/25',color: 'text-emerald-400' },
   'Deep Learning':    { icon: 'fa-brain',             bg: 'bg-teal-500/15',      border: 'border-teal-500/25',   color: 'text-teal-400'    },
   'NLP':              { icon: 'fa-language',          bg: 'bg-purple-500/15',    border: 'border-purple-500/25', color: 'text-purple-400'  },
   'Machine Learning': { icon: 'fa-chart-line',        bg: 'bg-blue-500/15',      border: 'border-blue-500/25',   color: 'text-blue-400'    },

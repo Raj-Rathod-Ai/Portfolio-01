@@ -2,7 +2,7 @@ import { Hero } from '../components/Hero.js';
 import { CategoryCard } from '../components/CategoryCard.js';
 import { getAllCategories } from '../utils/categorize.js';
 import { containsAbusiveContent } from '../utils/profanityFilter.js';
-import { setVisitorName, getVisitorId } from '../utils/analytics.js';
+import { setVisitorName, getVisitorId, validateVisitorName } from '../utils/analytics.js';
 
 
 
@@ -1118,6 +1118,18 @@ export class Home {
         const nameVal = document.getElementById('rev-name')?.value.trim();
         const reviewVal = document.getElementById('rev-comment')?.value.trim();
         const ratingVal = parseInt(document.getElementById('rev-rating')?.value || '5');
+
+        // Validate name to prevent unauthorized 3rd-party use of Raj or Boss title without surname
+        const nameValCheck = validateVisitorName(nameVal);
+        if (!nameValCheck.isValid) {
+          if (btn) { btn.textContent = 'Submit Review'; btn.disabled = false; }
+          showModal(
+            'error',
+            'Full Name Required',
+            nameValCheck.message || 'Please provide your full name / surname.'
+          );
+          return;
+        }
 
         // Check for profanity / abusive words / "gali"
         const nameCheck = containsAbusiveContent(nameVal);

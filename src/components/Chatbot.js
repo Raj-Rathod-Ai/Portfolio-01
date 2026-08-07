@@ -4,7 +4,7 @@
  * local storage chat memory, reviewer-name linking, and smart first-time suggestions.
  */
 
-import { getVisitorId, hasVisitorName, getVisitorProfile } from '../utils/analytics.js';
+import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName } from '../utils/analytics.js';
 
 // Dynamically read runtime client API key (decoded safely to avoid raw scanner triggers)
 const MISTRAL_KEY = atob('d0ZZZUhiSWtuNzdKWkdlcGhtMk13UzZSZldKNUxRQVI=');
@@ -312,6 +312,18 @@ export class Chatbot {
 
     container.innerHTML = '';
 
+    // Boss device recognition shortcut
+    if (isBossDevice()) {
+      if (!this.userProfile || !this.userProfile.name) {
+        this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '' };
+        this.saveProfile(this.userProfile);
+      }
+      const bossWelcome = `Hey Boss! 👋 Welcome back. All portfolio analytics and AI systems are active.\n\nHow can I assist you today?`;
+      this.appendMessage('bot', bossWelcome);
+      this.renderQuickChips(['🚀 Latest Project', '📊 Visitor Analytics', '🧠 NLP Projects']);
+      return;
+    }
+
     if (this.userProfile && this.userProfile.name) {
       // Returning user on same device! Restore past chat history or greeting
       if (this.history.length > 0) {
@@ -390,6 +402,30 @@ export class Chatbot {
         this.history.push({ role: 'assistant', content: reply });
         this.saveHistory();
         this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+        return;
+      }
+
+      // Name validation check for Raj surname and imposter check
+      const nameValidation = validateVisitorName(text);
+      if (!nameValidation.isValid) {
+        this.appendMessage('bot', nameValidation.message);
+        if (nameValidation.isRajFirstOnly) {
+          this.renderQuickChips(['Raj Rathod']);
+        }
+        return;
+      }
+
+      if (nameValidation.isBoss) {
+        this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '', createdAt: new Date().toISOString() };
+        this.saveProfile(this.userProfile);
+        this.updateHeaderProfileBadge();
+        this.onboardingStep = null;
+
+        const bossReply = `Welcome Boss! 👋 This device is now registered as Master.\n\nHow can I help you manage or showcase Raj's portfolio today?`;
+        this.appendMessage('bot', bossReply);
+        this.history.push({ role: 'assistant', content: bossReply });
+        this.saveHistory();
+        this.renderQuickChips(['🚀 Latest Project', '📊 Visitor Analytics', '🧠 NLP Projects']);
         return;
       }
 

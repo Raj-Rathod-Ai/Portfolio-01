@@ -1,7 +1,7 @@
 /**
  * Visitor Analytics & Silent Tracking Utility
  * Manages visitor identification, visit counters, page view history in localStorage,
- * link reviewer names to profiles, and syncs with backend database endpoints silently.
+ * Boss/Master device recognition, name spoofing validation, and database sync.
  */
 
 const STORAGE_KEYS = {
@@ -9,8 +9,69 @@ const STORAGE_KEYS = {
   VISIT_COUNT: 'raj_portfolio_visit_count',
   LAST_VISIT: 'raj_portfolio_last_visit',
   PAGE_VIEWS: 'raj_portfolio_page_views',
-  RUDRA_PROFILE: 'rudra_visitor_profile'
+  RUDRA_PROFILE: 'rudra_visitor_profile',
+  BOSS_MASTER: 'boss_master_device'
 };
+
+/**
+ * Check if the current device is registered as Boss/Master device.
+ * @returns {boolean} True if this device is authorized as Boss.
+ */
+export function isBossDevice() {
+  try {
+    if (localStorage.getItem(STORAGE_KEYS.BOSS_MASTER) === 'true') return true;
+    const profile = getVisitorProfile();
+    if (profile && profile.name) {
+      const lower = profile.name.trim().toLowerCase();
+      if (lower === 'boss' || lower === 'raj rathod' || lower === 'raj') {
+        localStorage.setItem(STORAGE_KEYS.BOSS_MASTER, 'true');
+        return true;
+      }
+    }
+  } catch (e) {}
+  return false;
+}
+
+/**
+ * Register current device as Boss/Master device permanently.
+ */
+export function setBossDevice() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.BOSS_MASTER, 'true');
+  } catch (e) {}
+}
+
+/**
+ * Validate input name to prevent imposter 3rd-party users from spoofing "Boss" or "Raj".
+ * @param {string} name - Input name string.
+ * @returns {object} { isValid: boolean, message: string|null }
+ */
+export function validateVisitorName(name) {
+  if (!name || typeof name !== 'string') {
+    return { isValid: false, message: 'Please enter a valid name.' };
+  }
+
+  const clean = name.trim().toLowerCase();
+  
+  // If user enters 'Raj' alone without surname
+  if (clean === 'raj') {
+    return {
+      isValid: false,
+      isRajFirstOnly: true,
+      message: 'Hi Raj! 👋 Please enter your full name / surname (e.g., Raj Rathod) to verify owner identity.'
+    };
+  }
+
+  const bossTitles = ['boss', 'raj rathod', 'owner', 'admin', 'master', 'portfolio owner'];
+
+  if (bossTitles.includes(clean)) {
+    // Register current device as Boss Master device permanently
+    setBossDevice();
+    return { isValid: true, isBoss: true, message: null };
+  }
+
+  return { isValid: true, message: null };
+}
 
 /**
  * Get or generate unique visitor ID for device recognition.
@@ -63,6 +124,11 @@ export function setVisitorName(name, source = 'review') {
   const cleanName = name.trim();
   if (!cleanName) return;
 
+  // Auto tag Boss device if user enters Boss
+  if (cleanName.toLowerCase() === 'boss' || cleanName.toLowerCase() === 'raj rathod') {
+    setBossDevice();
+  }
+
   let profile = getVisitorProfile() || {};
   profile.name = cleanName;
   profile.source = source;
@@ -81,7 +147,7 @@ export function setVisitorName(name, source = 'review') {
     body: JSON.stringify({
       visitorId,
       name: cleanName,
-      role: profile.role || 'Reviewer/Visitor',
+      role: profile.role || (isBossDevice() ? 'Boss/Owner' : 'Reviewer/Visitor'),
       isStudent: profile.isStudent || false,
       contactDetails: profile.contactDetails || ''
     })
@@ -140,7 +206,7 @@ export function trackVisit(path) {
 
     // Get visitor name if available
     const profile = getVisitorProfile();
-    const visitorName = profile?.name || null;
+    const visitorName = profile?.name || (isBossDevice() ? 'Boss' : null);
 
     // Async silent backend notification
     fetch('/api/analytics/visit', {

@@ -5,8 +5,9 @@ import { slugify } from './helpers.js';
  * The FIRST match in this list wins for any repo.
  */
 const CATEGORY_PRIORITY = [
-  'Generative AI',
   'RAG',
+  'Generative AI',
+  'Full Stack',
   'Deep Learning',
   'NLP',
   'Machine Learning',
@@ -29,6 +30,13 @@ const CATEGORY_PRIORITY = [
  * Visual config for each category: icon (Font Awesome), gradient, badge CSS class, description.
  */
 const CATEGORIES_CONFIG = {
+  'RAG': {
+    icon: 'fa-magnifying-glass-chart',
+    description: 'Retrieval-Augmented Generation, vector databases, and semantic search.',
+    gradient: 'from-rose-500 via-orange-500 to-pink-500',
+    glowColor: 'rgba(244,63,94,0.35)',
+    badgeClass: 'cat-badge-rag'
+  },
   'Generative AI': {
     icon: 'fa-wand-magic-sparkles',
     description: 'LLMs, prompt engineering, and GenAI application development.',
@@ -36,12 +44,12 @@ const CATEGORIES_CONFIG = {
     glowColor: 'rgba(99,102,241,0.35)',
     badgeClass: 'cat-badge-genai'
   },
-  'RAG': {
-    icon: 'fa-magnifying-glass-chart',
-    description: 'Retrieval-Augmented Generation, vector databases, and semantic search.',
-    gradient: 'from-rose-500 via-orange-500 to-pink-500',
-    glowColor: 'rgba(244,63,94,0.35)',
-    badgeClass: 'cat-badge-rag'
+  'Full Stack': {
+    icon: 'fa-layer-group',
+    description: 'Full-stack applications combining web development, APIs, and database engineering.',
+    gradient: 'from-emerald-500 via-teal-500 to-cyan-500',
+    glowColor: 'rgba(16,185,129,0.35)',
+    badgeClass: 'cat-badge-fullstack'
   },
   'Deep Learning': {
     icon: 'fa-brain',
@@ -94,7 +102,7 @@ const CATEGORIES_CONFIG = {
   },
   'Normal Projects': {
     icon: 'fa-folder-open',
-    description: 'Full-stack apps, management systems, and general software.',
+    description: 'Management systems, utility applications, and general software.',
     gradient: 'from-green-500 via-emerald-500 to-teal-500',
     glowColor: 'rgba(34,197,94,0.35)',
     badgeClass: 'cat-badge-normal'
@@ -163,29 +171,34 @@ const CATEGORIES_CONFIG = {
  */
 const DETECTION_RULES = [
   {
+    category: 'RAG',
+    topics: ['rag', 'chatnote', 'vector-database', 'vectordb', 'vector-search', 'pinecone', 'chroma', 'weaviate', 'faiss', 'qdrant', 'retrieval', 'embedding', 'document-qa', 'chat-pdf', 'pdf-chat', 'semantic-search'],
+    keywords: ['rag', 'chatnote', 'vector database', 'retrieval augmented', 'retrieval-augmented', 'pinecone', 'chromadb', 'weaviate', 'faiss', 'qdrant', 'semantic search', 'document qa', 'chat with pdf', 'chat pdf']
+  },
+  {
     category: 'Generative AI',
-    topics: ['generative-ai', 'genai', 'llm', 'openai', 'gemini', 'langchain', 'prompt-engineering', 'claude', 'gpt', 'mistral', 'ollama', 'huggingface', 'llama', 'anthropic'],
+    topics: ['generative-ai', 'genai', 'llm', 'openai', 'gemini', 'prompt-engineering', 'claude', 'gpt', 'mistral', 'ollama', 'huggingface', 'llama', 'anthropic'],
     keywords: ['generative ai', 'genai', 'llm', 'openai', 'prompt engineering', 'gpt', 'gemini', 'langchain', 'mistral', 'ollama', 'fine-tun']
   },
   {
-    category: 'RAG',
-    topics: ['rag', 'vector-database', 'vectordb', 'vector-search', 'pinecone', 'chroma', 'weaviate', 'faiss', 'retrieval'],
-    keywords: ['rag', 'vector database', 'retrieval augmented', 'retrieval-augmented', 'pinecone', 'chromadb', 'weaviate', 'faiss', 'semantic search']
+    category: 'Full Stack',
+    topics: ['fullstack', 'full-stack', 'react', 'node', 'express', 'vue', 'angular', 'nextjs', 'mongodb', 'management-system', 'web-app'],
+    keywords: ['full stack', 'fullstack', 'management system', 'web application', 'react node', 'express app']
   },
   {
     category: 'Deep Learning',
-    topics: ['deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer'],
-    keywords: ['deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras']
+    topics: ['deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer', 'flower-disease', 'leaf-disease'],
+    keywords: ['deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras', 'flower disease']
   },
   {
     category: 'NLP',
-    topics: ['nlp', 'text-mining', 'transformers', 'natural-language-processing', 'sentiment-analysis', 'text-classification', 'bert', 'word2vec'],
-    keywords: ['nlp', 'natural language', 'text class', 'sentiment', 'bert', 'word2vec', 'text mining']
+    topics: ['nlp', 'text-mining', 'transformers', 'natural-language-processing', 'sentiment-analysis', 'text-classification', 'bert', 'word2vec', 'fake-news'],
+    keywords: ['nlp', 'natural language', 'text class', 'sentiment', 'bert', 'word2vec', 'text mining', 'fake news']
   },
   {
     category: 'Machine Learning',
-    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest'],
-    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model']
+    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality'],
+    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time']
   },
   {
     category: 'Data Science',
@@ -239,14 +252,14 @@ const DETECTION_RULES = [
   },
   {
     category: 'Normal Projects',
-    topics: ['web-development', 'web', 'html', 'css', 'management-system', 'web-app', 'fullstack', 'database', 'oop'],
-    keywords: ['web app', 'website', 'management system', 'portfolio', 'full stack', 'fullstack', 'creative coding']
+    topics: ['web-development', 'web', 'html', 'css', 'management-system', 'web-app', 'database', 'oop'],
+    keywords: ['website', 'management system', 'portfolio', 'creative coding']
   }
 ];
 
 /**
  * Determine the single highest-priority category for a repo.
- * Priority order: projects.json override → topic detection → keyword detection → Others
+ * Priority order: projects.json override → RAG/GenAI/FullStack topic detection → keyword detection → Others
  *
  * @param {object} repo - GitHub repo object.
  * @param {Array}  localMetadata - Entries from projects.json.
@@ -266,7 +279,12 @@ export function getProjectCategory(repo, localMetadata = []) {
     if (match) return match;
   }
 
-  // 2. Walk detection rules in PRIORITY order — first match wins
+  // 2. High priority RAG check for repos like chatnote or retrieval projects
+  if (name.includes('chatnote') || name.includes('rag') || topics.includes('rag') || topics.includes('chatnote')) {
+    return 'RAG';
+  }
+
+  // 3. Walk detection rules in PRIORITY order — first match wins
   for (const rule of DETECTION_RULES) {
     // Check topics first (most reliable)
     if (rule.topics && rule.topics.some(t => topics.includes(t))) {
@@ -278,7 +296,12 @@ export function getProjectCategory(repo, localMetadata = []) {
     }
   }
 
-  // 3. Language-based fallback
+  // 4. Group Project Fallback → Full Stack
+  if (repo.isGroup || meta?.type === 'group') {
+    return 'Full Stack';
+  }
+
+  // 5. Language-based fallback
   if (lang === 'java')   return 'Java Projects';
   if (lang === 'c')      return 'C Programming';
   if (['javascript', 'typescript'].includes(lang)) return 'JavaScript Projects';
