@@ -275,6 +275,8 @@ function initPreloader(onLoadedCallback) {
     if (loaderFill) loaderFill.style.width = `${progress}%`;
     if (loaderPerc) loaderPerc.textContent = `${progress}%`;
   }, 30);
+}
+
 /**
  * Initialize Lenis Smooth Scroll engine for ultra-smooth inertia scrolling.
  */
