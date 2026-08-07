@@ -394,7 +394,7 @@ html.noscroll, body.noscroll, .noscroll {
 /* --- 3D Flip Card Container --- */
 .flip-card {
   perspective: 1000px;
-  height: 340px;
+  height: 360px;
   cursor: pointer;
 }
 
