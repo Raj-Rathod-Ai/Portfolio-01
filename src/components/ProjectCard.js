@@ -119,6 +119,24 @@ export class ProjectCard {
     const framework   = detectFramework(repo);
     const staggerN    = Math.min((idx % 12) + 1, 12);
 
+    const starsHTML = stars > 0
+      ? `<span class="inline-flex items-center gap-1 text-amber-400 text-[10px] font-mono"><i class="fa-solid fa-star text-[8px]"></i>${stars}</span>`
+      : '';
+
+    const liveBtnHTML = liveUrl
+      ? `<a href="${liveUrl}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all hover:scale-105 active:scale-95" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#a5b4fc">
+           <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>Live Demo
+         </a>`
+      : '';
+
+    const featuredBadge = isFeatured
+      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25);color:#fbbf24"><i class="fa-solid fa-star text-[8px]"></i>Featured</span>`
+      : '';
+
+    const groupBadge = isGroup
+      ? `<span class="px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.25);color:#c084fc">Group</span>`
+      : `<span class="px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.25);color:#2dd4bf">Solo</span>`;
+
     const isUpcoming   = repo.isUpcoming || false;
     const numberBadge  = repo.numberBadge ? `<span class="font-mono text-xs font-bold text-amber-400/80 mb-1 block">(${repo.numberBadge})</span>` : '';
     const displayTitle = repo.displayTitle || title;
