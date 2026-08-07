@@ -275,6 +275,33 @@ function initPreloader(onLoadedCallback) {
     if (loaderFill) loaderFill.style.width = `${progress}%`;
     if (loaderPerc) loaderPerc.textContent = `${progress}%`;
   }, 30);
+/**
+ * Initialize Lenis Smooth Scroll engine for ultra-smooth inertia scrolling.
+ */
+function initLenisSmoothScroll() {
+  if (typeof Lenis === 'undefined') return;
+  try {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.5,
+      infinite: false,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+    window.lenis = lenis;
+  } catch (e) {
+    console.warn('Lenis smooth scroll initialization warning:', e);
+  }
 }
 
 /**
