@@ -2,7 +2,7 @@ import { Hero } from '../components/Hero.js';
 import { CategoryCard } from '../components/CategoryCard.js';
 import { getAllCategories } from '../utils/categorize.js';
 import { containsAbusiveContent } from '../utils/profanityFilter.js';
-import { setVisitorName, getVisitorId, validateVisitorName } from '../utils/analytics.js';
+import { setVisitorName, getVisitorId, validateVisitorName, isBossDevice, getMasterPassword } from '../utils/analytics.js';
 
 
 
@@ -1091,19 +1091,52 @@ export class Home {
         !containsAbusiveContent(r.name).isAbusive && !containsAbusiveContent(r.review).isAbusive
       );
 
-      container.innerHTML = cleanReviews.map(r => `
-        <div class="rounded-xl border border-white/8 p-5 bg-white/3 space-y-3">
-          <div class="flex justify-between items-start gap-2">
-            <div>
-              <span class="font-jakarta font-semibold text-sm text-gray-100">${r.name}</span>
-              <span class="block font-mono text-[10px] text-gray-600 mt-0.5">${r.date}</span>
+      const isMaster = isBossDevice();
+      container.innerHTML = cleanReviews.map(r => {
+        const revId = r._id || r.id;
+        return `
+          <div class="rounded-xl border border-white/8 p-5 bg-white/3 space-y-3 relative group">
+            <div class="flex justify-between items-start gap-2">
+              <div>
+                <span class="font-jakarta font-semibold text-sm text-gray-100">${r.name}</span>
+                <span class="block font-mono text-[10px] text-gray-600 mt-0.5">${r.date}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="flex gap-0.5 flex-shrink-0">${'<i class="fa-solid fa-star text-accent text-xs"></i>'.repeat(r.rating)}</div>
+                ${isMaster && revId ? `
+                  <button class="delete-review-btn text-rose-400/70 hover:text-rose-400 text-xs px-1.5 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 transition-colors" data-id="${revId}" title="Master Boss: Delete Review">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                ` : ''}
+              </div>
             </div>
-            <div class="flex gap-0.5 flex-shrink-0">${'<i class="fa-solid fa-star text-accent text-xs"></i>'.repeat(r.rating)}</div>
+            <p class="font-inter text-xs text-gray-400 leading-relaxed">${r.review}</p>
           </div>
-          <p class="font-inter text-xs text-gray-400 leading-relaxed">${r.review}</p>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
+      // Add Master Delete button click listeners
+      if (isMaster) {
+        container.querySelectorAll('.delete-review-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const id = btn.dataset.id;
+            if (!id) return;
+            if (confirm('Master Boss: Permanently delete this review from database?')) {
+              try {
+                await fetch(`/api/reviews/${id}?password=${encodeURIComponent(getMasterPassword())}`, {
+                  method: 'DELETE',
+                  headers: { 'x-admin-key': getMasterPassword() }
+                });
+              } catch (err) {}
+              renderReviewsList();
+            }
+          });
+        });
+      }
     };
+
+    window.addEventListener('reviewDeleted', () => renderReviewsList());
 
     renderReviewsList();
 

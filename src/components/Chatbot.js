@@ -1,10 +1,11 @@
 /**
  * Personal AI Chatbot Component (Rudra)
  * Powered by Mistral AI LLM with persistent visitor onboarding, profile recognition,
- * local storage chat memory, reviewer-name linking, and smart first-time suggestions.
+ * local storage chat memory, Master Boss password authentication (default pooja1908),
+ * change password capability, direct review deletion, and live DB inspection.
  */
 
-import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName } from '../utils/analytics.js';
+import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName, authenticateBoss, changeBossPassword, getMasterPassword } from '../utils/analytics.js';
 
 // Dynamically read runtime client API key (decoded safely to avoid raw scanner triggers)
 const MISTRAL_KEY = atob('d0ZZZUhiSWtuNzdKWkdlcGhtMk13UzZSZldKNUxRQVI=');
@@ -19,7 +20,7 @@ export class Chatbot {
     this.history = [];
     this.isTyping = false;
     this.userProfile = this.loadProfile();
-    this.onboardingStep = null; // null | 'ask_name' | 'ask_role' | 'ask_contact'
+    this.onboardingStep = null; // null | 'ask_name' | 'ask_role' | 'ask_contact' | 'change_password_new'
     this.tempProfile = {};
   }
 
@@ -99,6 +100,7 @@ export class Chatbot {
   resetProfileAndHistory() {
     localStorage.removeItem(STORAGE_KEY_PROFILE);
     localStorage.removeItem(STORAGE_KEY_HISTORY);
+    localStorage.removeItem('boss_authenticated');
     this.userProfile = null;
     this.history = [];
     this.onboardingStep = null;
@@ -154,7 +156,7 @@ export class Chatbot {
               <div class="flex items-center gap-1.5">
                 <h4 class="font-jakarta font-bold text-xs text-gray-100">Rudra</h4>
                 <span class="px-1.5 py-0.2 rounded text-[8px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">AI</span>
-                <span id="chatbot-user-badge" class="hidden text-[9px] font-mono px-1.5 py-0.2 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 max-w-[100px] truncate"></span>
+                <span id="chatbot-user-badge" class="hidden text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 max-w-[120px] truncate"></span>
               </div>
               <p class="font-mono text-[9px] text-teal-400">Raj's Personal AI Assistant</p>
             </div>
@@ -181,7 +183,7 @@ export class Chatbot {
 
         <!-- Input Bar -->
         <form id="chatbot-form" class="p-3 border-t border-white/10 bg-white/2 flex items-center gap-2">
-          <input type="text" id="chatbot-input" placeholder="Type a message..."
+          <input type="text" id="chatbot-input" placeholder="Type a message or password..."
                  class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-100 focus:outline-none focus:border-primary/60 transition-colors placeholder-gray-500" autocomplete="off">
           <button type="submit" id="chatbot-send-btn"
                   class="w-8 h-8 rounded-xl bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0">
@@ -248,7 +250,7 @@ export class Chatbot {
     });
 
     // Show suggestion tooltip if first-time visitor without a name
-    if (!hasVisitorName() && !this.userProfile?.name) {
+    if (!hasVisitorName() && !this.userProfile?.name && !isBossDevice()) {
       setTimeout(() => {
         if (!this.isOpen && !hasVisitorName()) {
           tooltip?.classList.remove('hidden');
@@ -294,8 +296,13 @@ export class Chatbot {
   updateHeaderProfileBadge() {
     const badge = document.getElementById('chatbot-user-badge');
     if (!badge) return;
-    if (this.userProfile && this.userProfile.name) {
+    if (isBossDevice()) {
+      badge.textContent = `👑 MASTER BOSS`;
+      badge.className = 'text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold';
+      badge.classList.remove('hidden');
+    } else if (this.userProfile && this.userProfile.name) {
       badge.textContent = `👤 ${this.userProfile.name}`;
+      badge.className = 'text-[9px] font-mono px-1.5 py-0.2 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 max-w-[120px] truncate';
       badge.classList.remove('hidden');
     } else {
       badge.classList.add('hidden');
@@ -312,15 +319,15 @@ export class Chatbot {
 
     container.innerHTML = '';
 
-    // Boss device recognition shortcut
+    // Master Boss device recognition shortcut
     if (isBossDevice()) {
       if (!this.userProfile || !this.userProfile.name) {
         this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '' };
         this.saveProfile(this.userProfile);
       }
-      const bossWelcome = `Hey Boss! 👋 Welcome back. All portfolio analytics and AI systems are active.\n\nHow can I assist you today?`;
+      const bossWelcome = `👑 **Welcome Boss!** Master Admin mode is active on this device.\n\nYou have full access to live database analytics, review deletion, and master password management.`;
       this.appendMessage('bot', bossWelcome);
-      this.renderQuickChips(['🚀 Latest Project', '📊 Visitor Analytics', '🧠 NLP Projects']);
+      this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
       return;
     }
 
@@ -378,12 +385,81 @@ export class Chatbot {
   }
 
   /**
-   * Handle user input (routes through onboarding flow or standard AI chat).
+   * Handle user input (routes through onboarding flow, password auth, or standard AI chat).
    * @param {string} text 
    */
   async handleUserInput(text) {
     if (this.isTyping) return;
     this.clearQuickChips();
+
+    const cleanInput = text.trim();
+
+    // --- Master Password Interception Check ---
+    if (cleanInput === getMasterPassword() || cleanInput === 'pooja1908') {
+      const authResult = await authenticateBoss(cleanInput);
+      if (authResult.success) {
+        this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '' };
+        this.saveProfile(this.userProfile);
+        this.updateHeaderProfileBadge();
+        this.onboardingStep = null;
+
+        const bossReply = `👑 **Master Access Granted!** Welcome Boss.\n\nYour device is authenticated as Master Owner. You can inspect live database analytics, delete reviews, or change your master password below.`;
+        this.appendMessage('bot', bossReply);
+        this.history.push({ role: 'assistant', content: bossReply });
+        this.saveHistory();
+        this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+        return;
+      }
+    }
+
+    // --- Change Password Step ---
+    if (this.onboardingStep === 'change_password_new') {
+      this.appendMessage('user', text);
+      const res = await changeBossPassword(getMasterPassword(), cleanInput);
+      this.onboardingStep = null;
+      if (res.success) {
+        const successMsg = `✅ **Master Password Updated Successfully!**\n\nYour new password is: \`${cleanInput}\`.\nThis password will be used for future access across your devices.`;
+        this.appendMessage('bot', successMsg);
+        this.history.push({ role: 'assistant', content: successMsg });
+        this.saveHistory();
+      } else {
+        this.appendMessage('bot', `❌ ${res.error || 'Failed to update password.'}`);
+      }
+      this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+      return;
+    }
+
+    // --- Master Admin Command Shortcuts ---
+    if (cleanInput.toLowerCase() === 'change password' || cleanInput.toLowerCase() === 'change-password') {
+      this.appendMessage('user', text);
+      if (!isBossDevice()) {
+        this.appendMessage('bot', `🔑 Please enter your current Master Password first (default: \`pooja1908\`) to unlock password modification.`);
+        return;
+      }
+      this.onboardingStep = 'change_password_new';
+      this.appendMessage('bot', `🔑 **Change Master Password**\n\nPlease enter your **new Master Boss password**:`);
+      return;
+    }
+
+    if (cleanInput.toLowerCase().includes('master stats') || cleanInput.toLowerCase().includes('database stats') || cleanInput.toLowerCase().includes('live db')) {
+      this.appendMessage('user', text);
+      if (!isBossDevice()) {
+        this.appendMessage('bot', `🔒 Master Admin authentication required. Enter Master Password to inspect live database analytics.`);
+        return;
+      }
+      await this.showMasterDBStats();
+      return;
+    }
+
+    if (cleanInput.toLowerCase().includes('delete review') || cleanInput.toLowerCase().includes('remove review')) {
+      this.appendMessage('user', text);
+      if (!isBossDevice()) {
+        this.appendMessage('bot', `🔒 Master Admin authentication required. Enter Master Password to delete reviews.`);
+        return;
+      }
+      await this.showReviewDeleteMenu();
+      return;
+    }
 
     // Check if user clicked or typed 'Skip'
     const isSkip = text.toLowerCase().includes('skip');
@@ -412,20 +488,6 @@ export class Chatbot {
         if (nameValidation.isRajFirstOnly) {
           this.renderQuickChips(['Raj Rathod']);
         }
-        return;
-      }
-
-      if (nameValidation.isBoss) {
-        this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '', createdAt: new Date().toISOString() };
-        this.saveProfile(this.userProfile);
-        this.updateHeaderProfileBadge();
-        this.onboardingStep = null;
-
-        const bossReply = `Welcome Boss! 👋 This device is now registered as Master.\n\nHow can I help you manage or showcase Raj's portfolio today?`;
-        this.appendMessage('bot', bossReply);
-        this.history.push({ role: 'assistant', content: bossReply });
-        this.saveHistory();
-        this.renderQuickChips(['🚀 Latest Project', '📊 Visitor Analytics', '🧠 NLP Projects']);
         return;
       }
 
@@ -474,6 +536,123 @@ export class Chatbot {
   }
 
   /**
+   * Master Admin: Show live database analytics inspection.
+   */
+  async showMasterDBStats() {
+    try {
+      const res = await fetch(`/api/admin/analytics?password=${encodeURIComponent(getMasterPassword())}`, {
+        headers: { 'x-admin-key': getMasterPassword() }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const totalVisits = data.totalVisits || 0;
+        const uniqueCount = data.uniqueVisitors || 0;
+        const reviewsCount = data.reviewsCount || 0;
+        const contactsCount = data.contactsCount || 0;
+
+        const profilesList = (data.visitorProfiles || []).slice(0, 8).map(p => 
+          `• **${p.name || 'Anonymous'}** (${p.role || 'Visitor'}) - IP: \`${p.ipAddress || 'Recorded'}\` ${p.contactDetails ? `[Contact: ${p.contactDetails}]` : ''}`
+        ).join('\n');
+
+        const report = `📊 **LIVE MONGODB DATABASE ANALYTICS**\n\n` +
+                       `📈 **Total Visits**: **${totalVisits}** sessions\n` +
+                       `👥 **Unique Recognized Visitors**: **${uniqueCount}** profiles\n` +
+                       `💬 **Total Public Reviews**: **${reviewsCount}**\n` +
+                       `📬 **Contact Inquiries Dispatched**: **${contactsCount}**\n\n` +
+                       `📋 **Recent Visitor Log (IP & Profiles)**:\n${profilesList || '• No recent profiles logged yet.'}`;
+
+        this.appendMessage('bot', report);
+        this.history.push({ role: 'assistant', content: report });
+        this.saveHistory();
+      } else {
+        this.appendMessage('bot', `❌ Database analytics fetch failed. Ensure server connection is active.`);
+      }
+    } catch (e) {
+      this.appendMessage('bot', `⚠️ Could not connect to database analytics endpoint.`);
+    }
+    this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+  }
+
+  /**
+   * Master Admin: Show reviews list with direct delete buttons.
+   */
+  async showReviewDeleteMenu() {
+    try {
+      const res = await fetch('/api/reviews');
+      if (res.ok) {
+        const reviews = await res.json();
+        if (!Array.isArray(reviews) || reviews.length === 0) {
+          this.appendMessage('bot', `ℹ️ No public reviews found in database to delete.`);
+          return;
+        }
+
+        const chips = [];
+        let listText = `🗑️ **MASTER REVIEW DELETION MENU**\nClick a review below to permanently delete it from MongoDB:\n\n`;
+        
+        reviews.slice(0, 6).forEach((r, idx) => {
+          const revId = r._id || r.id;
+          listText += `${idx + 1}. **${r.name}** (${r.rating}★): "${r.review.substring(0, 45)}..."\n`;
+          if (revId) {
+            chips.push(`🗑️ Delete "${r.name}"`);
+          }
+        });
+
+        this.appendMessage('bot', listText);
+
+        // Render specific review deletion chips
+        const chipsContainer = document.getElementById('chatbot-dynamic-chips');
+        if (chipsContainer) {
+          chipsContainer.innerHTML = '';
+          reviews.slice(0, 6).forEach((r, idx) => {
+            const revId = r._id || r.id;
+            if (!revId) return;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'chat-chip px-2 py-1 rounded-xl border text-[10px] font-mono transition-all hover:scale-105 bg-rose-500/10 border-rose-500/30 text-rose-300 hover:bg-rose-500/20';
+            btn.textContent = `🗑️ Delete #${idx + 1} (${r.name})`;
+            btn.addEventListener('click', async () => {
+              await this.executeDeleteReview(revId, r.name);
+            });
+            chipsContainer.appendChild(btn);
+          });
+        }
+        return;
+      }
+    } catch (e) {}
+    this.appendMessage('bot', `⚠️ Could not fetch reviews for deletion.`);
+  }
+
+  /**
+   * Execute review deletion API call.
+   */
+  async executeDeleteReview(reviewId, reviewerName) {
+    try {
+      const res = await fetch(`/api/reviews/${reviewId}?password=${encodeURIComponent(getMasterPassword())}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': getMasterPassword()
+        }
+      });
+
+      if (res.ok) {
+        const msg = `✅ **Review Deleted!** Successfully removed review by **${reviewerName}** from database and frontend.`;
+        this.appendMessage('bot', msg);
+        this.history.push({ role: 'assistant', content: msg });
+        this.saveHistory();
+
+        // Refresh reviews list on page if available
+        window.dispatchEvent(new CustomEvent('reviewDeleted', { detail: { reviewId } }));
+      } else {
+        this.appendMessage('bot', `❌ Failed to delete review. Master authentication check failed.`);
+      }
+    } catch (e) {
+      this.appendMessage('bot', `⚠️ Network error while deleting review.`);
+    }
+    this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+  }
+
+  /**
    * Send user message and trigger response stream.
    * @param {string} text - User message string.
    */
@@ -505,7 +684,11 @@ export class Chatbot {
       this.saveHistory();
     } finally {
       this.isTyping = false;
-      this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      if (isBossDevice()) {
+        this.renderQuickChips(['👑 Master Stats', '🗑️ Delete Review', '🔑 Change Password']);
+      } else {
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      }
     }
   }
 
@@ -860,6 +1043,7 @@ CRITICAL INSTRUCTIONS:
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-primary hover:underline">$1</a>')
+      .replace(/`([^`]+)`/g, '<code class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono text-amber-300">$1</code>')
       .replace(/\n\n/g, '<br><br>')
       .replace(/\n/g, '<br>');
   }

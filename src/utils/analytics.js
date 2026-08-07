@@ -1,7 +1,7 @@
 /**
  * Visitor Analytics & Silent Tracking Utility
  * Manages visitor identification, visit counters, page view history in localStorage,
- * Boss/Master device recognition, name spoofing validation, and database sync.
+ * Master Boss password authentication (default pooja1908), change password, and DB sync.
  */
 
 const STORAGE_KEYS = {
@@ -10,40 +10,118 @@ const STORAGE_KEYS = {
   LAST_VISIT: 'raj_portfolio_last_visit',
   PAGE_VIEWS: 'raj_portfolio_page_views',
   RUDRA_PROFILE: 'rudra_visitor_profile',
-  BOSS_MASTER: 'boss_master_device'
+  BOSS_AUTH: 'boss_authenticated',
+  BOSS_PASS: 'boss_master_password'
 };
 
 /**
- * Check if the current device is registered as Boss/Master device.
- * @returns {boolean} True if this device is authorized as Boss.
+ * Get current stored master password (default pooja1908).
+ * @returns {string}
+ */
+export function getMasterPassword() {
+  return localStorage.getItem(STORAGE_KEYS.BOSS_PASS) || 'pooja1908';
+}
+
+/**
+ * Check if the current device is authenticated as Master Boss.
+ * @returns {boolean} True if this device is authorized with Master Password.
  */
 export function isBossDevice() {
   try {
-    // URL trigger fallback (e.g. portfolio.com/?boss=true or #boss)
-    if (window.location.search.includes('boss=true') || window.location.hash.includes('boss')) {
-      setBossDevice();
-      return true;
-    }
-
-    if (localStorage.getItem(STORAGE_KEYS.BOSS_MASTER) === 'true') return true;
+    if (localStorage.getItem(STORAGE_KEYS.BOSS_AUTH) === 'true') return true;
     const profile = getVisitorProfile();
-    if (profile && profile.name) {
-      const lower = profile.name.trim().toLowerCase();
-      if (lower === 'boss' || lower === 'raj rathod') {
-        localStorage.setItem(STORAGE_KEYS.BOSS_MASTER, 'true');
-        return true;
-      }
+    if (profile && profile.role === 'Portfolio Owner/Master') {
+      return true;
     }
   } catch (e) {}
   return false;
 }
 
 /**
- * Register current device as Boss/Master device permanently.
+ * Authenticate current device with Master Password.
+ * @param {string} inputPassword - Password entered by user.
+ * @returns {Promise<object>} { success: boolean, error?: string }
  */
-export function setBossDevice() {
+export async function authenticateBoss(inputPassword) {
+  if (!inputPassword || typeof inputPassword !== 'string') {
+    return { success: false, error: 'Password is required' };
+  }
+
+  const clean = inputPassword.trim();
+  const currentLocalPass = getMasterPassword();
+
+  // Try local match first for speed
+  if (clean === currentLocalPass) {
+    setBossDevice(clean);
+    return { success: true };
+  }
+
+  // Try server verification
   try {
-    localStorage.setItem(STORAGE_KEYS.BOSS_MASTER, 'true');
+    const res = await fetch('/api/admin/verify-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: clean })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        setBossDevice(clean);
+        return { success: true };
+      }
+    }
+  } catch (e) {}
+
+  return { success: false, error: 'Incorrect Master password' };
+}
+
+/**
+ * Change Master Boss password across local device and backend DB.
+ * @param {string} oldPassword 
+ * @param {string} newPassword 
+ * @returns {Promise<object>} { success: boolean, message?: string, error?: string }
+ */
+export async function changeBossPassword(oldPassword, newPassword) {
+  const cleanOld = (oldPassword || '').trim();
+  const cleanNew = (newPassword || '').trim();
+
+  if (!cleanNew || cleanNew.length < 4) {
+    return { success: false, error: 'New password must be at least 4 characters long' };
+  }
+
+  try {
+    const res = await fetch('/api/admin/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oldPassword: cleanOld || getMasterPassword(), newPassword: cleanNew })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem(STORAGE_KEYS.BOSS_PASS, cleanNew);
+        setBossDevice(cleanNew);
+        return { success: true, message: data.message || 'Master password updated successfully!' };
+      }
+      return { success: false, error: data.error || 'Failed to change password' };
+    }
+  } catch (e) {}
+
+  // Fallback local update if offline
+  localStorage.setItem(STORAGE_KEYS.BOSS_PASS, cleanNew);
+  setBossDevice(cleanNew);
+  return { success: true, message: 'Master password updated locally!' };
+}
+
+/**
+ * Register current device as Master Boss device permanently.
+ * @param {string} [pass] - Verified password.
+ */
+export function setBossDevice(pass) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.BOSS_AUTH, 'true');
+    if (pass) localStorage.setItem(STORAGE_KEYS.BOSS_PASS, pass);
+    
     const existing = getVisitorProfile() || {};
     existing.name = 'Boss';
     existing.role = 'Portfolio Owner/Master';
@@ -60,7 +138,7 @@ export function setBossDevice() {
         name: 'Boss',
         role: 'Portfolio Owner/Master',
         isStudent: false,
-        contactDetails: 'Portfolio Owner'
+        contactDetails: 'Master Owner'
       })
     }).catch(() => {});
   } catch (e) {}
@@ -90,9 +168,14 @@ export function validateVisitorName(name) {
   const bossTitles = ['boss', 'raj rathod', 'owner', 'admin', 'master', 'portfolio owner'];
 
   if (bossTitles.includes(clean)) {
-    // Register current device as Boss Master device permanently
-    setBossDevice();
-    return { isValid: true, isBoss: true, message: null };
+    if (isBossDevice()) {
+      return { isValid: true, isBoss: true, message: null };
+    }
+    return {
+      isValid: false,
+      isPasswordRequired: true,
+      message: 'Master Authentication Required: Please enter your Master Password in Chatbot to access Boss mode.'
+    };
   }
 
   return { isValid: true, message: null };
@@ -149,12 +232,6 @@ export function setVisitorName(name, source = 'review') {
   if (!name || typeof name !== 'string') return;
   const cleanName = name.trim();
   if (!cleanName) return;
-
-  // Auto tag Boss device if user enters Boss or Raj Rathod
-  if (cleanName.toLowerCase() === 'boss' || cleanName.toLowerCase() === 'raj rathod') {
-    setBossDevice();
-    return;
-  }
 
   let profile = getVisitorProfile() || {};
   profile.name = cleanName;

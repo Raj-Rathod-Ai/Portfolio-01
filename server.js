@@ -73,6 +73,29 @@ const VisitorProfileSchema = new mongoose.Schema({
 
 const VisitorProfile = mongoose.model('VisitorProfile', VisitorProfileSchema);
 
+const AdminSettingSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: mongoose.Schema.Types.Mixed },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const AdminSetting = mongoose.model('AdminSetting', AdminSettingSchema);
+
+// Helper function to get or initialize master password
+async function getMasterPassword() {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      let setting = await AdminSetting.findOne({ key: 'master_password' });
+      if (setting && setting.value) return setting.value;
+      // Initialize default password pooja1908
+      setting = new AdminSetting({ key: 'master_password', value: 'pooja1908' });
+      await setting.save();
+      return 'pooja1908';
+    }
+  } catch (e) {}
+  return 'pooja1908';
+}
+
 // Preset Default Reviews to seed if database is empty
 const DEFAULT_PRESETS = [
   {
@@ -563,6 +586,99 @@ app.post('/api/analytics/profile', async (req, res) => {
   } catch (err) {
     console.error('Analytics profile save error:', err.message);
     res.status(500).json({ error: 'Failed to save profile' });
+  }
+});
+
+// POST /api/admin/verify-password - Verify Master Boss password
+app.post('/api/admin/verify-password', async (req, res) => {
+  try {
+    const { password } = req.body;
+    const currentPass = await getMasterPassword();
+    if (password && password.trim() === currentPass) {
+      return res.json({ success: true, isMaster: true });
+    }
+    return res.status(401).json({ success: false, error: 'Incorrect Master password' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/admin/change-password - Change Master Boss password
+app.post('/api/admin/change-password', async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const currentPass = await getMasterPassword();
+    if (!oldPassword || oldPassword.trim() !== currentPass) {
+      return res.status(401).json({ error: 'Incorrect current Master password' });
+    }
+    if (!newPassword || newPassword.trim().length < 4) {
+      return res.status(400).json({ error: 'New password must be at least 4 characters long' });
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      await AdminSetting.findOneAndUpdate(
+        { key: 'master_password' },
+        { value: newPassword.trim(), updatedAt: new Date() },
+        { upsert: true }
+      );
+    }
+    console.log('Master Boss password updated successfully!');
+    return res.json({ success: true, message: 'Master password updated successfully!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/reviews/:id - Master Boss direct review deletion
+app.delete('/api/reviews/:id', async (req, res) => {
+  try {
+    const passHeader = req.headers['x-admin-key'] || req.query.password || req.body?.password;
+    const currentPass = await getMasterPassword();
+    if (!passHeader || passHeader.trim() !== currentPass) {
+      return res.status(403).json({ error: 'Master Admin authentication required to delete reviews.' });
+    }
+
+    const reviewId = req.params.id;
+    if (mongoose.connection.readyState === 1) {
+      await Review.findByIdAndDelete(reviewId);
+      console.log(`Review ${reviewId} deleted by Master Boss.`);
+      return res.json({ success: true, deletedId: reviewId });
+    }
+    return res.json({ success: true, offline: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/admin/analytics - Master Boss real-time database inspection
+app.get('/api/admin/analytics', async (req, res) => {
+  try {
+    const passHeader = req.headers['x-admin-key'] || req.query.password;
+    const currentPass = await getMasterPassword();
+    if (!passHeader || passHeader.trim() !== currentPass) {
+      return res.status(403).json({ error: 'Master Admin authentication required for live DB analytics.' });
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      const visits = await Visit.find().sort({ lastVisit: -1 }).limit(50);
+      const profiles = await VisitorProfile.find().sort({ updatedAt: -1 }).limit(50);
+      const totalVisitsCount = await Visit.aggregate([{ $group: { _id: null, total: { $sum: '$visitCount' } } }]);
+      const reviewsCount = await Review.countDocuments();
+      const contactsCount = await Contact.countDocuments();
+
+      return res.json({
+        success: true,
+        totalVisits: totalVisitsCount[0]?.total || visits.length,
+        uniqueVisitors: profiles.length,
+        reviewsCount,
+        contactsCount,
+        recentVisits: visits,
+        visitorProfiles: profiles
+      });
+    }
+    return res.json({ success: true, offline: true, visits: [], profiles: [] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
