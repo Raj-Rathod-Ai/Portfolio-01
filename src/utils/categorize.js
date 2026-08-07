@@ -192,8 +192,13 @@ const DETECTION_RULES = [
   },
   {
     category: 'Machine Learning',
-    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality', 'salary', 'salary-prediction'],
-    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time', 'salary']
+    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality', 'salary', 'salary-prediction', 'library-mangement', 'library-management'],
+    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time', 'salary', 'library mangement', 'library management']
+  },
+  {
+    category: 'Python Concepts',
+    topics: ['python-concepts', 'tic-tac-toe', 'tic-tak-toe', 'tictactoe', 'game', 'stone-paper-scissors', 'python-basics'],
+    keywords: ['python concept', 'tic tac toe', 'tic tak toe', 'tictactoe', 'stone paper']
   },
   {
     category: 'Data Science',
@@ -281,6 +286,8 @@ export const UPCOMING_PROJECTS = [
  * Determine the single highest-priority category for a repo.
  * Rule 1: Neuro OS is the ONLY project allowed in 'Full Stack'.
  * Rule 2: Salary is explicitly 'Machine Learning'.
+ * Rule 3: Library Management is explicitly 'Machine Learning'.
+ * Rule 4: Tic Tac Toe / Tic Tak Toe is explicitly 'Python Concepts'.
  *
  * @param {object} repo - GitHub repo object.
  * @param {Array}  localMetadata - Entries from projects.json.
@@ -303,23 +310,32 @@ export function getProjectCategory(repo, localMetadata = []) {
     return 'Machine Learning';
   }
 
-  // 1. Explicit override in projects.json (except Full Stack if not neuro-os)
+  // Rule 3: Library Management is explicitly Machine Learning
+  if (name.includes('library') || combined.includes('library')) {
+    return 'Machine Learning';
+  }
+
+  // Rule 4: Tic Tac Toe is explicitly Python Concepts
+  if (name.includes('tic') || combined.includes('tic-tac-toe') || combined.includes('tic-tak-toe') || combined.includes('tictactoe')) {
+    return 'Python Concepts';
+  }
+
+  // Explicit override in projects.json (except Full Stack if not neuro-os)
   const meta = localMetadata.find(m => m.repo.toLowerCase() === name);
   if (meta?.category) {
     if (meta.category.toLowerCase() === 'full stack') {
-      // Ignore full stack unless neuro os
       return 'Normal Projects';
     }
     const match = CATEGORY_PRIORITY.find(k => k.toLowerCase() === meta.category.toLowerCase());
     if (match) return match;
   }
 
-  // 2. High priority RAG check for repos like chatnote or retrieval projects
+  // High priority RAG check for repos like chatnote or retrieval projects
   if (name.includes('chatnote') || name.includes('rag') || topics.includes('rag') || topics.includes('chatnote')) {
     return 'RAG';
   }
 
-  // 3. Walk detection rules in PRIORITY order — first match wins
+  // Walk detection rules in PRIORITY order — first match wins
   for (const rule of DETECTION_RULES) {
     if (rule.topics && rule.topics.some(t => topics.includes(t))) {
       return rule.category;
@@ -329,7 +345,7 @@ export function getProjectCategory(repo, localMetadata = []) {
     }
   }
 
-  // 4. Language-based fallback
+  // Language-based fallback
   if (lang === 'java')   return 'Java Projects';
   if (lang === 'c')      return 'C Programming';
   if (['javascript', 'typescript'].includes(lang)) return 'JavaScript Projects';
@@ -364,6 +380,7 @@ export function getCategoryDetails(categoryName) {
 
 /**
  * Build the category list from projects, sorted by CATEGORY_PRIORITY order.
+ * Automatically filters out empty categories with 0 projects.
  * @param {Array} projects - All repos with .category set.
  * @returns {Array}
  */
@@ -374,10 +391,13 @@ export function getAllCategories(projects) {
     counts[cat] = (counts[cat] || 0) + 1;
   });
 
-  const categories = Object.keys(counts).map(catName => ({
-    ...getCategoryDetails(catName),
-    count: counts[catName]
-  }));
+  // Filter out any empty categories with 0 projects
+  const categories = Object.keys(counts)
+    .filter(catName => counts[catName] > 0)
+    .map(catName => ({
+      ...getCategoryDetails(catName),
+      count: counts[catName]
+    }));
 
   return categories.sort((a, b) => {
     const idxA = CATEGORY_PRIORITY.indexOf(a.name);
