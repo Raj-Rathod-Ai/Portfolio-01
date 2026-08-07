@@ -104,6 +104,51 @@ async function seedDefaultReviews() {
   }
 }
 
+// ================= MULTILINGUAL PROFANITY & ABUSER GUARD =================
+const ABUSIVE_PATTERNS = [
+  'fuck', 'fucking', 'fucker', 'shit', 'bitch', 'asshole', 'bastard', 'cunt', 'dick', 'pussy',
+  'motherfucker', 'cock', 'whore', 'slut', 'bullshit', 'prick', 'twat', 'wanker', 'retard',
+  'bhenchod', 'benchod', 'bhanchod', 'bc', 'madarchod', 'mc', 'chutiya', 'chutya', 'chootiya',
+  'bsdk', 'bhosdike', 'bhosdika', 'bhosdi', 'lauda', 'loda', 'lodu', 'laund', 'gand', 'gaand',
+  'gaandu', 'gandu', 'choot', 'chut', 'harami', 'hrami', 'saala', 'sala', 'kamina', 'kamine',
+  'bkl', 'bhenke lode', 'bhenkelode', 'randi', 'rndi', 'raand', 'kutta', 'kutti', 'tatte', 'tatta',
+  'jhantu', 'jhatu', 'chutiye', 'bhenchods', 'bhosad', 'maderchod', 'madarchodh', 'ghando', 'gandiyad'
+];
+
+function checkAbusiveContent(text) {
+  if (!text || typeof text !== 'string') return { isAbusive: false };
+  const rawLower = text.toLowerCase();
+  
+  // Anti-evasion normalization
+  const normalized = text
+    .toLowerCase()
+    .replace(/@/g, 'a')
+    .replace(/\$/g, 's')
+    .replace(/0/g, 'o')
+    .replace(/1|!|\|/g, 'i')
+    .replace(/3/g, 'e')
+    .replace(/5/g, 's')
+    .replace(/7/g, 't')
+    .replace(/8/g, 'b')
+    .replace(/\*/g, '')
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/(.)\1{2,}/g, '$1$1')
+    .trim();
+
+  const spaceless = normalized.replace(/\s+/g, '');
+
+  for (const word of ABUSIVE_PATTERNS) {
+    const pattern = new RegExp(`\\b${word}\\b`, 'i');
+    if (pattern.test(rawLower) || pattern.test(normalized)) {
+      return { isAbusive: true, word };
+    }
+    if (word.length >= 4 && spaceless.includes(word)) {
+      return { isAbusive: true, word };
+    }
+  }
+  return { isAbusive: false };
+}
+
 // Trigger seeding after database connection is ready
 mongoose.connection.once('open', () => {
   seedDefaultReviews();
@@ -111,7 +156,7 @@ mongoose.connection.once('open', () => {
 
 // ================= API ENDPOINTS =================
 
-// GET /api/reviews - List all reviews
+// GET /api/reviews - List all reviews (filtering out any profane entries)
 app.get('/api/reviews', async (req, res) => {
   try {
     // If Mongoose is not connected, fallback to sending default review values directly
@@ -119,22 +164,38 @@ app.get('/api/reviews', async (req, res) => {
       return res.json(DEFAULT_PRESETS);
     }
     const reviews = await Review.find().sort({ createdAt: -1 });
-    if (reviews.length === 0) {
+    // Filter out any stored reviews containing abusive content
+    const cleanReviews = reviews.filter(r => 
+      !checkAbusiveContent(r.name).isAbusive && !checkAbusiveContent(r.review).isAbusive
+    );
+
+    if (cleanReviews.length === 0) {
       return res.json(DEFAULT_PRESETS);
     }
-    res.json(reviews);
+    res.json(cleanReviews);
   } catch (err) {
     console.error('GET reviews error:', err);
     res.status(500).json({ error: 'Failed to retrieve reviews', fallback: DEFAULT_PRESETS });
   }
 });
 
-// POST /api/reviews - Add a new review
+// POST /api/reviews - Add a new review with profanity check
 app.post('/api/reviews', async (req, res) => {
   try {
     const { name, rating, review } = req.body;
     if (!name || !review) {
       return res.status(400).json({ error: 'Name and review content are required.' });
+    }
+
+    // Multilingual abusive language ("gali") check
+    const nameCheck = checkAbusiveContent(name);
+    const reviewCheck = checkAbusiveContent(review);
+    if (nameCheck.isAbusive || reviewCheck.isAbusive) {
+      console.warn(`Blocked abusive review attempt. Name: "${name}", Review: "${review}"`);
+      return res.status(400).json({
+        error: 'Review rejected: Inappropriate or offensive language ("gali" / abusive words) detected. Please submit respectful feedback.',
+        isAbusive: true
+      });
     }
 
     const formattedDate = new Date().toLocaleDateString('en-IN', {

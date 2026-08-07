@@ -1,6 +1,8 @@
 import { Hero } from '../components/Hero.js';
 import { CategoryCard } from '../components/CategoryCard.js';
 import { getAllCategories } from '../utils/categorize.js';
+import { containsAbusiveContent } from '../utils/profanityFilter.js';
+
 
 /**
  * Home page component rendering the complete landing page.
@@ -1067,7 +1069,12 @@ export class Home {
         }
       }
 
-      container.innerHTML = reviews.map(r => `
+      // Filter out any local or remote reviews containing abusive content / "gali"
+      const cleanReviews = reviews.filter(r => 
+        !containsAbusiveContent(r.name).isAbusive && !containsAbusiveContent(r.review).isAbusive
+      );
+
+      container.innerHTML = cleanReviews.map(r => `
         <div class="rounded-xl border border-white/8 p-5 bg-white/3 space-y-3">
           <div class="flex justify-between items-start gap-2">
             <div>
@@ -1083,7 +1090,7 @@ export class Home {
 
     renderReviewsList();
 
-    // 7. Review Form Submit
+    // 7. Review Form Submit with Profanity Guard
     const reviewForm = document.getElementById('review-form');
     if (reviewForm) {
       reviewForm.addEventListener('submit', async (e) => {
@@ -1095,11 +1102,33 @@ export class Home {
         const reviewVal = document.getElementById('rev-comment')?.value.trim();
         const ratingVal = parseInt(document.getElementById('rev-rating')?.value || '5');
 
+        // Check for profanity / abusive words / "gali"
+        const nameCheck = containsAbusiveContent(nameVal);
+        const reviewCheck = containsAbusiveContent(reviewVal);
+
+        if (nameCheck.isAbusive || reviewCheck.isAbusive) {
+          if (btn) { btn.textContent = 'Submit Review'; btn.disabled = false; }
+          showModal(
+            'error',
+            'Inappropriate Content Detected',
+            'Your review contains offensive or abusive language ("gali"). Please maintain respectful and constructive feedback.'
+          );
+
+          // Highlight textarea with error glow
+          const revInput = document.getElementById('rev-comment');
+          if (revInput) {
+            revInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/50');
+            setTimeout(() => revInput.classList.remove('border-red-500', 'ring-2', 'ring-red-500/50'), 4000);
+          }
+          return;
+        }
+
         const formattedDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-        
-        // Always save locally first so user review is never lost or blocked
+        const bodyData = { name: nameVal, rating: ratingVal, review: reviewVal, date: formattedDate };
+
+        // Save locally if valid
         const reviews = JSON.parse(localStorage.getItem('portfolioReviews') || '[]');
-        reviews.unshift({ name: nameVal, rating: ratingVal, review: reviewVal, date: formattedDate });
+        reviews.unshift(bodyData);
         localStorage.setItem('portfolioReviews', JSON.stringify(reviews));
 
         try {
