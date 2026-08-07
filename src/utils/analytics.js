@@ -1,7 +1,8 @@
 /**
  * Visitor Analytics & Silent Tracking Utility
  * Manages visitor identification, visit counters, page view history in localStorage,
- * Master Boss password authentication (default pooja1908), change password, and DB sync.
+ * Master Boss password authentication, dynamic password change, and DB sync.
+ * (No plain-text passwords stored in client code; verified via server hash).
  */
 
 const STORAGE_KEYS = {
@@ -11,15 +12,15 @@ const STORAGE_KEYS = {
   PAGE_VIEWS: 'raj_portfolio_page_views',
   RUDRA_PROFILE: 'rudra_visitor_profile',
   BOSS_AUTH: 'boss_authenticated',
-  BOSS_PASS: 'boss_master_password'
+  BOSS_PASS: 'boss_master_session'
 };
 
 /**
- * Get current stored master password (default pooja1908).
+ * Get active session key for authenticated Master Boss requests.
  * @returns {string}
  */
 export function getMasterPassword() {
-  return localStorage.getItem(STORAGE_KEYS.BOSS_PASS) || 'pooja1908';
+  return localStorage.getItem(STORAGE_KEYS.BOSS_PASS) || '';
 }
 
 /**
@@ -38,7 +39,7 @@ export function isBossDevice() {
 }
 
 /**
- * Authenticate current device with Master Password.
+ * Authenticate current device with Master Password against server SHA-256 database hash.
  * @param {string} inputPassword - Password entered by user.
  * @returns {Promise<object>} { success: boolean, error?: string }
  */
@@ -48,15 +49,8 @@ export async function authenticateBoss(inputPassword) {
   }
 
   const clean = inputPassword.trim();
-  const currentLocalPass = getMasterPassword();
 
-  // Try local match first for speed
-  if (clean === currentLocalPass) {
-    setBossDevice(clean);
-    return { success: true };
-  }
-
-  // Try server verification
+  // Verify against server SHA-256 database hash endpoint
   try {
     const res = await fetch('/api/admin/verify-password', {
       method: 'POST',
@@ -76,7 +70,7 @@ export async function authenticateBoss(inputPassword) {
 }
 
 /**
- * Change Master Boss password across local device and backend DB.
+ * Change Master Boss password across local device and backend DB hash.
  * @param {string} oldPassword 
  * @param {string} newPassword 
  * @returns {Promise<object>} { success: boolean, message?: string, error?: string }
@@ -99,23 +93,19 @@ export async function changeBossPassword(oldPassword, newPassword) {
     if (res.ok) {
       const data = await res.json();
       if (data.success) {
-        localStorage.setItem(STORAGE_KEYS.BOSS_PASS, cleanNew);
         setBossDevice(cleanNew);
-        return { success: true, message: data.message || 'Master password updated successfully!' };
+        return { success: true, message: data.message || 'Master password updated in database hash format!' };
       }
       return { success: false, error: data.error || 'Failed to change password' };
     }
   } catch (e) {}
 
-  // Fallback local update if offline
-  localStorage.setItem(STORAGE_KEYS.BOSS_PASS, cleanNew);
-  setBossDevice(cleanNew);
-  return { success: true, message: 'Master password updated locally!' };
+  return { success: false, error: 'Network error or invalid current password.' };
 }
 
 /**
  * Register current device as Master Boss device permanently.
- * @param {string} [pass] - Verified password.
+ * @param {string} [pass] - Verified password session.
  */
 export function setBossDevice(pass) {
   try {

@@ -421,8 +421,8 @@ export class Chatbot {
       }
     }
 
-    // --- Direct Master Password Interception ---
-    if (cleanInput === getMasterPassword() || cleanInput === 'pooja1908') {
+    // --- Master Password Interception Check ---
+    if (cleanInput.length >= 4 && !isBossDevice()) {
       const authResult = await authenticateBoss(cleanInput);
       if (authResult.success) {
         this.userProfile = { name: 'Boss', role: 'Portfolio Owner/Master', isStudent: false, contactDetails: '' };
@@ -445,7 +445,7 @@ export class Chatbot {
       const res = await changeBossPassword(getMasterPassword(), cleanInput);
       this.onboardingStep = null;
       if (res.success) {
-        const successMsg = `✅ **Master Password Updated Successfully!**\n\nYour new password is: \`${cleanInput}\`.\nThis password will be used for future access across your devices.`;
+        const successMsg = `✅ **Master Password Updated Successfully!**\n\nYour new password has been saved to the database in secure hash format.\nThis password will be used for future access across your devices.`;
         this.appendMessage('bot', successMsg);
         this.history.push({ role: 'assistant', content: successMsg });
         this.saveHistory();
@@ -460,7 +460,7 @@ export class Chatbot {
     if (cleanInput.toLowerCase() === 'change password' || cleanInput.toLowerCase() === 'change-password') {
       this.appendMessage('user', text);
       if (!isBossDevice()) {
-        this.appendMessage('bot', `🔑 Please enter your current Master Password first (default: \`pooja1908\`) to unlock password modification.`);
+        this.appendMessage('bot', `🔑 Please enter your current Master Password first to unlock password modification.`);
         return;
       }
       this.onboardingStep = 'change_password_new';

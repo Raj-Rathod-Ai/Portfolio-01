@@ -73,6 +73,8 @@ const VisitorProfileSchema = new mongoose.Schema({
 
 const VisitorProfile = mongoose.model('VisitorProfile', VisitorProfileSchema);
 
+const crypto = require('crypto');
+
 const AdminSettingSchema = new mongoose.Schema({
   key: { type: String, required: true, unique: true },
   value: { type: mongoose.Schema.Types.Mixed },
@@ -81,19 +83,37 @@ const AdminSettingSchema = new mongoose.Schema({
 
 const AdminSetting = mongoose.model('AdminSetting', AdminSettingSchema);
 
-// Helper function to get or initialize master password
-async function getMasterPassword() {
+function hashPassword(password) {
+  if (!password || typeof password !== 'string') return '';
+  return crypto.createHash('sha256').update(password.trim()).digest('hex');
+}
+
+// Default hash initialized for Pooja1908
+const DEFAULT_MASTER_HASH = hashPassword('Pooja1908');
+
+async function getMasterPasswordHash() {
   try {
     if (mongoose.connection.readyState === 1) {
-      let setting = await AdminSetting.findOne({ key: 'master_password' });
+      let setting = await AdminSetting.findOne({ key: 'master_password_hash' });
       if (setting && setting.value) return setting.value;
-      // Initialize default password pooja1908
-      setting = new AdminSetting({ key: 'master_password', value: 'pooja1908' });
+
+      // Migrate legacy unhashed entry if present
+      const oldSetting = await AdminSetting.findOne({ key: 'master_password' });
+      if (oldSetting && oldSetting.value) {
+        const migratedHash = hashPassword(oldSetting.value);
+        setting = new AdminSetting({ key: 'master_password_hash', value: migratedHash });
+        await setting.save();
+        await AdminSetting.deleteOne({ key: 'master_password' });
+        return migratedHash;
+      }
+
+      // Initialize default password hash for Pooja1908
+      setting = new AdminSetting({ key: 'master_password_hash', value: DEFAULT_MASTER_HASH });
       await setting.save();
-      return 'pooja1908';
+      return DEFAULT_MASTER_HASH;
     }
   } catch (e) {}
-  return 'pooja1908';
+  return DEFAULT_MASTER_HASH;
 }
 
 // Preset Default Reviews to seed if database is empty
@@ -589,12 +609,13 @@ app.post('/api/analytics/profile', async (req, res) => {
   }
 });
 
-// POST /api/admin/verify-password - Verify Master Boss password
+// POST /api/admin/verify-password - Verify Master Boss password hash
 app.post('/api/admin/verify-password', async (req, res) => {
   try {
     const { password } = req.body;
-    const currentPass = await getMasterPassword();
-    if (password && password.trim() === currentPass) {
+    const storedHash = await getMasterPasswordHash();
+    const inputHash = hashPassword(password);
+    if (inputHash && inputHash === storedHash) {
       return res.json({ success: true, isMaster: true });
     }
     return res.status(401).json({ success: false, error: 'Incorrect Master password' });
@@ -603,38 +624,43 @@ app.post('/api/admin/verify-password', async (req, res) => {
   }
 });
 
-// POST /api/admin/change-password - Change Master Boss password
+// POST /api/admin/change-password - Change Master Boss password in hash form
 app.post('/api/admin/change-password', async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const currentPass = await getMasterPassword();
-    if (!oldPassword || oldPassword.trim() !== currentPass) {
+    const storedHash = await getMasterPasswordHash();
+    const oldHash = hashPassword(oldPassword);
+
+    if (!oldPassword || oldHash !== storedHash) {
       return res.status(401).json({ error: 'Incorrect current Master password' });
     }
     if (!newPassword || newPassword.trim().length < 4) {
       return res.status(400).json({ error: 'New password must be at least 4 characters long' });
     }
 
+    const newHash = hashPassword(newPassword);
     if (mongoose.connection.readyState === 1) {
       await AdminSetting.findOneAndUpdate(
-        { key: 'master_password' },
-        { value: newPassword.trim(), updatedAt: new Date() },
+        { key: 'master_password_hash' },
+        { value: newHash, updatedAt: new Date() },
         { upsert: true }
       );
     }
-    console.log('Master Boss password updated successfully!');
-    return res.json({ success: true, message: 'Master password updated successfully!' });
+    console.log('Master Boss password updated cleanly in database hash form.');
+    return res.json({ success: true, message: 'Master password updated in database hash format!' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// DELETE /api/reviews/:id - Master Boss direct review deletion
+// DELETE /api/reviews/:id - Master Boss direct review deletion with hash validation
 app.delete('/api/reviews/:id', async (req, res) => {
   try {
-    const passHeader = req.headers['x-admin-key'] || req.query.password || req.body?.password;
-    const currentPass = await getMasterPassword();
-    if (!passHeader || passHeader.trim() !== currentPass) {
+    const passInput = req.headers['x-admin-key'] || req.query.password || req.body?.password;
+    const storedHash = await getMasterPasswordHash();
+    const inputHash = hashPassword(passInput);
+
+    if (!passInput || inputHash !== storedHash) {
       return res.status(403).json({ error: 'Master Admin authentication required to delete reviews.' });
     }
 
@@ -650,12 +676,14 @@ app.delete('/api/reviews/:id', async (req, res) => {
   }
 });
 
-// GET /api/admin/analytics - Master Boss real-time database inspection
+// GET /api/admin/analytics - Master Boss real-time database inspection with hash validation
 app.get('/api/admin/analytics', async (req, res) => {
   try {
-    const passHeader = req.headers['x-admin-key'] || req.query.password;
-    const currentPass = await getMasterPassword();
-    if (!passHeader || passHeader.trim() !== currentPass) {
+    const passInput = req.headers['x-admin-key'] || req.query.password;
+    const storedHash = await getMasterPasswordHash();
+    const inputHash = hashPassword(passInput);
+
+    if (!passInput || inputHash !== storedHash) {
       return res.status(403).json({ error: 'Master Admin authentication required for live DB analytics.' });
     }
 
@@ -678,6 +706,9 @@ app.get('/api/admin/analytics', async (req, res) => {
     }
     return res.json({ success: true, offline: true, visits: [], profiles: [] });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
     res.status(500).json({ error: err.message });
   }
 });
