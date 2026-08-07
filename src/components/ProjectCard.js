@@ -196,6 +196,18 @@ export class ProjectCard {
       </div>
     ` : '';
 
+    const flipBtnFrontHTML = isUpcoming
+      ? ''
+      : `<button class="flip-btn z-30" title="See project details" aria-label="Flip card">
+           <i class="fa-solid fa-rotate"></i>
+         </button>`;
+
+    const flipBtnBackHTML = isUpcoming
+      ? ''
+      : `<button class="flip-btn z-30" title="Go back" aria-label="Flip back">
+           <i class="fa-solid fa-xmark"></i>
+         </button>`;
+
     return `
     <div class="flip-card scroll-reveal reveal-zoom-fade stagger-${staggerN}" data-project-slug="${slug}">
       <div class="flip-card-inner">
@@ -204,9 +216,7 @@ export class ProjectCard {
         <div class="flip-card-front relative overflow-hidden ${isFeatured ? 'is-featured' : ''} ${isUpcoming ? 'border-amber-500/20 bg-amber-950/5' : ''} p-5 flex flex-col justify-between">
           ${blurOverlayHTML}
           <!-- Flip trigger button (top-right corner) -->
-          <button class="flip-btn z-30" title="See project details" aria-label="Flip card">
-            <i class="fa-solid fa-rotate"></i>
-          </button>
+          ${flipBtnFrontHTML}
           <!-- Header row -->
           <div class="space-y-3 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
             <div class="flex items-start justify-between gap-3">
@@ -248,9 +258,7 @@ export class ProjectCard {
         <div class="flip-card-back relative overflow-hidden p-5 flex flex-col justify-between h-full">
           ${blurOverlayHTML}
           <!-- Unflip trigger button (top-right corner) -->
-          <button class="flip-btn z-30" title="Go back" aria-label="Flip back">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          ${flipBtnBackHTML}
 
           <!-- Scrollable Content Body -->
           <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
