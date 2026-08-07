@@ -119,37 +119,35 @@ export class ProjectCard {
     const framework   = detectFramework(repo);
     const staggerN    = Math.min((idx % 12) + 1, 12);
 
-    // Front: tech chips
-    const topicsHTML = topics.length
-      ? topics.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#6b7280">${t}</span>`).join('')
-      : '';
+    const isUpcoming   = repo.isUpcoming || false;
+    const numberBadge  = repo.numberBadge ? `<span class="font-mono text-xs font-bold text-amber-400/80 mb-1 block">(${repo.numberBadge})</span>` : '';
+    const displayTitle = repo.displayTitle || title;
 
-    const starsHTML = stars > 0
-      ? `<span class="inline-flex items-center gap-1 text-amber-400 text-[10px] font-mono"><i class="fa-solid fa-star text-[8px]"></i>${stars}</span>`
-      : '';
+    // Masked details for upcoming project cards
+    const cardDesc = isUpcoming
+      ? '🔒 [CLASSIFIED PROJECT DETAILS] — System architecture, documentation, and live preview will reveal automatically when published to GitHub.'
+      : desc;
 
-    const liveBtnHTML = liveUrl
-      ? `<a href="${liveUrl}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all hover:scale-105 active:scale-95" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#a5b4fc">
-           <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>Live Demo
-         </a>`
-      : '';
+    const topicsHTML = isUpcoming
+      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono border bg-amber-500/10 border-amber-500/25 text-amber-300/80"><i class="fa-solid fa-lock text-[8px]"></i>Secret Tech Stack</span>
+         <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-mono border border-white/10 text-gray-400">Coming Very Soon</span>`
+      : (topics.length
+        ? topics.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#6b7280">${t}</span>`).join('')
+        : '');
 
-    const featuredBadge = isFeatured
-      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25);color:#fbbf24"><i class="fa-solid fa-star text-[8px]"></i>Featured</span>`
-      : '';
-
-    const groupBadge = isGroup
-      ? `<span class="px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.25);color:#c084fc">Group</span>`
-      : `<span class="px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.25);color:#2dd4bf">Solo</span>`;
-
-    // Back: feature bullets
-    const bulletsHTML = features.length
-      ? `<ul class="space-y-1.5 mt-1">${features.map(f =>
-          `<li class="flex items-start gap-2 text-[11px] text-gray-400 leading-snug">
-             <i class="fa-solid fa-circle-dot text-indigo-500 mt-0.5 flex-shrink-0 text-[7px]"></i>
-             <span>${f}</span>
-           </li>`).join('')}</ul>`
-      : `<p class="text-[11px] text-gray-500 italic mt-1">See GitHub for full project description.</p>`;
+    // Back: feature bullets or locked mystery box
+    const bulletsHTML = isUpcoming
+      ? `<div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-mono space-y-1">
+           <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-amber-400"></i>CLASSIFIED REPOSITORY</p>
+           <p class="text-[10px] text-gray-400 leading-relaxed">Raj Rathod is actively building this system. Source code, AI architecture, and live demo will automatically sync as soon as it is uploaded to GitHub.</p>
+         </div>`
+      : (features.length
+        ? `<ul class="space-y-1.5 mt-1">${features.map(f =>
+            `<li class="flex items-start gap-2 text-[11px] text-gray-400 leading-snug">
+               <i class="fa-solid fa-circle-dot text-indigo-500 mt-0.5 flex-shrink-0 text-[7px]"></i>
+               <span>${f}</span>
+             </li>`).join('')}</ul>`
+        : `<p class="text-[11px] text-gray-500 italic mt-1">See GitHub for full project description.</p>`);
 
     const frameworkBadge = framework
       ? `<div class="flex items-center gap-2 mt-3 pt-3 border-t" style="border-color:rgba(255,255,255,0.05)">
@@ -220,7 +218,7 @@ export class ProjectCard {
             </div>
 
             <!-- Description -->
-            <p class="text-[11px] text-gray-500 leading-relaxed" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${desc}</p>
+            <p class="text-[11px] ${isUpcoming ? 'text-amber-300/80 font-mono italic' : 'text-gray-500'} leading-relaxed" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${cardDesc}</p>
 
             <!-- Topics -->
             <div class="flex flex-wrap gap-1">${topicsHTML}</div>
