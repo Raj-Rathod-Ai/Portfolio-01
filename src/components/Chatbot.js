@@ -183,7 +183,7 @@ export class Chatbot {
 
         <!-- Input Bar -->
         <form id="chatbot-form" class="p-3 border-t border-white/10 bg-white/2 flex items-center gap-2">
-          <input type="text" id="chatbot-input" placeholder="Type a message or password..."
+          <input type="text" id="chatbot-input" placeholder="Type a message..."
                  class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-100 focus:outline-none focus:border-primary/60 transition-colors placeholder-gray-500" autocomplete="off">
           <button type="submit" id="chatbot-send-btn"
                   class="w-8 h-8 rounded-xl bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0">
