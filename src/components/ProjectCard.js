@@ -320,5 +320,57 @@ export class ProjectCard {
         });
       });
     });
+
+    // Master Boss Solo/Group Toggle
+    container.querySelectorAll('.boss-toggle-group-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const repoName = btn.dataset.name;
+        if (!repoName) return;
+        const overrides = JSON.parse(localStorage.getItem('boss_project_overrides') || '{}');
+        const existing = overrides[repoName] || {};
+        const repo = (window.portfolioData?.repos || []).find(r => r.name === repoName);
+        const currentIsGroup = existing.isGroup !== undefined ? existing.isGroup : (repo?.isGroup || false);
+        
+        overrides[repoName] = { ...existing, isGroup: !currentIsGroup };
+        localStorage.setItem('boss_project_overrides', JSON.stringify(overrides));
+
+        // Sync to backend API if available
+        fetch('/api/project-overrides', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ overrides })
+        }).catch(() => {});
+
+        window.location.reload();
+      });
+    });
+
+    // Master Boss Featured Pin Top Toggle
+    container.querySelectorAll('.boss-toggle-featured-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const repoName = btn.dataset.name;
+        if (!repoName) return;
+        const overrides = JSON.parse(localStorage.getItem('boss_project_overrides') || '{}');
+        const existing = overrides[repoName] || {};
+        const repo = (window.portfolioData?.repos || []).find(r => r.name === repoName);
+        const currentFeatured = existing.featured !== undefined ? existing.featured : (repo?.featured || false);
+        
+        overrides[repoName] = { ...existing, featured: !currentFeatured };
+        localStorage.setItem('boss_project_overrides', JSON.stringify(overrides));
+
+        // Sync to backend API if available
+        fetch('/api/project-overrides', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ overrides })
+        }).catch(() => {});
+
+        window.location.reload();
+      });
+    });
   }
 }
