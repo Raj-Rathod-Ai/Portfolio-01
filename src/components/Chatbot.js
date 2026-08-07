@@ -1,17 +1,111 @@
 /**
  * Personal AI Chatbot Component (Rudra)
- * Powered by Mistral AI LLM with client & backend fallback.
+ * Powered by Mistral AI LLM with persistent visitor onboarding, profile recognition,
+ * local storage chat memory, and backend fallback sync.
  */
+
+import { getVisitorId } from '../utils/analytics.js';
 
 // Dynamically read runtime client API key (decoded safely to avoid raw scanner triggers)
 const MISTRAL_KEY = atob('d0ZZZUhiSWtuNzdKWkdlcGhtMk13UzZSZldKNUxRQVI=');
 const getMistralKey = () => window.MISTRAL_API_KEY || MISTRAL_KEY;
+
+const STORAGE_KEY_PROFILE = 'rudra_visitor_profile';
+const STORAGE_KEY_HISTORY = 'rudra_chat_history';
 
 export class Chatbot {
   constructor() {
     this.isOpen = false;
     this.history = [];
     this.isTyping = false;
+    this.userProfile = this.loadProfile();
+    this.onboardingStep = null; // null | 'ask_name' | 'ask_role' | 'ask_contact'
+    this.tempProfile = {};
+  }
+
+  /**
+   * Load stored profile from localStorage.
+   */
+  loadProfile() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_PROFILE);
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Save user profile to localStorage and sync to backend.
+   */
+  saveProfile(profile) {
+    this.userProfile = profile;
+    try {
+      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profile));
+      const visitorId = getVisitorId();
+      fetch('/api/analytics/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitorId,
+          name: profile.name,
+          role: profile.role,
+          isStudent: profile.isStudent,
+          contactDetails: profile.contactDetails,
+          chatHistory: this.history
+        })
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
+  /**
+   * Load stored chat history from localStorage.
+   */
+  loadHistory() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_HISTORY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /**
+   * Save current chat history to localStorage.
+   */
+  saveHistory() {
+    try {
+      localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(this.history.slice(-40)));
+      if (this.userProfile) {
+        const visitorId = getVisitorId();
+        fetch('/api/analytics/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            visitorId,
+            chatHistory: this.history.slice(-40)
+          })
+        }).catch(() => {});
+      }
+    } catch (e) {}
+  }
+
+  /**
+   * Reset visitor profile and chat history.
+   */
+  resetProfileAndHistory() {
+    localStorage.removeItem(STORAGE_KEY_PROFILE);
+    localStorage.removeItem(STORAGE_KEY_HISTORY);
+    this.userProfile = null;
+    this.history = [];
+    this.onboardingStep = null;
+    this.tempProfile = {};
+
+    const container = document.getElementById('chatbot-messages');
+    if (container) container.innerHTML = '';
+    
+    this.updateHeaderProfileBadge();
+    this.startConversation();
   }
 
   /**
@@ -30,61 +124,51 @@ export class Chatbot {
 
       <!-- Floating Chatbot Window -->
       <div id="chatbot-window"
-           class="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 w-[calc(100vw-2rem)] sm:w-[380px] h-[520px] max-h-[82vh] z-[60] rounded-2xl flex flex-col overflow-hidden border border-white/10 shadow-2xl backdrop-blur-2xl transition-all duration-300 transform scale-90 opacity-0 pointer-events-none"
+           class="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 w-[calc(100vw-2rem)] sm:w-[390px] h-[540px] max-h-[82vh] z-[60] rounded-2xl flex flex-col overflow-hidden border border-white/10 shadow-2xl backdrop-blur-2xl transition-all duration-300 transform scale-90 opacity-0 pointer-events-none"
            style="background: rgba(13, 17, 23, 0.95);">
         
         <!-- Header -->
-        <div class="px-5 py-4 border-b border-white/10 bg-white/3 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="relative w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-inner">
-              <i class="fa-solid fa-robot text-base"></i>
+        <div class="px-4 py-3 border-b border-white/10 bg-white/3 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="relative w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-inner">
+              <i class="fa-solid fa-robot text-sm"></i>
               <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-teal-400 border-2 border-[#0d1117] rounded-full"></span>
             </div>
             <div>
-              <h4 class="font-jakarta font-bold text-sm text-gray-100 flex items-center gap-1.5">
-                Rudra <span class="px-2 py-0.2 rounded text-[9px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">AI</span>
-              </h4>
-              <p class="font-mono text-[10px] text-teal-400">Raj's Personal AI Engine</p>
+              <div class="flex items-center gap-1.5">
+                <h4 class="font-jakarta font-bold text-xs text-gray-100">Rudra</h4>
+                <span class="px-1.5 py-0.2 rounded text-[8px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">AI</span>
+                <span id="chatbot-user-badge" class="hidden text-[9px] font-mono px-1.5 py-0.2 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 max-w-[100px] truncate"></span>
+              </div>
+              <p class="font-mono text-[9px] text-teal-400">Raj's Personal AI Assistant</p>
             </div>
           </div>
           
-          <button id="chatbot-close-btn" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
-            <i class="fa-solid fa-xmark text-sm"></i>
-          </button>
+          <div class="flex items-center gap-1">
+            <button id="chatbot-reset-btn" class="px-2 py-1 rounded text-[10px] font-mono text-gray-400 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1" title="Reset Chat & Visitor Profile">
+              <i class="fa-solid fa-rotate-right text-[10px]"></i>
+              <span class="hidden sm:inline">Reset</span>
+            </button>
+            <button id="chatbot-close-btn" class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+              <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Chat Stream Body -->
-        <div id="chatbot-messages" class="flex-1 overflow-y-auto p-4 space-y-4 font-inter text-xs text-gray-300 leading-relaxed scrollbar-thin">
-          <!-- Welcome Message -->
-          <div class="flex items-start gap-2.5">
-            <div class="w-7 h-7 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs shrink-0 mt-0.5">
-              <i class="fa-solid fa-robot"></i>
-            </div>
-            <div class="bg-white/5 border border-white/8 rounded-2xl rounded-tl-none p-3 max-w-[85%] text-gray-200 shadow-sm">
-              <p>Hi! 👋 I'm <strong>Rudra</strong>, Raj Rathod's custom AI Assistant. Ask me anything about Raj's ML/AI projects, latest repository updates, technical skills, or education!</p>
-            </div>
-          </div>
+        <div id="chatbot-messages" class="flex-1 overflow-y-auto p-3.5 space-y-3 font-inter text-xs text-gray-300 leading-relaxed scrollbar-thin">
+        </div>
 
-          <!-- Quick Suggestion Chips -->
-          <div id="chatbot-quick-chips" class="flex flex-wrap gap-1.5 pt-1 pl-9">
-            <button class="chat-chip px-3 py-1.5 rounded-xl border text-[11px] font-mono transition-all hover:scale-105" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.25);color:#a5b4fc">
-              🚀 Latest Working Project
-            </button>
-            <button class="chat-chip px-3 py-1.5 rounded-xl border text-[11px] font-mono transition-all hover:scale-105" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.25);color:#2dd4bf">
-              🧠 NLP Projects
-            </button>
-            <button class="chat-chip px-3 py-1.5 rounded-xl border text-[11px] font-mono transition-all hover:scale-105" style="background:rgba(244,63,94,0.1);border-color:rgba(244,63,94,0.25);color:#fda4af">
-              🎓 Education & CGPA
-            </button>
-          </div>
+        <!-- Dynamic Quick Action Chips Container -->
+        <div id="chatbot-dynamic-chips" class="px-3.5 pb-2 flex flex-wrap gap-1.5">
         </div>
 
         <!-- Input Bar -->
         <form id="chatbot-form" class="p-3 border-t border-white/10 bg-white/2 flex items-center gap-2">
-          <input type="text" id="chatbot-input" placeholder="Ask Rudra about Raj..."
-                 class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-gray-100 focus:outline-none focus:border-primary/60 transition-colors placeholder-gray-500" autocomplete="off">
+          <input type="text" id="chatbot-input" placeholder="Type a message..."
+                 class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-gray-100 focus:outline-none focus:border-primary/60 transition-colors placeholder-gray-500" autocomplete="off">
           <button type="submit" id="chatbot-send-btn"
-                  class="w-9 h-9 rounded-xl bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0">
+                  class="w-8 h-8 rounded-xl bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0">
             <i class="fa-solid fa-paper-plane text-xs"></i>
           </button>
         </form>
@@ -99,10 +183,10 @@ export class Chatbot {
   setup() {
     const toggleBtn = document.getElementById('chatbot-toggle-btn');
     const closeBtn  = document.getElementById('chatbot-close-btn');
+    const resetBtn  = document.getElementById('chatbot-reset-btn');
     const win       = document.getElementById('chatbot-window');
     const form      = document.getElementById('chatbot-form');
     const input     = document.getElementById('chatbot-input');
-    const chips     = document.querySelectorAll('.chat-chip');
 
     if (!toggleBtn || !win) return;
 
@@ -112,6 +196,12 @@ export class Chatbot {
         win.classList.remove('opacity-0', 'pointer-events-none', 'scale-90');
         win.classList.add('opacity-100', 'pointer-events-auto', 'scale-100');
         input?.focus();
+
+        // Initialize chat content if container is empty
+        const container = document.getElementById('chatbot-messages');
+        if (container && container.children.length === 0) {
+          this.startConversation();
+        }
       } else {
         win.classList.add('opacity-0', 'pointer-events-none', 'scale-90');
         win.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
@@ -120,13 +210,10 @@ export class Chatbot {
 
     toggleBtn.addEventListener('click', () => toggleChat());
     closeBtn?.addEventListener('click', () => toggleChat(false));
-
-    // Handle Quick Chips
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        const text = chip.textContent.trim().replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\s*/u, '');
-        if (text) this.sendMessage(text);
-      });
+    resetBtn?.addEventListener('click', () => {
+      if (confirm('Reset chatbot history and visitor profile?')) {
+        this.resetProfileAndHistory();
+      }
     });
 
     // Handle Form Submit
@@ -135,9 +222,160 @@ export class Chatbot {
       const val = input.value.trim();
       if (val) {
         input.value = '';
-        this.sendMessage(val);
+        this.handleUserInput(val);
       }
     });
+
+    this.updateHeaderProfileBadge();
+  }
+
+  /**
+   * Update header visitor recognition pill badge.
+   */
+  updateHeaderProfileBadge() {
+    const badge = document.getElementById('chatbot-user-badge');
+    if (!badge) return;
+    if (this.userProfile && this.userProfile.name) {
+      badge.textContent = `👤 ${this.userProfile.name}`;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Start initial conversation or restore chat history.
+   */
+  startConversation() {
+    this.history = this.loadHistory();
+    const container = document.getElementById('chatbot-messages');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (this.userProfile && this.userProfile.name) {
+      // Returning user on same device! Restore past chat history or greeting
+      if (this.history.length > 0) {
+        this.history.forEach(item => {
+          this.appendMessage(item.role === 'user' ? 'user' : 'bot', item.content, false);
+        });
+        // Render welcoming chip bar
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      } else {
+        const welcomeText = `Welcome back, **${this.userProfile.name}**! 👋 Great to see you again.${this.userProfile.role ? ` (Role: ${this.userProfile.role})` : ''}\n\nI am **Rudra**, Raj Rathod's custom AI Assistant. How can I help you today?`;
+        this.appendMessage('bot', welcomeText);
+        this.history.push({ role: 'assistant', content: welcomeText });
+        this.saveHistory();
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      }
+    } else {
+      // First time visitor onboarding step 1: Name request
+      this.onboardingStep = 'ask_name';
+      const introText = `Hi! 👋 I'm **Rudra**, Raj Rathod's custom AI Assistant.\n\nBefore we start exploring Raj's portfolio, **what is your name?**`;
+      this.appendMessage('bot', introText);
+      this.renderQuickChips(['⏩ Skip Intro']);
+    }
+  }
+
+  /**
+   * Render dynamic option action chips below message body.
+   */
+  renderQuickChips(chipLabels) {
+    const chipsContainer = document.getElementById('chatbot-dynamic-chips');
+    if (!chipsContainer) return;
+
+    chipsContainer.innerHTML = '';
+    chipLabels.forEach(label => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chat-chip px-2.5 py-1 rounded-xl border text-[10px] font-mono transition-all hover:scale-105 bg-white/5 border-white/10 text-indigo-300 hover:bg-indigo-500/20 hover:border-indigo-500/40';
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        const text = label.replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\s*/u, '').trim();
+        this.handleUserInput(text);
+      });
+      chipsContainer.appendChild(btn);
+    });
+  }
+
+  /**
+   * Clear dynamic action chips.
+   */
+  clearQuickChips() {
+    const chipsContainer = document.getElementById('chatbot-dynamic-chips');
+    if (chipsContainer) chipsContainer.innerHTML = '';
+  }
+
+  /**
+   * Handle user input (routes through onboarding flow or standard AI chat).
+   * @param {string} text 
+   */
+  async handleUserInput(text) {
+    if (this.isTyping) return;
+    this.clearQuickChips();
+
+    // Check if user clicked or typed 'Skip'
+    const isSkip = text.toLowerCase().includes('skip');
+
+    // --- Onboarding Flow Handling ---
+    if (this.onboardingStep === 'ask_name') {
+      this.appendMessage('user', text);
+      if (isSkip) {
+        this.userProfile = { name: 'Guest Visitor', role: 'Visitor', isStudent: false, contactDetails: '', createdAt: new Date().toISOString() };
+        this.saveProfile(this.userProfile);
+        this.updateHeaderProfileBadge();
+        this.onboardingStep = null;
+        
+        const reply = `No problem! 👋 You're exploring as **Guest Visitor**.\n\nAsk me anything about Raj's **ML/AI projects**, **education & university**, or **technical skills**!`;
+        this.appendMessage('bot', reply);
+        this.history.push({ role: 'assistant', content: reply });
+        this.saveHistory();
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+        return;
+      }
+
+      this.tempProfile.name = text.trim();
+      this.onboardingStep = 'ask_role';
+      
+      const roleText = `Nice to meet you, **${this.tempProfile.name}**! 😊\n\nMay I know your current role or introduction? (e.g., Student, Recruiter, Developer, Client, or Other)`;
+      this.appendMessage('bot', roleText);
+      this.renderQuickChips(['🎓 Student', '💼 Recruiter', '💻 Developer', '🤝 Client', '⏩ Skip']);
+      return;
+    }
+
+    if (this.onboardingStep === 'ask_role') {
+      this.appendMessage('user', text);
+      const cleanRole = isSkip ? 'Visitor' : text.trim();
+      this.tempProfile.role = cleanRole;
+      this.tempProfile.isStudent = cleanRole.toLowerCase().includes('student');
+
+      this.onboardingStep = 'ask_contact';
+      const contactPrompt = `Got it, **${this.tempProfile.name}**! 👍\n\nWould you like to share your **contact details** (email, LinkedIn, or phone) so Raj Rathod can connect with you? *(Or click Skip to proceed directly)*`;
+      this.appendMessage('bot', contactPrompt);
+      this.renderQuickChips(['⏩ Skip / Leave it']);
+      return;
+    }
+
+    if (this.onboardingStep === 'ask_contact') {
+      this.appendMessage('user', text);
+      this.tempProfile.contactDetails = isSkip ? 'Not provided' : text.trim();
+      this.tempProfile.createdAt = new Date().toISOString();
+
+      // Finalize and save profile
+      this.saveProfile(this.tempProfile);
+      this.updateHeaderProfileBadge();
+      this.onboardingStep = null;
+
+      const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I've remembered your details so I recognize you whenever you visit on this device.\n\nHow can I help you explore Raj's portfolio today?`;
+      this.appendMessage('bot', completionText);
+      this.history.push({ role: 'assistant', content: completionText });
+      this.saveHistory();
+      this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      return;
+    }
+
+    // --- Standard Chat Flow ---
+    this.sendMessage(text);
   }
 
   /**
@@ -146,16 +384,11 @@ export class Chatbot {
    */
   async sendMessage(text) {
     if (this.isTyping) return;
-    const messagesContainer = document.getElementById('chatbot-messages');
-    if (!messagesContainer) return;
-
-    // Hide quick chips once chatting starts
-    const chipsContainer = document.getElementById('chatbot-quick-chips');
-    if (chipsContainer) chipsContainer.style.display = 'none';
 
     // 1. Append User Message
     this.appendMessage('user', text);
     this.history.push({ role: 'user', content: text });
+    this.saveHistory();
 
     // 2. Show Typing Indicator
     this.isTyping = true;
@@ -167,13 +400,17 @@ export class Chatbot {
       this.removeTypingIndicator(typingId);
       this.appendMessage('bot', replyText);
       this.history.push({ role: 'assistant', content: replyText });
+      this.saveHistory();
     } catch (err) {
       console.warn('Bot fetch error:', err);
       this.removeTypingIndicator(typingId);
       const fallbackMsg = this.getOfflineFallback(text);
       this.appendMessage('bot', fallbackMsg);
+      this.history.push({ role: 'assistant', content: fallbackMsg });
+      this.saveHistory();
     } finally {
       this.isTyping = false;
+      this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
     }
   }
 
@@ -202,7 +439,13 @@ export class Chatbot {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: prompt, history: this.history, repoContext: repoListText, latestProject: latestProjSummary })
+        body: JSON.stringify({
+          message: prompt,
+          history: this.history,
+          userProfile: this.userProfile,
+          repoContext: repoListText,
+          latestProject: latestProjSummary
+        })
       });
       if (res.ok) {
         const data = await res.json();
@@ -217,8 +460,12 @@ export class Chatbot {
       const key = getMistralKey();
       if (!key) throw new Error('No Mistral API key found');
 
+      const userCtxStr = this.userProfile && this.userProfile.name
+        ? `\nCURRENT USER DETAILS:\n- Name: ${this.userProfile.name}\n- Role: ${this.userProfile.role || 'Guest'}\nAddress user respectfully by name (${this.userProfile.name}) when helpful.`
+        : '';
+
       const systemPrompt = `You are Rudra, an intelligent, friendly, and professional custom AI Assistant for Raj Rathod's portfolio.
-Answer user questions naturally, accurately, and concisely (2-4 sentences max unless detailed project lists are explicitly requested).
+Answer user questions naturally, accurately, and concisely (2-4 sentences max unless detailed project lists are explicitly requested).${userCtxStr}
 
 RAJ RATHOD'S PROFILE DATA:
 - Role: AI & Machine Learning Developer.
@@ -247,16 +494,13 @@ Contact Details:
 - LinkedIn: https://linkedin.com/in/raj-rathod-ai
 
 CRITICAL INSTRUCTIONS:
-- If the user sends a simple greeting like "hi", "hello", "hey", or "how are you", reply warmly with a friendly greeting (e.g. "Hello! 👋 I'm doing great! I am Rudra, the custom AI Assistant of Raj Rathod. How can I help you explore Raj's portfolio?"). Do NOT dump project lists on simple greetings!
+- If the user sends a simple greeting like "hi", "hello", "hey", or "how are you", reply warmly with a friendly greeting (e.g. "Hello ${this.userProfile?.name || ''}! 👋 I'm doing great! How can I help you explore Raj's portfolio today?").
 - If the user asks about location / where Raj lives / map, state: "Raj is based in Vadodara, Gujarat, India. He studies at Parul University (P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760)." and include the Google Maps link: [View on Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)!
 - If the user asks about college result, CGPA, or marks, state clearly: "Raj's academic result in B.Tech CSE (AI Specialization) at Parul University is 7.66 CGPA." Do NOT tell the user to check university portals or contact academic departments!
-- If the user asks "which project raj do in recent" / "last working project" / "latest project" / "what did Raj work on recently", state clearly that the last working project is ${latestProject ? latestProject.name : 'Taxi-Fare-Prediction'}, and explain its description, tech stack, and GitHub link!
-- If the user asks specifically for "NLP project", focus on "Fake-News-Detection-Using-ML-Real-time" and prompt engineering.
-- If asked for "Deep Learning" or "Computer Vision", focus on "FlowerDiseaseSystem".
 - Use clean markdown formatting (bolding, bullet points, links).`;
 
       const apiMessages = [{ role: 'system', content: systemPrompt }];
-      this.history.slice(-4).forEach(h => apiMessages.push(h));
+      this.history.slice(-4).forEach(h => apiMessages.push({ role: h.role === 'user' ? 'user' : 'assistant', content: h.content }));
       apiMessages.push({ role: 'user', content: prompt });
 
       const mRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
@@ -294,12 +538,13 @@ CRITICAL INSTRUCTIONS:
     const text = input.toLowerCase().trim();
     const repos = window.portfolioData?.repos || [];
     const sorted = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+    const namePrefix = this.userProfile?.name ? `${this.userProfile.name}, ` : '';
 
-    // 0. Greeting Check (e.g. "hi", "hello", "hey", "how are you")
+    // 0. Greeting Check
     const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'how are you', 'who are you', 'what is your name'];
     const cleanText = text.replace(/[^a-z\s]/g, '').trim();
     if (greetings.some(g => cleanText === g || cleanText.startsWith(g + ' ') || cleanText.endsWith(' ' + g))) {
-      return `Hello! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant of **Raj Rathod**. How can I help you explore Raj's **ML/AI projects**, **education & university**, **skills**, or **contact links** today?`;
+      return `Hello ${namePrefix}! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant of **Raj Rathod**. How can I help you explore Raj's **ML/AI projects**, **education & university**, **skills**, or **contact links** today?`;
     }
 
     // 0.1 Location & Map query
@@ -327,7 +572,7 @@ CRITICAL INSTRUCTIONS:
         const top2 = sorted[1];
         const dateStr = top.updated_at ? new Date(top.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'June 2026';
         
-        return `Raj's **last working / most recent project** is **${top.name.replace(/[-_]/g, ' ')}** (Last updated: ${dateStr})!\n\n` +
+        return `${namePrefix}Raj's **last working / most recent project** is **${top.name.replace(/[-_]/g, ' ')}** (Last updated: ${dateStr})!\n\n` +
                `• **Domain / Category**: ${top.category || 'Machine Learning'}\n` +
                `• **Tech Stack**: ${top.language || 'Python'}${top.topics?.length ? ` (${top.topics.slice(0, 4).join(', ')})` : ''}\n` +
                `• **Description**: ${top.description || 'Predictive modeling application.'}\n` +
@@ -335,7 +580,7 @@ CRITICAL INSTRUCTIONS:
                (top2 ? `Directly before this, Raj also updated **${top2.name.replace(/[-_]/g, ' ')}** (${top2.category || 'AI/ML'}).` : '');
       }
 
-      return `Raj's **last working / most recent project** is **Taxi Fare Prediction** (Updated: 12 Jun 2026)!\n\n` +
+      return `${namePrefix}Raj's **last working / most recent project** is **Taxi Fare Prediction** (Updated: 12 Jun 2026)!\n\n` +
              `• **Domain**: Machine Learning\n` +
              `• **Tech Stack**: Python, Scikit-Learn, Regression Modeling\n` +
              `• **Description**: Predicting taxi fare amounts using trip parameters, distance, and time metrics.\n` +
@@ -447,7 +692,7 @@ CRITICAL INSTRUCTIONS:
   /**
    * Append formatted message bubble to chat window.
    */
-  appendMessage(sender, text) {
+  appendMessage(sender, text, animate = true) {
     const container = document.getElementById('chatbot-messages');
     if (!container) return;
 

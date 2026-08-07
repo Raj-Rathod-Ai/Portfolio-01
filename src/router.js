@@ -3,6 +3,7 @@ import { Projects } from './pages/Projects.js';
 import { ProjectDetails } from './pages/ProjectDetails.js';
 import { slugify } from './utils/helpers.js';
 import { getAllCategories } from './utils/categorize.js';
+import { trackVisit } from './utils/analytics.js';
 
 // Instantiate pages (singleton)
 const homePage = new Home();
@@ -56,6 +57,9 @@ export function matchRoute(path) {
  * @param {boolean} [pushState=true] - Whether to push state to window.history.
  */
 export async function navigate(path, pushState = true) {
+  // Silently record visit analytics
+  trackVisit(path);
+
   const match = matchRoute(path);
 
   if (pushState) {

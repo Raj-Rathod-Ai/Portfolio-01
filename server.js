@@ -48,6 +48,28 @@ const ContactSchema = new mongoose.Schema({
 
 const Contact = mongoose.model('Contact', ContactSchema);
 
+const VisitSchema = new mongoose.Schema({
+  visitorId: { type: String, required: true },
+  visitCount: { type: Number, default: 1 },
+  pagesViewed: [{ path: String, timestamp: { type: Date, default: Date.now } }],
+  lastVisit: { type: Date, default: Date.now },
+  userAgent: { type: String }
+}, { timestamps: true });
+
+const Visit = mongoose.model('Visit', VisitSchema);
+
+const VisitorProfileSchema = new mongoose.Schema({
+  visitorId: { type: String, required: true, unique: true },
+  name: { type: String },
+  role: { type: String },
+  isStudent: { type: Boolean },
+  contactDetails: { type: String },
+  chatHistory: [{ role: String, content: String, timestamp: Date }],
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const VisitorProfile = mongoose.model('VisitorProfile', VisitorProfileSchema);
+
 // Preset Default Reviews to seed if database is empty
 const DEFAULT_PRESETS = [
   {
@@ -376,18 +398,98 @@ app.post('/api/contact', async (req, res) => {
     console.error('Contact endpoint error:', err.message);
     res.status(500).json({ error: err.message });
   }
+
+// POST /api/analytics/visit - Record silent visitor analytics session
+app.post('/api/analytics/visit', async (req, res) => {
+  try {
+    const { visitorId, path, visitCount, userAgent } = req.body;
+    if (!visitorId) {
+      return res.status(400).json({ error: 'visitorId is required' });
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      let visitDoc = await Visit.findOne({ visitorId });
+      if (visitDoc) {
+        visitDoc.visitCount = Math.max(visitDoc.visitCount || 1, visitCount || 1);
+        visitDoc.lastVisit = new Date();
+        if (path) visitDoc.pagesViewed.push({ path, timestamp: new Date() });
+        if (visitDoc.pagesViewed.length > 100) visitDoc.pagesViewed = visitDoc.pagesViewed.slice(-100);
+        await visitDoc.save();
+      } else {
+        visitDoc = new Visit({
+          visitorId,
+          visitCount: visitCount || 1,
+          pagesViewed: path ? [{ path, timestamp: new Date() }] : [],
+          lastVisit: new Date(),
+          userAgent
+        });
+        await visitDoc.save();
+      }
+      return res.json({ success: true, visitCount: visitDoc.visitCount });
+    }
+    return res.json({ success: true, offline: true });
+  } catch (err) {
+    console.error('Analytics visit tracking error:', err.message);
+    res.status(500).json({ error: 'Failed to record visit' });
+  }
+});
+
+// POST /api/analytics/profile - Save or update chatbot visitor profile & history
+app.post('/api/analytics/profile', async (req, res) => {
+  try {
+    const { visitorId, name, role, isStudent, contactDetails, chatHistory } = req.body;
+    if (!visitorId) {
+      return res.status(400).json({ error: 'visitorId is required' });
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      let profile = await VisitorProfile.findOne({ visitorId });
+      if (profile) {
+        if (name) profile.name = name;
+        if (role) profile.role = role;
+        if (typeof isStudent === 'boolean') profile.isStudent = isStudent;
+        if (contactDetails) profile.contactDetails = contactDetails;
+        if (Array.isArray(chatHistory)) profile.chatHistory = chatHistory.slice(-50);
+        profile.updatedAt = new Date();
+        await profile.save();
+      } else {
+        profile = new VisitorProfile({
+          visitorId,
+          name,
+          role,
+          isStudent,
+          contactDetails,
+          chatHistory: Array.isArray(chatHistory) ? chatHistory.slice(-50) : [],
+          updatedAt: new Date()
+        });
+        await profile.save();
+      }
+      return res.json({ success: true, profile });
+    }
+    return res.json({ success: true, offline: true });
+  } catch (err) {
+    console.error('Analytics profile save error:', err.message);
+    res.status(500).json({ error: 'Failed to save profile' });
+  }
+});
+
 // POST /api/chat - AI Chatbot endpoint powered by Mistral AI LLM
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, history } = req.body;
+    const { message, history, userProfile } = req.body;
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'Message text is required.' });
     }
 
     const mistralKey = process.env.MISTRAL_API_KEY || 'wFYeHbIkn77JZGephm2MwS6RfWJ5LQAR';
     
+    let userContextStr = '';
+    if (userProfile && userProfile.name) {
+      userContextStr = `\nCURRENT VISITOR DETAILS:\n- Visitor Name: ${userProfile.name}\n- Visitor Role: ${userProfile.role || 'Guest'}\n- Student Status: ${userProfile.isStudent ? 'Yes (Student)' : 'No'}\n- Contact details provided: ${userProfile.contactDetails || 'None'}\nInstructions: Recognize the user by name (${userProfile.name}) warmly when appropriate.`;
+    }
+
     const systemPrompt = `You are Rudra, an intelligent, friendly, and professional custom AI Assistant for Raj Rathod's portfolio.
-Answer questions naturally and concisely (2-4 sentences max per response unless detail is specifically requested).
+Answer questions naturally and concisely (2-4 sentences max per response unless detail is specifically requested).${userContextStr}
 
 RAJ RATHOD'S PROFILE DATA:
 - Role: AI & Machine Learning Developer.
@@ -421,7 +523,7 @@ RAJ RATHOD'S PROFILE DATA:
   * Resume: Available for download on the portfolio navbar (RATHOD_RAJ.pdf).
 
 Instructions:
-- If the user sends a simple greeting like "hi", "hello", "how are you", respond warmly: "Hello! 👋 I'm doing great! I am Rudra, the custom AI Assistant of Raj Rathod. How can I help you today?"
+- If the user sends a simple greeting like "hi", "hello", "how are you", respond warmly: "Hello ${userProfile?.name || ''}! 👋 I'm doing great! I am Rudra, the custom AI Assistant of Raj Rathod. How can I help you today?"
 - If asked about location / where Raj lives / map, state: "Raj is based in Vadodara, Gujarat, India. He studies at Parul University (P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760)." and include the Google Maps link: [View on Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)!
 - If asked about college result, CGPA, or marks, state clearly: "Raj's academic result in B.Tech CSE (AI Specialization) at Parul University is 7.66 CGPA." Do NOT tell the user to check student portals or contact academic departments!
 - Format responses cleanly with markdown formatting (bold text, bullet points, links).`;

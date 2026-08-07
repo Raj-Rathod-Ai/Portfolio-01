@@ -5,6 +5,8 @@ import { initRouter } from './router.js';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
 import { Chatbot } from './components/Chatbot.js';
+import { trackVisit } from './utils/analytics.js';
+
 
 // Global navbar/footer/chatbot instances
 const navbar = new Navbar();
