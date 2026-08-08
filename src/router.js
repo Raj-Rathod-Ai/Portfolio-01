@@ -32,6 +32,10 @@ export function matchRoute(path) {
   let cleanPath = path.replace(/\/$/, '');
   if (cleanPath === '' || cleanPath === '/index.html') cleanPath = '/';
 
+  if (cleanPath.endsWith('.pdf')) {
+    return { route: 'pdf', params: { file: cleanPath } };
+  }
+
   if (cleanPath === '/') return { route: 'home', params: {} };
   if (cleanPath === '/projects') return { route: 'projects-index', params: {} };
 
@@ -61,6 +65,10 @@ export async function navigate(path, pushState = true) {
   trackVisit(path);
 
   const match = matchRoute(path);
+  if (match.route === 'pdf') {
+    window.location.href = path;
+    return;
+  }
 
   if (pushState) {
     window.history.pushState(null, '', path);
@@ -148,6 +156,7 @@ export function initRouter() {
     if (
       href.startsWith('/') &&
       !href.startsWith('//') &&
+      !href.endsWith('.pdf') &&
       !target.hasAttribute('download') &&
       target.getAttribute('target') !== '_blank'
     ) {
