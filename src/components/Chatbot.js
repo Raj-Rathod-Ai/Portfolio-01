@@ -1073,7 +1073,7 @@ CRITICAL INSTRUCTIONS:
              `• Direct Download: [Rathod_Raj_AI_ML_Resume.pdf](/RATHOD_RAJ_AIML.pdf)\n\n` +
              `💻 **2. Full-Stack AI Engineer Resume**\n` +
              `• Focus: Full-Stack Web Development, React/Node/Express, REST APIs & GenAI Integration\n` +
-             `• Direct Download: [Rathod_Raj_FullStack_Resume.pdf](/RATHOD_RAJ_FULLSTACK.pdf)\n\n` +
+             `• View Online: [Full-Stack Resume Preview](/RATHOD_RAJ_FULLSTACK.html) | [Download PDF](/RATHOD_RAJ_FULLSTACK.pdf)\n\n` +
              `💡 *Tip: You can also click the **"Resume"** button on the navbar to open the interactive selection menu!*`;
     }
 
