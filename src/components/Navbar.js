@@ -29,10 +29,10 @@ export class Navbar {
           </nav>
 
           <div class="flex items-center space-x-3">
-            <a href="/RATHOD_RAJ.pdf" download class="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta text-xs font-semibold text-white shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+            <button class="resume-modal-trigger hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta text-xs font-semibold text-white shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
               <i class="fa-solid fa-file-arrow-down"></i>
               <span>Resume</span>
-            </a>
+            </button>
             <button id="mobile-menu-btn" class="md:hidden w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white">
               <i class="fa-solid fa-bars text-sm"></i>
             </button>
@@ -56,9 +56,9 @@ export class Navbar {
           <a href="#github" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-link" data-section="github">GitHub</a>
           <a href="#reviews" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-link" data-section="reviews">Reviews</a>
           <a href="#contact" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-link" data-section="contact">Contact</a>
-          <a href="/RATHOD_RAJ.pdf" download class="py-3 px-4 rounded-lg text-primary hover:bg-white/5 transition-colors font-medium flex items-center gap-2">
+          <button class="resume-modal-trigger w-full py-3 px-4 rounded-lg text-primary hover:bg-white/5 transition-colors font-medium flex items-center gap-2 text-left cursor-pointer">
             <i class="fa-solid fa-file-arrow-down text-sm"></i> Download Resume
-          </a>
+          </button>
         </nav>
       </div>
     `;

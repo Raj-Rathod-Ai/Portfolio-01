@@ -1064,6 +1064,19 @@ CRITICAL INSTRUCTIONS:
              `For academic inquiries or detailed transcripts, you can reach Raj directly at rathodraj1504@gmail.com.`;
     }
 
+    // 0.25 Resume / CV query
+    if (text.includes('resume') || text.includes('cv') || text.includes('bio') || text.includes('download resume')) {
+      return `📄 **RAJ RATHOD'S RESUMES & CVs**\n\n` +
+             `Raj provides two specialized resume formats:\n\n` +
+             `🤖 **1. AI & Machine Learning Developer Resume**\n` +
+             `• Focus: Python, PyTorch, TensorFlow, LLMs, RAG, NLP, CNNs & Predictive ML\n` +
+             `• Direct Download: [Rathod_Raj_AI_ML_Resume.pdf](/RATHOD_RAJ_AIML.pdf)\n\n` +
+             `💻 **2. Full-Stack AI Engineer Resume**\n` +
+             `• Focus: Full-Stack Web Development, React/Node/Express, REST APIs & GenAI Integration\n` +
+             `• Direct Download: [Rathod_Raj_FullStack_Resume.pdf](/RATHOD_RAJ_FULLSTACK.pdf)\n\n` +
+             `💡 *Tip: You can also click the **"Resume"** button on the navbar to open the interactive selection menu!*`;
+    }
+
     // 0.3 Last working / Latest Project query
     if (text.includes('last working') || text.includes('latest project') || text.includes('last project') || text.includes('most recent') || text.includes('recent project') || (text.includes('recent') && text.includes('project')) || (text.includes('do in recent') || text.includes('doing recent'))) {
       if (sorted.length > 0) {

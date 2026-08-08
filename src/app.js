@@ -17,6 +17,50 @@ import { trackVisit, trackInteraction, getApiBaseUrl } from './utils/analytics.j
   } catch (e) {}
 })();
 
+// Multi-Resume Selection Modal Controller
+function initResumeModal() {
+  const modal = document.getElementById('resume-modal');
+  const closeBtn = document.getElementById('resume-modal-close');
+
+  const openModal = () => {
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+  };
+
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('.resume-modal-trigger');
+    if (trigger) {
+      e.preventDefault();
+      openModal();
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeModal);
+  }
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initResumeModal);
+} else {
+  initResumeModal();
+}
+
 // Global interaction listener for clicks on GitHub, Live Demo, View Details, and Category links
 document.addEventListener('click', (e) => {
   const target = e.target;

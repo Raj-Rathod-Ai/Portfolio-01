@@ -46,9 +46,9 @@ export class Hero {
               <a href="#projects" class="px-7 py-3.5 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta font-semibold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 hero-projects-btn">
                 View Projects <i class="fa-solid fa-arrow-right text-sm"></i>
               </a>
-              <a href="/RATHOD_RAJ.pdf" download class="px-7 py-3.5 rounded-xl border border-white/10 bg-white/5 font-jakarta font-semibold text-gray-300 hover:text-white hover:border-primary/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">
+              <button class="resume-modal-trigger px-7 py-3.5 rounded-xl border border-white/10 bg-white/5 font-jakarta font-semibold text-gray-300 hover:text-white hover:border-primary/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-file-arrow-down text-sm text-primary"></i> Download Resume
-              </a>
+              </button>
             </div>
           </div>
 
