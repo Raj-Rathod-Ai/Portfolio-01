@@ -205,7 +205,7 @@ export class Chatbot {
         </div>
 
         <!-- Chat Stream Body -->
-        <div id="chatbot-messages" class="flex-1 overflow-y-auto p-3.5 space-y-3 font-inter text-xs text-gray-300 leading-relaxed scrollbar-thin">
+        <div id="chatbot-messages" class="flex-1 overflow-y-auto p-3.5 space-y-3 font-inter text-xs text-gray-300 leading-relaxed scrollbar-thin min-h-0" data-lenis-prevent>
         </div>
 
         <!-- Dynamic Quick Action Chips Container -->

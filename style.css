@@ -489,23 +489,24 @@ html.noscroll, body.noscroll, .noscroll {
   pointer-events: auto !important;
 }
 
-/* Custom smooth thin scrollbar for flip card content (both front & back) */
-.flip-card .scrollbar-thin {
+/* Custom smooth thin scrollbar for all scrollable containers (Chatbot & Cards) */
+.scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: rgba(99, 102, 241, 0.4) rgba(0, 0, 0, 0.2);
+  overscroll-behavior: contain;
 }
-.flip-card .scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
 }
-.flip-card .scrollbar-thin::-webkit-scrollbar-track {
+.scrollbar-thin::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 4px;
 }
-.flip-card .scrollbar-thin::-webkit-scrollbar-thumb {
+.scrollbar-thin::-webkit-scrollbar-thumb {
   background: rgba(99, 102, 241, 0.4);
   border-radius: 4px;
 }
-.flip-card .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 92, 246, 0.8);
 }
 
