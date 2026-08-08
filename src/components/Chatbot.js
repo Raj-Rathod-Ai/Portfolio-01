@@ -1102,17 +1102,25 @@ CRITICAL INSTRUCTIONS:
 
     // 1. NLP / Text Mining queries
     if (text.includes('nlp') || text.includes('text') || text.includes('sentiment') || text.includes('language') || text.includes('fake news') || text.includes('bert') || text.includes('natural language')) {
-      const nlpRepos = repos.filter(r => (r.category || '').toLowerCase() === 'nlp' || (r.topics || []).some(t => t.toLowerCase().includes('nlp') || t.toLowerCase().includes('text')));
-      
-      let repoList = '• **Fake News Detection (Real-Time NLP)**: Built using Python, Scikit-Learn, TF-IDF vectorizers, and NLTK to classify and detect fake news in textual articles.\n';
-      if (nlpRepos.length > 0) {
-        repoList = nlpRepos.map(r => `• **${r.name.replace(/[-_]/g, ' ')}**: ${r.description || 'NLP classification model.'} [View GitHub](${r.html_url})`).join('\n');
-      }
-
-      return `Here are Raj's **Natural Language Processing (NLP)** projects:\n\n` +
-             repoList + `\n` +
-             `• **Prompt Engineering & GenAI**: Advanced query optimization, LLM prompt tuning, and zero/few-shot prompt templates.\n\n` +
-             `You can inspect the code under the **NLP** category in the Projects section!`;
+      return `🔤 **RAJ RATHOD'S NATURAL LANGUAGE PROCESSING (NLP) PROJECTS**\n\n` +
+             `Here are Raj's top NLP & Text Mining projects:\n\n` +
+             `🕵️ **1. Fake News Detection (Real-Time NLP)**\n` +
+             `• **Tech**: Python, Scikit-learn, NLTK, TF-IDF, Flask, Three.js\n` +
+             `• **Objective**: Real-time NLP classifier analyzing text articles to detect fake news with ~92% classification accuracy.\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)\n\n` +
+             `🧠 **2. Discover Your True Personality**\n` +
+             `• **Tech**: Python, NLP, Machine Learning, Scikit-learn\n` +
+             `• **Objective**: Analyzes user textual responses & language patterns to predict personality traits.\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality)\n\n` +
+             `💬 **3. ChatNotes (RAG & Document QA)**\n` +
+             `• **Tech**: Python, RAG, LLM, LangChain, Groq API, ChromaDB, FastAPI\n` +
+             `• **Objective**: RAG-powered document assistant for conversational PDF question answering using NLP vector embeddings.\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/ChatNotes)\n\n` +
+             `🎬 **4. Movie Recommendations Using NLP & ML**\n` +
+             `• **Tech**: Python, NLP, Scikit-learn, Pandas\n` +
+             `• **Objective**: Content-based recommendation engine using NLP text vectorization to recommend movies based on plot keywords & genres.\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-ML)\n\n` +
+             `💡 *Tip: Click on the **NLP** tag in the Projects section to filter these repositories directly!*`;
     }
 
     // 2. Deep Learning / Computer Vision / CNN queries
