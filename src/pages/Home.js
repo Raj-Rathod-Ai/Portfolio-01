@@ -46,7 +46,7 @@ export class Home {
                 <span class="block text-xs text-gray-500 mt-1">B.Tech CGPA</span>
               </div>
               <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-secondary">10+</span>
+                <span class="block font-jakarta font-extrabold text-2xl text-secondary">25+</span>
                 <span class="block text-xs text-gray-500 mt-1">Projects Built</span>
               </div>
               <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">

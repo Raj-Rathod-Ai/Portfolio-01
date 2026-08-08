@@ -222,7 +222,7 @@ export class ProjectCard {
           ${flipBtnFrontHTML}
 
           <!-- Scrollable Content Body (Front) -->
-          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 min-h-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
+          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 min-h-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}" data-lenis-prevent>
             <!-- Header row with right padding to clear flip button -->
             <div class="flex items-start justify-between gap-3 pr-6">
               <div class="w-10 h-10 rounded-xl ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
@@ -266,7 +266,7 @@ export class ProjectCard {
           ${flipBtnBackHTML}
 
           <!-- Scrollable Content Body (Back) -->
-          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 min-h-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
+          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 min-h-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}" data-lenis-prevent>
             <!-- Back header -->
             <div class="flex items-center gap-2 pr-6">
               <div class="w-8 h-8 rounded-lg ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
