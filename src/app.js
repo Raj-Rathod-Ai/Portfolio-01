@@ -7,6 +7,16 @@ import { Footer } from './components/Footer.js';
 import { Chatbot } from './components/Chatbot.js';
 import { trackVisit, trackInteraction, getApiBaseUrl } from './utils/analytics.js';
 
+// Pre-warm Render backend server immediately on page load to prevent cold start delay
+(function prewarmBackend() {
+  try {
+    const apiUrl = getApiBaseUrl();
+    if (apiUrl) {
+      fetch(apiUrl + '/api/health', { cache: 'no-store' }).catch(() => {});
+    }
+  } catch (e) {}
+})();
+
 // Global interaction listener for clicks on GitHub, Live Demo, View Details, and Category links
 document.addEventListener('click', (e) => {
   const target = e.target;

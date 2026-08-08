@@ -1144,3 +1144,14 @@ app.listen(PORT, () => {
   console.log(`Express server running on: http://localhost:${PORT}`);
   console.log(`==================================================`);
 });
+
+// Keep-Alive Self-Ping Engine for Render Free Tier (Pings /api/health every 14 minutes)
+const RENDER_SERVICE_URL = process.env.RENDER_EXTERNAL_URL || 'https://portfolio-raj-qda3.onrender.com';
+setInterval(async () => {
+  try {
+    console.log('Sending self-ping to keep Render backend awake...');
+    await safeFetch(`${RENDER_SERVICE_URL}/api/health`, { headers: { 'User-Agent': 'RenderKeepAlive/1.0' } });
+  } catch (err) {
+    console.log('Self-ping notice:', err.message);
+  }
+}, 14 * 60 * 1000);

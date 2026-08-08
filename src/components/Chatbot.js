@@ -718,7 +718,10 @@ export class Chatbot {
    */
   async fetchAndShowDBStats() {
     try {
-      const res = await fetch(getApiBaseUrl() + '/api/analytics/stats');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(getApiBaseUrl() + '/api/analytics/stats', { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
         const visits = data.totalVisits || 0;
@@ -750,9 +753,13 @@ export class Chatbot {
    */
   async showMasterDBStats() {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
       const res = await fetch(getApiBaseUrl() + `/api/admin/analytics?password=${encodeURIComponent(getMasterPassword())}`, {
-        headers: { 'x-admin-key': getMasterPassword() }
+        headers: { 'x-admin-key': getMasterPassword() },
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
         const totalVisits = data.totalVisits || 0;
@@ -924,6 +931,8 @@ export class Chatbot {
 
     // Attempt 1: Portfolio backend Express API endpoint
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
       const res = await fetch(getApiBaseUrl() + '/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -933,8 +942,10 @@ export class Chatbot {
           userProfile: this.userProfile,
           repoContext: repoListText,
           latestProject: latestProjSummary
-        })
+        }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
         if (data.reply) return data.reply;
