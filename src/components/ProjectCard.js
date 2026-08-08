@@ -216,7 +216,7 @@ export class ProjectCard {
       <div class="flip-card-inner">
 
         <!-- ===== FRONT ===== -->
-        <div class="flip-card-front relative overflow-hidden ${isFeatured ? 'is-featured' : ''} ${isUpcoming ? 'border-amber-500/20 bg-amber-950/5' : ''} p-5 flex flex-col justify-between h-full">
+        <div class="flip-card-front overflow-hidden ${isFeatured ? 'is-featured' : ''} ${isUpcoming ? 'border-amber-500/20 bg-amber-950/5' : ''} p-5 flex flex-col justify-between h-full">
           ${blurOverlayHTML}
           <!-- Flip trigger button (top-right corner) -->
           ${flipBtnFrontHTML}
@@ -260,7 +260,7 @@ export class ProjectCard {
         </div>
 
         <!-- ===== BACK ===== -->
-        <div class="flip-card-back relative overflow-hidden p-5 flex flex-col justify-between h-full">
+        <div class="flip-card-back overflow-hidden p-5 flex flex-col justify-between h-full">
           ${blurOverlayHTML}
           <!-- Unflip trigger button (top-right corner) -->
           ${flipBtnBackHTML}
