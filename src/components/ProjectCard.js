@@ -1,5 +1,5 @@
 import { getLiveUrl, formatDate, slugify } from '../utils/helpers.js';
-import { isBossDevice } from '../utils/analytics.js';
+import { isBossDevice, getApiBaseUrl } from '../utils/analytics.js';
 
 /* ── Badge CSS class lookup ──────────────────────────────────── */
 const CAT_BADGE = {
@@ -427,7 +427,7 @@ export class ProjectCard {
         }
 
         // Sync to backend silently
-        fetch('/api/project-overrides', {
+        fetch(getApiBaseUrl() + '/api/project-overrides', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ overrides })
@@ -462,7 +462,7 @@ export class ProjectCard {
         }
 
         // Sync to backend silently
-        fetch('/api/project-overrides', {
+        fetch(getApiBaseUrl() + '/api/project-overrides', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ overrides })

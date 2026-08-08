@@ -5,7 +5,7 @@ import { initRouter } from './router.js';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
 import { Chatbot } from './components/Chatbot.js';
-import { trackVisit, trackInteraction } from './utils/analytics.js';
+import { trackVisit, trackInteraction, getApiBaseUrl } from './utils/analytics.js';
 
 // Global interaction listener for clicks on GitHub, Live Demo, View Details, and Category links
 document.addEventListener('click', (e) => {
@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load global database project overrides if backend connected
   try {
-    const overrideRes = await fetch('/api/project-overrides');
+    const overrideRes = await fetch(getApiBaseUrl() + '/api/project-overrides');
     if (overrideRes.ok && overrideRes.headers.get('content-type')?.includes('application/json')) {
       const data = await overrideRes.json();
       if (data && data.overrides && Object.keys(data.overrides).length > 0) {

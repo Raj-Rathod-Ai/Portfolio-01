@@ -5,7 +5,7 @@
  * change password capability, direct review deletion, and live DB inspection.
  */
 
-import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName, authenticateBoss, changeBossPassword, getMasterPassword, getVisitedCategories, trackInteraction } from '../utils/analytics.js';
+import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName, authenticateBoss, changeBossPassword, getMasterPassword, getVisitedCategories, trackInteraction, getApiBaseUrl } from '../utils/analytics.js';
 
 // Dynamically read runtime client API key (decoded safely to avoid raw scanner triggers)
 const MISTRAL_KEY = atob('d0ZZZUhiSWtuNzdKWkdlcGhtMk13UzZSZldKNUxRQVI=');
@@ -45,7 +45,7 @@ export class Chatbot {
     try {
       localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profile));
       const visitorId = getVisitorId();
-      fetch('/api/analytics/profile', {
+      fetch(getApiBaseUrl() + '/api/analytics/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -83,7 +83,7 @@ export class Chatbot {
       localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(this.history.slice(-40)));
       if (this.userProfile) {
         const visitorId = getVisitorId();
-        fetch('/api/analytics/profile', {
+        fetch(getApiBaseUrl() + '/api/analytics/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -690,7 +690,7 @@ export class Chatbot {
       const catsStr = visitedCats.length ? visitedCats.join(', ') : 'Generative AI & Machine Learning';
 
       // Dispatch automated follow-up email via backend
-      fetch('/api/analytics/lead-email', {
+      fetch(getApiBaseUrl() + '/api/analytics/lead-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -718,7 +718,7 @@ export class Chatbot {
    */
   async fetchAndShowDBStats() {
     try {
-      const res = await fetch('/api/analytics/stats');
+      const res = await fetch(getApiBaseUrl() + '/api/analytics/stats');
       if (res.ok) {
         const data = await res.json();
         const visits = data.totalVisits || 0;
@@ -750,7 +750,7 @@ export class Chatbot {
    */
   async showMasterDBStats() {
     try {
-      const res = await fetch(`/api/admin/analytics?password=${encodeURIComponent(getMasterPassword())}`, {
+      const res = await fetch(getApiBaseUrl() + `/api/admin/analytics?password=${encodeURIComponent(getMasterPassword())}`, {
         headers: { 'x-admin-key': getMasterPassword() }
       });
       if (res.ok) {
@@ -788,7 +788,7 @@ export class Chatbot {
    */
   async showReviewDeleteMenu() {
     try {
-      const res = await fetch('/api/reviews');
+      const res = await fetch(getApiBaseUrl() + '/api/reviews');
       if (res.ok) {
         const reviews = await res.json();
         if (!Array.isArray(reviews) || reviews.length === 0) {
@@ -837,7 +837,7 @@ export class Chatbot {
    */
   async executeDeleteReview(reviewId, reviewerName) {
     try {
-      const res = await fetch(`/api/reviews/${reviewId}?password=${encodeURIComponent(getMasterPassword())}`, {
+      const res = await fetch(getApiBaseUrl() + `/api/reviews/${reviewId}?password=${encodeURIComponent(getMasterPassword())}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -924,7 +924,7 @@ export class Chatbot {
 
     // Attempt 1: Portfolio backend Express API endpoint
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch(getApiBaseUrl() + '/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

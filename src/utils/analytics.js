@@ -4,6 +4,17 @@
  * Master Boss SHA-256 password authentication, 3-attempt retries, dynamic password change, and DB sync.
  */
 
+/**
+ * Resolves the active backend API base URL for Render deployment / localhost.
+ * @returns {string}
+ */
+export function getApiBaseUrl() {
+  if (typeof window !== 'undefined' && window.API_BASE_URL) return window.API_BASE_URL;
+  const host = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (host === 'localhost' || host === '127.0.0.1') return '';
+  return 'https://portfolio-raj-qda3.onrender.com';
+}
+
 const STORAGE_KEYS = {
   VISITOR_ID: 'raj_portfolio_visitor_id',
   VISIT_COUNT: 'raj_portfolio_visit_count',
@@ -97,7 +108,7 @@ export async function authenticateBoss(inputPassword) {
 
   // 3. Try server verification if Express backend is running safely
   try {
-    const res = await fetch('/api/admin/verify-password', {
+    const res = await fetch(getApiBaseUrl() + '/api/admin/verify-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: clean })
@@ -134,7 +145,7 @@ export async function changeBossPassword(oldPassword, newPassword) {
   setBossDevice(cleanNew, newHash);
 
   try {
-    const res = await fetch('/api/admin/change-password', {
+    const res = await fetch(getApiBaseUrl() + '/api/admin/change-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ oldPassword: cleanOld || getMasterPassword(), newPassword: cleanNew })
@@ -170,7 +181,7 @@ export function setBossDevice(pass, hash) {
     localStorage.setItem(STORAGE_KEYS.RUDRA_PROFILE, JSON.stringify(existing));
 
     const visitorId = getVisitorId();
-    fetch('/api/analytics/profile', {
+    fetch(getApiBaseUrl() + '/api/analytics/profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -353,7 +364,7 @@ export function trackVisit(path) {
     const visitorName = profile?.name || (isBossDevice() ? 'Boss' : null);
 
     // Async silent backend notification
-    fetch('/api/analytics/visit', {
+    fetch(getApiBaseUrl() + '/api/analytics/visit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -408,7 +419,7 @@ export function trackInteraction(type, targetName, category, linkUrl) {
     }
 
     // Async silent backend interaction log
-    fetch('/api/analytics/interaction', {
+    fetch(getApiBaseUrl() + '/api/analytics/interaction', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
