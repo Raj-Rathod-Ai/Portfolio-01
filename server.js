@@ -612,6 +612,7 @@ app.post('/api/contact', async (req, res) => {
     console.error('Contact endpoint error:', err.message);
     res.status(500).json({ error: err.message });
   }
+});
 
 // POST /api/analytics/visit - Record silent visitor analytics session
 app.post('/api/analytics/visit', async (req, res) => {
