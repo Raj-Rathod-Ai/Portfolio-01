@@ -1052,11 +1052,9 @@ RAJ RATHOD'S PROFILE DATA:
   * AI/ML/DL Frameworks: TensorFlow, PyTorch, Scikit-learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit.
   * Tools: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
 - Key Projects by Domain:
-  * Natural Language Processing (NLP) Projects:
+  * Natural Language Processing (NLP) Projects (2 Official Portfolio Repositories):
     1. Fake News Detection (Real-Time NLP): Real-time NLP text classifier using Scikit-learn, NLTK, TF-IDF vectorizers (~92% accuracy). GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
     2. Discover Your True Personality: NLP + ML text classification model analyzing user input to predict personality traits. GitHub: https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
-    3. ChatNotes (RAG & Document QA): Conversational PDF question answering assistant using RAG, LangChain, Groq API, and ChromaDB embeddings. GitHub: https://github.com/Raj-Rathod-Ai/ChatNotes
-    4. Movie Recommendations Using NLP & ML: Content-based recommendation engine using NLP TF-IDF text vectorization to match genres and plot descriptions. GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-ML
   * Computer Vision & Deep Learning:
     1. Flower Disease System: CNN leaf disease classifier using PyTorch & Streamlit.
   * Machine Learning:
