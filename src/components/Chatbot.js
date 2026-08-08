@@ -1070,10 +1070,10 @@ CRITICAL INSTRUCTIONS:
              `Raj provides two specialized resume formats:\n\n` +
              `🤖 **1. AI & Machine Learning Developer Resume**\n` +
              `• Focus: Python, PyTorch, TensorFlow, LLMs, RAG, NLP, CNNs & Predictive ML\n` +
-             `• Direct Download: [Rathod_Raj_AI_ML_Resume.pdf](/RATHOD_RAJ_AIML.pdf)\n\n` +
+             `• Direct PDF: [Rathod-Raj-Ai.pdf](/Rathod-Raj-Ai.pdf)\n\n` +
              `💻 **2. Full-Stack AI Engineer Resume**\n` +
              `• Focus: Full-Stack Web Development, React/Node/Express, REST APIs & GenAI Integration\n` +
-             `• View Online: [Full-Stack Resume Preview](/RATHOD_RAJ_FULLSTACK.html) | [Download PDF](/RATHOD_RAJ_FULLSTACK.pdf)\n\n` +
+             `• Direct PDF: [RATHOD_RAJ_FULLSTACK.pdf](/RATHOD_RAJ_FULLSTACK.pdf)\n\n` +
              `💡 *Tip: You can also click the **"Resume"** button on the navbar to open the interactive selection menu!*`;
     }
 
