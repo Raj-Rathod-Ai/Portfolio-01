@@ -7,6 +7,41 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// Safe HTTP fetch helper for all Node environments
+const safeFetch = async (url, options = {}) => {
+  if (typeof fetch === 'function') {
+    return fetch(url, options);
+  }
+  const https = require('https');
+  return new Promise((resolve, reject) => {
+    try {
+      const u = new URL(url);
+      const req = https.request({
+        hostname: u.hostname,
+        path: u.pathname + u.search,
+        method: options.method || 'GET',
+        headers: options.headers || {}
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          resolve({
+            ok: res.statusCode >= 200 && res.statusCode < 300,
+            status: res.statusCode,
+            json: async () => JSON.parse(data),
+            text: async () => data
+          });
+        });
+      });
+      req.on('error', reject);
+      if (options.body) req.write(options.body);
+      req.end();
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -817,7 +852,7 @@ app.post('/api/analytics/lead-email', async (req, res) => {
     // Dispatch email via Brevo transactional API if key exists
     if (process.env.BREVO_API_KEY) {
       try {
-        await fetch('https://api.brevo.com/v3/smtp/email', {
+        await safeFetch('https://api.brevo.com/v3/smtp/email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1054,7 +1089,7 @@ Instructions:
 
     messages.push({ role: 'user', content: message });
 
-    const mistralRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    const mistralRes = await safeFetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

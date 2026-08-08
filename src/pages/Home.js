@@ -1038,24 +1038,27 @@ export class Home {
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-jakarta text-xs font-bold text-black shadow-lg shadow-amber-500/20 hover:scale-105 transition-all flex items-center gap-2">
-                    <span>Open Live Certificate Portal</span>
+                    <span>Open Official Certificate Portal</span>
                     <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                   </a>
                 </div>
               </div>`;
           } else if (certData.type === 'image') {
             bodyEl.innerHTML = `
-              <div class="w-full h-full flex flex-col items-center justify-center p-2 relative group overflow-y-auto" data-lenis-prevent>
-                <img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-[72vh] object-contain rounded-xl shadow-2xl border border-white/10"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="hidden flex-col items-center justify-center p-8 text-center space-y-4 bg-white/5 border border-white/10 rounded-2xl">
-                  <i class="fa-solid fa-file-image text-4xl text-gray-400"></i>
-                  <div>
-                    <h4 class="font-jakarta font-bold text-base text-gray-100">${certData.title}</h4>
-                    <p class="text-xs text-gray-400 mt-1">${certData.issuer}</p>
+              <div class="w-full h-full flex flex-col items-center justify-center p-4 relative overflow-y-auto" data-lenis-prevent>
+                <img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-[72vh] object-contain rounded-xl shadow-2xl border border-white/15"
+                     onerror="this.style.display='none'; var f=document.getElementById('cert-img-fallback'); if(f) f.style.display='flex';">
+                <div id="cert-img-fallback" class="flex-col items-center justify-center p-8 text-center space-y-4 bg-white/5 border border-white/10 rounded-2xl max-w-md" style="display:none;">
+                  <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary text-3xl">
+                    <i class="fa-solid fa-certificate"></i>
                   </div>
-                  <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/80 transition-all flex items-center gap-2">
-                    <span>Open Raw Certificate File</span>
+                  <div>
+                    <h4 class="font-jakarta font-bold text-lg text-gray-100">${certData.title}</h4>
+                    <p class="text-xs text-gray-400 mt-1 font-mono">${certData.issuer}</p>
+                    <p class="text-xs text-gray-500 mt-2">Verified Credential for <strong class="text-gray-300">Rathod Raj</strong></p>
+                  </div>
+                  <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white text-xs font-bold font-jakarta shadow-lg hover:scale-105 transition-all flex items-center gap-2">
+                    <span>View Official Certificate Link</span>
                     <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                   </a>
                 </div>
