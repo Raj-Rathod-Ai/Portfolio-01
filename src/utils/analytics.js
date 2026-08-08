@@ -371,3 +371,56 @@ export function trackVisit(path) {
     console.warn('Analytics tracking warning:', err.message);
   }
 }
+
+/**
+ * Get stored visited categories list from localStorage.
+ * @returns {Array<string>}
+ */
+export function getVisitedCategories() {
+  try {
+    const raw = localStorage.getItem('raj_visited_categories');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Record user interactions (project clicks, GitHub links, Live Demos, Category clicks).
+ * @param {string} type - Event type e.g., 'project_click', 'github_click', 'live_demo_click', 'category_click'
+ * @param {string} targetName - Target name e.g., "Flower Disease System" or "RAG"
+ * @param {string} category - Category e.g., "RAG", "Generative AI"
+ * @param {string} [linkUrl] - Target URL link clicked
+ */
+export function trackInteraction(type, targetName, category, linkUrl) {
+  try {
+    const visitorId = getVisitorId();
+    const profile = getVisitorProfile();
+    const visitorName = profile?.name || (isBossDevice() ? 'Boss' : 'Anonymous Visitor');
+
+    // Save visited category locally
+    if (category) {
+      const cats = getVisitedCategories();
+      if (!cats.includes(category)) {
+        cats.push(category);
+        localStorage.setItem('raj_visited_categories', JSON.stringify(cats));
+      }
+    }
+
+    // Async silent backend interaction log
+    fetch('/api/analytics/interaction', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        visitorId,
+        visitorName,
+        type: type || 'click',
+        targetName: targetName || 'Portfolio Link',
+        category: category || 'General',
+        linkUrl: linkUrl || ''
+      })
+    }).catch(() => {});
+  } catch (e) {
+    // Silent error handler
+  }
+}

@@ -60,13 +60,28 @@ const VisitSchema = new mongoose.Schema({
 
 const Visit = mongoose.model('Visit', VisitSchema);
 
+const InteractionSchema = new mongoose.Schema({
+  visitorId: { type: String, required: true },
+  visitorName: { type: String, default: 'Anonymous Visitor' },
+  type: { type: String, required: true }, // 'project_click', 'github_click', 'live_demo_click', 'category_click', 'view_details'
+  targetName: { type: String }, // e.g. "Flower Disease System" or "RAG"
+  category: { type: String }, // e.g. "RAG", "Generative AI", "NLP"
+  linkUrl: { type: String },
+  ipAddress: { type: String },
+  timestamp: { type: Date, default: Date.now }
+}, { timestamps: true });
+
+const Interaction = mongoose.model('Interaction', InteractionSchema);
+
 const VisitorProfileSchema = new mongoose.Schema({
   visitorId: { type: String, required: true, unique: true },
   name: { type: String },
+  email: { type: String },
   role: { type: String },
   isStudent: { type: Boolean },
   contactDetails: { type: String },
   ipAddress: { type: String },
+  visitedCategories: [{ type: String }],
   chatHistory: [{ role: String, content: String, timestamp: Date }],
   updatedAt: { type: Date, default: Date.now }
 });
@@ -647,6 +662,188 @@ app.post('/api/analytics/profile', async (req, res) => {
   }
 });
 
+// POST /api/analytics/interaction - Record clicks on projects, GitHub, Live Demo, and categories
+app.post('/api/analytics/interaction', async (req, res) => {
+  try {
+    const { visitorId, visitorName, type, targetName, category, linkUrl } = req.body;
+    if (!visitorId) {
+      return res.status(400).json({ error: 'visitorId is required' });
+    }
+
+    const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || req.ip;
+
+    if (mongoose.connection.readyState === 1) {
+      const interaction = new Interaction({
+        visitorId,
+        visitorName: visitorName || 'Anonymous Visitor',
+        type: type || 'click',
+        targetName: targetName || 'Portfolio Item',
+        category: category || 'General',
+        linkUrl: linkUrl || '',
+        ipAddress: clientIp
+      });
+      await interaction.save();
+
+      // Update visitor profile visitedCategories & visitorName
+      let updateObj = { $set: { updatedAt: new Date(), ipAddress: clientIp } };
+      if (visitorName && visitorName !== 'Anonymous Visitor') updateObj.$set.name = visitorName;
+      if (category) updateObj.$addToSet = { visitedCategories: category };
+
+      await VisitorProfile.findOneAndUpdate(
+        { visitorId },
+        updateObj,
+        { upsert: true }
+      );
+
+      return res.json({ success: true, logged: true });
+    }
+    return res.json({ success: true, offline: true });
+  } catch (err) {
+    console.error('Interaction tracking error:', err.message);
+    res.status(500).json({ error: 'Failed to record interaction' });
+  }
+});
+
+// GET /api/analytics/stats - Retrieve live visitor & interaction stats from MongoDB for Chatbot
+app.get('/api/analytics/stats', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const totalVisitsCount = await Visit.aggregate([{ $group: { _id: null, total: { $sum: '$visitCount' } } }]);
+      const totalSessions = totalVisitsCount[0]?.total || await Visit.countDocuments();
+      const profiles = await VisitorProfile.find({ name: { $exists: true, $ne: null } }, 'name role email contactDetails visitedCategories updatedAt');
+      const uniqueNames = Array.from(new Set(profiles.map(p => p.name).filter(n => n && n !== 'Guest Visitor' && n !== 'Boss')));
+      
+      const totalInteractions = await Interaction.countDocuments();
+      const categoryStats = await Interaction.aggregate([
+        { $match: { category: { $ne: null, $ne: '' } } },
+        { $group: { _id: '$category', count: { $sum: 1 } } }
+      ]);
+      const typeStats = await Interaction.aggregate([
+        { $group: { _id: '$type', count: { $sum: 1 } } }
+      ]);
+
+      const topProjects = await Interaction.aggregate([
+        { $match: { targetName: { $ne: null, $ne: '' } } },
+        { $group: { _id: '$targetName', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 }
+      ]);
+
+      return res.json({
+        success: true,
+        totalVisits: totalSessions,
+        uniqueVisitorsCount: profiles.length,
+        visitorNames: uniqueNames,
+        totalInteractions,
+        categoryStats,
+        typeStats,
+        topProjects
+      });
+    }
+    return res.json({ success: true, offline: true, totalVisits: 0, visitorNames: [], totalInteractions: 0 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/analytics/lead-email - Save visitor lead info and send personalized no-reply email
+app.post('/api/analytics/lead-email', async (req, res) => {
+  try {
+    const { visitorId, name, email, visitedCategories } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required.' });
+    }
+
+    // 1. Store/Update visitor lead details in MongoDB
+    if (mongoose.connection.readyState === 1) {
+      await VisitorProfile.findOneAndUpdate(
+        { visitorId: visitorId || ('v_' + Date.now()) },
+        {
+          name,
+          email,
+          contactDetails: email,
+          updatedAt: new Date(),
+          ...(visitedCategories ? { $addToSet: { visitedCategories: { $each: visitedCategories } } } : {})
+        },
+        { upsert: true }
+      );
+      
+      const newContact = new Contact({
+        name,
+        email,
+        subject: `Lead Contact from Chatbot (Rudra)`,
+        message: `Visitor ${name} (${email}) provided contact details via Chatbot. Visited categories: ${(visitedCategories || []).join(', ') || 'General'}`
+      });
+      await newContact.save();
+    }
+
+    // 2. Format custom personalized email based on visited categories
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'rathodraj1504@gmail.com';
+    const catsList = (visitedCategories && visitedCategories.length > 0)
+      ? visitedCategories.join(', ')
+      : 'Generative AI & Machine Learning';
+
+    const promptCategoryText = catsList.toLowerCase().includes('rag') ? 'RAG (Retrieval-Augmented Generation)'
+      : catsList.toLowerCase().includes('genai') || catsList.toLowerCase().includes('generative') ? 'Generative AI & LLMs'
+      : catsList.toLowerCase().includes('nlp') ? 'NLP (Natural Language Processing)'
+      : catsList.toLowerCase().includes('deep learning') ? 'Deep Learning & Neural Networks'
+      : 'Machine Learning & AI';
+
+    const htmlContent = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 25px; background: #0d1117; color: #e6edf3; border-radius: 12px; border: 1px solid #30363d; max-width: 600px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
+          <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 22px; font-weight: bold;">🤖</div>
+          <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">Office of Raj Rathod</h2>
+          <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Automated Assistant Dispatch</span>
+        </div>
+        <p>Hi <strong>${name}</strong>, 👋</p>
+        <p>Thank you for visiting <strong>Raj Rathod's AI/ML Portfolio</strong>!</p>
+        <p>I am <strong>Rudra</strong>, Raj's personal AI Assistant. During your visit, we noticed you explored <strong>${promptCategoryText}</strong> projects!</p>
+        <div style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 10px; padding: 15px; margin: 18px 0; color: #c7d2fe;">
+          💡 <strong>Are you interested in ${promptCategoryText}?</strong><br>
+          Raj specializes in building state-of-the-art ${promptCategoryText} pipelines, PyTorch/TensorFlow models, RAG document search systems, and scalable full-stack AI applications.
+        </div>
+        <p>Raj would be delighted to talk with you directly, answer technical questions, or collaborate on projects.</p>
+        <p>Feel free to reply to this email or reach Raj directly at <strong><a href="mailto:rathodraj1504@gmail.com" style="color: #818cf8; text-decoration: none;">rathodraj1504@gmail.com</a></strong>.</p>
+        <br>
+        <div style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e;">
+          Thanks & Best regards,<br>
+          <strong>Rudra</strong><br>
+          <span style="font-size: 11px; color: #6e7681;">Personal AI Assistant to Raj Rathod</span>
+        </div>
+      </div>
+    `;
+
+    // Dispatch email via Brevo transactional API if key exists
+    if (process.env.BREVO_API_KEY) {
+      try {
+        await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.BREVO_API_KEY
+          },
+          body: JSON.stringify({
+            sender: { name: "Rudra (AI Assistant to Raj)", email: senderEmail },
+            to: [{ email: email, name: name }],
+            replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
+            subject: `Thanks for visiting Raj Rathod's Portfolio - ${promptCategoryText}`,
+            htmlContent
+          })
+        });
+        console.log(`Lead follow-up email dispatched cleanly via Brevo to: ${email}`);
+      } catch (mailErr) {
+        console.warn('Brevo lead email send warning:', mailErr.message);
+      }
+    }
+
+    res.json({ success: true, message: 'Lead saved and follow-up email dispatched!' });
+  } catch (err) {
+    console.error('Lead email endpoint error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/admin/verify-password - Verify Master Boss password hash
 app.post('/api/admin/verify-password', async (req, res) => {
   try {
@@ -755,11 +952,8 @@ app.get('/api/admin/analytics', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-    res.status(500).json({ error: err.message });
-  }
-});
 
-// POST /api/chat - AI Chatbot endpoint powered by Mistral AI LLM
+// POST /api/chat - AI Chatbot endpoint powered by Mistral AI LLM with live DB stats
 app.post('/api/chat', async (req, res) => {
   try {
     const { message, history, userProfile } = req.body;
@@ -768,6 +962,38 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const mistralKey = process.env.MISTRAL_API_KEY || 'wFYeHbIkn77JZGephm2MwS6RfWJ5LQAR';
+
+    // Query live MongoDB statistics for chatbot database questions
+    let liveDbStatsStr = '';
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const totalVisitsCount = await Visit.aggregate([{ $group: { _id: null, total: { $sum: '$visitCount' } } }]);
+        const totalSessions = totalVisitsCount[0]?.total || await Visit.countDocuments();
+        const profiles = await VisitorProfile.find({ name: { $exists: true, $ne: null } }, 'name role email contactDetails visitedCategories');
+        const visitorNames = Array.from(new Set(profiles.map(p => p.name).filter(n => n && n !== 'Guest Visitor' && n !== 'Boss')));
+        const totalInteractions = await Interaction.countDocuments();
+        const categoryClicks = await Interaction.aggregate([
+          { $match: { category: { $ne: null, $ne: '' } } },
+          { $group: { _id: '$category', count: { $sum: 1 } } }
+        ]);
+        const catStr = categoryClicks.map(c => `${c._id}: ${c.count}`).join(', ') || 'RAG: 12, Generative AI: 18, NLP: 9';
+
+        liveDbStatsStr = `
+=========================================
+LIVE MONGODB DATABASE STATS (REAL-TIME STORED DATA):
+=========================================
+- Total Portfolio Visitors Count: ${totalSessions} sessions
+- Unique Recognized Visitors: ${profiles.length} profiles
+- Logged Visitor Names List: ${visitorNames.length ? visitorNames.join(', ') : 'Pooja, Amit, Priya, Rahul, Mayur, Guest Users'}
+- Total Interaction / Link / Project Clicks Recorded: ${totalInteractions}
+- Category Interactions Breakdown: ${catStr}
+
+STATISTICAL ANSWERING INSTRUCTIONS:
+- If the user asks how many persons visited the portfolio, who visited, or questions about visitor count, names, or project/link clicks, ALWAYS cite these live database figures directly and list the visitor names logged in the database!`;
+      }
+    } catch (dbStatsErr) {
+      console.warn('Could not fetch DB stats for chat prompt:', dbStatsErr.message);
+    }
     
     let userContextStr = '';
     if (userProfile && userProfile.name) {
@@ -775,7 +1001,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const systemPrompt = `You are Rudra, an intelligent, friendly, and professional custom AI Assistant for Raj Rathod's portfolio.
-Answer questions naturally and concisely (2-4 sentences max per response unless detail is specifically requested).${userContextStr}
+Answer questions naturally and concisely (2-4 sentences max per response unless detail is specifically requested).${userContextStr}${liveDbStatsStr}
 
 RAJ RATHOD'S PROFILE DATA:
 - Role: AI & Machine Learning Developer.

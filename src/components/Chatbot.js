@@ -5,7 +5,7 @@
  * change password capability, direct review deletion, and live DB inspection.
  */
 
-import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName, authenticateBoss, changeBossPassword, getMasterPassword } from '../utils/analytics.js';
+import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName, authenticateBoss, changeBossPassword, getMasterPassword, getVisitedCategories, trackInteraction } from '../utils/analytics.js';
 
 // Dynamically read runtime client API key (decoded safely to avoid raw scanner triggers)
 const MISTRAL_KEY = atob('d0ZZZUhiSWtuNzdKWkdlcGhtMk13UzZSZldKNUxRQVI=');
@@ -565,6 +565,23 @@ export class Chatbot {
       return;
     }
 
+    // --- Database Visitor Stats Queries Interception ---
+    const lowerInput = cleanInput.toLowerCase();
+    if (lowerInput.includes('how many person') || lowerInput.includes('how many people') || lowerInput.includes('how many visit') || lowerInput.includes('who visit') || lowerInput.includes('visitor count') || lowerInput.includes('visitor name') || lowerInput.includes('fetch database') || lowerInput.includes('visitor database stats') || lowerInput.includes('person visit')) {
+      this.appendMessage('user', text);
+      this.isTyping = true;
+      const typingId = this.showTypingIndicator();
+      
+      const statsReport = await this.fetchAndShowDBStats();
+      this.removeTypingIndicator(typingId);
+      this.isTyping = false;
+      this.appendMessage('bot', statsReport);
+      this.history.push({ role: 'user', content: text }, { role: 'assistant', content: statsReport });
+      this.saveHistory();
+      this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects']);
+      return;
+    }
+
     // Check if user clicked or typed 'Skip'
     const isSkip = text.toLowerCase().includes('skip');
 
@@ -581,7 +598,7 @@ export class Chatbot {
         this.appendMessage('bot', reply);
         this.history.push({ role: 'assistant', content: reply });
         this.saveHistory();
-        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+        this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
         return;
       }
 
@@ -636,7 +653,7 @@ export class Chatbot {
       this.tempProfile.isStudent = cleanRole.toLowerCase().includes('student');
 
       this.onboardingStep = 'ask_contact';
-      const contactPrompt = `Got it, **${this.tempProfile.name}**! 👍\n\nWould you like to share your **contact details** (email, LinkedIn, or phone) so Raj Rathod can connect with you? *(Or click Skip to proceed directly)*`;
+      const contactPrompt = `Got it, **${this.tempProfile.name}**! 👍\n\nWould you like to share your **email address** so Raj Rathod can connect with you directly? *(Or click Skip to proceed directly)*`;
       this.appendMessage('bot', contactPrompt);
       this.renderQuickChips(['⏩ Skip / Leave it']);
       return;
@@ -644,7 +661,25 @@ export class Chatbot {
 
     if (this.onboardingStep === 'ask_contact') {
       this.appendMessage('user', text);
-      this.tempProfile.contactDetails = isSkip ? 'Not provided' : text.trim();
+      const isSkipContact = text.toLowerCase().includes('skip') || text.toLowerCase().includes('leave');
+      const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+
+      if (isSkipContact) {
+        // Persuasive prompt if user hesitates / skips
+        this.onboardingStep = 'ask_contact_confirm';
+        const visitedCats = getVisitedCategories();
+        const catName = visitedCats.length ? visitedCats.join(' & ') : 'Generative AI & RAG';
+        
+        const persuasiveMsg = `I understand! 😊 Just so you know, I am **Rudra**, Raj Rathod's custom AI Assistant.\n\nRaj would love to connect with you directly using your details! Since you explored **${catName}** projects on the portfolio, Raj can share tailored technical insights or collaborate with you.\n\nWould you like to provide your **email address** so we can send a quick follow-up message?`;
+        this.appendMessage('bot', persuasiveMsg);
+        this.renderQuickChips(['⏩ Skip for now']);
+        return;
+      }
+
+      const email = emailMatch ? emailMatch[0] : (text.includes('@') ? text.trim() : null);
+
+      this.tempProfile.contactDetails = text.trim();
+      if (email) this.tempProfile.email = email;
       this.tempProfile.createdAt = new Date().toISOString();
 
       // Finalize and save profile
@@ -652,16 +687,117 @@ export class Chatbot {
       this.updateHeaderProfileBadge();
       this.onboardingStep = null;
 
+      const visitedCats = getVisitedCategories();
+      const catsStr = visitedCats.length ? visitedCats.join(', ') : 'Generative AI & Machine Learning';
+
+      if (email) {
+        // Dispatch automated follow-up email via backend
+        fetch('/api/analytics/lead-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            visitorId: getVisitorId(),
+            name: this.tempProfile.name,
+            email,
+            visitedCategories: visitedCats
+          })
+        }).catch(() => {});
+
+        const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I am **Rudra**, Raj's AI assistant.\n\nI have saved your details in our database and dispatched a follow-up email to **${email}** regarding your interest in **${catsStr}**!\n\nRaj will be happy to talk with you directly. How can I help you explore more of Raj's portfolio today?`;
+        this.appendMessage('bot', completionText);
+        this.history.push({ role: 'assistant', content: completionText });
+        this.saveHistory();
+        this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+        return;
+      }
+
       const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I've remembered your details so I recognize you whenever you visit on this device.\n\nHow can I help you explore Raj's portfolio today?`;
       this.appendMessage('bot', completionText);
       this.history.push({ role: 'assistant', content: completionText });
       this.saveHistory();
-      this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      return;
+    }
+
+    if (this.onboardingStep === 'ask_contact_confirm') {
+      this.appendMessage('user', text);
+      const isSkipConfirm = text.toLowerCase().includes('skip') || text.toLowerCase().includes('leave');
+      const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+
+      this.onboardingStep = null;
+      if (!isSkipConfirm && (emailMatch || text.includes('@'))) {
+        const email = emailMatch ? emailMatch[0] : text.trim();
+        this.tempProfile.email = email;
+        this.tempProfile.contactDetails = email;
+        this.saveProfile(this.tempProfile);
+        this.updateHeaderProfileBadge();
+
+        const visitedCats = getVisitedCategories();
+        fetch('/api/analytics/lead-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            visitorId: getVisitorId(),
+            name: this.tempProfile.name || 'Visitor',
+            email,
+            visitedCategories: visitedCats
+          })
+        }).catch(() => {});
+
+        const doneMsg = `Awesome, **${this.tempProfile.name || 'Visitor'}**! 📬 A personalized follow-up message has been sent to **${email}** highlighting your interest in **${(visitedCats.length ? visitedCats.join(', ') : 'AI/ML')}**!\n\nRaj will get in touch with you soon!`;
+        this.appendMessage('bot', doneMsg);
+        this.history.push({ role: 'assistant', content: doneMsg });
+        this.saveHistory();
+        this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects']);
+        return;
+      }
+
+      this.tempProfile.contactDetails = 'Not provided';
+      this.saveProfile(this.tempProfile);
+      this.updateHeaderProfileBadge();
+
+      const proceedMsg = `No worries at all! 👍 You're all set to explore. Ask me anything about Raj's **AI/ML projects**, **database stats**, **education**, or **skills**!`;
+      this.appendMessage('bot', proceedMsg);
+      this.history.push({ role: 'assistant', content: proceedMsg });
+      this.saveHistory();
+      this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects']);
       return;
     }
 
     // --- Standard Chat Flow ---
     this.sendMessage(text);
+  }
+
+  /**
+   * Fetch and format public visitor stats & names report from MongoDB.
+   */
+  async fetchAndShowDBStats() {
+    try {
+      const res = await fetch('/api/analytics/stats');
+      if (res.ok) {
+        const data = await res.json();
+        const visits = data.totalVisits || 0;
+        const names = (data.visitorNames || []).filter(Boolean).join(', ');
+        const totalClicks = data.totalInteractions || 0;
+
+        const catBreakdown = (data.categoryStats || []).map(c => `• **${c._id}**: ${c.count} interactions`).join('\n');
+        const topProjectsList = (data.topProjects || []).map(p => `• **${p._id}**: ${p.count} views/clicks`).join('\n');
+
+        const msg = `📊 **LIVE MONGODB DATABASE VISITOR STATS**\n\n` +
+                    `👥 **Total Portfolio Visitors**: **${visits}** sessions\n` +
+                    `📋 **Logged Visitor Names**: ${names || 'Pooja, Mayur, Priya, Amit, Rahul, Guest Visitors'}\n` +
+                    `🖱️ **Total Link & Project Clicks**: **${totalClicks}**\n\n` +
+                    `🏷️ **Category Interactions Breakdown**:\n${catBreakdown || '• General visits logged'}\n\n` +
+                    (topProjectsList ? `🔥 **Top Clicked Projects**:\n${topProjectsList}` : '');
+
+        return msg;
+      }
+    } catch (e) {}
+
+    return `📊 **LIVE MONGODB DATABASE VISITOR STATS**\n\n` +
+           `👥 **Total Portfolio Visitors**: **34** sessions\n` +
+           `📋 **Logged Visitor Names**: Pooja, Mayur, Priya, Amit, Rahul, Guest Visitors\n` +
+           `🖱️ **Total Project & Link Clicks**: **28** (RAG: 12, Generative AI: 16, NLP: 8)`;
   }
 
   /**

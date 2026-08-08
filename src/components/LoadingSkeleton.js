@@ -4,7 +4,7 @@
 export class LoadingSkeleton {
   render(count = 6) {
     const card = () => `
-    <div class="skeleton-card" style="height:340px;border-radius:16px">
+    <div class="skeleton-card" style="height:420px;border-radius:16px">
       <div class="space-y-4 h-full flex flex-col justify-between">
         <div class="space-y-3">
           <!-- Icon + title row -->

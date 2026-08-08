@@ -216,13 +216,15 @@ export class ProjectCard {
       <div class="flip-card-inner">
 
         <!-- ===== FRONT ===== -->
-        <div class="flip-card-front relative overflow-hidden ${isFeatured ? 'is-featured' : ''} ${isUpcoming ? 'border-amber-500/20 bg-amber-950/5' : ''} p-5 flex flex-col justify-between">
+        <div class="flip-card-front relative overflow-hidden ${isFeatured ? 'is-featured' : ''} ${isUpcoming ? 'border-amber-500/20 bg-amber-950/5' : ''} p-5 flex flex-col justify-between h-full">
           ${blurOverlayHTML}
           <!-- Flip trigger button (top-right corner) -->
           ${flipBtnFrontHTML}
-          <!-- Header row -->
-          <div class="space-y-3 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
-            <div class="flex items-start justify-between gap-3">
+
+          <!-- Scrollable Content Body (Front) -->
+          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 min-h-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
+            <!-- Header row with right padding to clear flip button -->
+            <div class="flex items-start justify-between gap-3 pr-6">
               <div class="w-10 h-10 rounded-xl ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
                 <i class="fa-solid ${iconData.icon} ${iconData.color} text-base"></i>
               </div>
@@ -236,21 +238,21 @@ export class ProjectCard {
             </div>
 
             <!-- Description -->
-            <p class="text-[11px] text-gray-500 leading-relaxed" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${desc}</p>
+            <p class="text-[11px] text-gray-400 leading-relaxed">${desc}</p>
 
             <!-- Topics -->
-            <div class="flex flex-wrap gap-1">${topicsHTML}</div>
+            <div class="flex flex-wrap gap-1.5 pt-1">${topicsHTML}</div>
           </div>
 
-          <!-- Footer badges + actions -->
-          <div class="space-y-3 mt-3 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
+          <!-- Pinned Footer badges + actions -->
+          <div class="space-y-2.5 pt-3 mt-1 border-t shrink-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}" style="border-color:rgba(255,255,255,0.06)">
             <div class="flex flex-wrap items-center gap-1.5">
               <span class="px-2 py-0.5 rounded-md text-[9px] font-mono border ${badgeClass}">${repo.category}</span>
               ${upcomingBadge}
               ${groupBadge}
               ${featuredBadge}
             </div>
-            <div class="flex items-center gap-2 pt-2 border-t" style="border-color:rgba(255,255,255,0.05)">
+            <div class="flex items-center gap-2 pt-1">
               ${actionBtnsHTML}
             </div>
             ${masterControlsHTML}
@@ -263,11 +265,11 @@ export class ProjectCard {
           <!-- Unflip trigger button (top-right corner) -->
           ${flipBtnBackHTML}
 
-          <!-- Scrollable Content Body -->
-          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
+          <!-- Scrollable Content Body (Back) -->
+          <div class="space-y-3 flex-1 overflow-y-auto pr-1.5 scrollbar-thin my-1 min-h-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}">
             <!-- Back header -->
             <div class="flex items-center gap-2 pr-6">
-              <div class="w-7 h-7 rounded-lg ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
+              <div class="w-8 h-8 rounded-lg ${iconData.bg} border ${iconData.border} flex items-center justify-center flex-shrink-0">
                 <i class="fa-solid ${iconData.icon} ${iconData.color} text-xs"></i>
               </div>
               <div class="min-w-0 flex-1">
@@ -276,17 +278,17 @@ export class ProjectCard {
               </div>
             </div>
 
-            <div style="height:1px;background:rgba(255,255,255,0.05)"></div>
+            <div style="height:1px;background:rgba(255,255,255,0.06)"></div>
 
             <!-- Overview -->
             <div>
-              <span class="text-[9px] font-mono uppercase tracking-widest text-gray-600">Overview</span>
-              <p class="text-[11px] text-gray-400 leading-relaxed mt-1">${desc}</p>
+              <span class="text-[9px] font-mono uppercase tracking-widest text-indigo-400 font-semibold">Overview</span>
+              <p class="text-[11px] text-gray-300 leading-relaxed mt-1">${desc}</p>
             </div>
 
             <!-- Key features -->
             <div>
-              <span class="text-[9px] font-mono uppercase tracking-widest text-gray-600">Key Points</span>
+              <span class="text-[9px] font-mono uppercase tracking-widest text-indigo-400 font-semibold">Key Highlights</span>
               ${bulletsHTML}
             </div>
 
@@ -294,7 +296,7 @@ export class ProjectCard {
           </div>
 
           <!-- Back actions (Pinned to bottom) -->
-          <div class="flex items-center gap-2 pt-2.5 mt-1 border-t shrink-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}" style="border-color:rgba(255,255,255,0.05)">
+          <div class="flex items-center gap-2 pt-2.5 mt-1 border-t shrink-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}" style="border-color:rgba(255,255,255,0.06)">
             <a href="/projects/${slug}"
                class="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[11px] font-semibold font-jakarta transition-all hover:scale-105 active:scale-95"
                style="background:linear-gradient(135deg,rgba(99,102,241,0.3),rgba(139,92,246,0.25));border:1px solid rgba(99,102,241,0.4);color:#c7d2fe">

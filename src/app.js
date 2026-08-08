@@ -5,8 +5,57 @@ import { initRouter } from './router.js';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
 import { Chatbot } from './components/Chatbot.js';
-import { trackVisit } from './utils/analytics.js';
+import { trackVisit, trackInteraction } from './utils/analytics.js';
 
+// Global interaction listener for clicks on GitHub, Live Demo, View Details, and Category links
+document.addEventListener('click', (e) => {
+  const target = e.target;
+  
+  // 1. GitHub Code links
+  const githubLink = target.closest('a[href*="github.com"]');
+  if (githubLink) {
+    const card = githubLink.closest('.flip-card, .spotlight-card') || document;
+    const titleEl = card.querySelector('h3, h4, h2');
+    const title = titleEl ? titleEl.textContent.trim() : 'GitHub Repo';
+    const catEl = card.querySelector('[class*="cat-badge"]');
+    const category = catEl ? catEl.textContent.trim() : 'General';
+    trackInteraction('github_click', title, category, githubLink.href);
+    return;
+  }
+
+  // 2. Live Demo links
+  const linkEl = target.closest('a');
+  if (linkEl && linkEl.textContent.toLowerCase().includes('demo')) {
+    const card = linkEl.closest('.flip-card, .spotlight-card') || document;
+    const titleEl = card.querySelector('h3, h4, h2');
+    const title = titleEl ? titleEl.textContent.trim() : 'Live Demo';
+    const catEl = card.querySelector('[class*="cat-badge"]');
+    const category = catEl ? catEl.textContent.trim() : 'General';
+    trackInteraction('live_demo_click', title, category, linkEl.href);
+    return;
+  }
+
+  // 3. View Details buttons
+  const detailsBtn = target.closest('a[href*="/projects/"]');
+  if (detailsBtn) {
+    const card = detailsBtn.closest('.flip-card, .cat-card-premium') || document;
+    const titleEl = card.querySelector('h3, h4, h2');
+    const title = titleEl ? titleEl.textContent.trim() : 'Project Details';
+    const catEl = card.querySelector('[class*="cat-badge"]');
+    const category = catEl ? catEl.textContent.trim() : 'General';
+    trackInteraction('view_details', title, category, detailsBtn.href);
+    return;
+  }
+
+  // 4. Category card clicks
+  const catCard = target.closest('.cat-card-premium');
+  if (catCard) {
+    const titleEl = catCard.querySelector('h4, h3');
+    const title = titleEl ? titleEl.textContent.trim() : 'Category Card';
+    trackInteraction('category_click', title, title, catCard.href);
+    return;
+  }
+});
 
 // Global navbar/footer/chatbot instances
 const navbar = new Navbar();
