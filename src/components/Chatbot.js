@@ -653,33 +653,32 @@ export class Chatbot {
       this.tempProfile.isStudent = cleanRole.toLowerCase().includes('student');
 
       this.onboardingStep = 'ask_contact';
-      const contactPrompt = `Got it, **${this.tempProfile.name}**! 👍\n\nWould you like to share your **email address** so Raj Rathod can connect with you directly? *(Or click Skip to proceed directly)*`;
+      const contactPrompt = `Got it, **${this.tempProfile.name}**! 👍\n\nTo help Raj Rathod connect with you directly, please share your **email address**: *(Required to proceed)*`;
       this.appendMessage('bot', contactPrompt);
-      this.renderQuickChips(['⏩ Skip / Leave it']);
+      this.renderQuickChips(['✉️ Enter Email']);
       return;
     }
 
-    if (this.onboardingStep === 'ask_contact') {
+    if (this.onboardingStep === 'ask_contact' || this.onboardingStep === 'ask_contact_confirm') {
       this.appendMessage('user', text);
-      const isSkipContact = text.toLowerCase().includes('skip') || text.toLowerCase().includes('leave');
       const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
 
-      if (isSkipContact) {
-        // Persuasive prompt if user hesitates / skips
+      if (!emailMatch && !text.includes('@')) {
+        // Persuasive & compulsory prompt when user hesitates or types non-email text
         this.onboardingStep = 'ask_contact_confirm';
         const visitedCats = getVisitedCategories();
         const catName = visitedCats.length ? visitedCats.join(' & ') : 'Generative AI & RAG';
-        
-        const persuasiveMsg = `I understand! 😊 Just so you know, I am **Rudra**, Raj Rathod's custom AI Assistant.\n\nRaj would love to connect with you directly using your details! Since you explored **${catName}** projects on the portfolio, Raj can share tailored technical insights or collaborate with you.\n\nWould you like to provide your **email address** so we can send a quick follow-up message?`;
+
+        const persuasiveMsg = `I understand your hesitation! 😊 However, I am **Rudra**, Raj Rathod's custom AI Assistant.\n\nProviding your **email address is required** so Raj can talk with you directly!\n\nSince you explored **${catName}** projects on the portfolio, Raj would love to connect with you to share tailored technical insights or discuss potential collaborations with you.\n\nPlease enter a valid email address (e.g., \`yourname@gmail.com\`) to proceed:`;
         this.appendMessage('bot', persuasiveMsg);
-        this.renderQuickChips(['⏩ Skip for now']);
+        this.renderQuickChips(['✉️ Enter valid Email']);
         return;
       }
 
-      const email = emailMatch ? emailMatch[0] : (text.includes('@') ? text.trim() : null);
-
-      this.tempProfile.contactDetails = text.trim();
-      if (email) this.tempProfile.email = email;
+      // Valid email provided!
+      const email = emailMatch ? emailMatch[0] : text.trim();
+      this.tempProfile.contactDetails = email;
+      this.tempProfile.email = email;
       this.tempProfile.createdAt = new Date().toISOString();
 
       // Finalize and save profile
@@ -690,77 +689,23 @@ export class Chatbot {
       const visitedCats = getVisitedCategories();
       const catsStr = visitedCats.length ? visitedCats.join(', ') : 'Generative AI & Machine Learning';
 
-      if (email) {
-        // Dispatch automated follow-up email via backend
-        fetch('/api/analytics/lead-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            visitorId: getVisitorId(),
-            name: this.tempProfile.name,
-            email,
-            visitedCategories: visitedCats
-          })
-        }).catch(() => {});
+      // Dispatch automated follow-up email via backend
+      fetch('/api/analytics/lead-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitorId: getVisitorId(),
+          name: this.tempProfile.name || 'Visitor',
+          email,
+          visitedCategories: visitedCats
+        })
+      }).catch(() => {});
 
-        const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I am **Rudra**, Raj's AI assistant.\n\nI have saved your details in our database and dispatched a follow-up email to **${email}** regarding your interest in **${catsStr}**!\n\nRaj will be happy to talk with you directly. How can I help you explore more of Raj's portfolio today?`;
-        this.appendMessage('bot', completionText);
-        this.history.push({ role: 'assistant', content: completionText });
-        this.saveHistory();
-        this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
-        return;
-      }
-
-      const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I've remembered your details so I recognize you whenever you visit on this device.\n\nHow can I help you explore Raj's portfolio today?`;
+      const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I am **Rudra**, Raj's AI assistant.\n\nI have logged your details in our database and sent a personalized follow-up email to **${email}** highlighting your interest in **${catsStr}**!\n\nRaj will be happy to talk with you directly. How can I help you explore more of Raj's portfolio today?`;
       this.appendMessage('bot', completionText);
       this.history.push({ role: 'assistant', content: completionText });
       this.saveHistory();
       this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
-      return;
-    }
-
-    if (this.onboardingStep === 'ask_contact_confirm') {
-      this.appendMessage('user', text);
-      const isSkipConfirm = text.toLowerCase().includes('skip') || text.toLowerCase().includes('leave');
-      const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-
-      this.onboardingStep = null;
-      if (!isSkipConfirm && (emailMatch || text.includes('@'))) {
-        const email = emailMatch ? emailMatch[0] : text.trim();
-        this.tempProfile.email = email;
-        this.tempProfile.contactDetails = email;
-        this.saveProfile(this.tempProfile);
-        this.updateHeaderProfileBadge();
-
-        const visitedCats = getVisitedCategories();
-        fetch('/api/analytics/lead-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            visitorId: getVisitorId(),
-            name: this.tempProfile.name || 'Visitor',
-            email,
-            visitedCategories: visitedCats
-          })
-        }).catch(() => {});
-
-        const doneMsg = `Awesome, **${this.tempProfile.name || 'Visitor'}**! 📬 A personalized follow-up message has been sent to **${email}** highlighting your interest in **${(visitedCats.length ? visitedCats.join(', ') : 'AI/ML')}**!\n\nRaj will get in touch with you soon!`;
-        this.appendMessage('bot', doneMsg);
-        this.history.push({ role: 'assistant', content: doneMsg });
-        this.saveHistory();
-        this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects']);
-        return;
-      }
-
-      this.tempProfile.contactDetails = 'Not provided';
-      this.saveProfile(this.tempProfile);
-      this.updateHeaderProfileBadge();
-
-      const proceedMsg = `No worries at all! 👍 You're all set to explore. Ask me anything about Raj's **AI/ML projects**, **database stats**, **education**, or **skills**!`;
-      this.appendMessage('bot', proceedMsg);
-      this.history.push({ role: 'assistant', content: proceedMsg });
-      this.saveHistory();
-      this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects']);
       return;
     }
 

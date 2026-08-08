@@ -609,7 +609,7 @@ export class Home {
           </div>
 
           <!-- Reviews List -->
-          <div class="lg:col-span-7 space-y-4 max-h-[500px] overflow-y-auto pr-2" id="reviews-list-container">
+          <div class="lg:col-span-7 space-y-4 max-h-[520px] overflow-y-auto pr-2 scrollbar-thin min-h-0" id="reviews-list-container" data-lenis-prevent>
             <!-- Dynamically populated -->
           </div>
         </div>
@@ -1026,7 +1026,7 @@ export class Home {
         if (bodyEl) {
           if (certData.type === 'iframe') {
             bodyEl.innerHTML = `
-              <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-5 bg-gradient-to-b from-white/3 to-black/60 rounded-xl overflow-y-auto">
+              <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-5 bg-gradient-to-b from-white/5 to-black/80 rounded-xl overflow-y-auto" data-lenis-prevent>
                 <div class="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-3xl shadow-xl shadow-amber-500/10">
                   <i class="fa-solid fa-award"></i>
                 </div>
@@ -1042,23 +1042,41 @@ export class Home {
                     <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                   </a>
                 </div>
-                <div class="w-full max-w-2xl h-64 mt-4 rounded-xl overflow-hidden border border-white/10 relative bg-black/40">
-                  <iframe src="${certData.previewUrl}" class="w-full h-full border-0 bg-white" title="${certData.title}"></iframe>
-                </div>
               </div>`;
           } else if (certData.type === 'image') {
             bodyEl.innerHTML = `
-              <div class="w-full h-full flex items-center justify-center p-2 relative group">
-                <img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl border border-white/10">
+              <div class="w-full h-full flex flex-col items-center justify-center p-2 relative group overflow-y-auto" data-lenis-prevent>
+                <img src="${certData.previewUrl}" alt="${certData.title}" class="max-w-full max-h-[72vh] object-contain rounded-xl shadow-2xl border border-white/10"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="hidden flex-col items-center justify-center p-8 text-center space-y-4 bg-white/5 border border-white/10 rounded-2xl">
+                  <i class="fa-solid fa-file-image text-4xl text-gray-400"></i>
+                  <div>
+                    <h4 class="font-jakarta font-bold text-base text-gray-100">${certData.title}</h4>
+                    <p class="text-xs text-gray-400 mt-1">${certData.issuer}</p>
+                  </div>
+                  <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/80 transition-all flex items-center gap-2">
+                    <span>Open Raw Certificate File</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                  </a>
+                </div>
               </div>`;
           } else if (certData.type === 'pdf') {
             bodyEl.innerHTML = `
-              <div class="w-full h-full flex flex-col items-center justify-center p-4 text-center space-y-4">
-                <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(certData.previewUrl)}&embedded=true" class="w-full h-[80vh] rounded-xl border border-white/10 bg-white" title="${certData.title}"></iframe>
-                <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-5 py-2 rounded-xl bg-primary/20 border border-primary/40 text-xs font-mono text-primary hover:bg-primary/30 transition-all flex items-center gap-2">
-                  <span>Open Full PDF Document</span>
-                  <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
-                </a>
+              <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-5 bg-gradient-to-b from-white/5 to-black/80 rounded-xl overflow-y-auto" data-lenis-prevent>
+                <div class="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 text-2xl shadow-xl">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <div class="space-y-1 max-w-lg">
+                  <h3 class="font-jakarta font-extrabold text-xl text-gray-100">${certData.title}</h3>
+                  <p class="text-xs text-gray-400 font-mono">${certData.issuer}</p>
+                  <p class="text-xs text-gray-400 mt-1">Computer Networks & Internet Protocol Certification Document</p>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 font-jakarta text-xs font-bold text-white shadow-lg shadow-rose-500/20 hover:scale-105 transition-all flex items-center gap-2">
+                    <span>Open & Download PDF Certificate</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                  </a>
+                </div>
               </div>`;
           } else {
             bodyEl.innerHTML = `<a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="text-primary underline font-mono text-sm">Open Official Certificate Link</a>`;
