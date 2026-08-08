@@ -18,6 +18,13 @@
     "type": "solo",
     "live": "",
     "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Movie-Recommendations-Using-NLP-ML",
+    "type": "solo",
+    "live": "",
+    "featured": true,
     "category": "NLP"
   },
   {

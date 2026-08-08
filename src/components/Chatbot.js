@@ -1101,17 +1101,17 @@ CRITICAL INSTRUCTIONS:
     }
 
     // 1. NLP / Text Mining queries
-    if (text.includes('nlp') || text.includes('text') || text.includes('sentiment') || text.includes('language') || text.includes('fake news') || text.includes('bert') || text.includes('natural language')) {
+    if (text.includes('nlp') || text.includes('text') || text.includes('sentiment') || text.includes('language') || text.includes('fake news') || text.includes('movie') || text.includes('recommendation') || text.includes('bert') || text.includes('natural language')) {
       return `🔤 **RAJ RATHOD'S NATURAL LANGUAGE PROCESSING (NLP) PROJECTS**\n\n` +
              `Here are the **2 NLP Projects** featured in Raj's portfolio:\n\n` +
-             `🕵️ **1. Fake News Detection (Real-Time NLP)**\n` +
+             `🎬 **1. Movie Recommendations Using NLP And ML**\n` +
+             `• **Tech**: Python, NLP, Machine Learning, Pandas, Scikit-learn\n` +
+             `• **Objective**: Content-based movie recommendation system using NLP and Machine Learning to recommend similar movies based on content, genres, keywords, and user preferences.\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-ML)\n\n` +
+             `🕵️ **2. Fake News Detection Using ML Real Time**\n` +
              `• **Tech**: Python, Scikit-learn, NLTK, TF-IDF, Flask, Three.js\n` +
-             `• **Objective**: Real-time NLP classifier analyzing text articles to detect fake news with ~92% classification accuracy.\n` +
+             `• **Objective**: Real-time fake news detection system that analyzes online news articles using machine learning and NLP techniques (~92% accuracy).\n` +
              `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)\n\n` +
-             `🧠 **2. Discover Your True Personality**\n` +
-             `• **Tech**: Python, NLP, Machine Learning, Scikit-learn\n` +
-             `• **Objective**: Analyzes user textual responses & language patterns to predict personality traits.\n` +
-             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality)\n\n` +
              `💡 *Tip: Click on the **NLP** category tag in the Projects section to view these 2 repositories directly!*`;
     }
 

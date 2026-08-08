@@ -1053,8 +1053,8 @@ RAJ RATHOD'S PROFILE DATA:
   * Tools: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
 - Key Projects by Domain:
   * Natural Language Processing (NLP) Projects (2 Official Portfolio Repositories):
-    1. Fake News Detection (Real-Time NLP): Real-time NLP text classifier using Scikit-learn, NLTK, TF-IDF vectorizers (~92% accuracy). GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
-    2. Discover Your True Personality: NLP + ML text classification model analyzing user input to predict personality traits. GitHub: https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
+    1. Movie Recommendations Using NLP And ML: Content-based recommendation system using NLP and Machine Learning to suggest similar movies based on content, genres, keywords, and user preferences. GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-ML
+    2. Fake News Detection Using ML Real Time: Real-time fake news detection system analyzing online news articles using machine learning & NLP (~92% accuracy). GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
   * Computer Vision & Deep Learning:
     1. Flower Disease System: CNN leaf disease classifier using PyTorch & Streamlit.
   * Machine Learning:
