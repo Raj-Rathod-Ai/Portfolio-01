@@ -121,19 +121,28 @@ export function getLiveUrl(repo, localMetadata = []) {
   if (meta && meta.live) return meta.live;
 
   // Backward compatibility overrides
-  const overrides = {
-    'taxi-fare-prediction': 'https://taxi-price-prediction.netlify.app/',
-    'taxi-price-prediction': 'https://taxi-price-prediction.netlify.app/',
-    'food_delivery_time-using-ml': 'https://fooddelivery-time.streamlit.app/',
-    'food-delivery-time-prediction': 'https://fooddelivery-time.streamlit.app/',
+    const overrides = {
+    'autoprepai': 'https://data-eda-processing.streamlit.app/',
+    'car-selling-price-prediction': 'https://car-selling-price-prediction.streamlit.app/',
+    'chatnotes': 'https://chat-with-your-notes-dusx.onrender.com/',
     'discover-your-true-personality': 'https://discover-your-true-personality.streamlit.app/',
-    'job-analysis-dashboard': 'https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard',
-    'stone-paper-scissors-python': 'https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/',
-    'stone-paper-scissors': 'https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/',
+    'drug-recommendation-system': 'https://drug-recommendation-systems.streamlit.app/',
+    'fake-news-detection-using-ml-real-time': 'https://truthlens5.netlify.app/',
     'flowerdiseasesystem': 'https://flower-disease-system.vercel.app',
-    'flower-disease-system': 'https://flower-disease-system.vercel.app',
+    'food_delivery_time-using-ml': 'https://fooddelivery-time.streamlit.app/',
+    'healthy-lifestyle-prediction': 'https://healthy-lifestyle-prediction.streamlit.app/',
+    'hybridmind': 'https://hybridmind.netlify.app/',
     'library-mangement': 'https://librarymangement1.streamlit.app/',
-    'library-management-system': 'https://librarymangement1.streamlit.app/'
+    'loan-risk-assessment-app': 'https://loan-risk-assessment-app.streamlit.app/',
+    'mark-predication': 'https://mark-predication.streamlit.app/',
+    'movie-recommendations-using-nlp-and-ml': 'https://cinema-verse.streamlit.app/',
+    'random-forest-food-delivery-time': 'https://random-forest-food-delivery-time.streamlit.app/',
+    'salary_predication': 'https://salary-predications.streamlit.app/',
+    'stone-paper-scissors-python': 'https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/',
+    'student_performance_predication': 'https://student-performance-predication.streamlit.app',
+    'taxi-fare-prediction': 'https://taxi-price-prediction.netlify.app/',
+    'tic-tac-toe': 'https://tic-tac-toe-1.streamlit.app/',
+    'usa-house-price-prediction': 'https://usa-house-price-predictions.streamlit.app/'
   };
   
   const key = repo.name.toLowerCase();

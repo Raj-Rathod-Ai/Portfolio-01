@@ -9,56 +9,56 @@
   {
     "repo": "car-selling-price-prediction",
     "type": "solo",
-    "live": "",
+    "live": "https://car-selling-price-prediction.streamlit.app/",
     "featured": true,
     "category": "Machine Learning"
   },
   {
     "repo": "USA-house-price-prediction",
     "type": "solo",
-    "live": "",
+    "live": "https://usa-house-price-predictions.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
   {
     "repo": "Salary_predication",
     "type": "solo",
-    "live": "",
+    "live": "https://salary-predications.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
   {
     "repo": "Student_performance_predication",
     "type": "solo",
-    "live": "",
+    "live": "https://student-performance-predication.streamlit.app",
     "featured": false,
     "category": "Machine Learning"
   },
   {
     "repo": "Mark-Predication",
     "type": "solo",
-    "live": "",
+    "live": "https://mark-predication.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
   {
     "repo": "Loan-Risk-Assessment-App",
     "type": "solo",
-    "live": "",
+    "live": "https://loan-risk-assessment-app.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
   {
     "repo": "healthy-lifestyle-prediction",
     "type": "solo",
-    "live": "",
+    "live": "https://healthy-lifestyle-prediction.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
   {
     "repo": "drug-recommendation-system",
     "type": "solo",
-    "live": "",
+    "live": "https://drug-recommendation-systems.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
@@ -72,7 +72,7 @@
   {
     "repo": "Random-Forest-Food-Delivery-Time",
     "type": "solo",
-    "live": "",
+    "live": "https://random-forest-food-delivery-time.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
@@ -93,35 +93,35 @@
   {
     "repo": "ChatNotes",
     "type": "solo",
-    "live": "",
+    "live": "https://chat-with-your-notes-dusx.onrender.com/",
     "featured": true,
     "category": "RAG"
   },
   {
     "repo": "HybridMind",
     "type": "solo",
-    "live": "",
+    "live": "https://hybridmind.netlify.app/",
     "featured": true,
     "category": "Generative AI"
   },
   {
     "repo": "AutoPrepAI",
     "type": "solo",
-    "live": "",
+    "live": "https://data-eda-processing.streamlit.app/",
     "featured": true,
     "category": "Data Science"
   },
   {
     "repo": "Fake-News-Detection-Using-ML-Real-time",
     "type": "group",
-    "live": "",
+    "live": "https://truthlens5.netlify.app/",
     "featured": true,
     "category": "NLP"
   },
   {
     "repo": "Movie-Recommendations-Using-NLP-and-ML",
     "type": "solo",
-    "live": "",
+    "live": "https://cinema-verse.streamlit.app/",
     "featured": true,
     "category": "NLP"
   },
@@ -149,7 +149,7 @@
   {
     "repo": "Tic-Tac-Toe",
     "type": "solo",
-    "live": "",
+    "live": "https://tic-tac-toe-1.streamlit.app/",
     "featured": false,
     "category": "Python Concepts"
   },

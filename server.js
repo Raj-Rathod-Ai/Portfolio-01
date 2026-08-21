@@ -1586,36 +1586,36 @@ RAJ RATHOD'S PROFILE DATA:
   * Languages: Python, Java, C/C++, SQL, JavaScript, HTML/CSS.
   * AI/ML/DL Frameworks: TensorFlow, PyTorch, Scikit-learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit.
   * Tools: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
-- Key Projects by Domain (Total 24 Projects):
+- Key Projects by Domain (21 Active Live Deployments across 24 Projects):
   * Machine Learning (13 projects):
     1. Taxi Fare Prediction: ML regression predicting trip fares based on distance and traffic. Live Demo: https://taxi-price-prediction.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction
     2. Food Delivery Time Prediction: Streamlit ML app estimating delivery duration. Live Demo: https://fooddelivery-time.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML
     3. Discover Your True Personality: 26-trait psychometric classification model. Live Demo: https://discover-your-true-personality.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
-    4. Car Selling Price Prediction: Resale price estimator. GitHub: https://github.com/Raj-Rathod-Ai/car-selling-price-prediction
-    5. Loan Risk Assessment App: Gaussian Naive Bayes default risk predictor. GitHub: https://github.com/Raj-Rathod-Ai/Loan-Risk-Assessment-App
-    6. USA House Price Prediction: Residential property price regressor. GitHub: https://github.com/Raj-Rathod-Ai/USA-house-price-prediction
-    7. Salary Predication: Streamlit experience-based salary estimator. GitHub: https://github.com/Raj-Rathod-Ai/Salary_predication
-    8. Student Performance Predication: GPA predictor using academic factors. GitHub: https://github.com/Raj-Rathod-Ai/Student_performance_predication
-    9. Mark Predication: Tuned XGBoost regressor for academic scores. GitHub: https://github.com/Raj-Rathod-Ai/Mark-Predication
-    10. Healthy Lifestyle Prediction: Health habit risk analyzer. GitHub: https://github.com/Raj-Rathod-Ai/healthy-lifestyle-prediction
-    11. Drug Recommendation System: Drug category recommender. GitHub: https://github.com/Raj-Rathod-Ai/drug-recommendation-system
-    12. Random Forest Food Delivery Time: Random Forest delivery estimator. GitHub: https://github.com/Raj-Rathod-Ai/Random-Forest-Food-Delivery-Time
+    4. Car Selling Price Prediction: Resale price estimator. Live Demo: https://car-selling-price-prediction.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/car-selling-price-prediction
+    5. Loan Risk Assessment App: Gaussian Naive Bayes default risk predictor. Live Demo: https://loan-risk-assessment-app.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Loan-Risk-Assessment-App
+    6. USA House Price Prediction: Residential property price regressor. Live Demo: https://usa-house-price-predictions.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/USA-house-price-prediction
+    7. Salary Predication: Streamlit experience-based salary estimator. Live Demo: https://salary-predications.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Salary_predication
+    8. Student Performance Predication: GPA predictor using academic factors. Live Demo: https://student-performance-predication.streamlit.app | GitHub: https://github.com/Raj-Rathod-Ai/Student_performance_predication
+    9. Mark Predication: Tuned XGBoost regressor for academic scores. Live Demo: https://mark-predication.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Mark-Predication
+    10. Healthy Lifestyle Prediction: Health habit risk analyzer. Live Demo: https://healthy-lifestyle-prediction.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/healthy-lifestyle-prediction
+    11. Drug Recommendation System: Drug category recommender. Live Demo: https://drug-recommendation-systems.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/drug-recommendation-system
+    12. Random Forest Food Delivery Time: Random Forest delivery estimator. Live Demo: https://random-forest-food-delivery-time.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Random-Forest-Food-Delivery-Time
     13. Machine Learning Notes: Visual math formulas & diagrams. GitHub: https://github.com/Raj-Rathod-Ai/Machine-Learning-Notes
   * Data Science & Analytics (2 projects):
-    1. AutoPrepAI: Automated offline data cleaning, preprocessing & quality analytics in Streamlit. GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI
+    1. AutoPrepAI: Automated offline data cleaning, preprocessing & quality analytics platform. Live Demo: https://data-eda-processing.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI
     2. Job Analysis Dashboard: Interactive Power BI dashboard evaluating global tech job market trends. GitHub: https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard
   * Natural Language Processing (NLP) (2 projects):
-    1. Real-Time Fake News Detection: Online news credibility classifier (~92% accuracy). GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
-    2. Movie Recommendations Using NLP & ML: Cosine similarity content-based film recommender. GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
+    1. Real-Time Fake News Detection: Online news credibility classifier (~92% accuracy). Live Demo: https://truthlens5.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
+    2. Movie Recommendations Using NLP & ML: Cosine similarity content-based film recommender. Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
   * Deep Learning & Computer Vision (1 project):
     1. Flower Disease System: PyTorch CNN leaf disease classifier. Live Demo: https://flower-disease-system.vercel.app | GitHub: https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
   * Retrieval-Augmented Generation (RAG) (1 project):
-    1. ChatNotes: RAG-powered document assistant to chat with PDF documents without token limits. GitHub: https://github.com/Raj-Rathod-Ai/ChatNotes
+    1. ChatNotes: RAG-powered document assistant to chat with PDF documents without token limits. Live Demo: https://chat-with-your-notes-dusx.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/ChatNotes
   * Generative AI (1 project):
-    1. HybridMind: Multi-model platform orchestrating Gemini, Mistral, and Tavily search. GitHub: https://github.com/Raj-Rathod-Ai/HybridMind
+    1. HybridMind: Multi-model platform orchestrating Gemini, Mistral, and Tavily search. Live Demo: https://hybridmind.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/HybridMind
   * Python Concepts & Games (2 projects):
     1. Stone Paper Scissors Python Game: Interactive Streamlit game. Live Demo: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/stone-paper-scissors-python
-    2. Tic-Tac-Toe: Streamlit game with NumPy grid logic. GitHub: https://github.com/Raj-Rathod-Ai/Tic-Tac-Toe
+    2. Tic-Tac-Toe: Streamlit game with NumPy grid logic. Live Demo: https://tic-tac-toe-1.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Tic-Tac-Toe
   * Normal Projects & Systems (2 projects):
     1. Library Management System: Book cataloging and inventory app. Live Demo: https://librarymangement1.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Library-Mangement
     2. NeuroOS: AI-powered operating system web interface. GitHub: https://github.com/Raj-Rathod-Ai/neuro-os

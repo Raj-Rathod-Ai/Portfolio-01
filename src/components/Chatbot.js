@@ -1060,27 +1060,36 @@ CRITICAL INSTRUCTIONS:
         title: 'All Active Live Demos & Deployed Projects',
         keywords: ['live demo', 'live link', 'live links', 'live projects', 'deployed projects', 'deployed link', 'working demo', 'give live link', 'give me live', 'live deploy', 'deployed links', 'live demo link', 'interactive demo', 'working projects', 'active demo'],
         category: 'Live Demos',
-        content: `🚀 **RAJ RATHOD'S ACTIVE LIVE DEMOS & DEPLOYED APPS**\n\n` +
+        content: `🚀 **RAJ RATHOD'S ACTIVE LIVE DEMOS & DEPLOYED APPS (21 DEPLOYMENTS)**\n\n` +
                  `Here are Raj's interactive deployed applications ready to test live:\n\n` +
-                 `🚕 **1. Taxi Fare Prediction System** (Machine Learning / Regression)\n` +
-                 `• [Launch Live Demo](https://taxi-price-prediction.netlify.app/)\n` +
-                 `• Tech: Scikit-learn, Polynomial Regression, HTML5/CSS\n\n` +
-                 `🍔 **2. Food Delivery Time Prediction** (Machine Learning)\n` +
-                 `• [Launch Live Demo](https://fooddelivery-time.streamlit.app/)\n` +
-                 `• Tech: Scikit-learn, Random Forest, Streamlit Cloud\n\n` +
-                 `🧠 **3. Discover Your True Personality** (Machine Learning / Classification)\n` +
-                 `• [Launch Live Demo](https://discover-your-true-personality.streamlit.app/)\n` +
-                 `• Tech: 26-Trait Psychometric ML Classifier, Streamlit Cloud\n\n` +
-                 `🌸 **4. Flower & Leaf Disease Detection** (Deep Learning / Computer Vision)\n` +
-                 `• [Launch Live Demo](https://flower-disease-system.vercel.app)\n` +
-                 `• Tech: PyTorch CNN, OpenCV, Vercel\n\n` +
-                 `🎮 **5. Stone Paper Scissors Python Game** (Python Concepts)\n` +
-                 `• [Launch Live Demo](https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/)\n` +
-                 `• Tech: Python, Streamlit UI\n\n` +
-                 `📚 **6. Library Management System** (Software & Systems)\n` +
-                 `• [Launch Live Demo](https://librarymangement1.streamlit.app/)\n` +
-                 `• Tech: Python, SQLite, Streamlit Cloud\n\n` +
-                 `💡 *Tip: Projects like **AutoPrepAI**, **ChatNotes**, **HybridMind**, and **Fake News Detection** are open-source with full code on [GitHub](https://github.com/Raj-Rathod-Ai).*`
+                 `🤖 **Generative AI & RAG**:\n` +
+                 `• **HybridMind Multi-Model Platform**: [Launch Live Demo](https://hybridmind.netlify.app/)\n` +
+                 `• **ChatNotes PDF Assistant**: [Launch Live Demo](https://chat-with-your-notes-dusx.onrender.com/)\n\n` +
+                 `🔤 **Natural Language Processing (NLP)**:\n` +
+                 `• **Movie Recommendations Engine**: [Launch Live Demo](https://cinema-verse.streamlit.app/)\n` +
+                 `• **Real-Time Fake News Detector**: [Launch Live Demo](https://truthlens5.netlify.app/)\n\n` +
+                 `🌸 **Deep Learning & Computer Vision**:\n` +
+                 `• **Flower & Leaf Disease Detection**: [Launch Live Demo](https://flower-disease-system.vercel.app)\n\n` +
+                 `⚡ **Data Science & Preprocessing**:\n` +
+                 `• **AutoPrepAI Data Platform**: [Launch Live Demo](https://data-eda-processing.streamlit.app/)\n\n` +
+                 `📈 **Machine Learning & Predictive Systems**:\n` +
+                 `• **Taxi Fare Prediction**: [Launch Live Demo](https://taxi-price-prediction.netlify.app/)\n` +
+                 `• **Food Delivery Time Prediction**: [Launch Live Demo](https://fooddelivery-time.streamlit.app/)\n` +
+                 `• **Discover True Personality**: [Launch Live Demo](https://discover-your-true-personality.streamlit.app/)\n` +
+                 `• **Car Selling Price Predictor**: [Launch Live Demo](https://car-selling-price-prediction.streamlit.app/)\n` +
+                 `• **Loan Risk Assessment App**: [Launch Live Demo](https://loan-risk-assessment-app.streamlit.app/)\n` +
+                 `• **USA House Price Predictor**: [Launch Live Demo](https://usa-house-price-predictions.streamlit.app/)\n` +
+                 `• **Salary Prediction System**: [Launch Live Demo](https://salary-predications.streamlit.app/)\n` +
+                 `• **Student Performance Predictor**: [Launch Live Demo](https://student-performance-predication.streamlit.app)\n` +
+                 `• **Mark & Exam Score Predictor**: [Launch Live Demo](https://mark-predication.streamlit.app/)\n` +
+                 `• **Healthy Lifestyle Analyzer**: [Launch Live Demo](https://healthy-lifestyle-prediction.streamlit.app/)\n` +
+                 `• **Drug Recommendation System**: [Launch Live Demo](https://drug-recommendation-systems.streamlit.app/)\n` +
+                 `• **Random Forest Delivery Time**: [Launch Live Demo](https://random-forest-food-delivery-time.streamlit.app/)\n\n` +
+                 `🎮 **Python Concepts & Systems**:\n` +
+                 `• **Stone Paper Scissors Python Game**: [Launch Live Demo](https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/)\n` +
+                 `• **Tic-Tac-Toe Python Game**: [Launch Live Demo](https://tic-tac-toe-1.streamlit.app/)\n` +
+                 `• **Library Management System**: [Launch Live Demo](https://librarymangement1.streamlit.app/)\n\n` +
+                 `📂 *All source code repositories are available on [GitHub](https://github.com/Raj-Rathod-Ai).*`
       },
       {
         id: 'profile_overview',
@@ -1176,8 +1185,9 @@ CRITICAL INSTRUCTIONS:
         keywords: ['autoprep', 'autoprepai', 'data preprocessing', 'quality analysis', 'automated preprocessing'],
         category: 'Data Science',
         content: `⚡ **AUTOPREPAI — AUTOMATED DATA PREPROCESSING PLATFORM** (Data Science & Analytics)\n\n` +
-                 `• **Overview**: An offline AI-powered automated data preprocessing and quality analysis platform. Upload any CSV/Excel/Parquet/JSON dataset and get automated data cleaning, missing value imputation, outlier detection, feature engineering, and downloadable reports.\n` +
+                 `• **Overview**: An AI-powered automated data preprocessing and quality analysis platform for cleaning, missing value imputation, outlier detection, and feature engineering.\n` +
                  `• **Tech Stack**: Python, Streamlit, Pandas, NumPy, Matplotlib, Seaborn\n` +
+                 `• 🚀 **Live Demo**: [data-eda-processing.streamlit.app](https://data-eda-processing.streamlit.app/)\n` +
                  `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/AutoPrepAI)`
       },
       {
@@ -1198,8 +1208,9 @@ CRITICAL INSTRUCTIONS:
         keywords: ['chatnote', 'chatnotes', 'rag', 'pdf chat', 'chat with pdf', 'document qa'],
         category: 'RAG',
         content: `📑 **CHATNOTES — RAG-POWERED DOCUMENT ASSISTANT** (Retrieval-Augmented Generation)\n\n` +
-                 `• **Overview**: A high-speed RAG-powered document assistant allowing users to upload and chat with complex PDF documents without hitting token limits, utilizing vector search and LLM context synthesis.\n` +
+                 `• **Overview**: A high-speed RAG-powered document assistant allowing users to upload and chat with complex PDF documents without hitting token limits.\n` +
                  `• **Tech Stack**: Python, Groq API, Mistral LLM, Vector Embeddings, HTML5/CSS Glassmorphism\n` +
+                 `• 🚀 **Live Demo**: [chat-with-your-notes-dusx.onrender.com](https://chat-with-your-notes-dusx.onrender.com/)\n` +
                  `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/ChatNotes)`
       },
       {
@@ -1208,8 +1219,9 @@ CRITICAL INSTRUCTIONS:
         keywords: ['hybridmind', 'multi-model', 'genai', 'gemini platform', 'tavily'],
         category: 'Generative AI',
         content: `🤖 **HYBRIDMIND — MULTI-MODEL AI PLATFORM** (Generative AI)\n\n` +
-                 `• **Overview**: A multi-model AI platform for deploying Machine Learning models and orchestrating LLM agents with Python, Google Gemini AI, Mistral, and Tavily Search integration.\n` +
+                 `• **Overview**: A multi-model AI platform for deploying Machine Learning models and orchestrating LLM agents with Google Gemini AI, Mistral, and Tavily Search.\n` +
                  `• **Tech Stack**: Python, JavaScript, Google Gemini API, Mistral API, Tavily Search\n` +
+                 `• 🚀 **Live Demo**: [hybridmind.netlify.app](https://hybridmind.netlify.app/)\n` +
                  `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/HybridMind)`
       },
       {
@@ -1220,6 +1232,7 @@ CRITICAL INSTRUCTIONS:
         content: `📰 **REAL-TIME FAKE NEWS DETECTION SYSTEM** (NLP / Machine Learning)\n\n` +
                  `• **Overview**: A real-time Natural Language Processing system analyzing news articles and classifying them as credible or deceptive with **~92% accuracy**.\n` +
                  `• **Tech Stack**: Python, Scikit-Learn, NLTK, TF-IDF Vectorization, Passive-Aggressive Classifier, Flask, Three.js\n` +
+                 `• 🚀 **Live Demo**: [truthlens5.netlify.app](https://truthlens5.netlify.app/)\n` +
                  `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)`
       },
       {
@@ -1229,7 +1242,8 @@ CRITICAL INSTRUCTIONS:
         category: 'NLP',
         content: `🎬 **MOVIE RECOMMENDATIONS USING NLP & ML** (Natural Language Processing)\n\n` +
                  `• **Overview**: A content-based movie recommendation engine analyzing genres, keywords, cast, and overview descriptions using CountVectorizer and Cosine Similarity scoring.\n` +
-                 `• **Tech Stack**: Python, Scikit-Learn, Pandas, NLTK, AST\n` +
+                 `• **Tech Stack**: Python, Scikit-Learn, Pandas, NLTK, Streamlit\n` +
+                 `• 🚀 **Live Demo**: [cinema-verse.streamlit.app](https://cinema-verse.streamlit.app/)\n` +
                  `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML)`
       },
       {
