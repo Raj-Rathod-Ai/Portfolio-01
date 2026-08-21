@@ -251,28 +251,244 @@ mongoose.connection.once('open', () => {
   seedDefaultReviews();
 });
 
+// ================= IN-MEMORY RUNTIME STORES & GITHUB CACHE =================
+let inMemoryReviews = [...DEFAULT_PRESETS];
+let inMemoryOverrides = {};
+
+let githubReposCache = { data: null, timestamp: 0 };
+let githubStatsCache = { data: null, timestamp: 0 };
+const GITHUB_CACHE_TTL = 5 * 60 * 1000; // 5 minutes fresh live cache
+
+const SKIP_REPOS = [
+  'raj-rathod-ai',
+  '.github',
+  'impact-training-parul-university',
+  'portfolio',
+  'certificate',
+  'portfolio-01',
+  'neetcode-submissions',
+  'neetcode'
+];
+
+const GITHUB_FALLBACK_REPOS = [
+  {
+    name: 'Taxi-Fare-Prediction',
+    description: 'Predicting taxi fare amounts using machine learning regression models based on trip parameters.',
+    language: 'Python',
+    updated_at: '2026-06-12T00:00:00Z',
+    created_at: '2026-01-20T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['machine-learning', 'regression', 'scikit-learn'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction'
+  },
+  {
+    name: 'Food_Delivery_Time-Using-ML',
+    description: 'Predicting food delivery times dynamically based on distance, traffic, and weather conditions.',
+    language: 'Python',
+    updated_at: '2026-06-10T00:00:00Z',
+    created_at: '2026-02-15T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['predictive-modeling', 'machine-learning', 'streamlit'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML'
+  },
+  {
+    name: 'Discover-Your-True-Personality',
+    description: 'An AI-powered personality analysis system utilizing questionnaire data to predict traits.',
+    language: 'Python',
+    updated_at: '2026-06-08T00:00:00Z',
+    created_at: '2026-02-18T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['data-science', 'personality-analysis', 'classification'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality'
+  },
+  {
+    name: 'Library-Mangement',
+    description: 'An interactive system for book allocation, user registers, and catalog management.',
+    language: 'Python',
+    updated_at: '2026-06-05T00:00:00Z',
+    created_at: '2026-03-01T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['database', 'management-system', 'oop'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/Library-Mangement'
+  },
+  {
+    name: 'Fake-News-Detection-Using-ML-Real-time',
+    description: 'Real-time NLP classifier to detect fake news signals in textual reports.',
+    language: 'Python',
+    updated_at: '2026-06-02T00:00:00Z',
+    created_at: '2026-03-05T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['nlp', 'classification', 'text-mining'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time'
+  },
+  {
+    name: 'stone-paper-scissors-python',
+    description: 'A Python implementation of the classic game with user-vs-computer options.',
+    language: 'Python',
+    updated_at: '2026-05-28T00:00:00Z',
+    created_at: '2026-03-10T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['python-game', 'basics'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/stone-paper-scissors-python'
+  },
+  {
+    name: 'neuro-os',
+    description: 'A mock neural operating system interface built to demonstrate creative front-end styling.',
+    language: 'JavaScript',
+    updated_at: '2026-05-20T00:00:00Z',
+    created_at: '2026-03-15T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['creative-coding', 'web-app'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/neuro-os'
+  },
+  {
+    name: 'Job-Analysis-Dashboard',
+    description: 'An interactive dashboard showing job market insights, trends, and analytical insights.',
+    language: 'Power BI',
+    updated_at: '2026-05-15T00:00:00Z',
+    created_at: '2026-03-20T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['dashboard', 'data-analytics', 'job-market'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard'
+  },
+  {
+    name: 'FlowerDiseaseSystem',
+    description: 'Computer vision classification model to detect diseases in plant/flower leaves.',
+    language: 'Python',
+    updated_at: '2026-05-10T00:00:00Z',
+    created_at: '2026-03-25T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['cnn', 'deep-learning', 'computer-vision'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem'
+  }
+];
+
+// Helper to fetch live repos from GitHub API
+async function fetchLiveGitHubRepos() {
+  const headers = { 'User-Agent': 'RajPortfolioBackend/1.0' };
+  if (process.env.GITHUB_TOKEN) {
+    headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+
+  const res = await safeFetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100', { headers });
+  if (!res.ok) {
+    throw new Error(`GitHub API returned ${res.status}`);
+  }
+  const repos = await res.json();
+  return repos.filter(repo => {
+    const nameLower = (repo.name || '').toLowerCase();
+    return !SKIP_REPOS.includes(nameLower) && !repo.archived && !repo.fork;
+  });
+}
+
 // ================= API ENDPOINTS =================
+
+// GET /api/github/repos - Live GitHub repositories with server-side caching
+app.get('/api/github/repos', async (req, res) => {
+  const forceRefresh = req.query.fresh === 'true';
+  const now = Date.now();
+
+  if (!forceRefresh && githubReposCache.data && (now - githubReposCache.timestamp < GITHUB_CACHE_TTL)) {
+    return res.json({ success: true, cached: true, repos: githubReposCache.data });
+  }
+
+  try {
+    const liveRepos = await fetchLiveGitHubRepos();
+    githubReposCache = { data: liveRepos, timestamp: now };
+    res.json({ success: true, cached: false, repos: liveRepos });
+  } catch (err) {
+    console.warn('Backend GitHub repos fetch warning:', err.message);
+    if (githubReposCache.data) {
+      return res.json({ success: true, cached: true, stale: true, repos: githubReposCache.data });
+    }
+    res.json({ success: true, cached: true, fallback: true, repos: GITHUB_FALLBACK_REPOS });
+  }
+});
+
+// GET /api/github/stats - Live GitHub user profile metrics & language distribution
+app.get('/api/github/stats', async (req, res) => {
+  const forceRefresh = req.query.fresh === 'true';
+  const now = Date.now();
+
+  if (!forceRefresh && githubStatsCache.data && (now - githubStatsCache.timestamp < GITHUB_CACHE_TTL)) {
+    return res.json({ success: true, cached: true, stats: githubStatsCache.data });
+  }
+
+  try {
+    const headers = { 'User-Agent': 'RajPortfolioBackend/1.0' };
+    if (process.env.GITHUB_TOKEN) {
+      headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+    }
+
+    const [userRes, reposRes] = await Promise.all([
+      safeFetch('https://api.github.com/users/Raj-Rathod-Ai', { headers }),
+      safeFetch('https://api.github.com/users/Raj-Rathod-Ai/repos?per_page=100', { headers })
+    ]);
+
+    const user = userRes.ok ? await userRes.json() : {};
+    const repos = reposRes.ok ? await reposRes.json() : [];
+
+    const publicRepos = user.public_repos ?? repos.length ?? 28;
+    const followers = user.followers ?? 7;
+    const totalStars = Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : 20;
+
+    const langMap = {};
+    if (Array.isArray(repos)) {
+      repos.forEach(r => {
+        if (r.language) langMap[r.language] = (langMap[r.language] || 0) + 1;
+      });
+    }
+
+    const sortedLangs = Object.entries(langMap).sort((a, b) => b[1] - a[1]).slice(0, 7);
+    const languages = sortedLangs.length > 0
+      ? { labels: sortedLangs.map(s => s[0]), values: sortedLangs.map(s => s[1]) }
+      : { labels: ['Python', 'Java', 'C/C++', 'HTML/CSS', 'SQL'], values: [45, 20, 15, 12, 8] };
+
+    const statsData = {
+      publicRepos,
+      followers,
+      totalStars,
+      languages
+    };
+
+    githubStatsCache = { data: statsData, timestamp: now };
+    res.json({ success: true, cached: false, stats: statsData });
+  } catch (err) {
+    console.warn('Backend GitHub stats fetch warning:', err.message);
+    const fallbackStats = {
+      publicRepos: 28,
+      followers: 7,
+      totalStars: 20,
+      languages: {
+        labels: ['Python', 'Java', 'C/C++', 'HTML/CSS', 'SQL'],
+        values: [45, 20, 15, 12, 8]
+      }
+    };
+    res.json({ success: true, cached: true, fallback: true, stats: fallbackStats });
+  }
+});
 
 // GET /api/reviews - List all reviews (filtering out any profane entries)
 app.get('/api/reviews', async (req, res) => {
   try {
-    // If Mongoose is not connected, fallback to sending default review values directly
-    if (mongoose.connection.readyState !== 1) {
-      return res.json(DEFAULT_PRESETS);
+    if (mongoose.connection.readyState === 1) {
+      const reviews = await Review.find().sort({ createdAt: -1 });
+      const cleanReviews = reviews.filter(r => 
+        !checkAbusiveContent(r.name).isAbusive && !checkAbusiveContent(r.review).isAbusive
+      );
+
+      if (cleanReviews.length > 0) {
+        return res.json(cleanReviews);
+      }
     }
-    const reviews = await Review.find().sort({ createdAt: -1 });
-    // Filter out any stored reviews containing abusive content
-    const cleanReviews = reviews.filter(r => 
+    // Fallback to in-memory reviews if database is offline or empty
+    const cleanInMemory = inMemoryReviews.filter(r =>
       !checkAbusiveContent(r.name).isAbusive && !checkAbusiveContent(r.review).isAbusive
     );
-
-    if (cleanReviews.length === 0) {
-      return res.json(DEFAULT_PRESETS);
-    }
-    res.json(cleanReviews);
+    res.json(cleanInMemory.length > 0 ? cleanInMemory : DEFAULT_PRESETS);
   } catch (err) {
     console.error('GET reviews error:', err);
-    res.status(500).json({ error: 'Failed to retrieve reviews', fallback: DEFAULT_PRESETS });
+    res.json(inMemoryReviews.length > 0 ? inMemoryReviews : DEFAULT_PRESETS);
   }
 });
 
@@ -282,12 +498,13 @@ app.get('/api/project-overrides', async (req, res) => {
     if (mongoose.connection.readyState === 1) {
       const setting = await AdminSetting.findOne({ key: 'boss_project_overrides' });
       if (setting && setting.value) {
+        inMemoryOverrides = setting.value;
         return res.json({ overrides: setting.value });
       }
     }
-    res.json({ overrides: {} });
+    res.json({ overrides: inMemoryOverrides });
   } catch (err) {
-    res.json({ overrides: {} });
+    res.json({ overrides: inMemoryOverrides });
   }
 });
 
@@ -299,21 +516,23 @@ app.post('/api/project-overrides', async (req, res) => {
       return res.status(400).json({ error: 'Invalid overrides dataset.' });
     }
 
+    inMemoryOverrides = { ...inMemoryOverrides, ...overrides };
+
     if (mongoose.connection.readyState === 1) {
       await AdminSetting.findOneAndUpdate(
         { key: 'boss_project_overrides' },
-        { value: overrides, updatedAt: new Date() },
+        { value: inMemoryOverrides, updatedAt: new Date() },
         { upsert: true, new: true }
       );
       return res.json({ success: true, message: 'Global project overrides synced successfully.' });
     }
-    res.json({ success: true, message: 'Saved.' });
+    res.json({ success: true, message: 'Saved to runtime cache (DB offline).' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST /api/reviews - Add a new review with profanity check
+// POST /api/reviews - Add a new review with profanity check & in-memory backup
 app.post('/api/reviews', async (req, res) => {
   try {
     const { name, rating, review } = req.body;
@@ -339,19 +558,28 @@ app.post('/api/reviews', async (req, res) => {
     });
 
     const newReviewData = {
+      _id: 'rev_' + Date.now(),
+      name,
+      rating: parseInt(rating) || 5,
+      review,
+      date: formattedDate,
+      createdAt: new Date()
+    };
+
+    // Save into runtime memory immediately so live fetching succeeds
+    inMemoryReviews.unshift(newReviewData);
+
+    if (mongoose.connection.readyState !== 1) {
+      console.warn('Database offline. Review saved in server memory fallback.');
+      return res.status(201).json(newReviewData);
+    }
+
+    const newReview = new Review({
       name,
       rating: parseInt(rating) || 5,
       review,
       date: formattedDate
-    };
-
-    // If MongoDB is not connected, simulate success by returning mock JSON
-    if (mongoose.connection.readyState !== 1) {
-      console.warn('Database offline. Returning mock response for review submit.');
-      return res.status(201).json(newReviewData);
-    }
-
-    const newReview = new Review(newReviewData);
+    });
     await newReview.save();
     console.log(`New review saved for: ${name}`);
 
@@ -944,12 +1172,13 @@ app.delete('/api/reviews/:id', async (req, res) => {
     }
 
     const reviewId = req.params.id;
+    inMemoryReviews = inMemoryReviews.filter(r => (r._id && String(r._id) !== String(reviewId)) && (r.id && String(r.id) !== String(reviewId)));
     if (mongoose.connection.readyState === 1) {
       await Review.findByIdAndDelete(reviewId);
       console.log(`Review ${reviewId} deleted by Master Boss.`);
       return res.json({ success: true, deletedId: reviewId });
     }
-    return res.json({ success: true, offline: true });
+    return res.json({ success: true, deletedId: reviewId, offline: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

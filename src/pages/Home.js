@@ -2,7 +2,7 @@ import { Hero } from '../components/Hero.js';
 import { CategoryCard } from '../components/CategoryCard.js';
 import { getAllCategories } from '../utils/categorize.js';
 import { containsAbusiveContent } from '../utils/profanityFilter.js';
-import { setVisitorName, getVisitorId, validateVisitorName, isBossDevice, getMasterPassword } from '../utils/analytics.js';
+import { setVisitorName, getVisitorId, validateVisitorName, isBossDevice, getMasterPassword, getApiBaseUrl } from '../utils/analytics.js';
 
 
 
@@ -834,36 +834,61 @@ export class Home {
       const followersCountEl = document.getElementById('git-followers-count');
       const starsCountEl = document.getElementById('git-stars-count');
 
+      // Tier 1: Fetch Live Stats from Express backend on Render
+      try {
+        const apiUrl = getApiBaseUrl();
+        const res = await fetch(`${apiUrl}/api/github/stats`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.stats) {
+            const stats = data.stats;
+            if (reposCountEl) reposCountEl.textContent = stats.publicRepos ?? '28';
+            if (followersCountEl) followersCountEl.textContent = stats.followers ?? '7';
+            if (starsCountEl) starsCountEl.textContent = stats.totalStars ?? '20';
+            if (stats.languages && stats.languages.labels && stats.languages.labels.length > 0) {
+              updateGitChart(stats.languages.labels, stats.languages.values);
+              return;
+            }
+          }
+        }
+      } catch (backendErr) {
+        console.warn('Backend GitHub stats fetch notice:', backendErr.message);
+      }
+
+      // Tier 2: Direct GitHub API fallback
       try {
         const [userRes, reposRes] = await Promise.all([
           fetch('https://api.github.com/users/Raj-Rathod-Ai'),
           fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?per_page=100')
         ]);
 
-        const user = await userRes.json();
-        const repos = await reposRes.json();
+        const user = userRes.ok ? await userRes.json() : {};
+        const repos = reposRes.ok ? await reposRes.json() : [];
 
-        if (reposCountEl) reposCountEl.textContent = user.public_repos ?? repos.length;
-        if (followersCountEl) followersCountEl.textContent = user.followers ?? 0;
+        if (reposCountEl) reposCountEl.textContent = user.public_repos ?? repos.length ?? 28;
+        if (followersCountEl) followersCountEl.textContent = user.followers ?? 7;
 
-        const totalStars = repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
+        const totalStars = Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : 20;
         if (starsCountEl) starsCountEl.textContent = totalStars;
 
         const langMap = {};
-        repos.forEach(r => { if (r.language) langMap[r.language] = (langMap[r.language] || 0) + 1; });
+        if (Array.isArray(repos)) {
+          repos.forEach(r => { if (r.language) langMap[r.language] = (langMap[r.language] || 0) + 1; });
+        }
         const sorted = Object.entries(langMap).sort((a, b) => b[1] - a[1]).slice(0, 7);
         if (sorted.length > 0) {
           updateGitChart(sorted.map(s => s[0]), sorted.map(s => s[1]));
-        } else {
-          updateGitChart(['Python', 'Java', 'C/C++', 'HTML/CSS', 'SQL'], [45, 20, 15, 12, 8]);
+          return;
         }
       } catch (err) {
-        console.warn('GitHub stats load failed. Using fallbacks.', err);
-        if (reposCountEl) reposCountEl.textContent = '28';
-        if (followersCountEl) followersCountEl.textContent = '7';
-        if (starsCountEl) starsCountEl.textContent = '20';
-        updateGitChart(['Python', 'Java', 'C/C++', 'HTML/CSS', 'SQL'], [45, 20, 15, 12, 8]);
+        console.warn('Direct GitHub stats load failed. Using fallbacks.', err.message);
       }
+
+      // Tier 3: Static default fallback
+      if (reposCountEl) reposCountEl.textContent = '28';
+      if (followersCountEl) followersCountEl.textContent = '7';
+      if (starsCountEl) starsCountEl.textContent = '20';
+      updateGitChart(['Python', 'Java', 'C/C++', 'HTML/CSS', 'SQL'], [45, 20, 15, 12, 8]);
     };
 
     fetchGitHubData();
@@ -970,7 +995,7 @@ export class Home {
         localStorage.setItem('boss_project_overrides', JSON.stringify(overrides));
 
         // Sync to backend database
-        fetch('/api/project-overrides', {
+        fetch(getApiBaseUrl() + '/api/project-overrides', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ overrides })
@@ -995,7 +1020,7 @@ export class Home {
         localStorage.setItem('boss_project_overrides', JSON.stringify(overrides));
 
         // Sync to backend database
-        fetch('/api/project-overrides', {
+        fetch(getApiBaseUrl() + '/api/project-overrides', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ overrides })
@@ -1130,9 +1155,6 @@ export class Home {
       });
     }
 
-    // API Base URL config (switch relative for local, absolute for Render in production)
-    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://portfolio-raj-qda3.onrender.com';
-
     // 6. Review list renderer
     const renderReviewsList = async () => {
       const container = document.getElementById('reviews-list-container');
@@ -1140,7 +1162,8 @@ export class Home {
 
       let reviews = [];
       try {
-        const res = await fetch(API_BASE_URL + '/api/reviews');
+        const apiUrl = getApiBaseUrl();
+        const res = await fetch(apiUrl + '/api/reviews');
         if (!res.ok) throw new Error('API failed');
         reviews = await res.json();
       } catch (err) {
@@ -1214,7 +1237,8 @@ export class Home {
 
               try {
                 if (id && !id.startsWith('rev_')) {
-                  await fetch(`/api/reviews/${id}?password=${encodeURIComponent(getMasterPassword())}`, {
+                  const apiUrl = getApiBaseUrl();
+                  await fetch(`${apiUrl}/api/reviews/${id}?password=${encodeURIComponent(getMasterPassword())}`, {
                     method: 'DELETE',
                     headers: { 'x-admin-key': getMasterPassword() }
                   });
@@ -1292,7 +1316,7 @@ export class Home {
 
         try {
           // Attempt server save asynchronously
-          fetch(API_BASE_URL + '/api/reviews', {
+          fetch(getApiBaseUrl() + '/api/reviews', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(bodyData)
@@ -1335,7 +1359,7 @@ export class Home {
         localStorage.setItem('tempContactMessage', JSON.stringify(tempContact));
 
         try {
-          const res = await fetch(API_BASE_URL + '/api/contact', {
+          const res = await fetch(getApiBaseUrl() + '/api/contact', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: nameVal, email: emailVal, subject: subjectVal, message: messageVal })

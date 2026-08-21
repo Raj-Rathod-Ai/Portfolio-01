@@ -1,7 +1,8 @@
 import { getCache, setCache } from '../utils/cache.js';
+import { getApiBaseUrl } from '../utils/analytics.js';
 
 const CACHE_KEY = 'github_repositories_cache';
-const CACHE_EXPIRY_MINS = 20; // Cache for 20 minutes
+const CACHE_EXPIRY_MINS = 10; // Cache for 10 minutes
 
 const SKIP_REPOS = [
   'raj-rathod-ai',
@@ -108,19 +109,35 @@ const FALLBACK_REPOS = [
 ];
 
 /**
- * Fetch public repositories for the user from GitHub API.
- * Uses localStorage cache to prevent rate-limiting.
+ * Fetch public repositories for the user from Backend API (Render) or GitHub API.
+ * Uses localStorage cache to prevent rate-limiting while keeping data live.
  * @returns {Promise<Array>} List of filtered repositories.
  */
 export async function fetchGitHubRepositories() {
   const cached = getCache(CACHE_KEY);
-  if (cached) {
+  if (cached && Array.isArray(cached) && cached.length > 0) {
     console.log('Serving repositories from local cache.');
     return cached;
   }
 
+  // Tier 1: Try Backend Render API endpoint
   try {
-    console.log('Fetching repositories from GitHub API...');
+    const apiUrl = getApiBaseUrl();
+    const res = await fetch(`${apiUrl}/api/github/repos`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.repos && Array.isArray(data.repos) && data.repos.length > 0) {
+        setCache(CACHE_KEY, data.repos, CACHE_EXPIRY_MINS);
+        return data.repos;
+      }
+    }
+  } catch (backendErr) {
+    console.warn('Backend GitHub repos fetch notice:', backendErr.message);
+  }
+
+  // Tier 2: Direct GitHub API fallback
+  try {
+    console.log('Fetching repositories directly from GitHub API...');
     const res = await fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100');
     if (!res.ok) {
       throw new Error(`GitHub API returned status ${res.status}`);
@@ -136,10 +153,15 @@ export async function fetchGitHubRepositories() {
       );
     });
 
-    setCache(CACHE_KEY, filtered, CACHE_EXPIRY_MINS);
-    return filtered;
+    if (filtered.length > 0) {
+      setCache(CACHE_KEY, filtered, CACHE_EXPIRY_MINS);
+      return filtered;
+    }
   } catch (err) {
     console.warn('Failed to fetch from GitHub API. Falling back to static repositories list.', err.message);
-    return FALLBACK_REPOS; // Graceful fallback
   }
+
+  // Tier 3: Static fallback (cached briefly so it retries soon)
+  setCache(CACHE_KEY, FALLBACK_REPOS, 2);
+  return FALLBACK_REPOS;
 }
