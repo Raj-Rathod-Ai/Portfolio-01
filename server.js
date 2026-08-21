@@ -428,9 +428,9 @@ app.get('/api/github/stats', async (req, res) => {
     const user = userRes.ok ? await userRes.json() : {};
     const repos = reposRes.ok ? await reposRes.json() : [];
 
-    const publicRepos = user.public_repos ?? repos.length ?? 28;
-    const followers = user.followers ?? 7;
-    const totalStars = Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : 20;
+    const publicRepos = user.public_repos ?? repos.length ?? 30;
+    const followers = user.followers ?? 9;
+    const totalStars = Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : 76;
 
     const langMap = {};
     if (Array.isArray(repos)) {
@@ -442,12 +442,12 @@ app.get('/api/github/stats', async (req, res) => {
     const sortedLangs = Object.entries(langMap).sort((a, b) => b[1] - a[1]).slice(0, 7);
     const languages = sortedLangs.length > 0
       ? { labels: sortedLangs.map(s => s[0]), values: sortedLangs.map(s => s[1]) }
-      : { labels: ['Python', 'Java', 'C/C++', 'HTML/CSS', 'SQL'], values: [45, 20, 15, 12, 8] };
+      : { labels: ['Python', 'Jupyter', 'JavaScript', 'TypeScript', 'CSS', 'Java'], values: [10, 7, 3, 2, 2, 1] };
 
     const statsData = {
       publicRepos,
       followers,
-      totalStars,
+      totalStars: totalStars || 76,
       languages
     };
 
@@ -456,12 +456,12 @@ app.get('/api/github/stats', async (req, res) => {
   } catch (err) {
     console.warn('Backend GitHub stats fetch warning:', err.message);
     const fallbackStats = {
-      publicRepos: 28,
-      followers: 7,
-      totalStars: 20,
+      publicRepos: 30,
+      followers: 9,
+      totalStars: 76,
       languages: {
-        labels: ['Python', 'Java', 'C/C++', 'HTML/CSS', 'SQL'],
-        values: [45, 20, 15, 12, 8]
+        labels: ['Python', 'Jupyter', 'JavaScript', 'TypeScript', 'CSS', 'Java'],
+        values: [10, 7, 3, 2, 2, 1]
       }
     };
     res.json({ success: true, cached: true, fallback: true, stats: fallbackStats });

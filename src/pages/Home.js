@@ -369,7 +369,7 @@ export class Home {
             <div class="rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
               <div>
                 <span class="block font-mono text-xs text-gray-500 uppercase tracking-widest mb-1">Public Repositories</span>
-                <span id="git-repos-count" class="block font-jakarta font-extrabold text-3xl text-primary">--</span>
+                <span id="git-repos-count" class="block font-jakarta font-extrabold text-3xl text-primary">30</span>
               </div>
               <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                 <i class="fa-solid fa-code-fork text-primary text-lg"></i>
@@ -378,7 +378,7 @@ export class Home {
             <div class="rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
               <div>
                 <span class="block font-mono text-xs text-gray-500 uppercase tracking-widest mb-1">GitHub Followers</span>
-                <span id="git-followers-count" class="block font-jakarta font-extrabold text-3xl text-secondary">--</span>
+                <span id="git-followers-count" class="block font-jakarta font-extrabold text-3xl text-secondary">9</span>
               </div>
               <div class="w-12 h-12 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center">
                 <i class="fa-solid fa-users text-secondary text-lg"></i>
@@ -387,7 +387,7 @@ export class Home {
             <div class="rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
               <div>
                 <span class="block font-mono text-xs text-gray-500 uppercase tracking-widest mb-1">Total Stars</span>
-                <span id="git-stars-count" class="block font-jakarta font-extrabold text-3xl text-accent">--</span>
+                <span id="git-stars-count" class="block font-jakarta font-extrabold text-3xl text-accent">76</span>
               </div>
               <div class="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
                 <i class="fa-solid fa-star text-accent text-lg"></i>
@@ -829,22 +829,31 @@ export class Home {
       });
     };
 
-    const fetchGitHubData = async () => {
-      const reposCountEl = document.getElementById('git-repos-count');
-      const followersCountEl = document.getElementById('git-followers-count');
-      const starsCountEl = document.getElementById('git-stars-count');
+    // Initialize instant visual defaults so user never sees blank or delay
+    const reposCountEl = document.getElementById('git-repos-count');
+    const followersCountEl = document.getElementById('git-followers-count');
+    const starsCountEl = document.getElementById('git-stars-count');
 
-      // Tier 1: Fetch Live Stats from Express backend on Render
+    if (reposCountEl) reposCountEl.textContent = '30';
+    if (followersCountEl) followersCountEl.textContent = '9';
+    if (starsCountEl) starsCountEl.textContent = '76';
+    updateGitChart(['Python', 'Jupyter', 'JavaScript', 'TypeScript', 'CSS', 'Java'], [10, 7, 3, 2, 2, 1]);
+
+    const fetchGitHubData = async () => {
+      // Tier 1: Fetch Live Stats from Express backend on Render with 3.5s timeout
       try {
         const apiUrl = getApiBaseUrl();
-        const res = await fetch(`${apiUrl}/api/github/stats`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(`${apiUrl}/api/github/stats`, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           if (data && data.stats) {
             const stats = data.stats;
-            if (reposCountEl) reposCountEl.textContent = stats.publicRepos ?? '28';
-            if (followersCountEl) followersCountEl.textContent = stats.followers ?? '7';
-            if (starsCountEl) starsCountEl.textContent = stats.totalStars ?? '20';
+            if (reposCountEl) reposCountEl.textContent = stats.publicRepos ?? '30';
+            if (followersCountEl) followersCountEl.textContent = stats.followers ?? '9';
+            if (starsCountEl) starsCountEl.textContent = stats.totalStars ?? '76';
             if (stats.languages && stats.languages.labels && stats.languages.labels.length > 0) {
               updateGitChart(stats.languages.labels, stats.languages.values);
               return;
@@ -852,24 +861,27 @@ export class Home {
           }
         }
       } catch (backendErr) {
-        console.warn('Backend GitHub stats fetch notice:', backendErr.message);
+        console.log('Backend stats fetch note:', backendErr.message);
       }
 
       // Tier 2: Direct GitHub API fallback
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
         const [userRes, reposRes] = await Promise.all([
-          fetch('https://api.github.com/users/Raj-Rathod-Ai'),
-          fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?per_page=100')
+          fetch('https://api.github.com/users/Raj-Rathod-Ai', { signal: controller.signal }),
+          fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?per_page=100', { signal: controller.signal })
         ]);
+        clearTimeout(timeoutId);
 
         const user = userRes.ok ? await userRes.json() : {};
         const repos = reposRes.ok ? await reposRes.json() : [];
 
-        if (reposCountEl) reposCountEl.textContent = user.public_repos ?? repos.length ?? 28;
-        if (followersCountEl) followersCountEl.textContent = user.followers ?? 7;
+        if (reposCountEl && user.public_repos !== undefined) reposCountEl.textContent = user.public_repos;
+        if (followersCountEl && user.followers !== undefined) followersCountEl.textContent = user.followers;
 
-        const totalStars = Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : 20;
-        if (starsCountEl) starsCountEl.textContent = totalStars;
+        const totalStars = Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : 76;
+        if (starsCountEl) starsCountEl.textContent = totalStars || 76;
 
         const langMap = {};
         if (Array.isArray(repos)) {
@@ -881,14 +893,14 @@ export class Home {
           return;
         }
       } catch (err) {
-        console.warn('Direct GitHub stats load failed. Using fallbacks.', err.message);
+        console.log('Direct GitHub stats fetch note:', err.message);
       }
 
       // Tier 3: Static default fallback
-      if (reposCountEl) reposCountEl.textContent = '28';
-      if (followersCountEl) followersCountEl.textContent = '7';
-      if (starsCountEl) starsCountEl.textContent = '20';
-      updateGitChart(['Python', 'Java', 'C/C++', 'HTML/CSS', 'SQL'], [45, 20, 15, 12, 8]);
+      if (reposCountEl) reposCountEl.textContent = '30';
+      if (followersCountEl) followersCountEl.textContent = '9';
+      if (starsCountEl) starsCountEl.textContent = '76';
+      updateGitChart(['Python', 'Jupyter', 'JavaScript', 'TypeScript', 'CSS', 'Java'], [10, 7, 3, 2, 2, 1]);
     };
 
     fetchGitHubData();
