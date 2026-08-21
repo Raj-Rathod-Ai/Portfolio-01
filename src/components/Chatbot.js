@@ -1293,16 +1293,23 @@ CRITICAL INSTRUCTIONS:
   }
 
   /**
-   * Resolve conversational pronouns (it, this, that, live demo, how does it work) from history.
+   * Resolve conversational pronouns (it, this, that, live demo, link, how does it work) from history.
    * @param {string} input - Current user message.
    * @param {Array} history - Past message turns.
    * @returns {string} Enriched query string with resolved entities.
    */
   resolveContextualQuery(input, history = []) {
     const text = input.toLowerCase().trim();
-    const pronouns = ['it', 'this', 'that', 'this project', 'that project', 'live link', 'live demo', 'demo', 'source code', 'github link', 'algorithm', 'how was it built', 'dataset', 'tech stack', 'how does it work'];
+    const pronouns = [
+      'it', 'this', 'that', 'this project', 'that project', 'the project',
+      'live link', 'live demo', 'demo', 'link', 'url', 'deployed link', 'deploy link',
+      'source code', 'github link', 'code link', 'github', 'repo',
+      'algorithm', 'how was it built', 'dataset', 'tech stack', 'how does it work',
+      'give link', 'give me link', 'give live link', 'give me live link', 'show demo',
+      'give deploy link', 'deployed link please'
+    ];
 
-    const hasPronoun = pronouns.some(p => text === p || text.includes(p + ' ') || text.endsWith(' ' + p) || text.includes(' ' + p + ' '));
+    const hasPronoun = pronouns.some(p => text === p || text.startsWith(p + ' ') || text.endsWith(' ' + p) || text.includes(' ' + p + ' ') || text.includes(p));
     if (!hasPronoun || !history || history.length === 0) {
       return text;
     }
@@ -1311,17 +1318,26 @@ CRITICAL INSTRUCTIONS:
     const recentTurns = [...history].reverse();
     for (const turn of recentTurns) {
       const c = (turn.content || '').toLowerCase();
+      if (c.includes('movie') || c.includes('cinema-verse')) return `${text} movie recommendations`;
+      if (c.includes('fake news') || c.includes('truthlens')) return `${text} fake news detection`;
       if (c.includes('taxi') || c.includes('fare')) return `${text} taxi fare prediction`;
       if (c.includes('food delivery') || c.includes('delivery time')) return `${text} food delivery time`;
       if (c.includes('personality')) return `${text} discover true personality`;
-      if (c.includes('autoprep')) return `${text} autoprepai data preprocessing`;
+      if (c.includes('autoprep') || c.includes('eda')) return `${text} autoprepai data preprocessing`;
       if (c.includes('flower') || c.includes('leaf disease')) return `${text} flower disease system`;
       if (c.includes('chatnote')) return `${text} chatnotes rag`;
       if (c.includes('hybridmind')) return `${text} hybridmind`;
-      if (c.includes('fake news')) return `${text} fake news detection`;
-      if (c.includes('movie')) return `${text} movie recommendations`;
+      if (c.includes('car-selling') || c.includes('car selling') || c.includes('car price')) return `${text} car selling price prediction`;
+      if (c.includes('loan') || c.includes('risk assessment')) return `${text} loan risk assessment`;
+      if (c.includes('house') || c.includes('usa house')) return `${text} usa house price prediction`;
+      if (c.includes('salary')) return `${text} salary predication`;
+      if (c.includes('mark') || c.includes('exam')) return `${text} mark predication`;
+      if (c.includes('student') || c.includes('performance')) return `${text} student performance predication`;
+      if (c.includes('lifestyle') || c.includes('healthy')) return `${text} healthy lifestyle prediction`;
+      if (c.includes('drug')) return `${text} drug recommendation system`;
       if (c.includes('library')) return `${text} library management`;
       if (c.includes('stone') || c.includes('paper scissor')) return `${text} stone paper scissors`;
+      if (c.includes('tic-tac') || c.includes('tictactoe')) return `${text} tic tac toe`;
       if (c.includes('job analysis') || c.includes('power bi')) return `${text} job analysis dashboard`;
       if (c.includes('education') || c.includes('parul') || c.includes('cgpa')) return `${text} parul university education cgpa`;
       if (c.includes('resume') || c.includes('cv')) return `${text} resume cv`;
