@@ -65,7 +65,7 @@
   {
     "repo": "Food_Delivery_Time-Using-ML",
     "type": "solo",
-    "live": "",
+    "live": "https://fooddelivery-time.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
@@ -79,7 +79,7 @@
   {
     "repo": "Discover-Your-True-Personality",
     "type": "solo",
-    "live": "",
+    "live": "https://discover-your-true-personality.streamlit.app/",
     "featured": false,
     "category": "Machine Learning"
   },
@@ -135,7 +135,7 @@
   {
     "repo": "FlowerDiseaseSystem",
     "type": "group",
-    "live": "",
+    "live": "https://flower-disease-system.vercel.app",
     "featured": true,
     "category": "Deep Learning"
   },
@@ -149,7 +149,7 @@
   {
     "repo": "stone-paper-scissors-python",
     "type": "solo",
-    "live": "",
+    "live": "https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/",
     "featured": false,
     "category": "Python Concepts"
   },
@@ -163,7 +163,7 @@
   {
     "repo": "Library-Mangement",
     "type": "solo",
-    "live": "",
+    "live": "https://librarymangement1.streamlit.app/",
     "featured": false,
     "category": "Normal Projects"
   },
