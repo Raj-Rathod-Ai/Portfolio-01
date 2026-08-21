@@ -414,13 +414,16 @@ const FALLBACK_REPOS = [
 /**
  * Fetch public repositories for the user from GitHub API or Backend API.
  * Uses localStorage cache to prevent rate-limiting while keeping data live.
+ * @param {boolean} [forceRefresh=false] - If true, bypasses local cache and fetches live.
  * @returns {Promise<Array>} List of filtered repositories.
  */
-export async function fetchGitHubRepositories() {
-  const cached = getCache(CACHE_KEY);
-  if (cached && Array.isArray(cached) && cached.length >= 20) {
-    console.log('Serving full repositories dataset from local cache.');
-    return cached;
+export async function fetchGitHubRepositories(forceRefresh = false) {
+  if (!forceRefresh) {
+    const cached = getCache(CACHE_KEY);
+    if (cached && Array.isArray(cached) && cached.length >= 20) {
+      console.log('Serving full repositories dataset from local cache.');
+      return cached;
+    }
   }
 
   // Tier 1: Direct GitHub API (Fast, comprehensive, all live projects)

@@ -509,5 +509,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Register animations and routes
     initIntersectionObservers();
     initRouter();
+
+    // Background auto-sync: Silently fetch fresh GitHub repositories after 2.5s
+    setTimeout(async () => {
+      try {
+        const fresh = await fetchGitHubRepositories(true);
+        if (fresh && Array.isArray(fresh) && fresh.length > 0) {
+          const freshMapped = fresh.map(repo => {
+            const match = meta.find(m => m.repo.toLowerCase() === repo.name.toLowerCase());
+            const category = getProjectCategory(repo, meta);
+            const isGroup = isGroupProject(repo.name, meta);
+            const featured = match ? match.featured === true : false;
+            return { ...repo, category, isGroup, featured };
+          });
+          UPCOMING_PROJECTS.forEach(up => {
+            if (!freshMapped.some(r => r.name.toLowerCase() === up.name.toLowerCase())) {
+              freshMapped.unshift(up);
+            }
+          });
+          const updatedRepos = sortReposWithFeaturedTop(freshMapped);
+          window.portfolioData = { repos: updatedRepos, meta };
+          window.dispatchEvent(new CustomEvent('portfolioDataUpdated', { detail: { repos: updatedRepos } }));
+        }
+      } catch (e) {
+        console.log('Background repo auto-sync notice:', e.message);
+      }
+    }, 2500);
   });
 });
