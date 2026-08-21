@@ -7,7 +7,70 @@
     "category": "Machine Learning"
   },
   {
+    "repo": "car-selling-price-prediction",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "USA-house-price-prediction",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Salary_predication",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Student_performance_predication",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Mark-Predication",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Loan-Risk-Assessment-App",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "healthy-lifestyle-prediction",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "drug-recommendation-system",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
     "repo": "Food_Delivery_Time-Using-ML",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Random-Forest-Food-Delivery-Time",
     "type": "solo",
     "live": "",
     "featured": false,
@@ -21,18 +84,32 @@
     "category": "Machine Learning"
   },
   {
-    "repo": "Movie-Recommendations-Using-NLP-ML",
-    "type": "solo",
-    "live": "",
-    "featured": true,
-    "category": "NLP"
-  },
-  {
-    "repo": "Library-Mangement",
+    "repo": "Machine-Learning-Notes",
     "type": "solo",
     "live": "",
     "featured": false,
-    "category": "Normal Projects"
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "ChatNotes",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "RAG"
+  },
+  {
+    "repo": "HybridMind",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Generative AI"
+  },
+  {
+    "repo": "AutoPrepAI",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Generative AI"
   },
   {
     "repo": "Fake-News-Detection-Using-ML-Real-time",
@@ -42,18 +119,25 @@
     "category": "NLP"
   },
   {
-    "repo": "stone-paper-scissors-python",
+    "repo": "Movie-Recommendations-Using-NLP-and-ML",
     "type": "solo",
     "live": "",
-    "featured": false,
-    "category": "Python Concepts"
+    "featured": true,
+    "category": "NLP"
   },
   {
-    "repo": "neuro-os",
+    "repo": "Movie-Recommendations-Using-NLP-ML",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "NLP"
+  },
+  {
+    "repo": "FlowerDiseaseSystem",
     "type": "group",
     "live": "",
-    "featured": false,
-    "category": "Normal Projects"
+    "featured": true,
+    "category": "Deep Learning"
   },
   {
     "repo": "Job-Analysis-Dashboard",
@@ -63,10 +147,31 @@
     "category": "Data Science"
   },
   {
-    "repo": "FlowerDiseaseSystem",
+    "repo": "stone-paper-scissors-python",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Python Concepts"
+  },
+  {
+    "repo": "Tic-Tac-Toe",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Python Concepts"
+  },
+  {
+    "repo": "Library-Mangement",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Normal Projects"
+  },
+  {
+    "repo": "neuro-os",
     "type": "group",
     "live": "",
-    "featured": true,
-    "category": "Deep Learning"
+    "featured": false,
+    "category": "Normal Projects"
   }
 ]

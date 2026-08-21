@@ -1,21 +1,4 @@
-import { getCache, setCache } from '../utils/cache.js';
-import { getApiBaseUrl } from '../utils/analytics.js';
-
-const CACHE_KEY = 'github_repositories_cache';
-const CACHE_EXPIRY_MINS = 10; // Cache for 10 minutes
-
-const SKIP_REPOS = [
-  'raj-rathod-ai',
-  '.github',
-  'impact-training-parul-university',
-  'portfolio',
-  'certificate',
-  'portfolio-01',
-  'neetcode-submissions',
-  'neetcode'
-];
-
-const FALLBACK_REPOS = [
+[
   {
     "name": "AutoPrepAI",
     "description": "\u26a1 AutoPrepAI \u2014 Offline AI-powered automated data preprocessing & quality analysis platform built with Streamlit. Upload any CSV/Excel/Parquet/JSON dataset and get full cleaning, feature engineering, quality scoring, visualizations, and downloadable reports \u2014 no cloud required.",
@@ -409,72 +392,4 @@ const FALLBACK_REPOS = [
     ],
     "html_url": "https://github.com/Raj-Rathod-Ai/USA-house-price-prediction"
   }
-];
-
-/**
- * Fetch public repositories for the user from GitHub API or Backend API.
- * Uses localStorage cache to prevent rate-limiting while keeping data live.
- * @returns {Promise<Array>} List of filtered repositories.
- */
-export async function fetchGitHubRepositories() {
-  const cached = getCache(CACHE_KEY);
-  if (cached && Array.isArray(cached) && cached.length >= 20) {
-    console.log('Serving full repositories dataset from local cache.');
-    return cached;
-  }
-
-  // Tier 1: Direct GitHub API (Fast, comprehensive, all live projects)
-  try {
-    console.log('Fetching repositories directly from GitHub API...');
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
-    const res = await fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100', { signal: controller.signal });
-    clearTimeout(timeoutId);
-
-    if (res.ok) {
-      const repos = await res.json();
-      if (Array.isArray(repos)) {
-        const filtered = repos.filter(repo => {
-          const nameLower = (repo.name || '').toLowerCase();
-          return (
-            !SKIP_REPOS.includes(nameLower) &&
-            !repo.archived &&
-            !repo.fork
-          );
-        });
-
-        if (filtered.length >= 10) {
-          setCache(CACHE_KEY, filtered, CACHE_EXPIRY_MINS);
-          return filtered;
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('Direct GitHub API fetch notice:', err.message);
-  }
-
-  // Tier 2: Try Backend Render API endpoint
-  try {
-    const apiUrl = getApiBaseUrl();
-    if (apiUrl) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-      const res = await fetch(`${apiUrl}/api/github/repos`, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.repos && Array.isArray(data.repos) && data.repos.length >= 10) {
-          setCache(CACHE_KEY, data.repos, CACHE_EXPIRY_MINS);
-          return data.repos;
-        }
-      }
-    }
-  } catch (backendErr) {
-    console.warn('Backend GitHub repos fetch notice:', backendErr.message);
-  }
-
-  // Tier 3: Static curated fallback with all 24 projects
-  setCache(CACHE_KEY, FALLBACK_REPOS, CACHE_EXPIRY_MINS);
-  return FALLBACK_REPOS;
-}
+]
