@@ -263,9 +263,7 @@ export class Chatbot {
     toggleBtn.addEventListener('click', () => toggleChat());
     closeBtn?.addEventListener('click', () => toggleChat(false));
     resetBtn?.addEventListener('click', () => {
-      if (confirm('Reset chat? Your name will be kept, only messages are cleared.')) {
-        this.resetChatOnly();
-      }
+      this.resetProfileAndHistory();
     });
 
     // Tooltip suggestion handlers
@@ -939,7 +937,8 @@ export class Chatbot {
   async getBotReply(prompt) {
     // Extract live repos from window.portfolioData
     const repos = window.portfolioData?.repos || [];
-    const sortedRepos = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+    const realRepos = repos.filter(r => !r.isUpcoming && r.html_url && r.html_url !== '#' && r.name);
+    const sortedRepos = [...realRepos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
     
     // Format full repo metadata for context
     const repoListText = sortedRepos.length > 0

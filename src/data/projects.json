@@ -126,13 +126,6 @@
     "category": "NLP"
   },
   {
-    "repo": "Movie-Recommendations-Using-NLP-ML",
-    "type": "solo",
-    "live": "",
-    "featured": true,
-    "category": "NLP"
-  },
-  {
     "repo": "FlowerDiseaseSystem",
     "type": "group",
     "live": "https://flower-disease-system.vercel.app",

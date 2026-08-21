@@ -241,8 +241,8 @@ export const UPCOMING_PROJECTS = [
     language: 'Python',
     topics: ['discord-bot', 'genai', 'llm', 'multimodal', 'upcoming'],
     stargazers_count: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
     isUpcoming: true,
     isLocked: true,
     lockedMessage: '🔒 Coming Soon — Raj Rathod is actively building this project! Full code & live demo will auto-sync when uploaded to GitHub.'
@@ -256,8 +256,8 @@ export const UPCOMING_PROJECTS = [
     language: 'Python',
     topics: ['code-reviewer', 'ai-agents', 'multi-agent', 'llm', 'upcoming'],
     stargazers_count: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
     isUpcoming: true,
     isLocked: true,
     lockedMessage: '🔒 Coming Soon — Raj Rathod is actively building this project! Full code & live demo will auto-sync when uploaded to GitHub.'
@@ -271,8 +271,8 @@ export const UPCOMING_PROJECTS = [
     language: 'Python',
     topics: ['news-curation', 'rag', 'rss-parser', 'automation', 'upcoming'],
     stargazers_count: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
     isUpcoming: true,
     isLocked: true,
     lockedMessage: '🔒 Coming Soon — Raj Rathod is actively building this project! Full code & live demo will auto-sync when uploaded to GitHub.'
