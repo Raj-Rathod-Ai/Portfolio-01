@@ -850,10 +850,19 @@ export class Home {
         if (res.ok) {
           const data = await res.json();
           if (data && data.stats) {
-            const stats = data.stats;
-            if (reposCountEl) reposCountEl.textContent = stats.publicRepos ?? '30';
-            if (followersCountEl) followersCountEl.textContent = stats.followers ?? '9';
-            if (starsCountEl) starsCountEl.textContent = stats.totalStars ?? '76';
+            const pCount = (typeof stats.publicRepos === 'number' && stats.publicRepos > 0)
+              ? stats.publicRepos
+              : (stats.publicRepos || '30');
+            const fCount = (typeof stats.followers === 'number' && stats.followers > 0)
+              ? stats.followers
+              : (stats.followers || '9');
+            const sCount = (typeof stats.totalStars === 'number' && stats.totalStars > 0)
+              ? stats.totalStars
+              : (stats.totalStars || '76');
+
+            if (reposCountEl) reposCountEl.textContent = pCount;
+            if (followersCountEl) followersCountEl.textContent = fCount;
+            if (starsCountEl) starsCountEl.textContent = sCount;
             if (stats.languages && stats.languages.labels && stats.languages.labels.length > 0) {
               updateGitChart(stats.languages.labels, stats.languages.values);
               return;
@@ -877,14 +886,31 @@ export class Home {
         const user = userRes.ok ? await userRes.json() : {};
         const repos = reposRes.ok ? await reposRes.json() : [];
 
-        if (reposCountEl && user.public_repos !== undefined) reposCountEl.textContent = user.public_repos;
-        if (followersCountEl && user.followers !== undefined) followersCountEl.textContent = user.followers;
-
-        const totalStars = Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : 76;
-        if (starsCountEl) starsCountEl.textContent = totalStars || 76;
+        if (reposCountEl) {
+          if (typeof user.public_repos === 'number' && user.public_repos > 0) {
+            reposCountEl.textContent = user.public_repos;
+          } else if (Array.isArray(repos) && repos.length > 0) {
+            reposCountEl.textContent = repos.length;
+          } else {
+            reposCountEl.textContent = '30';
+          }
+        }
+        if (followersCountEl) {
+          if (typeof user.followers === 'number' && user.followers > 0) {
+            followersCountEl.textContent = user.followers;
+          } else {
+            followersCountEl.textContent = '9';
+          }
+        }
+        if (starsCountEl) {
+          const totalStars = (Array.isArray(repos) && repos.length > 0)
+            ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0)
+            : 76;
+          starsCountEl.textContent = totalStars || '76';
+        }
 
         const langMap = {};
-        if (Array.isArray(repos)) {
+        if (Array.isArray(repos) && repos.length > 0) {
           repos.forEach(r => { if (r.language) langMap[r.language] = (langMap[r.language] || 0) + 1; });
         }
         const sorted = Object.entries(langMap).sort((a, b) => b[1] - a[1]).slice(0, 7);

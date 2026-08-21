@@ -425,12 +425,15 @@ app.get('/api/github/stats', async (req, res) => {
       safeFetch('https://api.github.com/users/Raj-Rathod-Ai/repos?per_page=100', { headers })
     ]);
 
-    const user = userRes.ok ? await userRes.json() : {};
-    const repos = reposRes.ok ? await reposRes.json() : [];
-
-    const publicRepos = user.public_repos ?? repos.length ?? 30;
-    const followers = user.followers ?? 9;
-    const totalStars = Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : 76;
+    const publicRepos = (typeof user.public_repos === 'number' && user.public_repos > 0)
+      ? user.public_repos
+      : (Array.isArray(repos) && repos.length > 0 ? repos.length : 30);
+    const followers = (typeof user.followers === 'number' && user.followers > 0)
+      ? user.followers
+      : 9;
+    const totalStars = (Array.isArray(repos) && repos.length > 0)
+      ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0)
+      : 76;
 
     const langMap = {};
     if (Array.isArray(repos)) {
