@@ -941,15 +941,22 @@ export class Chatbot {
     const repos = window.portfolioData?.repos || [];
     const sortedRepos = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
 
-    // Format full repo metadata for context
+    // Format full repo metadata for context with explicit Live Demo URLs
     const repoListText = sortedRepos.length > 0
-      ? sortedRepos.map((r, idx) => `${idx + 1}. ${r.name} (Category: ${r.category || 'ML/AI'}, Lang: ${r.language || 'Python'}, Updated: ${r.updated_at ? new Date(r.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}) - Description: ${r.description || 'N/A'} [Topics: ${(r.topics || []).join(', ')}] URL: ${r.html_url}`).join('\n')
-      : `- Taxi-Fare-Prediction (Category: Machine Learning, Lang: Python, Updated: 12 Jun 2026): Regression model predicting fares.\n- Food_Delivery_Time-Using-ML (Category: Machine Learning, Lang: Python): Delivery predictor.\n- Discover-Your-True-Personality (Category: Machine Learning, Lang: Python): Classification system.\n- Library-Mangement (Category: Normal Projects, Lang: Python): Library records system.\n- Fake-News-Detection-Using-ML-Real-time (Category: NLP, Lang: Python): Real-time NLP classifier.\n- FlowerDiseaseSystem (Category: Deep Learning, Lang: Python): CNN plant leaf classifier.\n- Job-Analysis-Dashboard (Category: Data Science, Lang: Power BI): Market analytics dashboard.`;
+      ? sortedRepos.map((r, idx) => `${idx + 1}. ${r.name} (Category: ${r.category || 'ML/AI'}, Lang: ${r.language || 'Python'}, Updated: ${r.updated_at ? new Date(r.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}) - Description: ${r.description || 'N/A'} [Topics: ${(r.topics || []).join(', ')}] Live Demo URL: ${r.live || r.homepage || 'None (Code on GitHub)'} | GitHub Repo: ${r.html_url}`).join('\n')
+      : `- Movie-Recommendations-Using-NLP-and-ML (Category: NLP): Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML\n- Taxi-Fare-Prediction (Category: Machine Learning): Live Demo: https://taxi-price-prediction.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction\n- Food_Delivery_Time-Using-ML (Category: Machine Learning): Live Demo: https://fooddelivery-time.streamlit.app/\n- Discover-Your-True-Personality (Category: Machine Learning): Live Demo: https://discover-your-true-personality.streamlit.app/\n- AutoPrepAI (Category: Data Science): Live Demo: https://data-eda-processing.streamlit.app/\n- FlowerDiseaseSystem (Category: Deep Learning): Live Demo: https://flower-disease-system.vercel.app\n- ChatNotes (Category: RAG): Live Demo: https://chat-with-your-notes-dusx.onrender.com/\n- HybridMind (Category: Generative AI): Live Demo: https://hybridmind.netlify.app/\n- Fake-News-Detection-Using-ML-Real-time (Category: NLP): Live Demo: https://truthlens5.netlify.app/\n- stone-paper-scissors-python (Category: Python Concepts): Live Demo: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/\n- Library-Mangement (Category: Software Systems): Live Demo: https://librarymangement1.streamlit.app/`;
 
     const latestProject = sortedRepos[0];
     const latestProjSummary = latestProject
-      ? `MOST RECENT / LAST WORKING PROJECT: ${latestProject.name} (Updated: ${latestProject.updated_at ? new Date(latestProject.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}). Category: ${latestProject.category}, Language: ${latestProject.language}, Description: ${latestProject.description}, Link: ${latestProject.html_url}`
-      : `MOST RECENT / LAST WORKING PROJECT: Taxi-Fare-Prediction (Updated: 12 Jun 2026). Category: Machine Learning, Language: Python, Description: Predicting taxi fare amounts using machine learning regression models.`;
+      ? `MOST RECENT / LAST WORKING PROJECT: ${latestProject.name} (Updated: ${latestProject.updated_at ? new Date(latestProject.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}). Category: ${latestProject.category}, Language: ${latestProject.language}, Description: ${latestProject.description}, Live Demo: ${latestProject.live || latestProject.homepage || 'None'}, GitHub: ${latestProject.html_url}`
+      : `MOST RECENT / LAST WORKING PROJECT: Taxi-Fare-Prediction (Updated: 12 Jun 2026). Category: Machine Learning, Language: Python, Live Demo: https://taxi-price-prediction.netlify.app/, GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction`;
+
+    // Priority Check: Direct RAG semantic match for high-precision single project link queries
+    const directRAG = this.retrieveRAGContext(prompt, this.history);
+    const isLinkQuery = ['demo', 'live', 'link', 'url', 'deploy', 'github', 'repo', 'code', 'cgpa', 'education', 'resume', 'contact'].some(k => prompt.toLowerCase().includes(k));
+    if (directRAG && isLinkQuery) {
+      return directRAG;
+    }
 
     // Attempt 1: Portfolio backend Express API endpoint
     try {
@@ -999,7 +1006,7 @@ RAJ RATHOD'S PROFILE DATA:
 
 ${latestProjSummary}
 
-ALL REPOSITORIES & PROJECTS (ORDERED FROM MOST RECENT TO OLDEST):
+ALL REPOSITORIES & PROJECTS (WITH VERIFIED LIVE DEMOS & GITHUB REPOS):
 ${repoListText}
 
 Certifications & Accreditations:
@@ -1014,10 +1021,23 @@ Contact Details:
 - GitHub: https://github.com/Raj-Rathod-Ai
 - LinkedIn: https://linkedin.com/in/raj-rathod-ai
 
-CRITICAL INSTRUCTIONS:
-- If the user sends a simple greeting like "hi", "hello", "hey", or "how are you", reply warmly with a friendly greeting (e.g. "Hello ${this.userProfile?.name || ''}! 👋 I'm doing great! How can I help you explore Raj's portfolio today?").
+CRITICAL CONVERSATIONAL & ACCURACY RULES:
+- When the user asks for a project's demo link (e.g. "demo link of movie", "live link of fake news", "give link", "demo"), check the Live Demo URL in the project list above:
+  * Movie Recommendations: Live Demo https://cinema-verse.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
+  * Fake News Detection: Live Demo https://truthlens5.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
+  * AutoPrepAI: Live Demo https://data-eda-processing.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/AutoPrepAI
+  * Flower Disease: Live Demo https://flower-disease-system.vercel.app | GitHub https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
+  * HybridMind: Live Demo https://hybridmind.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/HybridMind
+  * ChatNotes: Live Demo https://chat-with-your-notes-dusx.onrender.com/ | GitHub https://github.com/Raj-Rathod-Ai/ChatNotes
+  * Taxi Fare: Live Demo https://taxi-price-prediction.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction
+  * Food Delivery Time: Live Demo https://fooddelivery-time.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML
+  * Discover Your True Personality: Live Demo https://discover-your-true-personality.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
+- NEVER say a deployed project is not deployed! ALWAYS provide its live link directly.
+- Use previous conversation turns to resolve pronouns ("it", "this", "that", "the project", "demo").
+- Answer ONLY for the specific project asked without dumping unasked lists.
+- If the user sends a simple greeting like "hi", "hello", "hey", or "how are you", reply warmly with a friendly greeting.
 - If the user asks about location / where Raj lives / map, state: "Raj is based in Vadodara, Gujarat, India. He studies at Parul University (P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760)." and include the Google Maps link: [View on Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)!
-- If the user asks about college result, CGPA, or marks, state clearly: "Raj's academic result in B.Tech CSE (AI Specialization) at Parul University is 7.66 CGPA." Do NOT tell the user to check university portals or contact academic departments!
+- If the user asks about college result, CGPA, or marks, state clearly: "Raj's academic result in B.Tech CSE (AI Specialization) at Parul University is 7.66 CGPA."
 - Use clean markdown formatting (bolding, bullet points, links).`;
 
       const apiMessages = [{ role: 'system', content: systemPrompt }];
