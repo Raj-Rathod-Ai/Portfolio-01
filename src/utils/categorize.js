@@ -172,38 +172,38 @@ const CATEGORIES_CONFIG = {
 const DETECTION_RULES = [
   {
     category: 'RAG',
-    topics: ['rag', 'chatnote', 'vector-database', 'vectordb', 'vector-search', 'pinecone', 'chroma', 'weaviate', 'faiss', 'qdrant', 'retrieval', 'embedding', 'document-qa', 'chat-pdf', 'pdf-chat', 'semantic-search'],
-    keywords: ['rag', 'chatnote', 'vector database', 'retrieval augmented', 'retrieval-augmented', 'pinecone', 'chromadb', 'weaviate', 'faiss', 'qdrant', 'semantic search', 'document qa', 'chat with pdf', 'chat pdf']
+    topics: ['rag', 'chatnote', 'chatnotes', 'vector-database', 'vectordb', 'vector-search', 'pinecone', 'chroma', 'weaviate', 'faiss', 'qdrant', 'retrieval', 'embedding', 'document-qa', 'chat-pdf', 'pdf-chat', 'semantic-search'],
+    keywords: ['rag', 'chatnote', 'chatnotes', 'vector database', 'retrieval augmented', 'retrieval-augmented', 'pinecone', 'chromadb', 'weaviate', 'faiss', 'qdrant', 'semantic search', 'document qa', 'chat with pdf', 'chat pdf']
   },
   {
     category: 'Generative AI',
-    topics: ['generative-ai', 'genai', 'llm', 'openai', 'gemini', 'prompt-engineering', 'claude', 'gpt', 'mistral', 'ollama', 'huggingface', 'llama', 'anthropic'],
-    keywords: ['generative ai', 'genai', 'llm', 'openai', 'prompt engineering', 'gpt', 'gemini', 'langchain', 'mistral', 'ollama', 'fine-tun']
+    topics: ['hybridmind', 'generative-ai', 'genai', 'llm', 'openai', 'gemini', 'prompt-engineering', 'claude', 'gpt', 'mistral', 'ollama', 'huggingface', 'llama', 'anthropic'],
+    keywords: ['hybridmind', 'generative ai', 'genai', 'llm', 'openai', 'prompt engineering', 'gpt', 'gemini', 'langchain', 'mistral', 'ollama', 'fine-tun']
   },
   {
     category: 'Deep Learning',
-    topics: ['deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer', 'flower-disease', 'leaf-disease'],
-    keywords: ['deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras', 'flower disease']
+    topics: ['deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer', 'flower-disease', 'flowerdiseasesystem', 'leaf-disease'],
+    keywords: ['flowerdiseasesystem', 'flower disease', 'deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras']
   },
   {
     category: 'NLP',
-    topics: ['nlp', 'text-mining', 'transformers', 'natural-language-processing', 'sentiment-analysis', 'text-classification', 'bert', 'word2vec', 'fake-news'],
-    keywords: ['nlp', 'natural language', 'text class', 'sentiment', 'bert', 'word2vec', 'text mining', 'fake news']
+    topics: ['movie-recommendations-using-nlp-and-ml', 'movie-recommendations-using-nlp-ml', 'fake-news-detection-using-ml-real-time', 'nlp', 'text-mining', 'transformers', 'natural-language-processing', 'sentiment-analysis', 'text-classification', 'bert', 'word2vec', 'fake-news'],
+    keywords: ['movie-recommendations', 'movie recommendations', 'fake-news', 'fake news', 'nlp', 'natural language', 'text class', 'sentiment', 'bert', 'word2vec', 'text mining']
+  },
+  {
+    category: 'Data Science',
+    topics: ['autoprepai', 'autoprep', 'data-science', 'analytics', 'power-bi', 'powerbi', 'visualization', 'data-analysis', 'tableau', 'pandas', 'numpy', 'matplotlib', 'seaborn', 'eda'],
+    keywords: ['autoprepai', 'autoprep', 'data preprocessing', 'quality analysis', 'job-analysis', 'job analysis', 'data science', 'power bi', 'dashboard', 'analytics', 'tableau', 'eda', 'exploratory data']
   },
   {
     category: 'Machine Learning',
-    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality', 'salary', 'salary-prediction', 'library-mangement', 'library-management'],
-    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time', 'salary', 'library mangement', 'library management']
+    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality', 'salary', 'salary-prediction', 'salary_predication', 'car-selling', 'drug-recommendation', 'healthy-lifestyle', 'loan-risk', 'machine-learning-notes', 'mark-predication', 'student_performance', 'usa-house', 'random-forest-food-delivery'],
+    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time', 'personality', 'car selling', 'drug recommendation', 'healthy lifestyle', 'loan risk', 'machine learning notes', 'mark predication', 'salary predication', 'student performance', 'house price', 'food delivery']
   },
   {
     category: 'Python Concepts',
     topics: ['python-concepts', 'tic-tac-toe', 'tic-tak-toe', 'tictactoe', 'game', 'stone-paper-scissors', 'python-basics'],
     keywords: ['python concept', 'tic tac toe', 'tic tak toe', 'tictactoe', 'stone paper']
-  },
-  {
-    category: 'Data Science',
-    topics: ['data-science', 'analytics', 'power-bi', 'visualization', 'data-analysis', 'tableau', 'pandas', 'numpy', 'matplotlib', 'seaborn', 'eda'],
-    keywords: ['data science', 'power bi', 'dashboard', 'analytics', 'tableau', 'eda', 'exploratory data']
   },
   {
     category: 'Computer Vision',
@@ -222,8 +222,8 @@ const DETECTION_RULES = [
   },
   {
     category: 'Normal Projects',
-    topics: ['web-development', 'web', 'html', 'css', 'database', 'oop'],
-    keywords: ['website', 'portfolio', 'creative coding']
+    topics: ['library-mangement', 'library-management', 'neuro-os', 'web-development', 'web', 'html', 'css', 'database', 'oop'],
+    keywords: ['library mangement', 'library management', 'neuro-os', 'neuro os', 'website', 'portfolio', 'creative coding']
   }
 ];
 
