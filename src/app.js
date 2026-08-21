@@ -139,9 +139,15 @@ export function applyBossOverrides(reposList) {
 
 export function sortReposWithFeaturedTop(reposList) {
   const overridesApplied = applyBossOverrides(reposList);
-  const featured = overridesApplied.filter(r => r.featured);
-  const nonFeatured = overridesApplied.filter(r => !r.featured);
-  return [...featured, ...nonFeatured];
+  const realFeatured = overridesApplied.filter(r => r.featured && !r.isUpcoming);
+  const realNonFeatured = overridesApplied.filter(r => !r.featured && !r.isUpcoming);
+  const upcoming = overridesApplied.filter(r => r.isUpcoming);
+
+  const sortByLatest = (arr) => [...arr].sort((a, b) => 
+    new Date(b.updated_at || b.pushed_at || b.created_at || 0) - new Date(a.updated_at || a.pushed_at || a.created_at || 0)
+  );
+
+  return [...sortByLatest(realFeatured), ...sortByLatest(realNonFeatured), ...upcoming];
 }
 
 /**
