@@ -648,37 +648,48 @@ export class Chatbot {
 
     if (this.onboardingStep === 'ask_role') {
       this.appendMessage('user', text);
-      const cleanRole = isSkip ? 'Visitor' : text.trim();
+      const isQuestionOrChat = text.includes('?') || text.toLowerCase().startsWith('who') || text.toLowerCase().startsWith('what') || text.toLowerCase().startsWith('tell') || text.toLowerCase().startsWith('hi') || text.toLowerCase().startsWith('hello');
+      const cleanRole = (isSkip || isQuestionOrChat) ? 'Visitor' : text.trim();
       this.tempProfile.role = cleanRole;
       this.tempProfile.isStudent = cleanRole.toLowerCase().includes('student');
 
+      if (isQuestionOrChat) {
+        // User asked a question directly - finalize profile and answer immediately!
+        this.saveProfile(this.tempProfile);
+        this.updateHeaderProfileBadge();
+        this.onboardingStep = null;
+        this.sendMessage(text);
+        return;
+      }
+
       this.onboardingStep = 'ask_contact';
-      const contactPrompt = `Got it, **${this.tempProfile.name}**! 👍\n\nTo help Raj Rathod connect with you directly, please share your **email address**: *(Required to proceed)*`;
+      const contactPrompt = `Got it, **${this.tempProfile.name}**! 👍\n\nTo help Raj Rathod connect with you directly, please share your **email address** (or click **Skip** if you prefer):`;
       this.appendMessage('bot', contactPrompt);
-      this.renderQuickChips(['✉️ Enter Email']);
+      this.renderQuickChips(['✉️ Enter Email', '⏩ Skip']);
       return;
     }
 
     if (this.onboardingStep === 'ask_contact' || this.onboardingStep === 'ask_contact_confirm') {
       this.appendMessage('user', text);
       const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const isDeclined = isSkip || text.toLowerCase().includes('no') || text.toLowerCase().includes('later') || text.toLowerCase().includes('not now') || text.toLowerCase().includes('never') || text.toLowerCase().includes('pass') || text.toLowerCase().includes('na');
+      const isDirectQuestion = text.includes('?') || text.toLowerCase().startsWith('who') || text.toLowerCase().startsWith('what') || text.toLowerCase().startsWith('tell') || text.toLowerCase().startsWith('show') || text.toLowerCase().startsWith('how') || text.toLowerCase().includes('project') || text.toLowerCase().includes('resume');
 
-      if (!emailMatch && !text.includes('@')) {
-        // Persuasive & compulsory prompt when user hesitates or types non-email text
+      if (!emailMatch && !isDeclined && !isDirectQuestion && this.onboardingStep === 'ask_contact') {
+        // Gentle reminder on first non-email attempt
         this.onboardingStep = 'ask_contact_confirm';
-        const visitedCats = getVisitedCategories();
-        const catName = visitedCats.length ? visitedCats.join(' & ') : 'Generative AI & RAG';
-
-        const persuasiveMsg = `I understand your hesitation! 😊 However, I am **Rudra**, Raj Rathod's custom AI Assistant.\n\nProviding your **email address is required** so Raj can talk with you directly!\n\nSince you explored **${catName}** projects on the portfolio, Raj would love to connect with you to share tailored technical insights or discuss potential collaborations with you.\n\nPlease enter a valid email address (e.g., \`yourname@gmail.com\`) to proceed:`;
+        const persuasiveMsg = `I am **Rudra**, Raj Rathod's custom AI Assistant 😊\n\nSharing your **email address** helps Raj send relevant project materials and connect with you directly. You can enter your email (e.g., \`name@gmail.com\`) or click **Skip** to continue freely:`;
         this.appendMessage('bot', persuasiveMsg);
-        this.renderQuickChips(['✉️ Enter valid Email']);
+        this.renderQuickChips(['⏩ Skip Intro']);
         return;
       }
 
-      // Valid email provided!
-      const email = emailMatch ? emailMatch[0] : text.trim();
-      this.tempProfile.contactDetails = email;
-      this.tempProfile.email = email;
+      // Either valid email, declined, or direct question -> finalize profile!
+      const email = emailMatch ? emailMatch[0] : '';
+      if (email) {
+        this.tempProfile.contactDetails = email;
+        this.tempProfile.email = email;
+      }
       this.tempProfile.createdAt = new Date().toISOString();
 
       // Finalize and save profile
@@ -689,23 +700,34 @@ export class Chatbot {
       const visitedCats = getVisitedCategories();
       const catsStr = visitedCats.length ? visitedCats.join(', ') : 'Generative AI & Machine Learning';
 
-      // Dispatch automated follow-up email via backend
-      fetch(getApiBaseUrl() + '/api/analytics/lead-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          visitorId: getVisitorId(),
-          name: this.tempProfile.name || 'Visitor',
-          email,
-          visitedCategories: visitedCats
-        })
-      }).catch(() => {});
+      if (email) {
+        // Dispatch automated follow-up email via backend
+        fetch(getApiBaseUrl() + '/api/analytics/lead-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            visitorId: getVisitorId(),
+            name: this.tempProfile.name || 'Visitor',
+            email,
+            visitedCategories: visitedCats
+          })
+        }).catch(() => {});
 
-      const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I am **Rudra**, Raj's AI assistant.\n\nI have logged your details in our database and sent a personalized follow-up email to **${email}** highlighting your interest in **${catsStr}**!\n\nRaj will be happy to talk with you directly. How can I help you explore more of Raj's portfolio today?`;
-      this.appendMessage('bot', completionText);
-      this.history.push({ role: 'assistant', content: completionText });
-      this.saveHistory();
-      this.renderQuickChips(['📊 Visitor Database Stats', '🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+        const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I am **Rudra**, Raj's AI assistant.\n\nI have saved your contact details and sent a confirmation note to **${email}** regarding **${catsStr}**.\n\nHow can I help you explore Raj's portfolio today?`;
+        this.appendMessage('bot', completionText);
+        this.history.push({ role: 'assistant', content: completionText });
+        this.saveHistory();
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      } else if (isDirectQuestion) {
+        this.sendMessage(text);
+        return;
+      } else {
+        const welcomeText = `Great to have you here, **${this.userProfile.name}**! 👋\n\nI am ready to answer any questions about Raj's **ML/AI projects**, **education & university**, **skills**, or **contact links**!`;
+        this.appendMessage('bot', welcomeText);
+        this.history.push({ role: 'assistant', content: welcomeText });
+        this.saveHistory();
+        this.renderQuickChips(['🚀 Latest Project', '🧠 NLP Projects', '🎓 Education & CGPA']);
+      }
       return;
     }
 
@@ -1039,15 +1061,45 @@ CRITICAL INSTRUCTIONS:
     const sorted = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
     const namePrefix = this.userProfile?.name ? `${this.userProfile.name}, ` : '';
 
-    // 0. Greeting Check
-    const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'how are you', 'who are you', 'what is your name'];
+    // 0. Greetings & Small Talk
+    const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'how are you', 'namaste'];
     const cleanText = text.replace(/[^a-z\s]/g, '').trim();
     if (greetings.some(g => cleanText === g || cleanText.startsWith(g + ' ') || cleanText.endsWith(' ' + g))) {
-      return `Hello ${namePrefix}! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant of **Raj Rathod**. How can I help you explore Raj's **ML/AI projects**, **education & university**, **skills**, or **contact links** today?`;
+      return `Hello ${namePrefix}! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant for **Raj Rathod**. I can help you explore Raj's **AI/ML projects**, **education & university**, **technical skills**, **resumes**, or **contact info**. What would you like to know?`;
+    }
+
+    // 0.01 Thank you / Compliment / Politeness
+    if (text.includes('thank') || text.includes('thx') || text.includes('appreciate') || text.includes('awesome') || text.includes('great bot') || text.includes('good job') || text.includes('nice')) {
+      return `You're very welcome, ${namePrefix}! 😊 I'm always here to help you explore Raj Rathod's engineering portfolio. Feel free to ask about any specific project, certifications, or download his resume!`;
+    }
+
+    // 0.02 Bot Identity / Capabilities
+    if (text.includes('who are you') || text.includes('what can you do') || text.includes('what are you') || text.includes('your name') || text.includes('about rudra')) {
+      return `I am **Rudra** 🤖, Raj Rathod's personal AI Assistant!\n\nHere is what I can help you with:\n` +
+             `• 🧠 **Explore AI & ML Projects**: Deep dives into Computer Vision, NLP, GenAI, and Regression systems.\n` +
+             `• 🎓 **Education & Background**: Information about Raj's B.Tech at Parul University, 7.66 CGPA, and 350+ LeetCode record.\n` +
+             `• 📄 **Resumes & CVs**: Direct access to AI/ML and Full-Stack resume PDFs.\n` +
+             `• 📍 **Location & Campus**: Vadodara, Gujarat location and interactive maps.\n` +
+             `• 📬 **Contact & Collaboration**: Direct links to email, LinkedIn, and GitHub.\n\n` +
+             `What would you like to explore first?`;
+    }
+
+    // 0.05 Who is Raj Rathod / Overview / Bio / Intro
+    if (text.includes('who is raj') || text.includes('about raj') || text.includes('tell me about raj') || text.includes('introduce raj') || text.includes('bio') || text.includes('summary') || text.includes('profile')) {
+      return `👨‍💻 **RAJ RATHOD — AI & MACHINE LEARNING DEVELOPER**\n\n` +
+             `Raj is a passionate AI/ML Engineer and undergraduate in **B.Tech Computer Science & Engineering (AI Specialization)** at **Parul University, Vadodara** (2023 - 2027).\n\n` +
+             `🌟 **Key Highlights**:\n` +
+             `• 📈 **Academic Excellence**: **7.66 CGPA**\n` +
+             `• 💻 **Algorithmic Problem Solving**: Solved **350+ problems on LeetCode** ([leetcode.com/u/Raj-Rathod](https://leetcode.com))\n` +
+             `• 🧠 **Specialization**: Deep Learning (CNNs), NLP, Predictive Modeling, GenAI & RAG systems\n` +
+             `• 🏆 **Certifications**: Data Science & Analytics with GenAI (Sheryians Coding School), Java, Python, Prompt Engineering, NPTEL\n` +
+             `• 📂 **Portfolio**: 12+ open-source AI & web engineering repositories on GitHub\n\n` +
+             `📄 **Resumes**: [AI/ML Resume](/Rathod-Raj-Ai.pdf) | [Full-Stack Resume](/Rathod_Raj_FullStack.pdf)\n` +
+             `📬 **Contact**: rathodraj1504@gmail.com | [LinkedIn](https://linkedin.com/in/raj-rathod-ai)`;
     }
 
     // 0.1 Location & Map query
-    if (text.includes('location') || text.includes('where') || text.includes('place') || text.includes('city') || text.includes('map') || text.includes('live') || text.includes('address')) {
+    if (text.includes('location') || text.includes('where') || text.includes('place') || text.includes('city') || text.includes('map') || text.includes('live') || text.includes('address') || text.includes('based')) {
       return `📍 **Current Location**: Vadodara, Gujarat, India\n\n` +
              `🏫 **University Campus**: [Parul University](https://paruluniversity.ac.in), Vadodara, Gujarat (2023 - 2027)\n` +
              `📍 **Full Address**: P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760, India\n` +
@@ -1056,16 +1108,16 @@ CRITICAL INSTRUCTIONS:
     }
 
     // 0.2 College Results & CGPA query
-    if (text.includes('result') || text.includes('cgpa') || text.includes('marks') || text.includes('grade') || text.includes('score') || text.includes('clg result')) {
+    if (text.includes('result') || text.includes('cgpa') || text.includes('marks') || text.includes('grade') || text.includes('score') || text.includes('clg result') || text.includes('academic')) {
       return `🎓 **Degree Program**: B.Tech in Computer Science & Engineering (AI Specialization)\n` +
              `🏫 **University**: [Parul University](https://paruluniversity.ac.in), Vadodara, Gujarat\n` +
              `📈 **Academic Performance / CGPA**: **7.66 CGPA**\n` +
              `💻 **LeetCode Record**: **350+ Problems Solved** ([leetcode.com/u/Raj-Rathod](https://leetcode.com))\n\n` +
-             `For academic inquiries or detailed transcripts, you can reach Raj directly at rathodraj1504@gmail.com.`;
+             `For academic inquiries or transcripts, reach Raj directly at rathodraj1504@gmail.com.`;
     }
 
     // 0.25 Resume / CV query
-    if (text.includes('resume') || text.includes('cv') || text.includes('bio') || text.includes('download resume')) {
+    if (text.includes('resume') || text.includes('cv') || text.includes('download resume') || text.includes('pdf')) {
       return `📄 **RAJ RATHOD'S RESUMES & CVs**\n\n` +
              `Raj provides two specialized resume formats:\n\n` +
              `🤖 **1. AI & Machine Learning Developer Resume**\n` +
@@ -1074,7 +1126,7 @@ CRITICAL INSTRUCTIONS:
              `💻 **2. Full-Stack AI Engineer Resume**\n` +
              `• Focus: Full-Stack Web Development, React/Node/Express, REST APIs & GenAI Integration\n` +
              `• Direct PDF: [Rathod_Raj_FullStack.pdf](/Rathod_Raj_FullStack.pdf)\n\n` +
-             `💡 *Tip: You can also click the **"Resume"** button on the navbar to open the interactive selection menu!*`;
+             `💡 *Tip: Click the **"Resume"** button on the top navbar to open the interactive preview and download modal!*`;
     }
 
     // 0.3 Last working / Latest Project query
@@ -1082,9 +1134,9 @@ CRITICAL INSTRUCTIONS:
       if (sorted.length > 0) {
         const top = sorted[0];
         const top2 = sorted[1];
-        const dateStr = top.updated_at ? new Date(top.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'June 2026';
+        const dateStr = top.updated_at ? new Date(top.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
         
-        return `${namePrefix}Raj's **last working / most recent project** is **${top.name.replace(/[-_]/g, ' ')}** (Last updated: ${dateStr})!\n\n` +
+        return `${namePrefix}Raj's **most recent / last working project** is **${top.name.replace(/[-_]/g, ' ')}** (Updated: ${dateStr})!\n\n` +
                `• **Domain / Category**: ${top.category || 'Machine Learning'}\n` +
                `• **Tech Stack**: ${top.language || 'Python'}${top.topics?.length ? ` (${top.topics.slice(0, 4).join(', ')})` : ''}\n` +
                `• **Description**: ${top.description || 'Predictive modeling application.'}\n` +
@@ -1092,74 +1144,163 @@ CRITICAL INSTRUCTIONS:
                (top2 ? `Directly before this, Raj also updated **${top2.name.replace(/[-_]/g, ' ')}** (${top2.category || 'AI/ML'}).` : '');
       }
 
-      return `${namePrefix}Raj's **last working / most recent project** is **Taxi Fare Prediction** (Updated: 12 Jun 2026)!\n\n` +
-             `• **Domain**: Machine Learning\n` +
-             `• **Tech Stack**: Python, Scikit-Learn, Regression Modeling\n` +
-             `• **Description**: Predicting taxi fare amounts using trip parameters, distance, and time metrics.\n` +
-             `• **Repository**: [GitHub Link](https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction)\n\n` +
-             `He also recently completed **Data Science & Analytics with GenAI** certification (July 2026)!`;
+      return `${namePrefix}Raj's **most recent project** is **Taxi Fare Prediction** (Updated: June 2026)!\n\n` +
+             `• **Domain**: Machine Learning (Regression)\n` +
+             `• **Tech Stack**: Python, Scikit-Learn, Pandas, Streamlit\n` +
+             `• **Live Demo**: [taxi-price-prediction.netlify.app](https://taxi-price-prediction.netlify.app/)\n` +
+             `• **Repository**: [GitHub Link](https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction)`;
+    }
+
+    // --- INDIVIDUAL PROJECT DEEP DIVES ---
+
+    // Flower Disease System
+    if (text.includes('flower') || text.includes('leaf') || text.includes('plant disease') || text.includes('flower disease')) {
+      return `🌸 **FLOWER & LEAF DISEASE DETECTION SYSTEM** (Deep Learning / Computer Vision)\n\n` +
+             `• **Overview**: An end-to-end computer vision classification system designed to detect and diagnose diseases from plant and flower leaf images.\n` +
+             `• **Architecture**: Deep Convolutional Neural Network (CNN) built with **PyTorch** and **OpenCV** with data augmentation and transfer learning.\n` +
+             `• **Tech Stack**: Python, PyTorch, OpenCV, NumPy, Matplotlib, Streamlit\n` +
+             `• **Key Feature**: Instant disease diagnosis with confidence score and recommended remedies.\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem)`;
+    }
+
+    // Fake News Detection
+    if (text.includes('fake news') || text.includes('news detection')) {
+      return `📰 **REAL-TIME FAKE NEWS DETECTION SYSTEM** (NLP / Machine Learning)\n\n` +
+             `• **Overview**: A real-time Natural Language Processing system that analyzes textual news articles and classifies them as reliable or misleading.\n` +
+             `• **Accuracy**: Achieves **~92% classification accuracy** on benchmark news datasets.\n` +
+             `• **Tech Stack**: Python, Scikit-Learn, NLTK, TF-IDF Vectorization, Passive-Aggressive Classifier, Flask, Three.js\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)`;
+    }
+
+    // Movie Recommendations
+    if (text.includes('movie') || text.includes('movie recommendation')) {
+      return `🎬 **MOVIE RECOMMENDATIONS USING NLP & ML** (Natural Language Processing)\n\n` +
+             `• **Overview**: A content-based movie recommendation engine that analyzes genres, keywords, cast, and overview descriptions to recommend personalized film suggestions.\n` +
+             `• **Technique**: Text vectorization with CountVectorizer and Cosine Similarity scoring across high-dimensional feature spaces.\n` +
+             `• **Tech Stack**: Python, Scikit-Learn, Pandas, NLTK, AST\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-ML)`;
+    }
+
+    // Taxi Fare Prediction
+    if (text.includes('taxi') || text.includes('fare') || text.includes('cab') || text.includes('taxi price')) {
+      return `🚕 **TAXI FARE PREDICTION SYSTEM** (Machine Learning / Regression)\n\n` +
+             `• **Overview**: A predictive machine learning model that estimates taxi ride fares based on trip distance, pickup/dropoff coordinates, passenger count, and peak hours.\n` +
+             `• **Algorithms**: Linear Regression, Random Forest Regressor, and Gradient Boosting with feature engineering.\n` +
+             `• **Tech Stack**: Python, Scikit-Learn, Pandas, NumPy, HTML/CSS\n` +
+             `• **Live Demo**: [taxi-price-prediction.netlify.app](https://taxi-price-prediction.netlify.app/)\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction)`;
+    }
+
+    // Food Delivery Time
+    if (text.includes('food delivery') || text.includes('delivery time')) {
+      return `🍔 **FOOD DELIVERY TIME PREDICTION** (Machine Learning)\n\n` +
+             `• **Overview**: An interactive ML application predicting delivery arrival duration by modeling rider ratings, distance, traffic density, and weather conditions.\n` +
+             `• **Tech Stack**: Python, Scikit-Learn, Streamlit, Pandas, Seaborn\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML)`;
+    }
+
+    // Discover True Personality
+    if (text.includes('personality') || text.includes('true personality')) {
+      return `🧠 **DISCOVER YOUR TRUE PERSONALITY** (Machine Learning / Classification)\n\n` +
+             `• **Overview**: An AI-powered personality analysis system utilizing psychometric questionnaire data to predict personality archetypes and behavioral traits.\n` +
+             `• **Tech Stack**: Python, Scikit-Learn, Pandas, Data Mining\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality)`;
+    }
+
+    // Job Analysis Dashboard
+    if (text.includes('job analysis') || text.includes('dashboard') || text.includes('power bi')) {
+      return `📊 **JOB MARKET ANALYSIS DASHBOARD** (Data Science / BI)\n\n` +
+             `• **Overview**: An interactive data analytics dashboard evaluating global tech job trends, salary distributions, required competencies, and industry demand.\n` +
+             `• **Tech Stack**: Power BI, DAX, Python Data Wrangling, Excel/CSV ETL\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard)`;
+    }
+
+    // Library Management
+    if (text.includes('library') || text.includes('library management')) {
+      return `📚 **LIBRARY MANAGEMENT SYSTEM** (Python & OOP)\n\n` +
+             `• **Overview**: A structured Python management system implementing object-oriented programming for book cataloging, checkout tracking, and user account management.\n` +
+             `• **Tech Stack**: Python, OOP, File Handling / SQLite\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Library-Mangement)`;
+    }
+
+    // Stone Paper Scissors
+    if (text.includes('stone') || text.includes('paper scissors') || text.includes('game')) {
+      return `🎮 **STONE PAPER SCISSORS GAME** (Python)\n\n` +
+             `• **Overview**: An interactive Python game implementation featuring score tracking, randomized computer logic, and clean terminal/UI flow.\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/stone-paper-scissors-python)`;
+    }
+
+    // Neuro OS
+    if (text.includes('neuro') || text.includes('neuro os')) {
+      return `💻 **NEURO OS** (Creative Web Interface)\n\n` +
+             `• **Overview**: A futuristic web desktop interface simulating a neural operating system with multitasking windows and interactive animations.\n` +
+             `• **Tech Stack**: JavaScript, CSS Glassmorphism, DOM Architecture\n` +
+             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/neuro-os)`;
     }
 
     // 1. NLP / Text Mining queries
-    if (text.includes('nlp') || text.includes('text') || text.includes('sentiment') || text.includes('language') || text.includes('fake news') || text.includes('movie') || text.includes('recommendation') || text.includes('bert') || text.includes('natural language')) {
+    if (text.includes('nlp') || text.includes('text') || text.includes('sentiment') || text.includes('language') || text.includes('bert') || text.includes('natural language')) {
       return `🔤 **RAJ RATHOD'S NATURAL LANGUAGE PROCESSING (NLP) PROJECTS**\n\n` +
              `Here are the **2 NLP Projects** featured in Raj's portfolio:\n\n` +
              `🎬 **1. Movie Recommendations Using NLP And ML**\n` +
              `• **Tech**: Python, NLP, Machine Learning, Pandas, Scikit-learn\n` +
-             `• **Objective**: Content-based movie recommendation system using NLP and Machine Learning to recommend similar movies based on content, genres, keywords, and user preferences.\n` +
+             `• **Objective**: Content-based recommendation system suggesting movies based on plot summaries, genres, and keywords.\n` +
              `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-ML)\n\n` +
              `🕵️ **2. Fake News Detection Using ML Real Time**\n` +
              `• **Tech**: Python, Scikit-learn, NLTK, TF-IDF, Flask, Three.js\n` +
-             `• **Objective**: Real-time fake news detection system that analyzes online news articles using machine learning and NLP techniques (~92% accuracy).\n` +
+             `• **Objective**: Real-time fake news detection analyzing news text (~92% accuracy).\n` +
              `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)\n\n` +
-             `💡 *Tip: Click on the **NLP** category tag in the Projects section to view these 2 repositories directly!*`;
+             `💡 *Tip: Click on the **NLP** category in the Projects section to see them!*`;
     }
 
     // 2. Deep Learning / Computer Vision / CNN queries
-    if (text.includes('deep learning') || text.includes('vision') || text.includes('cnn') || text.includes('image') || text.includes('flower') || text.includes('opencv') || text.includes('pytorch') || text.includes('tensorflow')) {
-      return `Raj's **Computer Vision & Deep Learning** projects:\n\n` +
-             `• **Flower Disease System**: A Convolutional Neural Network (CNN) built with PyTorch and OpenCV to detect and classify diseases in plant/flower leaves.\n` +
-             `• Deep feature extraction and image processing pipelines.\n\n` +
-             `Explore the **Deep Learning** category for interactive details!`;
+    if (text.includes('deep learning') || text.includes('vision') || text.includes('cnn') || text.includes('image') || text.includes('opencv') || text.includes('pytorch') || text.includes('tensorflow')) {
+      return `👁️ **COMPUTER VISION & DEEP LEARNING PROJECTS**\n\n` +
+             `• **Flower Disease System**: A Convolutional Neural Network (CNN) built with **PyTorch** and **OpenCV** to detect and classify diseases in plant and flower leaves.\n` +
+             `• Deep feature extraction pipelines and data augmentation techniques.\n\n` +
+             `Explore the **Deep Learning** category on the Projects page for interactive details!`;
     }
 
     // 3. Machine Learning / Regression / Predictive queries
-    if (text.includes('machine learning') || text.includes('regression') || text.includes('predict') || text.includes('taxi') || text.includes('food') || text.includes('personality')) {
-      return `Raj's **Machine Learning** projects include:\n\n` +
-             `• **Taxi Fare Prediction**: ML regression models predicting ride fares based on trip distance, duration, and time parameters.\n` +
-             `• **Food Delivery Time Prediction**: Streamlit ML application estimating food delivery duration based on weather and traffic.\n` +
-             `• **Discover Your True Personality**: Classification model analyzing user responses to determine personality traits.`;
+    if (text.includes('machine learning') || text.includes('regression') || text.includes('predict') || text.includes('scikit')) {
+      return `🤖 **MACHINE LEARNING PROJECTS**\n\n` +
+             `• **Taxi Fare Prediction**: ML regression predicting trip fares based on distance and traffic ([Live Demo](https://taxi-price-prediction.netlify.app/)).\n` +
+             `• **Food Delivery Time Prediction**: Streamlit ML app estimating delivery duration.\n` +
+             `• **Discover Your True Personality**: Classification model analyzing user questionnaires.`;
     }
 
     // 4. Data Science / Analytics / Power BI queries
-    if (text.includes('data science') || text.includes('analytic') || text.includes('dashboard') || text.includes('power bi') || text.includes('job')) {
-      return `Raj's **Data Science & Analytics** portfolio includes:\n\n` +
-             `• **Job Analysis Dashboard**: Interactive Power BI dashboard evaluating job market trends, salary distributions, and skill demands.\n` +
-             `• **Data Science & Analytics with GenAI**: Sheryians certification in data analytics and GenAI application development.`;
+    if (text.includes('data science') || text.includes('analytic') || text.includes('power bi')) {
+      return `📊 **DATA SCIENCE & ANALYTICS**\n\n` +
+             `• **Job Analysis Dashboard**: Interactive Power BI dashboard evaluating market trends, salaries, and required skillsets.\n` +
+             `• **Data Science & Analytics with GenAI**: Verified Sheryians Coding School certification covering data processing, statistical modeling, and GenAI workflows.`;
     }
 
-    // 5. Python / Scripting / Games queries
-    if (text.includes('python game') || text.includes('basics') || text.includes('stone') || text.includes('library') || text.includes('script')) {
-      return `Raj's Python & software management projects include:\n\n` +
-             `• **Library Management System**: Python & database system for catalog management, book checkout, and user records.\n` +
-             `• **Stone Paper Scissors**: Interactive Python game implementation.`;
+    // 5. Why hire Raj? / Strengths / Recruiter questions
+    if (text.includes('why hire') || text.includes('why should we hire') || text.includes('strengths') || text.includes('hire raj') || text.includes('experience')) {
+      return `💼 **WHY HIRE RAJ RATHOD?**\n\n` +
+             `1. 🧠 **End-to-End AI/ML Engineering**: Proven capability building and deploying Deep Learning (CNNs), NLP pipelines (TF-IDF/classification), and predictive models.\n` +
+             `2. 💻 **Algorithmic Rigor**: Solved **350+ LeetCode problems**, ensuring strong data structures, algorithms, and optimization foundations.\n` +
+             `3. 🚀 **Full-Stack Proficiency**: Ability to build complete, production-ready web apps (React, Node, Express, MongoDB, REST APIs) integrated with AI backend microservices.\n` +
+             `4. 📚 **Fast Learner & Certified**: Sheryians GenAI & Data Science, Java, Python, and NPTEL certified with a 7.66 CGPA.\n\n` +
+             `Contact Raj at **rathodraj1504@gmail.com** or via [LinkedIn](https://linkedin.com/in/raj-rathod-ai)!`;
     }
 
     // 6. General Projects query
     if (text.includes('project') || text.includes('work') || text.includes('build') || text.includes('repo')) {
-      return `Raj has built high-impact projects across multiple domains:\n\n` +
-             `• **GenAI / RAG**: Data Science with GenAI, Prompt Engineering.\n` +
-             `• **Deep Learning**: Flower Disease System (CNN).\n` +
-             `• **NLP**: Real-Time Fake News Classifier.\n` +
-             `• **Machine Learning**: Taxi Fare & Food Delivery Time Predictors.\n` +
-             `• **Data Science**: Job Analysis Power BI Dashboard.\n\n` +
+      return `Raj has built 12+ high-impact projects across multiple categories:\n\n` +
+             `• 🧠 **Deep Learning**: Flower Disease System (CNN with PyTorch)\n` +
+             `• 🔤 **NLP**: Real-Time Fake News Classifier & Movie Recommendation Engine\n` +
+             `• 📈 **Machine Learning**: Taxi Fare & Food Delivery Time Predictors\n` +
+             `• 📊 **Data Science**: Job Market Analysis Power BI Dashboard\n` +
+             `• 💻 **Software & Systems**: Library Management & Neuro OS\n\n` +
              `Click on any category in the **Projects** section to view code & live demos!`;
     }
 
     // 7. Certifications query
     if (text.includes('certificat') || text.includes('credential') || text.includes('accreditat')) {
       return `Raj holds several verified certifications:\n\n` +
-             `🏆 **Data Science & Analytics with GenAI** - Sheryians Coding School (Cert ID: 311726923637568120a0faf6)\n` +
+             `🏆 **Data Science & Analytics with GenAI** - Sheryians Coding School (Cert ID: \`311726923637568120a0faf6\`, July 2026)\n` +
              `🏆 **Prompt Engineering & GenAI** - Advanced Model Tuning\n` +
              `🏆 **Java Programming** - Core OOP & Data Structures\n` +
              `🏆 **Python Programming** - Data Analysis & Automation\n` +
@@ -1168,37 +1309,36 @@ CRITICAL INSTRUCTIONS:
     }
 
     // 8. Education / University / Address / Profile query
-    if (text.includes('education') || text.includes('cgpa') || text.includes('college') || text.includes('university') || text.includes('parul') || text.includes('degree') || text.includes('leetcode') || text.includes('where') || text.includes('address') || text.includes('location')) {
-      return `Raj's Education, University & Profile Details:\n\n` +
-             `🎓 **Degree**: B.Tech in Computer Science & Engineering (AI Specialization)\n` +
+    if (text.includes('education') || text.includes('college') || text.includes('university') || text.includes('parul') || text.includes('degree') || text.includes('leetcode')) {
+      return `🎓 **Degree**: B.Tech in Computer Science & Engineering (AI Specialization)\n` +
              `🏫 **University**: [Parul University](https://paruluniversity.ac.in), Vadodara, Gujarat (2023 - 2027)\n` +
-             `📍 **University Address / Location**: P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760, India\n` +
+             `📍 **Campus Location**: P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760, India\n` +
              `📈 **Academic Performance**: **7.66 CGPA**\n` +
              `💻 **LeetCode Record**: Solved **350+ problems** ([leetcode.com/u/Raj-Rathod](https://leetcode.com))\n\n` +
-             `🔗 **Raj's Official Profiles & Contact**:\n` +
+             `🔗 **Raj's Profiles**:\n` +
              `• **Email**: rathodraj1504@gmail.com\n` +
-             `• **GitHub Profile**: [github.com/Raj-Rathod-Ai](https://github.com/Raj-Rathod-Ai)\n` +
-             `• **LinkedIn Profile**: [linkedin.com/in/raj-rathod-ai](https://linkedin.com/in/raj-rathod-ai)`;
+             `• **GitHub**: [github.com/Raj-Rathod-Ai](https://github.com/Raj-Rathod-Ai)\n` +
+             `• **LinkedIn**: [linkedin.com/in/raj-rathod-ai](https://linkedin.com/in/raj-rathod-ai)`;
     }
 
     // 9. Skills query
     if (text.includes('skill') || text.includes('technolog') || text.includes('python') || text.includes('java') || text.includes('stack') || text.includes('framework')) {
       return `Here are Raj's core technical skills:\n\n` +
-             `• **Languages**: Python, Java, C/C++, SQL, JavaScript.\n` +
-             `• **AI/ML/DL**: TensorFlow, PyTorch, Scikit-Learn, Pandas, NumPy, OpenCV, NLTK, Streamlit.\n` +
-             `• **Tools**: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.`;
+             `• **Programming Languages**: Python, Java, C/C++, SQL, JavaScript, HTML/CSS\n` +
+             `• **AI / ML / DL**: PyTorch, TensorFlow, Scikit-Learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit\n` +
+             `• **Tools & Platforms**: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify, Render`;
     }
 
     // 10. Contact query
     if (text.includes('contact') || text.includes('email') || text.includes('reach') || text.includes('hire') || text.includes('message')) {
-      return `You can reach Raj via:\n\n` +
+      return `You can reach Raj directly via:\n\n` +
              `📧 **Email**: rathodraj1504@gmail.com\n` +
              `💻 **GitHub**: [github.com/Raj-Rathod-Ai](https://github.com/Raj-Rathod-Ai)\n` +
              `🔗 **LinkedIn**: [linkedin.com/in/raj-rathod-ai](https://linkedin.com/in/raj-rathod-ai)\n\n` +
-             `Or scroll to the **Contact** section to send a message directly!`;
+             `Or fill out the **Contact Form** on the homepage to send a message directly!`;
     }
 
-    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in GenAI, NLP, Computer Vision, and Predictive Modeling. Ask me about his **university & education**, **last working project**, **NLP projects**, **skills**, or **certifications**!`;
+    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in Deep Learning, NLP, Computer Vision, and Predictive Modeling. You can ask me about his **projects**, **education & university**, **skills**, **resumes**, or **contact info**!`;
   }
 
   /**
