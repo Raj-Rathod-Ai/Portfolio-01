@@ -352,6 +352,16 @@ const GITHUB_FALLBACK_REPOS = [
     html_url: 'https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard'
   },
   {
+    name: 'Movie-Recommendations-Using-NLP-ML',
+    description: 'Content-based movie recommendation system using NLP and Machine Learning to recommend movies based on genres and keywords.',
+    language: 'Python',
+    updated_at: '2026-06-04T00:00:00Z',
+    created_at: '2026-03-02T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['nlp', 'machine-learning', 'recommendation-system', 'scikit-learn'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-ML'
+  },
+  {
     name: 'FlowerDiseaseSystem',
     description: 'Computer vision classification model to detect diseases in plant/flower leaves.',
     language: 'Python',

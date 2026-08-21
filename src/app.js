@@ -446,9 +446,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Failed to load local projects metadata:', err.message);
   }
 
-  // Load global database project overrides if backend connected
+  // Load global database project overrides if backend connected (with timeout guard)
   try {
-    const overrideRes = await fetch(getApiBaseUrl() + '/api/project-overrides');
+    const apiUrl = getApiBaseUrl();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1500);
+    const overrideRes = await fetch(apiUrl + '/api/project-overrides', { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (overrideRes.ok && overrideRes.headers.get('content-type')?.includes('application/json')) {
       const data = await overrideRes.json();
       if (data && data.overrides && Object.keys(data.overrides).length > 0) {

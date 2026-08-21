@@ -97,6 +97,16 @@ const FALLBACK_REPOS = [
     html_url: 'https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard'
   },
   {
+    name: 'Movie-Recommendations-Using-NLP-ML',
+    description: 'Content-based movie recommendation system using NLP and Machine Learning to recommend movies based on genres and keywords.',
+    language: 'Python',
+    updated_at: '2026-06-04T00:00:00Z',
+    created_at: '2026-03-02T00:00:00Z',
+    stargazers_count: 0,
+    topics: ['nlp', 'machine-learning', 'recommendation-system', 'scikit-learn'],
+    html_url: 'https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-ML'
+  },
+  {
     name: 'FlowerDiseaseSystem',
     description: 'Computer vision classification model to detect diseases in plant/flower leaves.',
     language: 'Python',
@@ -120,10 +130,14 @@ export async function fetchGitHubRepositories() {
     return cached;
   }
 
-  // Tier 1: Try Backend Render API endpoint
+  // Tier 1: Try Backend Render API endpoint with 2.5s timeout
   try {
     const apiUrl = getApiBaseUrl();
-    const res = await fetch(`${apiUrl}/api/github/repos`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+    const res = await fetch(`${apiUrl}/api/github/repos`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const data = await res.json();
       if (data && data.repos && Array.isArray(data.repos) && data.repos.length > 0) {
@@ -135,30 +149,34 @@ export async function fetchGitHubRepositories() {
     console.warn('Backend GitHub repos fetch notice:', backendErr.message);
   }
 
-  // Tier 2: Direct GitHub API fallback
+  // Tier 2: Direct GitHub API fallback with 3.0s timeout
   try {
     console.log('Fetching repositories directly from GitHub API...');
-    const res = await fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100');
-    if (!res.ok) {
-      throw new Error(`GitHub API returned status ${res.status}`);
-    }
-    const repos = await res.json();
-    
-    const filtered = repos.filter(repo => {
-      const nameLower = (repo.name || '').toLowerCase();
-      return (
-        !SKIP_REPOS.includes(nameLower) &&
-        !repo.archived &&
-        !repo.fork
-      );
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100', { signal: controller.signal });
+    clearTimeout(timeoutId);
 
-    if (filtered.length > 0) {
-      setCache(CACHE_KEY, filtered, CACHE_EXPIRY_MINS);
-      return filtered;
+    if (res.ok) {
+      const repos = await res.json();
+      if (Array.isArray(repos)) {
+        const filtered = repos.filter(repo => {
+          const nameLower = (repo.name || '').toLowerCase();
+          return (
+            !SKIP_REPOS.includes(nameLower) &&
+            !repo.archived &&
+            !repo.fork
+          );
+        });
+
+        if (filtered.length > 0) {
+          setCache(CACHE_KEY, filtered, CACHE_EXPIRY_MINS);
+          return filtered;
+        }
+      }
     }
   } catch (err) {
-    console.warn('Failed to fetch from GitHub API. Falling back to static repositories list.', err.message);
+    console.warn('Direct GitHub API fetch notice:', err.message);
   }
 
   // Tier 3: Static fallback (cached briefly so it retries soon)
