@@ -1418,14 +1418,14 @@ CRITICAL INSTRUCTIONS:
       return `🔤 **RAJ RATHOD'S NATURAL LANGUAGE PROCESSING (NLP) PROJECTS**\n\n` +
              `Here are the **NLP Projects** featured in Raj's portfolio:\n\n` +
              `🎬 **1. Movie Recommendations Using NLP And ML**\n` +
-             `• **Tech**: Python, NLP, Machine Learning, Pandas, Scikit-learn\n` +
              `• **Objective**: Content-based recommendation system suggesting movies based on plot summaries, genres, and keywords.\n` +
-             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML)\n\n` +
+             `• 🚀 **Live Demo**: [cinema-verse.streamlit.app](https://cinema-verse.streamlit.app/)\n` +
+             `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML)\n\n` +
              `🕵️ **2. Fake News Detection Using ML Real Time**\n` +
-             `• **Tech**: Python, Scikit-learn, NLTK, TF-IDF, Flask, Three.js\n` +
              `• **Objective**: Real-time fake news detection analyzing news text (~92% accuracy).\n` +
-             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)\n\n` +
-             `💡 *Tip: Click on the **NLP** category in the Projects section to see them!*`;
+             `• 🚀 **Live Demo**: [truthlens5.netlify.app](https://truthlens5.netlify.app/)\n` +
+             `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)\n\n` +
+             `💡 *Tip: Both NLP projects are live deployed and ready to test!*`;
     }
 
     if (text.includes('deep learning') || text.includes('vision') || text.includes('cnn') || text.includes('image') || text.includes('opencv') || text.includes('pytorch') || text.includes('tensorflow')) {
@@ -1450,20 +1450,20 @@ CRITICAL INSTRUCTIONS:
 
     if (text.includes('data science') || text.includes('analytic') || text.includes('power bi')) {
       return `📊 **DATA SCIENCE & ANALYTICS**\n\n` +
-             `• **AutoPrepAI**: Automated data preprocessing & quality analysis platform ([View on GitHub](https://github.com/Raj-Rathod-Ai/AutoPrepAI)).\n` +
-             `• **Job Analysis Dashboard**: Interactive Power BI dashboard evaluating market trends, salaries, and required skillsets ([View on GitHub](https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard)).\n` +
-             `• **Data Science & Analytics with GenAI**: Verified Sheryians Coding School certification covering data processing, statistical modeling, and GenAI workflows.`;
+             `• **AutoPrepAI**: Automated data preprocessing & quality analysis platform ([Launch Live Demo](https://data-eda-processing.streamlit.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/AutoPrepAI)).\n` +
+             `• **Job Analysis Dashboard**: Interactive Power BI dashboard evaluating global tech market trends ([GitHub](https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard)).\n` +
+             `• **Data Science & Analytics with GenAI**: Verified Sheryians Coding School certification.`;
     }
 
     if (text.includes('rag') || text.includes('retrieval') || text.includes('vector') || text.includes('chatnotes')) {
       return `📑 **RAG (RETRIEVAL-AUGMENTED GENERATION) PROJECTS**\n\n` +
-             `• **ChatNotes**: RAG-powered document assistant allowing users to chat with PDFs using vector embeddings and Groq/Mistral LLMs ([View on GitHub](https://github.com/Raj-Rathod-Ai/ChatNotes)).\n` +
+             `• **ChatNotes**: High-speed RAG-powered document assistant to chat with PDF documents without token limits ([Launch Live Demo](https://chat-with-your-notes-dusx.onrender.com/) | [GitHub](https://github.com/Raj-Rathod-Ai/ChatNotes)).\n` +
              `• **Enterprise RAG Workflows**: High-accuracy retrieval pipelines with semantic search and chunking.`;
     }
 
     if (text.includes('genai') || text.includes('generative ai') || text.includes('llm') || text.includes('hybridmind')) {
       return `🤖 **GENERATIVE AI & LLM PLATFORMS**\n\n` +
-             `• **HybridMind**: Multi-model AI platform orchestrating Google Gemini, Mistral, and Tavily search for dynamic AI workflows ([View on GitHub](https://github.com/Raj-Rathod-Ai/HybridMind)).\n` +
+             `• **HybridMind**: Multi-model platform orchestrating Google Gemini, Mistral, and Tavily search ([Launch Live Demo](https://hybridmind.netlify.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/HybridMind)).\n` +
              `• **Sheryians GenAI Certified**: Advanced prompt engineering, LLM orchestration, and autonomous agent workflows.`;
     }
 
