@@ -56,8 +56,8 @@ export class Chatbot {
           contactDetails: profile.contactDetails,
           chatHistory: this.history
         })
-      }).catch(() => {});
-    } catch (e) {}
+      }).catch(() => { });
+    } catch (e) { }
 
     this.hideSuggestionTooltip();
     this.updateHeaderProfileBadge();
@@ -90,9 +90,9 @@ export class Chatbot {
             visitorId,
             chatHistory: this.history.slice(-40)
           })
-        }).catch(() => {});
+        }).catch(() => { });
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   /**
@@ -110,7 +110,7 @@ export class Chatbot {
 
     const container = document.getElementById('chatbot-messages');
     if (container) container.innerHTML = '';
-    
+
     this.updateHeaderProfileBadge();
 
     // After clearing, ask if they want to change their name
@@ -139,7 +139,7 @@ export class Chatbot {
 
     const container = document.getElementById('chatbot-messages');
     if (container) container.innerHTML = '';
-    
+
     this.updateHeaderProfileBadge();
     this.startConversation();
   }
@@ -230,14 +230,14 @@ export class Chatbot {
    * Bind events and initialize chatbot logic.
    */
   setup() {
-    const toggleBtn   = document.getElementById('chatbot-toggle-btn');
-    const closeBtn    = document.getElementById('chatbot-close-btn');
-    const resetBtn    = document.getElementById('chatbot-reset-btn');
-    const win         = document.getElementById('chatbot-window');
-    const form        = document.getElementById('chatbot-form');
-    const input       = document.getElementById('chatbot-input');
-    const tooltip     = document.getElementById('chatbot-suggestion-tooltip');
-    const tooltipClose= document.getElementById('chatbot-suggestion-close');
+    const toggleBtn = document.getElementById('chatbot-toggle-btn');
+    const closeBtn = document.getElementById('chatbot-close-btn');
+    const resetBtn = document.getElementById('chatbot-reset-btn');
+    const win = document.getElementById('chatbot-window');
+    const form = document.getElementById('chatbot-form');
+    const input = document.getElementById('chatbot-input');
+    const tooltip = document.getElementById('chatbot-suggestion-tooltip');
+    const tooltipClose = document.getElementById('chatbot-suggestion-close');
 
     if (!toggleBtn || !win) return;
 
@@ -263,7 +263,9 @@ export class Chatbot {
     toggleBtn.addEventListener('click', () => toggleChat());
     closeBtn?.addEventListener('click', () => toggleChat(false));
     resetBtn?.addEventListener('click', () => {
-      this.resetProfileAndHistory();
+      if (confirm('Reset chat? Your name will be kept, only messages are cleared.')) {
+        this.resetChatOnly();
+      }
     });
 
     // Tooltip suggestion handlers
@@ -569,7 +571,7 @@ export class Chatbot {
       this.appendMessage('user', text);
       this.isTyping = true;
       const typingId = this.showTypingIndicator();
-      
+
       const statsReport = await this.fetchAndShowDBStats();
       this.removeTypingIndicator(typingId);
       this.isTyping = false;
@@ -591,7 +593,7 @@ export class Chatbot {
         this.saveProfile(this.userProfile);
         this.updateHeaderProfileBadge();
         this.onboardingStep = null;
-        
+
         const reply = `No problem! 👋 You're exploring as **Guest Visitor**.\n\nAsk me anything about Raj's **ML/AI projects**, **education & university**, or **technical skills**!`;
         this.appendMessage('bot', reply);
         this.history.push({ role: 'assistant', content: reply });
@@ -637,7 +639,7 @@ export class Chatbot {
 
       this.tempProfile.name = text.trim();
       this.onboardingStep = 'ask_role';
-      
+
       const roleText = `Nice to meet you, **${this.tempProfile.name}**! 😊\n\nMay I know your current role or introduction? (e.g., Student, Recruiter, Developer, Client, or Other)`;
       this.appendMessage('bot', roleText);
       this.renderQuickChips(['🎓 Student', '💼 Recruiter', '💻 Developer', '🤝 Client', '⏩ Skip']);
@@ -709,7 +711,7 @@ export class Chatbot {
             email,
             visitedCategories: visitedCats
           })
-        }).catch(() => {});
+        }).catch(() => { });
 
         const completionText = `Thank you, **${this.userProfile.name}**! 🎉 I am **Rudra**, Raj's AI assistant.\n\nI have saved your contact details and sent a confirmation note to **${email}** regarding **${catsStr}**.\n\nHow can I help you explore Raj's portfolio today?`;
         this.appendMessage('bot', completionText);
@@ -752,20 +754,20 @@ export class Chatbot {
         const topProjectsList = (data.topProjects || []).map(p => `• **${p._id}**: ${p.count} views/clicks`).join('\n');
 
         const msg = `📊 **LIVE MONGODB DATABASE VISITOR STATS**\n\n` +
-                    `👥 **Total Portfolio Visitors**: **${visits}** sessions\n` +
-                    `📋 **Logged Visitor Names**: ${names || 'Pooja, Mayur, Priya, Amit, Rahul, Guest Visitors'}\n` +
-                    `🖱️ **Total Link & Project Clicks**: **${totalClicks}**\n\n` +
-                    `🏷️ **Category Interactions Breakdown**:\n${catBreakdown || '• General visits logged'}\n\n` +
-                    (topProjectsList ? `🔥 **Top Clicked Projects**:\n${topProjectsList}` : '');
+          `👥 **Total Portfolio Visitors**: **${visits}** sessions\n` +
+          `📋 **Logged Visitor Names**: ${names || 'Pooja, Mayur, Priya, Amit, Rahul, Guest Visitors'}\n` +
+          `🖱️ **Total Link & Project Clicks**: **${totalClicks}**\n\n` +
+          `🏷️ **Category Interactions Breakdown**:\n${catBreakdown || '• General visits logged'}\n\n` +
+          (topProjectsList ? `🔥 **Top Clicked Projects**:\n${topProjectsList}` : '');
 
         return msg;
       }
-    } catch (e) {}
+    } catch (e) { }
 
     return `📊 **LIVE MONGODB DATABASE VISITOR STATS**\n\n` +
-           `👥 **Total Portfolio Visitors**: **34** sessions\n` +
-           `📋 **Logged Visitor Names**: Pooja, Mayur, Priya, Amit, Rahul, Guest Visitors\n` +
-           `🖱️ **Total Project & Link Clicks**: **28** (RAG: 12, Generative AI: 16, NLP: 8)`;
+      `👥 **Total Portfolio Visitors**: **34** sessions\n` +
+      `📋 **Logged Visitor Names**: Pooja, Mayur, Priya, Amit, Rahul, Guest Visitors\n` +
+      `🖱️ **Total Project & Link Clicks**: **28** (RAG: 12, Generative AI: 16, NLP: 8)`;
   }
 
   /**
@@ -787,16 +789,16 @@ export class Chatbot {
         const reviewsCount = data.reviewsCount || 0;
         const contactsCount = data.contactsCount || 0;
 
-        const profilesList = (data.visitorProfiles || []).slice(0, 8).map(p => 
+        const profilesList = (data.visitorProfiles || []).slice(0, 8).map(p =>
           `• **${p.name || 'Anonymous'}** (${p.role || 'Visitor'}) - IP: \`${p.ipAddress || 'Recorded'}\` ${p.contactDetails ? `[Contact: ${p.contactDetails}]` : ''}`
         ).join('\n');
 
         const report = `📊 **LIVE MONGODB DATABASE ANALYTICS**\n\n` +
-                       `📈 **Total Visits**: **${totalVisits}** sessions\n` +
-                       `👥 **Unique Recognized Visitors**: **${uniqueCount}** profiles\n` +
-                       `💬 **Total Public Reviews**: **${reviewsCount}**\n` +
-                       `📬 **Contact Inquiries Dispatched**: **${contactsCount}**\n\n` +
-                       `📋 **Recent Visitor Log (IP & Profiles)**:\n${profilesList || '• No recent profiles logged yet.'}`;
+          `📈 **Total Visits**: **${totalVisits}** sessions\n` +
+          `👥 **Unique Recognized Visitors**: **${uniqueCount}** profiles\n` +
+          `💬 **Total Public Reviews**: **${reviewsCount}**\n` +
+          `📬 **Contact Inquiries Dispatched**: **${contactsCount}**\n\n` +
+          `📋 **Recent Visitor Log (IP & Profiles)**:\n${profilesList || '• No recent profiles logged yet.'}`;
 
         this.appendMessage('bot', report);
         this.history.push({ role: 'assistant', content: report });
@@ -825,7 +827,7 @@ export class Chatbot {
 
         const chips = [];
         let listText = `🗑️ **MASTER REVIEW DELETION MENU**\nClick a review below to permanently delete it from MongoDB:\n\n`;
-        
+
         reviews.slice(0, 6).forEach((r, idx) => {
           const revId = r._id || r.id;
           listText += `${idx + 1}. **${r.name}** (${r.rating}★): "${r.review.substring(0, 45)}..."\n`;
@@ -855,7 +857,7 @@ export class Chatbot {
         }
         return;
       }
-    } catch (e) {}
+    } catch (e) { }
     this.appendMessage('bot', `⚠️ Could not fetch reviews for deletion.`);
   }
 
@@ -937,9 +939,8 @@ export class Chatbot {
   async getBotReply(prompt) {
     // Extract live repos from window.portfolioData
     const repos = window.portfolioData?.repos || [];
-    const realRepos = repos.filter(r => !r.isUpcoming && r.html_url && r.html_url !== '#' && r.name);
-    const sortedRepos = [...realRepos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
-    
+    const sortedRepos = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+
     // Format full repo metadata for context
     const repoListText = sortedRepos.length > 0
       ? sortedRepos.map((r, idx) => `${idx + 1}. ${r.name} (Category: ${r.category || 'ML/AI'}, Lang: ${r.language || 'Python'}, Updated: ${r.updated_at ? new Date(r.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}) - Description: ${r.description || 'N/A'} [Topics: ${(r.topics || []).join(', ')}] URL: ${r.html_url}`).join('\n')
@@ -1050,15 +1051,37 @@ CRITICAL INSTRUCTIONS:
   }
 
   /**
-   * Offline intelligent, category-aware rule matching engine for instant responses.
-   * @param {string} input 
-   * @returns {string}
-   */
-  /**
    * RAG Knowledge Base Chunks & Multi-Turn Contextual Retrieval Engine
    */
   getRAGKnowledgeBase() {
     return [
+      {
+        id: 'live_demos_all',
+        title: 'All Active Live Demos & Deployed Projects',
+        keywords: ['live demo', 'live link', 'live links', 'live projects', 'deployed projects', 'deployed link', 'working demo', 'give live link', 'give me live', 'live deploy', 'deployed links', 'live demo link', 'interactive demo', 'working projects', 'active demo'],
+        category: 'Live Demos',
+        content: `🚀 **RAJ RATHOD'S ACTIVE LIVE DEMOS & DEPLOYED APPS**\n\n` +
+                 `Here are Raj's interactive deployed applications ready to test live:\n\n` +
+                 `🚕 **1. Taxi Fare Prediction System** (Machine Learning / Regression)\n` +
+                 `• [Launch Live Demo](https://taxi-price-prediction.netlify.app/)\n` +
+                 `• Tech: Scikit-learn, Polynomial Regression, HTML5/CSS\n\n` +
+                 `🍔 **2. Food Delivery Time Prediction** (Machine Learning)\n` +
+                 `• [Launch Live Demo](https://fooddelivery-time.streamlit.app/)\n` +
+                 `• Tech: Scikit-learn, Random Forest, Streamlit Cloud\n\n` +
+                 `🧠 **3. Discover Your True Personality** (Machine Learning / Classification)\n` +
+                 `• [Launch Live Demo](https://discover-your-true-personality.streamlit.app/)\n` +
+                 `• Tech: 26-Trait Psychometric ML Classifier, Streamlit Cloud\n\n` +
+                 `🌸 **4. Flower & Leaf Disease Detection** (Deep Learning / Computer Vision)\n` +
+                 `• [Launch Live Demo](https://flower-disease-system.vercel.app)\n` +
+                 `• Tech: PyTorch CNN, OpenCV, Vercel\n\n` +
+                 `🎮 **5. Stone Paper Scissors Python Game** (Python Concepts)\n` +
+                 `• [Launch Live Demo](https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/)\n` +
+                 `• Tech: Python, Streamlit UI\n\n` +
+                 `📚 **6. Library Management System** (Software & Systems)\n` +
+                 `• [Launch Live Demo](https://librarymangement1.streamlit.app/)\n` +
+                 `• Tech: Python, SQLite, Streamlit Cloud\n\n` +
+                 `💡 *Tip: Projects like **AutoPrepAI**, **ChatNotes**, **HybridMind**, and **Fake News Detection** are open-source with full code on [GitHub](https://github.com/Raj-Rathod-Ai).*`
+      },
       {
         id: 'profile_overview',
         title: 'Raj Rathod Overview & Bio',
@@ -1362,6 +1385,7 @@ CRITICAL INSTRUCTIONS:
     if (text.includes('who are you') || text.includes('what can you do') || text.includes('what are you') || text.includes('your name') || text.includes('about rudra')) {
       return `I am **Rudra** 🤖, Raj Rathod's personal AI Assistant!\n\nHere is what I can help you with:\n` +
              `• 🧠 **Explore AI & ML Projects**: Deep dives into Computer Vision, NLP, GenAI, RAG, and Regression systems.\n` +
+             `• 🚀 **Live Demos**: Interactive links to all active deployed web applications.\n` +
              `• 🎓 **Education & Background**: Information about Raj's B.Tech at Parul University, 7.66 CGPA, and 350+ LeetCode record.\n` +
              `• 📄 **Resumes & CVs**: Direct access to AI/ML and Full-Stack resume PDFs.\n` +
              `• 📍 **Location & Campus**: Vadodara, Gujarat location and interactive maps.\n` +
@@ -1430,8 +1454,12 @@ CRITICAL INSTRUCTIONS:
     }
 
     // Default Fallback
-    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in Deep Learning, NLP, Computer Vision, and Predictive Modeling. You can ask me about his **projects**, **education & university (Parul Univ, 7.66 CGPA)**, **skills**, **resumes**, or **contact info**!`;
+    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in Deep Learning, NLP, Computer Vision, and Predictive Modeling. You can ask me about his **projects**, **live demos**, **education & university (Parul Univ, 7.66 CGPA)**, **skills**, **resumes**, or **contact info**!`;
   }
+
+  /**
+   * Append formatted message bubble to chat window.
+   */
   appendMessage(sender, text, animate = true) {
     const container = document.getElementById('chatbot-messages');
     if (!container) return;
