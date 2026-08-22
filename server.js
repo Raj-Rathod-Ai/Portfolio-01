@@ -1071,6 +1071,17 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
       Thanks,<br>
       Rudra<br>
       AI Assistant to Raj Rathod
+    - After the sign-off, always append this recruiter quick access bar:
+      <div style="margin-top: 25px; padding-top: 18px; border-top: 1px solid #30363d; text-align: center;">
+        <div style="font-size: 11px; text-transform: uppercase; color: #8b949e; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600;">Verified Profiles & Portfolios</div>
+        <div style="text-align: center;">
+          <a href="https://rathodrajai.netlify.app/" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); color: #a5b4fc; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🌐 Live Portfolio</a>
+          <a href="https://github.com/Raj-Rathod-Ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #e6edf3; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">💻 GitHub</a>
+          <a href="https://linkedin.com/in/raj-rathod-ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #38bdf8; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">👔 LinkedIn</a>
+          <a href="https://leetcode.com/u/Raj-Rathod" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🧠 LeetCode (350+)</a>
+          <a href="https://rathodrajai.netlify.app/Rathod-Raj-Ai.pdf" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.4); color: #2dd4bf; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">📄 AI/ML Resume</a>
+        </div>
+      </div>
     - Return ONLY the raw HTML content. Do not wrap in markdown code blocks.`;
 
     let htmlReply = '';
@@ -1110,20 +1121,31 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
             <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">AI Assistant Dispatch</span>
           </div>
           <p>Hi ${name}, 👋</p>
-          <p>Thank you for your message regarding <strong>"${subject}"</strong>.</p>
-          <p>Here are Raj's key details for your reference:</p>
+          <p>Thank you for reaching out regarding <strong>"${subject}"</strong>.</p>
+          <p>Here are Raj's key credentials and background for your review:</p>
           <ul>
-            <li><strong>Education:</strong> B.Tech in CSE (AI Specialization) at Parul University, Vadodara. CGPA: 7.66.</li>
-            <li><strong>Key Skills:</strong> Python, ML/Deep Learning (TensorFlow, PyTorch), OpenCV, NLP, SQL.</li>
-            <li><strong>Selected Projects:</strong> Flower Leaf Disease CNN classifier, Fake News Detection NLP model, Taxi Price Predictor.</li>
+            <li><strong>Education:</strong> B.Tech in CSE (AI Specialization) at Parul University, Vadodara. Result: <strong>7.66 CGPA</strong>.</li>
+            <li><strong>Algorithmic Record:</strong> Solved <strong>350+ problems on LeetCode</strong>.</li>
+            <li><strong>Key Skills:</strong> Python, Deep Learning (PyTorch, TensorFlow), Computer Vision (OpenCV), NLP, GenAI, Streamlit.</li>
+            <li><strong>Featured Projects (21 Live Deployments):</strong> Movie Recommendations, Fake News Detector, AutoPrepAI, Flower Disease System, Taxi Price Predictor.</li>
           </ul>
-          <p>For direct coordination or detailed project proposals, feel free to email Raj directly at <strong>rathodraj1504@gmail.com</strong>.</p>
+          <p>For custom proposals, interviews, or contract coordination, feel free to reply directly to this email or reach Raj at <strong>rathodraj1504@gmail.com</strong>.</p>
           <br>
           <p style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e; margin-bottom: 0;">
             Thanks,<br>
             Rudra<br>
             AI Assistant to Raj Rathod
           </p>
+          <div style="margin-top: 25px; padding-top: 18px; border-top: 1px solid #30363d; text-align: center;">
+            <div style="font-size: 11px; text-transform: uppercase; color: #8b949e; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600;">Verified Profiles & Portfolios</div>
+            <div style="text-align: center;">
+              <a href="https://rathodrajai.netlify.app/" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); color: #a5b4fc; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🌐 Live Portfolio</a>
+              <a href="https://github.com/Raj-Rathod-Ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #e6edf3; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">💻 GitHub</a>
+              <a href="https://linkedin.com/in/raj-rathod-ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #38bdf8; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">👔 LinkedIn</a>
+              <a href="https://leetcode.com/u/Raj-Rathod" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🧠 LeetCode</a>
+              <a href="https://rathodrajai.netlify.app/Rathod-Raj-Ai.pdf" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.4); color: #2dd4bf; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">📄 AI/ML Resume</a>
+            </div>
+          </div>
         </div>
       `;
     }
