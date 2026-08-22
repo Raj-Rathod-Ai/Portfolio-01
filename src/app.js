@@ -361,34 +361,55 @@ function initMouseSpotlight() {
 function initPreloader(onLoadedCallback) {
   const loaderFill = document.getElementById('loader-fill');
   const loaderPerc = document.getElementById('loader-perc');
+  const loaderStatus = document.getElementById('loader-status');
   let progress = 0;
+
+  const statuses = [
+    { at: 0, text: 'INITIALIZING NEURAL CORE...' },
+    { at: 28, text: 'SYNCHRONIZING 21 LIVE APPS...' },
+    { at: 62, text: 'MOUNTING AI KNOWLEDGE MATRIX...' },
+    { at: 88, text: 'SYSTEM READY · LAUNCHING...' }
+  ];
 
   const preloaderInterval = setInterval(() => {
     // Increment progress dynamically
-    progress += Math.floor(Math.random() * 8) + 5;
+    progress += Math.floor(Math.random() * 7) + 4;
     
     if (progress >= 100) {
       progress = 100;
       clearInterval(preloaderInterval);
       
+      if (loaderStatus) {
+        loaderStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span><span>SYSTEM ONLINE</span>`;
+      }
+
       setTimeout(() => {
         const loaderScreen = document.getElementById('preloader');
         if (loaderScreen) {
           loaderScreen.style.opacity = '0';
-          loaderScreen.style.transition = 'opacity 0.4s ease';
+          loaderScreen.style.filter = 'blur(10px)';
+          loaderScreen.style.transform = 'scale(1.04)';
+          loaderScreen.style.transition = 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease, transform 0.5s ease';
           document.documentElement.classList.remove('noscroll');
           
           setTimeout(() => {
             loaderScreen.style.display = 'none';
             onLoadedCallback(); // Initialize SPA routes
-          }, 400);
+          }, 500);
         }
-      }, 150);
+      }, 200);
     }
     
     if (loaderFill) loaderFill.style.width = `${progress}%`;
     if (loaderPerc) loaderPerc.textContent = `${progress}%`;
-  }, 30);
+
+    if (loaderStatus && progress < 100) {
+      const cur = [...statuses].reverse().find(s => progress >= s.at);
+      if (cur) {
+        loaderStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping"></span><span>${cur.text}</span>`;
+      }
+    }
+  }, 28);
 }
 
 /**
