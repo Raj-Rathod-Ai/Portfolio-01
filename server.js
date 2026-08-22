@@ -1009,21 +1009,30 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
     =========================================
     Use this context to accurately and intelligently answer any questions the sender asks about Raj:
     - Role: AI & Machine Learning Developer.
-    - Education: B.Tech in Computer Science & Engineering with AI specialization at Parul University, Vadodara. Graduation Year: 2027. CGPA: 7.66.
-    - LeetCode achievements: Solved 350+ coding problems.
+    - Education: B.Tech in Computer Science & Engineering with AI specialization at Parul University, Vadodara (2023 - 2027). CGPA: 7.66.
+    - Algorithmic Rigor: Solved 350+ coding problems on LeetCode (https://leetcode.com/u/Raj-Rathod).
     - Key Technical Skills:
-      * Languages: Python, Java, C/C++, SQL, JavaScript.
-      * AI/ML Frameworks: TensorFlow, PyTorch, Scikit-learn, Pandas, NumPy, OpenCV, NLTK/NLP, Streamlit.
+      * Languages: Python, Java, C/C++, SQL, JavaScript, HTML/CSS.
+      * AI/ML Frameworks: PyTorch, TensorFlow, Scikit-learn, Pandas, NumPy, OpenCV, NLTK/Spacy, Streamlit.
       * Tools & Platforms: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
-    - Selected Projects:
-      * Flower Disease System: CNN classifier deployed to detect diseases in plant leaves.
-      * Fake News Detection: Real-time NLP text classifier.
-      * Taxi Price Prediction: Regression models predicting fare amounts.
-      * Food Delivery Time: Streamlit ML app predicting delivery duration.
-      * Discover Your True Personality: Personality classification models.
-      * Job Analysis Dashboard: Power BI market insights dashboard.
-    - Selected Credentials: Certifications in Java programming, Prompt engineering, Python programming.
-    - Location: Gujarat, India (Ranavav, Porbandar).
+    - Verified Live Deployments (21 Interactive Web Apps):
+      * Movie Recommendations Engine: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
+      * Fake News Detection: https://truthlens5.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
+      * AutoPrepAI Data Platform: https://data-eda-processing.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI
+      * HybridMind Multi-Model Platform: https://hybridmind.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/HybridMind
+      * ChatNotes RAG PDF Assistant: https://chat-with-your-notes-dusx.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/ChatNotes
+      * Flower & Leaf Disease Detection: https://flower-disease-system.vercel.app | GitHub: https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
+      * Taxi Fare Prediction: https://taxi-price-prediction.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction
+      * Food Delivery Time: https://fooddelivery-time.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML
+      * Discover Your True Personality: https://discover-your-true-personality.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
+      * Car Selling Price Prediction: https://car-selling-price-prediction.streamlit.app/
+      * Loan Risk Assessment App: https://loan-risk-assessment-app.streamlit.app/
+      * USA House Price Prediction: https://usa-house-price-predictions.streamlit.app/
+      * Library Management System: https://librarymangement1.streamlit.app/
+      * Stone Paper Scissors Python Game: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/
+    - Verified Credentials: Data Science & Analytics with GenAI (Sheryians Coding School, July 2026), Java Programming, Prompt Engineering & GenAI, Python Programming, Networks & Protocols (NPTEL IIT).
+    - Resumes (PDF): AI/ML Resume (/Rathod-Raj-Ai.pdf), Full-Stack Resume (/Rathod_Raj_FullStack.pdf).
+    - Location: Vadodara, Gujarat, India (Parul University Campus, P.O. Limda, Ta. Waghodia, Dist. Vadodara 391760).
     - GitHub: https://github.com/Raj-Rathod-Ai
     - LinkedIn: https://linkedin.com/in/raj-rathod-ai
     - Direct Contact Email: rathodraj1504@gmail.com
