@@ -908,3 +908,17 @@ html.noscroll, body.noscroll, .noscroll {
   animation: scanBeam 3s ease-in-out infinite;
   pointer-events: none;
 }
+
+@keyframes textGradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.text-flow-gradient {
+  background: linear-gradient(90deg, #ffffff 0%, #c084fc 25%, #38bdf8 50%, #f472b6 75%, #ffffff 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textGradientFlow 4s ease infinite;
+}

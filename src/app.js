@@ -383,12 +383,15 @@ function initPreloader(onLoadedCallback) {
     return span;
   });
 
-  // Stagger reveal each letter with blur-to-focus
+  // Stagger reveal each letter with blur-to-focus and flowing text shimmer
   chars.forEach((span, i) => {
     setTimeout(() => {
       span.style.opacity = '1';
       span.style.filter = 'blur(0)';
       span.style.transform = 'translateY(0) scale(1)';
+      setTimeout(() => {
+        span.classList.add('text-flow-gradient');
+      }, 400);
     }, i * 75 + 160);
   });
 

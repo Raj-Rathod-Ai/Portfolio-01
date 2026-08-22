@@ -57,75 +57,47 @@
   <div class="aurora-blob blob-secondary"></div>
   <div class="aurora-blob blob-accent"></div>
 
-  <!-- CINEMATIC CYBERNETIC MULTI-LAYER PRELOADER -->
-  <div id="preloader" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center select-none overflow-hidden" style="background:#05070d;">
+  <!-- CINEMATIC PRELOADER (Pure Black & Flowing Chromatic Text) -->
+  <div id="preloader" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center select-none overflow-hidden" style="background:#000000 !important;">
     
-    <!-- Layer 1: Animated Perspective Cyber Grid Floor -->
-    <div class="absolute inset-0 cyber-grid-bg opacity-30 pointer-events-none"></div>
+    <!-- Ambient Hologram Radial Glow -->
+    <div class="absolute w-[450px] h-[450px] rounded-full bg-gradient-to-tr from-purple-600/15 via-indigo-600/15 to-teal-400/10 blur-[130px] pointer-events-none animate-pulse"></div>
 
-    <!-- Layer 2: Moving Holographic Laser Scan Beam -->
-    <div class="scan-beam-line"></div>
-
-    <!-- Layer 3: Ambient Radial Glow Auroras -->
-    <div class="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-primary/25 via-purple-600/20 to-teal-400/15 blur-[120px] pointer-events-none animate-pulse"></div>
-
-    <!-- Layer 4: Sci-Fi HUD Corner Framing -->
-    <div class="absolute inset-6 sm:inset-10 pointer-events-none">
-      <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-indigo-500/40"></div>
-      <div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-indigo-500/40"></div>
-      <div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-indigo-500/40"></div>
-      <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-indigo-500/40"></div>
-      <!-- HUD System Labels -->
-      <div class="absolute top-2 left-3 font-mono text-[9px] text-gray-500 uppercase tracking-widest hidden sm:block">SYS // NEURAL_OS_v3.2</div>
-      <div class="absolute top-2 right-3 font-mono text-[9px] text-gray-500 uppercase tracking-widest hidden sm:block">PORTFOLIO // RAJ_RATHOD</div>
-    </div>
-
-    <!-- Layer 5: Main Interactive Content Core -->
-    <div class="relative z-10 flex flex-col items-center max-w-lg px-6 text-center space-y-6">
+    <div class="relative z-10 flex flex-col items-center text-center max-w-xl px-6 space-y-7">
       
-      <!-- Multi-Orbital Quantum Reactor with Glowing AI Core -->
-      <div class="relative w-28 h-28 flex items-center justify-center">
-        <!-- Outer Orbital Pulsing Ring -->
-        <div class="absolute inset-0 rounded-full border border-dashed border-indigo-500/40 animate-spin-slow"></div>
-        <!-- Middle Counter-Rotating Dual-Tone Ring -->
-        <div class="absolute inset-2.5 rounded-full border-2 border-t-teal-400 border-r-transparent border-b-purple-500 border-l-transparent animate-spin-reverse"></div>
-        <!-- Inner Accent Ring -->
-        <div class="absolute inset-5 rounded-full border border-indigo-400/60 border-t-transparent animate-spin"></div>
-        <!-- Central Floating 3D AI Brain Node -->
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-teal-400 p-[1.5px] shadow-2xl animate-pulse-core flex items-center justify-center">
-          <div class="w-full h-full bg-[#090d16] rounded-[14px] flex items-center justify-center text-white text-lg">
-            <i class="fa-solid fa-microchip text-transparent bg-clip-text bg-gradient-to-tr from-indigo-300 via-purple-300 to-teal-300"></i>
+      <!-- Quantum Neural Orbit Badge -->
+      <div class="relative w-20 h-20 flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full border border-dashed border-white/20 animate-spin-slow"></div>
+        <div class="absolute inset-2 rounded-full border-2 border-t-purple-500 border-r-transparent border-b-indigo-400 border-l-transparent animate-spin-reverse"></div>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-teal-400 p-[1px] shadow-[0_0_25px_rgba(168,85,247,0.5)] animate-pulse-core flex items-center justify-center">
+          <div class="w-full h-full bg-black rounded-[11px] flex items-center justify-center text-white text-base">
+            <i class="fa-solid fa-brain text-transparent bg-clip-text bg-gradient-to-tr from-indigo-300 via-purple-300 to-teal-300"></i>
           </div>
         </div>
       </div>
 
-      <!-- Chromatic Aurora Typography & Brand Identity -->
-      <div class="space-y-2">
-        <div id="preloader-brand" class="font-jakarta font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-white inline-block select-none cursor-default" style="letter-spacing: -0.03em;">
-          <!-- Staggered Characters Populated via JS with Neon Bloom -->
+      <!-- Animated Chromatic Brand Typography -->
+      <div class="space-y-2.5">
+        <div id="preloader-brand" class="font-serif font-black italic tracking-tighter text-white inline-block select-none cursor-default" style="font-size: clamp(2.8rem, 8vw, 4.8rem); line-height: 1.05;">
+          <!-- Staggered Characters Populated via JS -->
         </div>
 
-        <div>
-          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-indigo-500/30 bg-indigo-950/40 backdrop-blur-md font-mono text-[10px] text-indigo-300 tracking-[0.25em] shadow-lg shadow-indigo-500/10">
-            <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping"></span>
-            <span>AI & MACHINE LEARNING DEVELOPER</span>
-          </div>
-        </div>
+        <p class="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.32em] text-neutral-400 font-semibold">
+          AI & Machine Learning Developer
+        </p>
       </div>
 
-      <!-- High-Precision Holographic Laser Progress Bar -->
+      <!-- Ultra-Clean Laser Progress Bar -->
       <div class="w-72 sm:w-80 space-y-2.5">
         <div class="flex items-center justify-between text-xs font-mono">
-          <span id="pl-status" class="text-teal-400 text-[11px] tracking-wider flex items-center gap-1.5">
+          <span id="pl-status" class="text-teal-400 text-[11px] tracking-widest uppercase flex items-center gap-1.5">
             Initializing AI Engine...
           </span>
           <span id="pl-perc" class="text-indigo-300 font-bold text-[11px]">0%</span>
         </div>
         
-        <div class="h-1.5 w-full bg-white/5 rounded-full p-[1px] border border-white/10 overflow-hidden relative shadow-inner">
-          <div id="pl-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-400 w-0 transition-all duration-75 rounded-full relative shadow-[0_0_15px_rgba(99,102,241,0.9)]">
-            <div class="absolute right-0 top-0 bottom-0 w-2.5 bg-white rounded-full shadow-[0_0_10px_#ffffff]"></div>
-          </div>
+        <div style="width:100%;height:2px;background:rgba(255,255,255,0.08);position:relative;overflow:hidden;border-radius:10px;">
+          <div id="pl-bar" style="position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#a855f7,#3b82f6,#14b8a6);box-shadow:0 0 20px #a855f7;border-radius:10px;"></div>
         </div>
       </div>
 
