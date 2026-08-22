@@ -362,6 +362,7 @@ function initPreloader(onLoadedCallback) {
   const brand = document.getElementById('preloader-brand');
   const bar = document.getElementById('pl-bar');
   const status = document.getElementById('pl-status');
+  const perc = document.getElementById('pl-perc');
   const preloader = document.getElementById('preloader');
 
   if (!brand || !preloader) {
@@ -369,15 +370,15 @@ function initPreloader(onLoadedCallback) {
     return;
   }
 
-  // TruthLens Cinematic Typography Stagger Effect
+  // Multi-Color Glowing Hologram Character Stagger Suite
   const text = 'RAJ RATHOD';
-  const colors = ['#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#06b6d4', '#ec4899'];
+  const colors = ['#818cf8', '#a855f7', '#38bdf8', '#34d399', '#fbbf24', '#f472b6'];
   brand.innerHTML = '';
 
   const chars = Array.from(text).map((c) => {
     const span = document.createElement('span');
     span.textContent = c === ' ' ? '\u00A0' : c;
-    span.style.cssText = 'display:inline-block;opacity:0;filter:blur(22px);transform:translateY(18px) scale(0.94);will-change:filter,opacity,transform;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),filter 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1),color 0.25s,text-shadow 0.25s;';
+    span.style.cssText = 'display:inline-block;opacity:0;filter:blur(24px);transform:translateY(22px) scale(0.92);background:linear-gradient(135deg,#ffffff 20%,#c7d2fe 60%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;will-change:filter,opacity,transform;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),filter 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1),text-shadow 0.25s;';
     brand.appendChild(span);
     return span;
   });
@@ -388,21 +389,21 @@ function initPreloader(onLoadedCallback) {
       span.style.opacity = '1';
       span.style.filter = 'blur(0)';
       span.style.transform = 'translateY(0) scale(1)';
-    }, i * 85 + 180);
+    }, i * 75 + 160);
   });
 
-  // Interactive Neon Hover effect on letters
+  // Interactive Neon Hover effect on individual characters
   chars.forEach((span) => {
     span.addEventListener('mouseenter', () => {
       const col = colors[Math.floor(Math.random() * colors.length)];
-      span.style.color = col;
-      span.style.transform = 'translateY(-8px) scale(1.08)';
-      span.style.textShadow = `0 0 28px ${col}cc, 0 0 50px ${col}66`;
+      span.style.webkitTextFillColor = col;
+      span.style.transform = 'translateY(-10px) scale(1.12)';
+      span.style.filter = `drop-shadow(0 0 25px ${col}) drop-shadow(0 0 50px ${col}88)`;
     });
     span.addEventListener('mouseleave', () => {
-      span.style.color = 'white';
+      span.style.webkitTextFillColor = 'transparent';
       span.style.transform = 'translateY(0) scale(1)';
-      span.style.textShadow = 'none';
+      span.style.filter = 'none';
     });
   });
 
@@ -418,31 +419,33 @@ function initPreloader(onLoadedCallback) {
   let currentStepIdx = 0;
 
   const preloaderInterval = setInterval(() => {
-    progress += Math.random() * 3.5 + 1.2;
+    progress += Math.random() * 3.6 + 1.4;
 
     if (progress >= 100) {
       progress = 100;
       clearInterval(preloaderInterval);
 
       if (bar) bar.style.width = '100%';
+      if (perc) perc.textContent = '100%';
       if (status) status.textContent = 'Portfolio Ready.';
 
       setTimeout(() => {
         preloader.style.transition = 'opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease, transform 0.75s ease';
         preloader.style.opacity = '0';
-        preloader.style.filter = 'blur(12px)';
-        preloader.style.transform = 'scale(1.02)';
+        preloader.style.filter = 'blur(16px)';
+        preloader.style.transform = 'scale(1.03)';
         document.documentElement.classList.remove('noscroll');
 
         setTimeout(() => {
           if (preloader.parentNode) preloader.remove();
           onLoadedCallback(); // Initialize SPA routes
         }, 800);
-      }, 350);
+      }, 300);
       return;
     }
 
     if (bar) bar.style.width = `${progress}%`;
+    if (perc) perc.textContent = `${Math.floor(progress)}%`;
 
     const stepIdx = Math.min(
       Math.floor(progress / (100 / statusSteps.length)),
@@ -452,7 +455,7 @@ function initPreloader(onLoadedCallback) {
       currentStepIdx = stepIdx;
       status.textContent = statusSteps[stepIdx];
     }
-  }, 40);
+  }, 35);
 }
 
 /**
