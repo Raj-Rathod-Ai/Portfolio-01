@@ -5,6 +5,9 @@ import { initRouter } from './router.js';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
 import { Chatbot } from './components/Chatbot.js';
+import { commandPalette } from './components/CommandPalette.js';
+import { initMagneticCursor } from './utils/magneticCursor.js';
+import { initCardTilt } from './utils/cardTilt.js';
 import { trackVisit, trackInteraction, getApiBaseUrl } from './utils/analytics.js';
 
 // Pre-warm Render backend server immediately on page load to prevent cold start delay
@@ -582,8 +585,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.body.appendChild(chatMount);
     chatbot.setup();
 
-    // Register animations and routes
+    // Register animations, 3D tilt, command palette, and routes
     initIntersectionObservers();
+    initMagneticCursor();
+    initCardTilt();
+    commandPalette.setup();
     initRouter();
 
     // Background auto-sync: Silently fetch fresh GitHub repositories after 2.5s
