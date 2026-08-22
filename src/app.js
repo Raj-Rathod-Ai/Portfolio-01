@@ -381,7 +381,7 @@ function initPreloader(onLoadedCallback) {
   const chars = Array.from(text).map((c) => {
     const span = document.createElement('span');
     span.textContent = c === ' ' ? '\u00A0' : c;
-    span.style.cssText = 'display:inline-block;opacity:0;filter:blur(24px);transform:translateY(22px) scale(0.92);background:linear-gradient(135deg,#ffffff 20%,#c7d2fe 60%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;will-change:filter,opacity,transform;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),filter 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1),text-shadow 0.25s;';
+    span.style.cssText = 'font-family:\'Outfit\',\'Plus Jakarta Sans\',sans-serif;font-weight:900;display:inline-block;opacity:0;filter:blur(24px);transform:translateY(22px) scale(0.92);background:linear-gradient(135deg,#ffffff 20%,#c7d2fe 60%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;will-change:filter,opacity,transform;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),filter 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1),text-shadow 0.25s;';
     brand.appendChild(span);
     return span;
   });
