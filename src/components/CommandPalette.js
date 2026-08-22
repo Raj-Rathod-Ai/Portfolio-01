@@ -1,6 +1,7 @@
 /**
  * Global Command Palette (Cmd+K / Ctrl+K) Spotlight Engine (Awwwards Style)
  * Provides instant search and direct navigation across 21 live deployments, categories, resumes, and actions.
+ * Features Lenis scroll locking, dedicated scroll containment, and keyboard navigation.
  */
 
 export class CommandPalette {
@@ -54,9 +55,11 @@ export class CommandPalette {
     if (!document.getElementById('cmd-palette-modal')) {
       const modal = document.createElement('div');
       modal.id = 'cmd-palette-modal';
+      modal.setAttribute('data-lenis-prevent', 'true');
       modal.className = 'fixed inset-0 z-[100000] hidden items-start justify-center pt-16 sm:pt-24 px-4 bg-black/80 backdrop-blur-xl transition-all duration-200';
+      modal.style.overscrollBehavior = 'contain';
       modal.innerHTML = `
-        <div class="w-full max-w-2xl bg-[#0d1117] border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-all duration-200 scale-95 opacity-0" id="cmd-palette-card">
+        <div class="w-full max-w-2xl bg-[#0d1117] border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-all duration-200 scale-95 opacity-0" id="cmd-palette-card" data-lenis-prevent="true" style="overscroll-behavior: contain;">
           <!-- Search Header -->
           <div class="flex items-center px-4 py-3.5 border-b border-white/10 gap-3">
             <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
@@ -64,7 +67,7 @@ export class CommandPalette {
             <kbd class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono text-gray-400 bg-white/5 border border-white/10 rounded">ESC</kbd>
           </div>
           <!-- Results List -->
-          <div id="cmd-palette-results" class="max-h-[60vh] overflow-y-auto p-2 space-y-1">
+          <div id="cmd-palette-results" class="max-h-[55vh] overflow-y-auto p-2 space-y-1" data-lenis-prevent="true" style="overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
             <!-- Dynamic Items -->
           </div>
           <!-- Footer HUD -->
@@ -78,6 +81,18 @@ export class CommandPalette {
         </div>
       `;
       document.body.appendChild(modal);
+
+      // Prevent background scrolling propagation when scrolling inside modal
+      modal.addEventListener('wheel', (e) => {
+        e.stopPropagation();
+      }, { passive: false });
+
+      const results = modal.querySelector('#cmd-palette-results');
+      if (results) {
+        results.addEventListener('wheel', (e) => {
+          e.stopPropagation();
+        }, { passive: false });
+      }
 
       // Desktop Floating HUD Shortcut Pill
       const triggerPill = document.createElement('div');
@@ -104,11 +119,11 @@ export class CommandPalette {
         if (e.key === 'ArrowDown') {
           e.preventDefault();
           this.selectedIndex = (this.selectedIndex + 1) % Math.max(1, this.filteredItems.length);
-          this.renderResults();
+          this.renderResults(true);
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
           this.selectedIndex = (this.selectedIndex - 1 + this.filteredItems.length) % Math.max(1, this.filteredItems.length);
-          this.renderResults();
+          this.renderResults(true);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           this.executeSelection();
@@ -137,6 +152,13 @@ export class CommandPalette {
     const card = document.getElementById('cmd-palette-card');
     const input = document.getElementById('cmd-palette-input');
 
+    // Pause Lenis smooth background scrolling
+    if (window.lenis && typeof window.lenis.stop === 'function') {
+      window.lenis.stop();
+    }
+    document.documentElement.classList.add('noscroll');
+    document.body.classList.add('noscroll');
+
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 
@@ -153,6 +175,13 @@ export class CommandPalette {
     this.isOpen = false;
     const modal = document.getElementById('cmd-palette-modal');
     const card = document.getElementById('cmd-palette-card');
+
+    // Resume Lenis smooth background scrolling
+    if (window.lenis && typeof window.lenis.start === 'function') {
+      window.lenis.start();
+    }
+    document.documentElement.classList.remove('noscroll');
+    document.body.classList.remove('noscroll');
 
     card.classList.remove('scale-100', 'opacity-100');
     card.classList.add('scale-95', 'opacity-0');
@@ -177,7 +206,7 @@ export class CommandPalette {
     this.renderResults();
   }
 
-  renderResults() {
+  renderResults(autoScroll = false) {
     const container = document.getElementById('cmd-palette-results');
     if (!container) return;
 
@@ -224,6 +253,14 @@ export class CommandPalette {
         this.executeSelection();
       });
     });
+
+    // Auto-scroll selected item into view if navigating with keyboard
+    if (autoScroll) {
+      const selectedEl = container.querySelector(`[data-idx="${this.selectedIndex}"]`);
+      if (selectedEl && typeof selectedEl.scrollIntoView === 'function') {
+        selectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
   }
 
   executeSelection() {
