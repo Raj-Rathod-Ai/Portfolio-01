@@ -359,57 +359,100 @@ function initMouseSpotlight() {
  * Initialize loading preloader progression page overlays.
  */
 function initPreloader(onLoadedCallback) {
-  const loaderFill = document.getElementById('loader-fill');
-  const loaderPerc = document.getElementById('loader-perc');
-  const loaderStatus = document.getElementById('loader-status');
-  let progress = 0;
+  const brand = document.getElementById('preloader-brand');
+  const bar = document.getElementById('pl-bar');
+  const status = document.getElementById('pl-status');
+  const preloader = document.getElementById('preloader');
 
-  const statuses = [
-    { at: 0, text: 'INITIALIZING NEURAL CORE...' },
-    { at: 28, text: 'SYNCHRONIZING 21 LIVE APPS...' },
-    { at: 62, text: 'MOUNTING AI KNOWLEDGE MATRIX...' },
-    { at: 88, text: 'SYSTEM READY · LAUNCHING...' }
+  if (!brand || !preloader) {
+    onLoadedCallback();
+    return;
+  }
+
+  // TruthLens Cinematic Typography Stagger Effect
+  const text = 'RAJ RATHOD';
+  const colors = ['#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#06b6d4', '#ec4899'];
+  brand.innerHTML = '';
+
+  const chars = Array.from(text).map((c) => {
+    const span = document.createElement('span');
+    span.textContent = c === ' ' ? '\u00A0' : c;
+    span.style.cssText = 'display:inline-block;opacity:0;filter:blur(22px);transform:translateY(18px) scale(0.94);will-change:filter,opacity,transform;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),filter 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1),color 0.25s,text-shadow 0.25s;';
+    brand.appendChild(span);
+    return span;
+  });
+
+  // Stagger reveal each letter with blur-to-focus
+  chars.forEach((span, i) => {
+    setTimeout(() => {
+      span.style.opacity = '1';
+      span.style.filter = 'blur(0)';
+      span.style.transform = 'translateY(0) scale(1)';
+    }, i * 85 + 180);
+  });
+
+  // Interactive Neon Hover effect on letters
+  chars.forEach((span) => {
+    span.addEventListener('mouseenter', () => {
+      const col = colors[Math.floor(Math.random() * colors.length)];
+      span.style.color = col;
+      span.style.transform = 'translateY(-8px) scale(1.08)';
+      span.style.textShadow = `0 0 28px ${col}cc, 0 0 50px ${col}66`;
+    });
+    span.addEventListener('mouseleave', () => {
+      span.style.color = 'white';
+      span.style.transform = 'translateY(0) scale(1)';
+      span.style.textShadow = 'none';
+    });
+  });
+
+  // Laser Progress Bar Animation & Status Stepper
+  let progress = 0;
+  const statusSteps = [
+    'Initializing Neural Engine...',
+    'Loading AI Architectures & Models...',
+    'Synchronizing 21 Live Deployments...',
+    'Calibrating Multi-Turn Assistant...',
+    'Portfolio Ready.'
   ];
+  let currentStepIdx = 0;
 
   const preloaderInterval = setInterval(() => {
-    // Increment progress dynamically
-    progress += Math.floor(Math.random() * 7) + 4;
-    
+    progress += Math.random() * 3.5 + 1.2;
+
     if (progress >= 100) {
       progress = 100;
       clearInterval(preloaderInterval);
-      
-      if (loaderStatus) {
-        loaderStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span><span>SYSTEM ONLINE</span>`;
-      }
+
+      if (bar) bar.style.width = '100%';
+      if (status) status.textContent = 'Portfolio Ready.';
 
       setTimeout(() => {
-        const loaderScreen = document.getElementById('preloader');
-        if (loaderScreen) {
-          loaderScreen.style.opacity = '0';
-          loaderScreen.style.filter = 'blur(10px)';
-          loaderScreen.style.transform = 'scale(1.04)';
-          loaderScreen.style.transition = 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease, transform 0.5s ease';
-          document.documentElement.classList.remove('noscroll');
-          
-          setTimeout(() => {
-            loaderScreen.style.display = 'none';
-            onLoadedCallback(); // Initialize SPA routes
-          }, 500);
-        }
-      }, 200);
-    }
-    
-    if (loaderFill) loaderFill.style.width = `${progress}%`;
-    if (loaderPerc) loaderPerc.textContent = `${progress}%`;
+        preloader.style.transition = 'opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease, transform 0.75s ease';
+        preloader.style.opacity = '0';
+        preloader.style.filter = 'blur(12px)';
+        preloader.style.transform = 'scale(1.02)';
+        document.documentElement.classList.remove('noscroll');
 
-    if (loaderStatus && progress < 100) {
-      const cur = [...statuses].reverse().find(s => progress >= s.at);
-      if (cur) {
-        loaderStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping"></span><span>${cur.text}</span>`;
-      }
+        setTimeout(() => {
+          if (preloader.parentNode) preloader.remove();
+          onLoadedCallback(); // Initialize SPA routes
+        }, 800);
+      }, 350);
+      return;
     }
-  }, 28);
+
+    if (bar) bar.style.width = `${progress}%`;
+
+    const stepIdx = Math.min(
+      Math.floor(progress / (100 / statusSteps.length)),
+      statusSteps.length - 1
+    );
+    if (stepIdx !== currentStepIdx && status) {
+      currentStepIdx = stepIdx;
+      status.textContent = statusSteps[stepIdx];
+    }
+  }, 40);
 }
 
 /**
