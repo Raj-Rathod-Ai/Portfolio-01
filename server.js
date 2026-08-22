@@ -42,10 +42,52 @@ const safeFetch = async (url, options = {}) => {
   });
 };
 
+// Security & Noise Prevention Middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
+// In-Memory Lightweight Sliding-Window Rate Limiter (Zero external dependencies)
+const rateLimitMap = new Map();
+const apiRateLimiter = (limit = 60, windowMs = 60000) => (req, res, next) => {
+  const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'client';
+  const now = Date.now();
+  const record = rateLimitMap.get(ip) || { count: 0, resetTime: now + windowMs };
+
+  if (now > record.resetTime) {
+    record.count = 1;
+    record.resetTime = now + windowMs;
+  } else {
+    record.count++;
+  }
+
+  rateLimitMap.set(ip, record);
+
+  if (record.count > limit) {
+    return res.status(429).json({
+      error: 'Too many requests. Rate limit exceeded. Please wait a moment before trying again.',
+      retryAfterSeconds: Math.ceil((record.resetTime - now) / 1000)
+    });
+  }
+  next();
+};
+
+// Clean up stale rate limiter entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of rateLimitMap.entries()) {
+    if (now > record.resetTime) rateLimitMap.delete(ip);
+  }
+}, 5 * 60 * 1000);
 
 // Serve frontend static assets from current directory
 app.use(express.static(__dirname));
@@ -839,7 +881,7 @@ app.post('/api/project-overrides', async (req, res) => {
 });
 
 // POST /api/reviews - Add a new review with profanity check & in-memory backup
-app.post('/api/reviews', async (req, res) => {
+app.post('/api/reviews', apiRateLimiter(20, 60000), async (req, res) => {
   try {
     const { name, rating, review } = req.body;
     if (!name || !review) {
@@ -915,7 +957,7 @@ app.post('/api/reviews', async (req, res) => {
 });
 
 // POST /api/contact - Direct inquiry handler with Gemini AI assistant auto-replies via Brevo SMTP
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
     if (!name || !email || !subject || !message) {
@@ -1525,7 +1567,7 @@ app.get('/api/admin/analytics', async (req, res) => {
 });
 
 // POST /api/chat - AI Chatbot endpoint powered by Mistral AI LLM with live DB stats
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', apiRateLimiter(45, 60000), async (req, res) => {
   try {
     const { message, history, userProfile } = req.body;
     if (!message || typeof message !== 'string') {
@@ -1698,17 +1740,32 @@ Instructions & Conversational Memory:
   }
 });
 
-// GET /api/health - Diagnostic endpoint for validating configurations
-app.get('/api/health', (req, res) => {
+// GET /api/health & /health & /api/status - Diagnostic endpoint
+app.get(['/api/health', '/health', '/api/status'], (req, res) => {
   res.json({
     status: 'online',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    service: 'Raj Rathod AI Portfolio Engine',
+    totalDeployedProjects: 21,
     config: {
       hasGeminiKey: !!process.env.GEMINI_API_KEY,
+      hasMistralKey: !!process.env.MISTRAL_API_KEY,
       hasBrevoKey: !!process.env.BREVO_API_KEY,
-      senderEmail: process.env.BREVO_SENDER_EMAIL || 'rathodraj1504@gmail.com'
+      hasTelegram: !!(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID)
     }
   });
+});
+
+// GET /api/projects - Synchronized projects catalogue endpoint
+app.get('/api/projects', (req, res) => {
+  try {
+    const projectsData = require('./src/data/projects.json');
+    res.json(projectsData);
+  } catch (err) {
+    res.json({ error: 'Projects data offline fallback' });
+  }
 });
 
 // Serve frontend route fallback
