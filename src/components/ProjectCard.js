@@ -320,12 +320,26 @@ export class ProjectCard {
 
     // --- Flip card toggle ---
     container.querySelectorAll('.flip-card').forEach(card => {
+      const inner = card.querySelector('.flip-card-inner');
+      const toggleFlip = (e) => {
+        // Prevent flip toggle if clicking inside links, interactive action buttons, or forms
+        if (e.target.closest('a, button:not(.flip-btn), input, select, textarea, .upcoming-lock-btn, .boss-toggle-group-btn, .boss-toggle-featured-btn')) {
+          return;
+        }
+        if (inner) inner.style.transform = '';
+        card.classList.toggle('is-flipped');
+      };
+
       card.querySelectorAll('.flip-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          e.preventDefault();
           e.stopPropagation();
+          if (inner) inner.style.transform = '';
           card.classList.toggle('is-flipped');
         });
       });
+
+      card.addEventListener('click', toggleFlip);
     });
 
     // --- Upcoming card hover reveal (show name on hover) ---
