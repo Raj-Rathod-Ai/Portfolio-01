@@ -21,6 +21,34 @@
     "category": "Deep Learning"
   },
   {
+    "repo": "Senti-AI",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "SentiAI",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "sentiai",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "senti_ai",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
     "repo": "Taxi-Fare-Prediction",
     "type": "solo",
     "live": "https://taxi-price-prediction.netlify.app/",

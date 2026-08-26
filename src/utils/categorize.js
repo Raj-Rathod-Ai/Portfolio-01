@@ -297,6 +297,21 @@ export function getProjectCategory(repo, localMetadata = []) {
   const lang   = (repo.language    || '').toLowerCase();
   const combined = `${name} ${desc}`;
 
+  // Rule 0: SENTI.AI / BiGRU Emotion Intelligence is explicitly Deep Learning
+  if (
+    name.includes('senti') ||
+    combined.includes('senti.ai') ||
+    combined.includes('senti-ai') ||
+    combined.includes('sentiai') ||
+    combined.includes('bigru') ||
+    combined.includes('emotion intelligence') ||
+    topics.includes('senti.ai') ||
+    topics.includes('senti') ||
+    topics.includes('bigru')
+  ) {
+    return 'Deep Learning';
+  }
+
   // Rule 1: Neuro OS is the ONLY project in Full Stack
   if (name.includes('neuro-os') || name.includes('neuro_os') || name.includes('neuro os') || name.includes('nuero-os') || name.includes('nuero_os') || name.includes('nuero os')) {
     return 'Full Stack';
