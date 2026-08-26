@@ -182,8 +182,8 @@ const DETECTION_RULES = [
   },
   {
     category: 'Deep Learning',
-    topics: ['deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer', 'flower-disease', 'flowerdiseasesystem', 'leaf-disease'],
-    keywords: ['flowerdiseasesystem', 'flower disease', 'deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras']
+    topics: ['senti.ai', 'senti-ai', 'sentiai', 'senti', 'bigru', 'emotion-intelligence', 'deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer', 'flower-disease', 'flowerdiseasesystem', 'leaf-disease'],
+    keywords: ['senti', 'senti.ai', 'senti-ai', 'bigru', 'emotion intelligence', 'flowerdiseasesystem', 'flower disease', 'deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras']
   },
   {
     category: 'NLP',

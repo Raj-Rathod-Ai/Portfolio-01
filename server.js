@@ -314,6 +314,25 @@ const SKIP_REPOS = [
 
 const GITHUB_FALLBACK_REPOS = [
   {
+    "name": "senti.ai",
+    "description": "⚡ SENTI.AI — BiGRU Deep Learning Emotion Intelligence & Sentiment Analysis system.",
+    "language": "Python",
+    "updated_at": "2026-08-26T17:00:00Z",
+    "created_at": "2026-08-26T16:00:00Z",
+    "stargazers_count": 1,
+    "topics": [
+      "deep-learning",
+      "bigru",
+      "nlp",
+      "emotion-intelligence",
+      "sentiment-analysis",
+      "python",
+      "tensorflow",
+      "pytorch"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/senti.ai"
+  },
+  {
     "name": "AutoPrepAI",
     "description": "\u26a1 AutoPrepAI \u2014 Offline AI-powered automated data preprocessing & quality analysis platform built with Streamlit. Upload any CSV/Excel/Parquet/JSON dataset and get full cleaning, feature engineering, quality scoring, visualizations, and downloadable reports \u2014 no cloud required.",
     "language": "Python",
@@ -769,6 +788,15 @@ app.get('/api/github/stats', async (req, res) => {
       safeFetch('https://api.github.com/users/Raj-Rathod-Ai', { headers }),
       safeFetch('https://api.github.com/users/Raj-Rathod-Ai/repos?per_page=100', { headers })
     ]);
+
+    let user = {};
+    let repos = [];
+    try {
+      if (userRes && userRes.ok) user = await userRes.json();
+    } catch (e) {}
+    try {
+      if (reposRes && reposRes.ok) repos = await reposRes.json();
+    } catch (e) {}
 
     const publicRepos = (typeof user.public_repos === 'number' && user.public_repos > 0)
       ? user.public_repos

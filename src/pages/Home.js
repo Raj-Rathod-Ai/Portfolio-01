@@ -840,16 +840,33 @@ export class Home {
     updateGitChart(['Python', 'Jupyter', 'JavaScript', 'TypeScript', 'CSS', 'Java'], [10, 7, 3, 2, 2, 1]);
 
     const fetchGitHubData = async () => {
-      // Tier 1: Fetch Live Stats from Express backend on Render with 3.5s timeout
+      // Check localStorage stats cache first for instant 0ms visual hydration
+      try {
+        const cachedStatsRaw = localStorage.getItem('raj_github_stats_cache');
+        if (cachedStatsRaw) {
+          const cachedStats = JSON.parse(cachedStatsRaw);
+          if (cachedStats && cachedStats.publicRepos) {
+            if (reposCountEl) reposCountEl.textContent = cachedStats.publicRepos;
+            if (followersCountEl) followersCountEl.textContent = cachedStats.followers || '9';
+            if (starsCountEl) starsCountEl.textContent = cachedStats.totalStars || '76';
+            if (cachedStats.languages && cachedStats.languages.labels) {
+              updateGitChart(cachedStats.languages.labels, cachedStats.languages.values);
+            }
+          }
+        }
+      } catch (e) {}
+
+      // Tier 1: Fetch Live Stats from Express backend on Render with fast timeout
       try {
         const apiUrl = getApiBaseUrl();
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
         const res = await fetch(`${apiUrl}/api/github/stats`, { signal: controller.signal });
         clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           if (data && data.stats) {
+            const stats = data.stats;
             const pCount = (typeof stats.publicRepos === 'number' && stats.publicRepos > 0)
               ? stats.publicRepos
               : (stats.publicRepos || '30');
@@ -865,8 +882,11 @@ export class Home {
             if (starsCountEl) starsCountEl.textContent = sCount;
             if (stats.languages && stats.languages.labels && stats.languages.labels.length > 0) {
               updateGitChart(stats.languages.labels, stats.languages.values);
-              return;
             }
+            try {
+              localStorage.setItem('raj_github_stats_cache', JSON.stringify(stats));
+            } catch (e) {}
+            return;
           }
         }
       } catch (backendErr) {

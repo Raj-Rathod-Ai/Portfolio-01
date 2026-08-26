@@ -1,5 +1,26 @@
 [
   {
+    "repo": "senti.ai",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "SENTI.AI",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "senti-ai",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
     "repo": "Taxi-Fare-Prediction",
     "type": "solo",
     "live": "https://taxi-price-prediction.netlify.app/",

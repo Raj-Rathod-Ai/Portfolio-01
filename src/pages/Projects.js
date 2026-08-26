@@ -130,6 +130,20 @@ export class Projects {
         grid.innerHTML = categories.map(cat => this.categoryCard.render(cat)).join('');
       }
       if (window.initializeObservers) window.initializeObservers();
+
+      // Listen for background GitHub updates and refresh categories seamlessly
+      const updateCategoriesListener = (e) => {
+        const updatedRepos = e.detail?.repos || window.portfolioData?.repos || [];
+        const activeGrid = document.getElementById('projects-categories-grid');
+        if (activeGrid) {
+          const freshCategories = getAllCategories(updatedRepos);
+          activeGrid.innerHTML = freshCategories.map(cat => this.categoryCard.render(cat)).join('');
+          if (window.initializeObservers) window.initializeObservers();
+        }
+      };
+      window.removeEventListener('portfolioDataUpdated', this._categoryUpdateHandler);
+      this._categoryUpdateHandler = updateCategoriesListener;
+      window.addEventListener('portfolioDataUpdated', updateCategoriesListener);
       return;
     }
 
@@ -147,10 +161,10 @@ export class Projects {
     const countEl = document.getElementById('active-category-count');
     if (titleEl) titleEl.textContent = catName;
 
-    const catProjects = projects.filter(p =>
+    let currentCatProjects = projects.filter(p =>
       (p.category || 'Others').toLowerCase() === catName.toLowerCase()
     );
-    if (countEl) countEl.textContent = `${catProjects.length} Project${catProjects.length !== 1 ? 's' : ''}`;
+    if (countEl) countEl.textContent = `${currentCatProjects.length} Project${currentCatProjects.length !== 1 ? 's' : ''}`;
 
     const mountEl  = document.getElementById('category-projects-mount');
     const searchEl = document.getElementById('search-bar-mount');
@@ -159,7 +173,7 @@ export class Projects {
 
     const renderGrid = () => {
       if (!mountEl) return;
-      let filtered = searchProjects(catProjects, this.searchQuery);
+      let filtered = searchProjects(currentCatProjects, this.searchQuery);
       filtered     = filterProjects(filtered, this.activeFilter);
       filtered     = sortProjects(filtered, this.activeSort);
       mountEl.innerHTML = this.projectGrid.render(filtered, localMeta);
@@ -190,6 +204,22 @@ export class Projects {
 
     // Initial grid render after toolbar mounts
     setTimeout(renderGrid, 50);
+
+    // Listen for background GitHub updates and refresh project cards
+    const updateCategoryProjectsListener = (e) => {
+      const updatedRepos = e.detail?.repos || window.portfolioData?.repos || [];
+      currentCatProjects = updatedRepos.filter(p =>
+        (p.category || 'Others').toLowerCase() === catName.toLowerCase()
+      );
+      const activeCountEl = document.getElementById('active-category-count');
+      if (activeCountEl) {
+        activeCountEl.textContent = `${currentCatProjects.length} Project${currentCatProjects.length !== 1 ? 's' : ''}`;
+      }
+      renderGrid();
+    };
+    window.removeEventListener('portfolioDataUpdated', this._categoryProjectUpdateHandler);
+    this._categoryProjectUpdateHandler = updateCategoryProjectsListener;
+    window.addEventListener('portfolioDataUpdated', updateCategoryProjectsListener);
   }
 }
 

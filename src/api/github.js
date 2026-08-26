@@ -17,6 +17,25 @@ const SKIP_REPOS = [
 
 const FALLBACK_REPOS = [
   {
+    "name": "senti.ai",
+    "description": "⚡ SENTI.AI — BiGRU Deep Learning Emotion Intelligence & Sentiment Analysis system.",
+    "language": "Python",
+    "updated_at": "2026-08-26T17:00:00Z",
+    "created_at": "2026-08-26T16:00:00Z",
+    "stargazers_count": 1,
+    "topics": [
+      "deep-learning",
+      "bigru",
+      "nlp",
+      "emotion-intelligence",
+      "sentiment-analysis",
+      "python",
+      "tensorflow",
+      "pytorch"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/senti.ai"
+  },
+  {
     "name": "AutoPrepAI",
     "description": "\u26a1 AutoPrepAI \u2014 Offline AI-powered automated data preprocessing & quality analysis platform built with Streamlit. Upload any CSV/Excel/Parquet/JSON dataset and get full cleaning, feature engineering, quality scoring, visualizations, and downloadable reports \u2014 no cloud required.",
     "language": "Python",
@@ -412,72 +431,94 @@ const FALLBACK_REPOS = [
 ];
 
 /**
- * Fetch public repositories for the user from GitHub API or Backend API.
- * Uses localStorage cache to prevent rate-limiting while keeping data live.
- * @param {boolean} [forceRefresh=false] - If true, bypasses local cache and fetches live.
- * @returns {Promise<Array>} List of filtered repositories.
+ * Helper to fetch and filter repos from direct GitHub API
+ */
+async function fetchDirectGitHub(timeoutMs = 3000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100', {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/vnd.github.v3+json' }
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) throw new Error(`GitHub API HTTP ${res.status}`);
+    const repos = await res.json();
+    if (Array.isArray(repos) && repos.length > 0) {
+      const filtered = repos.filter(repo => {
+        const nameLower = (repo.name || '').toLowerCase();
+        return !SKIP_REPOS.includes(nameLower) && !repo.archived && !repo.fork;
+      });
+      if (filtered.length >= 10) return filtered;
+    }
+    throw new Error('Direct GitHub repo list empty or too short');
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+/**
+ * Helper to fetch repos from backend server proxy
+ */
+async function fetchBackendGitHub(timeoutMs = 3000) {
+  const apiUrl = getApiBaseUrl();
+  if (!apiUrl) throw new Error('No backend API URL available');
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(`${apiUrl}/api/github/repos`, {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' }
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) throw new Error(`Backend API HTTP ${res.status}`);
+    const data = await res.json();
+    if (data && Array.isArray(data.repos) && data.repos.length >= 10) {
+      return data.repos;
+    }
+    throw new Error('Backend repo list invalid');
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+/**
+ * Fetch public repositories with Zero-Delay Optimistic Cache + Parallel Live Sync.
+ * @param {boolean} [forceRefresh=false] - If true, performs a live parallel fetch.
+ * @returns {Promise<Array>} List of repositories.
  */
 export async function fetchGitHubRepositories(forceRefresh = false) {
+  const cached = getCache(CACHE_KEY);
+
+  // If not forcing refresh, return cached data or fallback IMMEDIATELY (0ms UI latency)
   if (!forceRefresh) {
-    const cached = getCache(CACHE_KEY);
-    if (cached && Array.isArray(cached) && cached.length >= 20) {
-      console.log('Serving full repositories dataset from local cache.');
+    if (cached && Array.isArray(cached) && cached.length >= 15) {
       return cached;
     }
+    // Return fallback immediately and allow background sync to update
+    return FALLBACK_REPOS;
   }
 
-  // Tier 1: Direct GitHub API (Fast, comprehensive, all live projects)
+  // Live Refresh: Run Direct GitHub and Backend proxy in parallel race
   try {
-    console.log('Fetching repositories directly from GitHub API...');
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
-    const res = await fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100', { signal: controller.signal });
-    clearTimeout(timeoutId);
-
-    if (res.ok) {
-      const repos = await res.json();
-      if (Array.isArray(repos)) {
-        const filtered = repos.filter(repo => {
-          const nameLower = (repo.name || '').toLowerCase();
-          return (
-            !SKIP_REPOS.includes(nameLower) &&
-            !repo.archived &&
-            !repo.fork
-          );
-        });
-
-        if (filtered.length >= 10) {
-          setCache(CACHE_KEY, filtered, CACHE_EXPIRY_MINS);
-          return filtered;
-        }
-      }
+    const liveRepos = await Promise.any([
+      fetchDirectGitHub(3200),
+      fetchBackendGitHub(3200)
+    ]);
+    if (Array.isArray(liveRepos) && liveRepos.length >= 10) {
+      setCache(CACHE_KEY, liveRepos, CACHE_EXPIRY_MINS);
+      return liveRepos;
     }
   } catch (err) {
-    console.warn('Direct GitHub API fetch notice:', err.message);
+    console.warn('Live GitHub sync notice (falling back to cached/curated):', err.message);
   }
 
-  // Tier 2: Try Backend Render API endpoint
-  try {
-    const apiUrl = getApiBaseUrl();
-    if (apiUrl) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-      const res = await fetch(`${apiUrl}/api/github/repos`, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.repos && Array.isArray(data.repos) && data.repos.length >= 10) {
-          setCache(CACHE_KEY, data.repos, CACHE_EXPIRY_MINS);
-          return data.repos;
-        }
-      }
-    }
-  } catch (backendErr) {
-    console.warn('Backend GitHub repos fetch notice:', backendErr.message);
+  // If live fetch fails, keep cached or static fallback
+  if (cached && Array.isArray(cached) && cached.length >= 10) {
+    return cached;
   }
-
-  // Tier 3: Static curated fallback with all 24 projects
   setCache(CACHE_KEY, FALLBACK_REPOS, CACHE_EXPIRY_MINS);
   return FALLBACK_REPOS;
 }
