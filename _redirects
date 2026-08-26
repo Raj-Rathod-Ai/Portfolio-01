@@ -1,5 +1,8 @@
 /api/*                  https://portfolio-raj-qda3.onrender.com/api/:splat  200
-/Rathod-Raj-Ai.pdf      /Rathod-Raj-Ai.pdf                                   200
+/Rathod_Raj_Ai_Update.pdf /Rathod_Raj_Ai_Update.pdf                         200
+/Rathod-Raj-Ai.pdf      /Rathod_Raj_Ai_Update.pdf                           200
+/Rathod-Raj-Ai-Update.pdf /Rathod_Raj_Ai_Update.pdf                         200
+/Rathod_Raj_Ai.pdf      /Rathod_Raj_Ai_Update.pdf                           200
 /Rathod_Raj_FullStack.pdf /Rathod_Raj_FullStack.pdf                         200
 /RATHOD_RAJ_FULLSTACK.pdf /Rathod_Raj_FullStack.pdf                         200
 /*.pdf                  /:splat                                             200

@@ -1059,7 +1059,7 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
       * Library Management System: https://librarymangement1.streamlit.app/
       * Stone Paper Scissors Python Game: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/
     - Verified Credentials: Data Science & Analytics with GenAI (Sheryians Coding School, July 2026), Java Programming, Prompt Engineering & GenAI, Python Programming, Networks & Protocols (NPTEL IIT).
-    - Resumes (PDF): AI/ML Resume (/Rathod-Raj-Ai.pdf), Full-Stack Resume (/Rathod_Raj_FullStack.pdf).
+    - Resumes (PDF): AI/ML Resume (/Rathod_Raj_Ai_Update.pdf), Full-Stack Resume (/Rathod_Raj_FullStack.pdf).
     - Location: Vadodara, Gujarat, India (Parul University Campus, P.O. Limda, Ta. Waghodia, Dist. Vadodara 391760).
     - GitHub: https://github.com/Raj-Rathod-Ai
     - LinkedIn: https://linkedin.com/in/raj-rathod-ai
@@ -1107,7 +1107,7 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
           <a href="https://github.com/Raj-Rathod-Ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #e6edf3; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">💻 GitHub</a>
           <a href="https://linkedin.com/in/raj-rathod-ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #38bdf8; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">👔 LinkedIn</a>
           <a href="https://leetcode.com/u/Raj-Rathod" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🧠 LeetCode (350+)</a>
-          <a href="https://rathodrajai.netlify.app/Rathod-Raj-Ai.pdf" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.4); color: #2dd4bf; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">📄 AI/ML Resume</a>
+          <a href="https://rathodrajai.netlify.app/Rathod_Raj_Ai_Update.pdf" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.4); color: #2dd4bf; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">📄 AI/ML Resume</a>
         </div>
       </div>
     - Return ONLY the raw HTML content. Do not wrap in markdown code blocks.`;
@@ -1171,7 +1171,7 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
               <a href="https://github.com/Raj-Rathod-Ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #e6edf3; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">💻 GitHub</a>
               <a href="https://linkedin.com/in/raj-rathod-ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #38bdf8; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">👔 LinkedIn</a>
               <a href="https://leetcode.com/u/Raj-Rathod" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🧠 LeetCode</a>
-              <a href="https://rathodrajai.netlify.app/Rathod-Raj-Ai.pdf" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.4); color: #2dd4bf; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">📄 AI/ML Resume</a>
+              <a href="https://rathodrajai.netlify.app/Rathod_Raj_Ai_Update.pdf" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.4); color: #2dd4bf; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">📄 AI/ML Resume</a>
             </div>
           </div>
         </div>
@@ -1731,7 +1731,7 @@ RAJ RATHOD'S PROFILE DATA:
   * GitHub Profile: https://github.com/Raj-Rathod-Ai
   * LinkedIn Profile: https://linkedin.com/in/raj-rathod-ai
   * Resumes (PDF): 
-    1. AI & Machine Learning Developer Resume: /Rathod-Raj-Ai.pdf
+    1. AI & Machine Learning Developer Resume: /Rathod_Raj_Ai_Update.pdf
     2. Full-Stack AI Engineer Resume: /Rathod_Raj_FullStack.pdf
 
 Instructions & Conversational Memory:
@@ -1749,7 +1749,7 @@ Instructions & Conversational Memory:
 - NEVER say Movie Recommendations or Fake News are not deployed! Both are live deployed.
 - Answer directly, concisely, and accurately without dumping unasked lists of other projects.
 - If the user sends a greeting, reply warmly with polite greeting.
-- If asked about resumes or CVs, provide direct download links for both: [AI & ML Resume](/Rathod-Raj-Ai.pdf) and [Full-Stack Resume](/Rathod_Raj_FullStack.pdf).
+- If asked about resumes or CVs, provide direct download links for both: [AI & ML Resume](/Rathod_Raj_Ai_Update.pdf) and [Full-Stack Resume](/Rathod_Raj_FullStack.pdf).
 - If asked about location / where Raj lives / map, state: "Raj is based in Vadodara, Gujarat, India. He studies at Parul University (P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760)." and include the Google Maps link: [View on Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)!
 - If asked about college result, CGPA, or marks, state clearly: "Raj's academic result in B.Tech CSE (AI Specialization) at Parul University is 7.66 CGPA." Do NOT tell the user to check student portals or contact academic departments!
 - If asked "Why should we hire Raj?" or about his strengths, highlight his strong algorithmic problem-solving (350+ LeetCode problems), hands-on ML/DL project deployments (CNNs, NLP, regression models), Sheryians GenAI certification, and full-stack capabilities.

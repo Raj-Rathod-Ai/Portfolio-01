@@ -1121,10 +1121,10 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                  `🌟 **Key Highlights**:\n` +
                  `• 📈 **Academic Performance**: **7.66 CGPA**\n` +
                  `• 💻 **Algorithmic Rigor**: Solved **350+ problems on LeetCode** ([leetcode.com/u/Raj-Rathod](https://leetcode.com))\n` +
-                 `• 🧠 **Specialization**: Deep Learning (CNNs), NLP, Predictive Modeling, GenAI & RAG systems\n` +
+                 `• 🧠 **Specialization**: Deep Learning (BiGRU, RNN, CNN), NLP, Predictive Modeling, GenAI & RAG systems\n` +
                  `• 🏆 **Certifications**: Data Science & Analytics with GenAI (Sheryians Coding School), Java, Python, Prompt Engineering, NPTEL\n` +
                  `• 📂 **Portfolio**: 24+ open-source AI & web engineering repositories on GitHub\n\n` +
-                 `📄 **Resumes**: [AI/ML Resume](/Rathod-Raj-Ai.pdf) | [Full-Stack Resume](/Rathod_Raj_FullStack.pdf)\n` +
+                 `📄 **Resumes**: [AI/ML Resume](/Rathod_Raj_Ai_Update.pdf) | [Full-Stack Resume](/Rathod_Raj_FullStack.pdf)\n` +
                  `📬 **Contact**: rathodraj1504@gmail.com | [LinkedIn](https://linkedin.com/in/raj-rathod-ai)`
       },
       {
@@ -1147,8 +1147,8 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
         content: `📄 **RAJ RATHOD'S VERIFIED RESUMES**\n\n` +
                  `Raj provides two specialized resume formats:\n\n` +
                  `🤖 **1. AI & Machine Learning Developer Resume**\n` +
-                 `• Focus: Python, PyTorch, TensorFlow, LLMs, RAG, NLP, CNNs & Predictive ML\n` +
-                 `• PDF Link: [Download AI/ML Resume](/Rathod-Raj-Ai.pdf)\n\n` +
+                 `• Focus: Python, Deep Learning (BiGRU/RNN), TensorFlow/Keras, LLMs, RAG, NLP, ChromaDB & Predictive ML\n` +
+                 `• PDF Link: [Download AI/ML Resume](/Rathod_Raj_Ai_Update.pdf)\n\n` +
                  `💻 **2. Full-Stack AI Engineer Resume**\n` +
                  `• Focus: Full-Stack Web Development, React/Node/Express, REST APIs & GenAI Integration\n` +
                  `• PDF Link: [Download Full-Stack Resume](/Rathod_Raj_FullStack.pdf)\n\n` +
