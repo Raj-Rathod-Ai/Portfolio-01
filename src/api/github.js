@@ -17,6 +17,25 @@ const SKIP_REPOS = [
 
 const FALLBACK_REPOS = [
   {
+    "name": "MeetNotes",
+    "description": "⚡ MeetNotes — Autonomous AI Meeting Intelligence & Video-Agent System powered by RAG, Whisper, and Mistral LLM.",
+    "language": "Python",
+    "updated_at": "2026-08-27T20:00:00Z",
+    "created_at": "2026-08-27T18:00:00Z",
+    "stargazers_count": 1,
+    "homepage": "https://meetnotes.streamlit.app/",
+    "topics": [
+      "rag",
+      "video-agent",
+      "generative-ai",
+      "llm",
+      "speech-to-text",
+      "python",
+      "streamlit"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/MeetNotes"
+  },
+  {
     "name": "senti.ai",
     "description": "⚡ SENTI.AI — BiGRU Deep Learning Emotion Intelligence & Sentiment Analysis system.",
     "language": "Python",
@@ -437,8 +456,9 @@ async function fetchDirectGitHub(timeoutMs = 3000) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100', {
+    const res = await fetch(`https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100&_t=${Date.now()}`, {
       signal: controller.signal,
+      cache: 'no-store',
       headers: { 'Accept': 'application/vnd.github.v3+json' }
     });
     clearTimeout(timeoutId);
@@ -467,8 +487,9 @@ async function fetchBackendGitHub(timeoutMs = 3000) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(`${apiUrl}/api/github/repos`, {
+    const res = await fetch(`${apiUrl}/api/github/repos?fresh=true&_t=${Date.now()}`, {
       signal: controller.signal,
+      cache: 'no-store',
       headers: { 'Accept': 'application/json' }
     });
     clearTimeout(timeoutId);

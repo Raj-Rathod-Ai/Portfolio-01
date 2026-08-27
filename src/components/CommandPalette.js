@@ -14,6 +14,7 @@ export class CommandPalette {
 
   getDefaultItems() {
     return [
+      { title: 'MeetNotes AI Meeting Intelligence', category: 'Live Demo', url: 'https://meetnotes.streamlit.app/', icon: 'fa-solid fa-video', tech: 'RAG · Whisper · Video-Agent · Streamlit', external: true },
       { title: 'SENTI.AI Emotion Intelligence', category: 'Deep Learning', url: 'https://github.com/Raj-Rathod-Ai/senti.ai', icon: 'fa-solid fa-brain', tech: 'BiGRU · Deep Learning · Python', external: true },
       { title: 'AutoPrepAI Data Platform', category: 'Live Demo', url: 'https://data-eda-processing.streamlit.app/', icon: 'fa-solid fa-wand-magic-sparkles', tech: 'Streamlit · Python · EDA', external: true },
       { title: 'Movie Recommendations Engine', category: 'Live Demo', url: 'https://cinema-verse.streamlit.app/', icon: 'fa-solid fa-film', tech: 'NLP · Cosine Similarity · ML', external: true },

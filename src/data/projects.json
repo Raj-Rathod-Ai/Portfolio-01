@@ -1,5 +1,33 @@
 [
   {
+    "repo": "MeetNotes",
+    "type": "solo",
+    "live": "https://meetnotes.streamlit.app/",
+    "featured": true,
+    "category": "RAG"
+  },
+  {
+    "repo": "MeetNote",
+    "type": "solo",
+    "live": "https://meetnotes.streamlit.app/",
+    "featured": true,
+    "category": "RAG"
+  },
+  {
+    "repo": "meetnotes",
+    "type": "solo",
+    "live": "https://meetnotes.streamlit.app/",
+    "featured": true,
+    "category": "RAG"
+  },
+  {
+    "repo": "meetnote",
+    "type": "solo",
+    "live": "https://meetnotes.streamlit.app/",
+    "featured": true,
+    "category": "RAG"
+  },
+  {
     "repo": "senti.ai",
     "type": "solo",
     "live": "",

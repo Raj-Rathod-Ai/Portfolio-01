@@ -117,14 +117,26 @@ export function getRepoIcon(repo) {
  * @returns {string} Live demo link.
  */
 export function getLiveUrl(repo, localMetadata = []) {
-  const meta = localMetadata.find(m => m.repo.toLowerCase() === repo.name.toLowerCase());
-  if (meta && meta.live) return meta.live;
+  if (!repo) return '';
 
-  // Backward compatibility overrides
-    const overrides = {
+  // 1. Live homepage set directly on GitHub repository (highest priority)
+  if (repo.homepage && typeof repo.homepage === 'string' && repo.homepage.trim().length > 5) {
+    return repo.homepage.trim();
+  }
+
+  // 2. Local metadata override from projects.json
+  const meta = localMetadata.find(m => m.repo && m.repo.toLowerCase() === (repo.name || '').toLowerCase());
+  if (meta && meta.live && meta.live.trim().length > 5) {
+    return meta.live.trim();
+  }
+
+  // 3. Fallback default deployment links
+  const overrides = {
     'autoprepai': 'https://data-eda-processing.streamlit.app/',
     'car-selling-price-prediction': 'https://car-selling-price-prediction.streamlit.app/',
     'chatnotes': 'https://chat-with-your-notes-dusx.onrender.com/',
+    'meetnotes': 'https://meetnotes.streamlit.app/',
+    'meetnote': 'https://meetnotes.streamlit.app/',
     'discover-your-true-personality': 'https://discover-your-true-personality.streamlit.app/',
     'drug-recommendation-system': 'https://drug-recommendation-systems.streamlit.app/',
     'fake-news-detection-using-ml-real-time': 'https://truthlens5.netlify.app/',
@@ -145,8 +157,6 @@ export function getLiveUrl(repo, localMetadata = []) {
     'usa-house-price-prediction': 'https://usa-house-price-predictions.streamlit.app/'
   };
   
-  const key = repo.name.toLowerCase();
-  if (overrides[key]) return overrides[key];
-
-  return repo.homepage || '';
+  const key = (repo.name || '').toLowerCase();
+  return overrides[key] || '';
 }

@@ -342,8 +342,8 @@ export function getProjectCategory(repo, localMetadata = []) {
     if (match) return match;
   }
 
-  // High priority RAG check for repos like chatnote or retrieval projects
-  if (name.includes('chatnote') || name.includes('rag') || topics.includes('rag') || topics.includes('chatnote')) {
+  // High priority RAG check for repos like chatnote, meetnotes, or retrieval projects
+  if (name.includes('chatnote') || name.includes('meetnote') || name.includes('meetnotes') || name.includes('rag') || topics.includes('rag') || topics.includes('chatnote') || topics.includes('meetnote') || topics.includes('meetnotes') || topics.includes('video-agent')) {
     return 'RAG';
   }
 

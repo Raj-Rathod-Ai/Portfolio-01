@@ -592,8 +592,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     commandPalette.setup();
     initRouter();
 
-    // Background auto-sync: Silently fetch fresh GitHub repositories after 2.5s
-    setTimeout(async () => {
+    // Background auto-sync engine: Silently fetch fresh GitHub repositories & URLs
+    const syncFreshRepos = async () => {
       try {
         const fresh = await fetchGitHubRepositories(true);
         if (fresh && Array.isArray(fresh) && fresh.length > 0) {
@@ -616,6 +616,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (e) {
         console.log('Background repo auto-sync notice:', e.message);
       }
-    }, 2500);
+    };
+
+    // Trigger immediate background sync 400ms after load
+    setTimeout(syncFreshRepos, 400);
+
+    // Auto-revalidate whenever user switches back to portfolio tab
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        syncFreshRepos();
+      }
+    });
   });
 });
