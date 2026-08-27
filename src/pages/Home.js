@@ -790,6 +790,21 @@ export class Home {
       this.categoryCard.setup(categoriesGrid);
     }
 
+    // Auto-update Home categories grid when GitHub repos sync in background
+    const updateHomeCategoriesListener = (e) => {
+      const updatedRepos = e.detail?.repos || window.portfolioData?.repos || [];
+      const activeGrid = document.getElementById('home-categories-grid');
+      if (activeGrid) {
+        const freshCategories = getAllCategories(updatedRepos);
+        activeGrid.innerHTML = freshCategories.map(cat => this.categoryCard.render(cat)).join('');
+        this.categoryCard.setup(activeGrid);
+        if (window.initializeObservers) window.initializeObservers();
+      }
+    };
+    window.removeEventListener('portfolioDataUpdated', this._homeCategoryUpdateHandler);
+    this._homeCategoryUpdateHandler = updateHomeCategoriesListener;
+    window.addEventListener('portfolioDataUpdated', updateHomeCategoriesListener);
+
     // 3. GitHub Dashboard Counters & Chart
     let gitChart = null;
     const updateGitChart = (labels, dataValues) => {
