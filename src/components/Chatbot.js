@@ -96,8 +96,6 @@ export class Chatbot {
   }
 
   /**
-   * Reset visitor profile and chat history.
-  /**
    * Reset ONLY chat history — keeps visitor name/profile intact.
    * Asks if user wants to change their name after reset.
    */
