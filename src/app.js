@@ -618,8 +618,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     };
 
-    // Trigger immediate background sync 400ms after load
-    setTimeout(syncFreshRepos, 400);
+    // Trigger immediate background sync after load
+    setTimeout(syncFreshRepos, 200);
+
+    // Periodic auto-sync every 5 minutes to keep new GitHub repos completely synchronized
+    setInterval(syncFreshRepos, 5 * 60 * 1000);
 
     // Auto-revalidate whenever user switches back to portfolio tab
     document.addEventListener('visibilitychange', () => {

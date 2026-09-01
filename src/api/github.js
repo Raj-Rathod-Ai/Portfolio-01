@@ -2,7 +2,7 @@ import { getCache, setCache } from '../utils/cache.js';
 import { getApiBaseUrl } from '../utils/analytics.js';
 
 const CACHE_KEY = 'github_repositories_cache';
-const CACHE_EXPIRY_MINS = 10; // Cache for 10 minutes
+const CACHE_EXPIRY_MINS = 5; // Cache for 5 minutes
 
 const SKIP_REPOS = [
   'raj-rathod-ai',
@@ -16,6 +16,88 @@ const SKIP_REPOS = [
 ];
 
 const FALLBACK_REPOS = [
+  {
+    "name": "FruitsCheck-CNN-Fruit-Freshness",
+    "description": "FruitCheck is a CNN-based computer vision application that classifies fruit images as Fresh or Rotten. Built with TensorFlow/Keras, FastAPI, and React, it currently supports apples, bananas, and oranges with image preprocessing using Pillow and NumPy.",
+    "language": "Python",
+    "updated_at": "2026-09-01T13:09:35Z",
+    "created_at": "2026-09-01T10:43:55Z",
+    "stargazers_count": 0,
+    "homepage": "https://fruits-check.streamlit.app/",
+    "topics": [
+      "cnn-classification",
+      "cnn-keras",
+      "convolutional-neural-networks",
+      "deep-learning",
+      "jupyter-notebook",
+      "kaggle",
+      "nural-network",
+      "pooling",
+      "python-3"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness"
+  },
+  {
+    "name": "Sukoon-Saathi",
+    "description": "SukoonSaathi - An ML-based student wellness prediction system that learns from academic, digital behavior, lifestyle, sleep, physical activity, and stress-related features to predict a personalized mental wellness score, with a production-ready inference pipeline powered by FastAPI.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-08-29T04:43:43Z",
+    "created_at": "2026-08-28T10:02:51Z",
+    "stargazers_count": 0,
+    "homepage": "https://sukoonsaathi-frontend.onrender.com/",
+    "topics": [
+      "exploratory-data-analysis",
+      "machine-learning",
+      "machine-learning-pipelines",
+      "pkl-model",
+      "preprocessing",
+      "sklearn"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Sukoon-Saathi"
+  },
+  {
+    "name": "SENTI-AI-BiGRU-Emotion-Detection-Using-DL",
+    "description": "SENTI.AI is a Deep Learning-based NLP project that analyzes English text and predicts six emotions-Joy, Sadness, Love, Anger, Fear, and Surprise-using a Bidirectional GRU (BiGRU) model, Keras Tokenizer, and FastAPI.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-08-26T12:37:49Z",
+    "created_at": "2026-08-26T11:43:27Z",
+    "stargazers_count": 0,
+    "homepage": "https://senti-ai.onrender.com",
+    "topics": [
+      "bigru",
+      "deep-learning",
+      "fastapi",
+      "huggingface",
+      "nlp",
+      "numpy",
+      "pandas",
+      "preprocessing",
+      "sklearn",
+      "tensorflow",
+      "tokenization",
+      "tokenizer"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL"
+  },
+  {
+    "name": "Laptop-Price-Predicate-Using-DL",
+    "description": "Deep Learning-based Laptop Price Prediction using an Artificial Neural Network (ANN), with One-Hot Encoding and StandardScaler preprocessing, and an interactive Streamlit web application for real-time price estimation.",
+    "language": "Python",
+    "updated_at": "2026-08-26T06:32:35Z",
+    "created_at": "2026-08-26T06:10:19Z",
+    "stargazers_count": 0,
+    "homepage": "https://laptop-price-predicate.streamlit.app/",
+    "topics": [
+      "artificial-neural-networks",
+      "deep-learning",
+      "keras",
+      "pkl",
+      "sklearn",
+      "streamlit",
+      "tensorflow"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL"
+  },
   {
     "name": "MeetNotes",
     "description": "⚡ MeetNotes — Autonomous AI Meeting Intelligence & Video-Agent System powered by RAG, Whisper, and Mistral LLM.",
@@ -452,7 +534,7 @@ const FALLBACK_REPOS = [
 /**
  * Helper to fetch and filter repos from direct GitHub API
  */
-async function fetchDirectGitHub(timeoutMs = 3000) {
+async function fetchDirectGitHub(timeoutMs = 12000) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -469,9 +551,9 @@ async function fetchDirectGitHub(timeoutMs = 3000) {
         const nameLower = (repo.name || '').toLowerCase();
         return !SKIP_REPOS.includes(nameLower) && !repo.archived && !repo.fork;
       });
-      if (filtered.length >= 10) return filtered;
+      if (filtered.length > 0) return filtered;
     }
-    throw new Error('Direct GitHub repo list empty or too short');
+    throw new Error('Direct GitHub repo list empty or invalid');
   } catch (err) {
     clearTimeout(timeoutId);
     throw err;
@@ -481,13 +563,13 @@ async function fetchDirectGitHub(timeoutMs = 3000) {
 /**
  * Helper to fetch repos from backend server proxy
  */
-async function fetchBackendGitHub(timeoutMs = 3000) {
+async function fetchBackendGitHub(timeoutMs = 10000) {
   const apiUrl = getApiBaseUrl();
-  if (!apiUrl) throw new Error('No backend API URL available');
+  const endpoint = apiUrl ? `${apiUrl}/api/github/repos?fresh=true&_t=${Date.now()}` : `/api/github/repos?fresh=true&_t=${Date.now()}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(`${apiUrl}/api/github/repos?fresh=true&_t=${Date.now()}`, {
+    const res = await fetch(endpoint, {
       signal: controller.signal,
       cache: 'no-store',
       headers: { 'Accept': 'application/json' }
@@ -495,7 +577,7 @@ async function fetchBackendGitHub(timeoutMs = 3000) {
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(`Backend API HTTP ${res.status}`);
     const data = await res.json();
-    if (data && Array.isArray(data.repos) && data.repos.length >= 10) {
+    if (data && Array.isArray(data.repos) && data.repos.length > 0) {
       return data.repos;
     }
     throw new Error('Backend repo list invalid');
@@ -515,7 +597,7 @@ export async function fetchGitHubRepositories(forceRefresh = false) {
 
   // If not forcing refresh, return cached data or fallback IMMEDIATELY (0ms UI latency)
   if (!forceRefresh) {
-    if (cached && Array.isArray(cached) && cached.length >= 15) {
+    if (cached && Array.isArray(cached) && cached.length >= 10) {
       return cached;
     }
     // Return fallback immediately and allow background sync to update
@@ -525,16 +607,25 @@ export async function fetchGitHubRepositories(forceRefresh = false) {
   // Live Refresh: Run Direct GitHub and Backend proxy in parallel race
   try {
     const liveRepos = await Promise.any([
-      fetchDirectGitHub(3200),
-      fetchBackendGitHub(3200)
+      fetchDirectGitHub(12000),
+      fetchBackendGitHub(10000)
     ]);
-    if (Array.isArray(liveRepos) && liveRepos.length >= 10) {
+    if (Array.isArray(liveRepos) && liveRepos.length > 0) {
       setCache(CACHE_KEY, liveRepos, CACHE_EXPIRY_MINS);
       return liveRepos;
     }
   } catch (err) {
     console.warn('Live GitHub sync notice (falling back to cached/curated):', err.message);
   }
+
+  // Fallback try direct GitHub API alone if parallel race failed
+  try {
+    const directFallback = await fetchDirectGitHub(15000);
+    if (Array.isArray(directFallback) && directFallback.length > 0) {
+      setCache(CACHE_KEY, directFallback, CACHE_EXPIRY_MINS);
+      return directFallback;
+    }
+  } catch (e) {}
 
   // If live fetch fails, keep cached or static fallback
   if (cached && Array.isArray(cached) && cached.length >= 10) {

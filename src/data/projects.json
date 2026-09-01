@@ -1,5 +1,33 @@
 [
   {
+    "repo": "FruitsCheck-CNN-Fruit-Freshness",
+    "type": "solo",
+    "live": "https://fruits-check.streamlit.app/",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "Sukoon-Saathi",
+    "type": "solo",
+    "live": "https://sukoonsaathi-frontend.onrender.com/",
+    "featured": true,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "SENTI-AI-BiGRU-Emotion-Detection-Using-DL",
+    "type": "solo",
+    "live": "https://senti-ai.onrender.com",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "Laptop-Price-Predicate-Using-DL",
+    "type": "solo",
+    "live": "https://laptop-price-predicate.streamlit.app/",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
     "repo": "MeetNotes",
     "type": "solo",
     "live": "https://meetnotes.streamlit.app/",

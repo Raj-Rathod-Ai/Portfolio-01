@@ -132,6 +132,11 @@ export function getLiveUrl(repo, localMetadata = []) {
 
   // 3. Fallback default deployment links
   const overrides = {
+    'fruitscheck-cnn-fruit-freshness': 'https://fruits-check.streamlit.app/',
+    'sukoon-saathi': 'https://sukoonsaathi-frontend.onrender.com/',
+    'senti-ai-bigru-emotion-detection-using-dl': 'https://senti-ai.onrender.com',
+    'senti.ai': 'https://senti-ai.onrender.com',
+    'laptop-price-predicate-using-dl': 'https://laptop-price-predicate.streamlit.app/',
     'autoprepai': 'https://data-eda-processing.streamlit.app/',
     'car-selling-price-prediction': 'https://car-selling-price-prediction.streamlit.app/',
     'chatnotes': 'https://chat-with-your-notes-dusx.onrender.com/',
@@ -156,7 +161,7 @@ export function getLiveUrl(repo, localMetadata = []) {
     'tic-tac-toe': 'https://tic-tac-toe-1.streamlit.app/',
     'usa-house-price-prediction': 'https://usa-house-price-predictions.streamlit.app/'
   };
-  
+
   const key = (repo.name || '').toLowerCase();
   return overrides[key] || '';
 }

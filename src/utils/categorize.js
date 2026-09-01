@@ -182,8 +182,8 @@ const DETECTION_RULES = [
   },
   {
     category: 'Deep Learning',
-    topics: ['senti.ai', 'senti-ai', 'sentiai', 'senti', 'bigru', 'emotion-intelligence', 'deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer', 'flower-disease', 'flowerdiseasesystem', 'leaf-disease'],
-    keywords: ['senti', 'senti.ai', 'senti-ai', 'bigru', 'emotion intelligence', 'flowerdiseasesystem', 'flower disease', 'deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras']
+    topics: ['fruitscheck-cnn-fruit-freshness', 'fruitscheck', 'fruit-freshness', 'laptop-price-predicate-using-dl', 'laptop-price', 'senti.ai', 'senti-ai', 'sentiai', 'senti', 'bigru', 'emotion-intelligence', 'deep-learning', 'dl', 'cnn', 'rnn', 'lstm', 'pytorch', 'tensorflow', 'keras', 'neural-network', 'gnn', 'transformer', 'flower-disease', 'flowerdiseasesystem', 'leaf-disease'],
+    keywords: ['fruitscheck', 'fruit freshness', 'fruit fresh', 'laptop price', 'senti', 'senti.ai', 'senti-ai', 'bigru', 'emotion intelligence', 'flowerdiseasesystem', 'flower disease', 'deep learning', 'neural network', 'cnn', 'lstm', 'rnn', 'pytorch', 'tensorflow', 'keras']
   },
   {
     category: 'NLP',
@@ -197,8 +197,8 @@ const DETECTION_RULES = [
   },
   {
     category: 'Machine Learning',
-    topics: ['machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality', 'salary', 'salary-prediction', 'salary_predication', 'car-selling', 'drug-recommendation', 'healthy-lifestyle', 'loan-risk', 'machine-learning-notes', 'mark-predication', 'student_performance', 'usa-house', 'random-forest-food-delivery'],
-    keywords: ['machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time', 'personality', 'car selling', 'drug recommendation', 'healthy lifestyle', 'loan risk', 'machine learning notes', 'mark predication', 'salary predication', 'student performance', 'house price', 'food delivery']
+    topics: ['sukoon-saathi', 'sukoonsaathi', 'machine-learning', 'ml', 'scikit-learn', 'regression', 'classification', 'predictive', 'sklearn', 'xgboost', 'random-forest', 'taxi-fare', 'food-delivery', 'personality', 'salary', 'salary-prediction', 'salary_predication', 'car-selling', 'drug-recommendation', 'healthy-lifestyle', 'loan-risk', 'machine-learning-notes', 'mark-predication', 'student_performance', 'usa-house', 'random-forest-food-delivery'],
+    keywords: ['sukoon saathi', 'sukoonsaathi', 'machine learning', 'regression', 'classification', 'scikit-learn', 'xgboost', 'random forest', 'predictive model', 'taxi fare', 'delivery time', 'personality', 'car selling', 'drug recommendation', 'healthy lifestyle', 'loan risk', 'machine learning notes', 'mark predication', 'salary predication', 'student performance', 'house price', 'food delivery']
   },
   {
     category: 'Python Concepts',
