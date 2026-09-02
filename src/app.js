@@ -549,11 +549,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (err) {}
 
-  try {
-    const githubRepos = await fetchGitHubRepositories();
-    // Merge database categories, types, and featured overrides
-    repos = githubRepos.map(repo => {
-      const match = meta.find(m => m.repo.toLowerCase() === repo.name.toLowerCase());
+  const processAndSetRepos = (rawGithubRepos) => {
+    const merged = rawGithubRepos.map(repo => {
+      const match = meta.find(m => m.repo && m.repo.toLowerCase() === (repo.name || '').toLowerCase());
       const category = getProjectCategory(repo, meta);
       const isGroup = isGroupProject(repo.name, meta);
       const featured = match ? match.featured === true : false;
@@ -564,23 +562,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         featured
       };
     });
-    // Merge upcoming projects (only if not already uploaded on GitHub)
     UPCOMING_PROJECTS.forEach(up => {
-      const exists = repos.some(r => r.name.toLowerCase() === up.name.toLowerCase());
-      if (!exists) {
-        repos.unshift(up);
-      }
+      const exists = merged.some(r => r.name.toLowerCase() === up.name.toLowerCase());
+      if (!exists) merged.unshift(up);
     });
+    const sorted = sortReposWithFeaturedTop(merged);
+    window.portfolioData = { repos: sorted, meta };
+    return sorted;
+  };
+
+  // Register real-time background sync callback from github.js
+  window.onGitHubReposSynced = (liveRepos) => {
+    if (Array.isArray(liveRepos) && liveRepos.length > 0) {
+      processAndSetRepos(liveRepos);
+    }
+  };
+
+  try {
+    const githubRepos = await fetchGitHubRepositories();
+    repos = processAndSetRepos(githubRepos);
   } catch (err) {
     console.error('Failed fetching repository datasets:', err.message);
-    repos = [...UPCOMING_PROJECTS];
+    repos = processAndSetRepos(UPCOMING_PROJECTS);
   }
-
-  // Apply Master Boss overrides & pin Featured projects on top
-  const finalRepos = sortReposWithFeaturedTop(repos);
-
-  // Save merged state globally for router access
-  window.portfolioData = { repos: finalRepos, meta };
 
   // Trigger preloader and start routing on completion
   initPreloader(() => {

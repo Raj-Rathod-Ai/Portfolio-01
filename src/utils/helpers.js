@@ -134,12 +134,20 @@ export function getLiveUrl(repo, localMetadata = []) {
 
   let target = null;
 
-  // 2. Live homepage set directly on GitHub repository (highest priority)
+  // 2. Live homepage set directly on GitHub repository (highest priority - 100% automatic)
   if (repo.homepage && typeof repo.homepage === 'string' && repo.homepage.trim().length > 5) {
     target = repo.homepage.trim();
   }
 
-  // 3. Local metadata override from projects.json
+  // 3. Auto-detect deployment URL in repo description (e.g. streamlit, netlify, vercel, onrender)
+  if (!target && repo.description && typeof repo.description === 'string') {
+    const urlMatch = repo.description.match(/https?:\/\/[^\s\)\],]+/i);
+    if (urlMatch && (urlMatch[0].includes('streamlit.app') || urlMatch[0].includes('netlify.app') || urlMatch[0].includes('vercel.app') || urlMatch[0].includes('onrender.com') || urlMatch[0].includes('huggingface.co'))) {
+      target = urlMatch[0].trim();
+    }
+  }
+
+  // 4. Local metadata override from projects.json
   if (!target && Array.isArray(localMetadata)) {
     const meta = localMetadata.find(m => m.repo && m.repo.toLowerCase() === key);
     if (meta && meta.live) {
@@ -147,7 +155,7 @@ export function getLiveUrl(repo, localMetadata = []) {
     }
   }
 
-  // 4. Fallback default deployment links
+  // 5. Fallback default deployment links
   const overrides = {
     'fruitscheck-cnn-fruit-freshness': 'https://fruits-check.streamlit.app/',
     'sukoon-saathi': 'https://sukoonsaathi-frontend.onrender.com/',

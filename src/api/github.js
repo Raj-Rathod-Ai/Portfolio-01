@@ -583,49 +583,58 @@ async function fetchBackendGitHub(timeoutMs = 10000) {
 }
 
 /**
- * Fetch public repositories with Zero-Delay Optimistic Cache + Parallel Live Sync.
- * @param {boolean} [forceRefresh=false] - If true, performs a live parallel fetch.
+ * Fetch public repositories with automatic live sync, fast parallel race, and background revalidation.
+ * @param {boolean} [forceRefresh=false] - If true, bypasses local cache.
  * @returns {Promise<Array>} List of repositories.
  */
 export async function fetchGitHubRepositories(forceRefresh = false) {
   const cached = getCache(CACHE_KEY);
 
-  // If not forcing refresh, return cached data or fallback IMMEDIATELY (0ms UI latency)
-  if (!forceRefresh) {
-    if (cached && Array.isArray(cached) && cached.length >= 10) {
-      return cached;
-    }
-    // Return fallback immediately and allow background sync to update
-    return FALLBACK_REPOS;
+  // Background sync helper
+  const syncInBackground = () => {
+    Promise.any([
+      fetchDirectGitHub(8000),
+      fetchBackendGitHub(7000)
+    ]).then(liveRepos => {
+      if (Array.isArray(liveRepos) && liveRepos.length > 0) {
+        setCache(CACHE_KEY, liveRepos, CACHE_EXPIRY_MINS);
+        if (typeof window !== 'undefined' && typeof window.onGitHubReposSynced === 'function') {
+          window.onGitHubReposSynced(liveRepos);
+        }
+      }
+    }).catch(err => {
+      console.warn('Background GitHub sync notice:', err.message);
+    });
+  };
+
+  // 1. If cache is fresh and not forcing refresh, return cache instantly and revalidate in background
+  if (!forceRefresh && cached && Array.isArray(cached) && cached.length >= 5) {
+    setTimeout(syncInBackground, 100);
+    return cached;
   }
 
-  // Live Refresh: Run Direct GitHub and Backend proxy in parallel race
+  // 2. Otherwise perform fast parallel live fetch (Direct GitHub API + Backend proxy)
   try {
     const liveRepos = await Promise.any([
-      fetchDirectGitHub(12000),
-      fetchBackendGitHub(10000)
+      fetchDirectGitHub(4000),
+      fetchBackendGitHub(3500)
     ]);
     if (Array.isArray(liveRepos) && liveRepos.length > 0) {
       setCache(CACHE_KEY, liveRepos, CACHE_EXPIRY_MINS);
       return liveRepos;
     }
   } catch (err) {
-    console.warn('Live GitHub sync notice (falling back to cached/curated):', err.message);
+    console.warn('Fast live GitHub sync notice (falling back to cached/fallback data):', err.message);
   }
 
-  // Fallback try direct GitHub API alone if parallel race failed
-  try {
-    const directFallback = await fetchDirectGitHub(15000);
-    if (Array.isArray(directFallback) && directFallback.length > 0) {
-      setCache(CACHE_KEY, directFallback, CACHE_EXPIRY_MINS);
-      return directFallback;
-    }
-  } catch (e) {}
+  // 3. Fallback try direct GitHub API with longer timeout in background
+  setTimeout(syncInBackground, 100);
 
-  // If live fetch fails, keep cached or static fallback
-  if (cached && Array.isArray(cached) && cached.length >= 10) {
+  // 4. Return cached data if available or static fallback
+  if (cached && Array.isArray(cached) && cached.length >= 5) {
     return cached;
   }
+
   setCache(CACHE_KEY, FALLBACK_REPOS, CACHE_EXPIRY_MINS);
   return FALLBACK_REPOS;
 }
