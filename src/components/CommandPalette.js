@@ -15,7 +15,7 @@ export class CommandPalette {
   getDefaultItems() {
     return [
       { title: 'MeetNotes AI Meeting Intelligence', category: 'Live Demo', url: 'https://meetnotes.streamlit.app/', icon: 'fa-solid fa-video', tech: 'RAG · Whisper · Video-Agent · Streamlit', external: true },
-      { title: 'SENTI.AI Emotion Intelligence', category: 'Deep Learning', url: 'https://github.com/Raj-Rathod-Ai/senti.ai', icon: 'fa-solid fa-brain', tech: 'BiGRU · Deep Learning · Python', external: true },
+      { title: 'SENTI.AI Emotion Intelligence', category: 'Live Demo', url: 'https://senti-ai.onrender.com', icon: 'fa-solid fa-brain', tech: 'BiGRU · Deep Learning · Python', external: true },
       { title: 'AutoPrepAI Data Platform', category: 'Live Demo', url: 'https://data-eda-processing.streamlit.app/', icon: 'fa-solid fa-wand-magic-sparkles', tech: 'Streamlit · Python · EDA', external: true },
       { title: 'Movie Recommendations Engine', category: 'Live Demo', url: 'https://cinema-verse.streamlit.app/', icon: 'fa-solid fa-film', tech: 'NLP · Cosine Similarity · ML', external: true },
       { title: 'TruthLens Fake News Detection', category: 'Live Demo', url: ['https://truthlens5.netlify.app/', 'https://truthlens5.streamlit.app/'], icon: 'fa-solid fa-shield-halved', tech: 'NLP · Deep Learning · Streamlit · Netlify', external: true },

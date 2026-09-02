@@ -149,8 +149,33 @@ export function applyBossOverrides(reposList) {
   }
 }
 
+export function deduplicateRepos(reposList) {
+  if (!Array.isArray(reposList)) return [];
+  const seen = new Set();
+  const canonicalAliases = {
+    'senti.ai': 'senti-ai-bigru-emotion-detection-using-dl',
+    'senti-ai': 'senti-ai-bigru-emotion-detection-using-dl',
+    'sentiai': 'senti-ai-bigru-emotion-detection-using-dl',
+    'senti_ai': 'senti-ai-bigru-emotion-detection-using-dl',
+    'fake-news-detection-using-ml-real-time': 'fake-news-detection-using-dl-real-time',
+    'meetnote': 'meetnotes',
+  };
+
+  return reposList.filter(repo => {
+    if (!repo || !repo.name) return false;
+    const rawKey = repo.name.toLowerCase().trim();
+    const canonicalKey = canonicalAliases[rawKey] || rawKey;
+    if (seen.has(canonicalKey)) {
+      return false;
+    }
+    seen.add(canonicalKey);
+    return true;
+  });
+}
+
 export function sortReposWithFeaturedTop(reposList) {
-  const overridesApplied = applyBossOverrides(reposList);
+  const deduped = deduplicateRepos(reposList);
+  const overridesApplied = applyBossOverrides(deduped);
   const realFeatured = overridesApplied.filter(r => r.featured && !r.isUpcoming);
   const realNonFeatured = overridesApplied.filter(r => !r.featured && !r.isUpcoming);
   const upcoming = overridesApplied.filter(r => r.isUpcoming);
@@ -523,6 +548,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNeuralCanvas();
   initMouseSpotlight();
   initLenisSmoothScroll();
+
+  // Clear any legacy cached duplicate repos from browser localStorage
+  try {
+    const cachedStr = localStorage.getItem('github_repositories_cache');
+    if (cachedStr && (cachedStr.includes('senti.ai') || cachedStr.includes('senti_ai'))) {
+      localStorage.removeItem('github_repositories_cache');
+    }
+  } catch (e) {}
 
   // Load and merge local database with live API repositories
   let repos = [];
