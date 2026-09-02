@@ -526,34 +526,29 @@ const GITHUB_FALLBACK_REPOS = [
     "html_url": "https://github.com/Raj-Rathod-Ai/drug-recommendation-system"
   },
   {
-    "name": "Fake-News-Detection-Using-ML-Real-time",
-    "description": "A real-time fake news detection system that analyzes online news articles using machine learning. The project fetches live news, evaluates credibility based on trusted patterns, and shows how likely a news article is to be true, helping users make informed decisions.",
+    "name": "Fake-News-Detection-Using-DL-Real-time",
+    "description": "TruthLens — A real-time fake news detection and credibility verification system using deep learning and machine learning. Features dual web portals on Netlify and Streamlit for instant news credibility analysis and truth scoring.",
     "language": "Python",
     "updated_at": "2026-08-21T14:31:46Z",
     "created_at": "2026-01-29T10:22:11Z",
     "stargazers_count": 4,
     "topics": [
       "ai",
-      "authentication-backend",
-      "css",
+      "deep-learning",
+      "machine-learning",
+      "nlp",
+      "truthlens",
+      "streamlit",
+      "transformers",
       "fake-news",
       "flask",
       "html5",
       "js",
-      "login",
-      "machine-learning",
-      "ml",
-      "mlops",
-      "multimodel",
-      "python3",
-      "real-news",
-      "real-time",
-      "rf",
-      "singup",
       "three-js",
+      "real-time",
       "verify"
     ],
-    "html_url": "https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time"
+    "html_url": "https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time"
   },
   {
     "name": "FlowerDiseaseSystem",
@@ -1146,7 +1141,7 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
       * Tools & Platforms: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
     - Verified Live Deployments (21 Interactive Web Apps):
       * Movie Recommendations Engine: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
-      * Fake News Detection: https://truthlens5.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
+      * Fake News Detection (TruthLens): https://truthlens5.netlify.app/ | https://truthlens5.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
       * AutoPrepAI Data Platform: https://data-eda-processing.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI
       * HybridMind Multi-Model Platform: https://hybridmind.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/HybridMind
       * ChatNotes RAG PDF Assistant: https://chat-with-your-notes-dusx.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/ChatNotes
@@ -1807,7 +1802,7 @@ RAJ RATHOD'S PROFILE DATA:
     1. AutoPrepAI: Automated offline data cleaning, preprocessing & quality analytics platform. Live Demo: https://data-eda-processing.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI
     2. Job Analysis Dashboard: Interactive Power BI dashboard evaluating global tech job market trends. GitHub: https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard
   * Natural Language Processing (NLP) (2 projects):
-    1. Real-Time Fake News Detection: Online news credibility classifier (~92% accuracy). Live Demo: https://truthlens5.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
+    1. Real-Time Fake News Detection (TruthLens): Online news credibility classifier (~92% accuracy). Live Demos: https://truthlens5.netlify.app/ & https://truthlens5.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
     2. Movie Recommendations Using NLP & ML: Cosine similarity content-based film recommender. Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
   * Deep Learning & Computer Vision (1 project):
     1. Flower Disease System: PyTorch CNN leaf disease classifier. Live Demo: https://flower-disease-system.vercel.app | GitHub: https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
@@ -1838,7 +1833,7 @@ RAJ RATHOD'S PROFILE DATA:
 Instructions & Conversational Memory:
 - CRITICAL LIVE DEMO KNOWLEDGE: Raj has 21 live deployed web applications!
   * Movie Recommendations: Live Demo https://cinema-verse.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
-  * Fake News Detection: Live Demo https://truthlens5.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
+  * Fake News Detection: Live Demo https://truthlens5.netlify.app/ or https://truthlens5.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
   * AutoPrepAI: Live Demo https://data-eda-processing.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/AutoPrepAI
   * HybridMind: Live Demo https://hybridmind.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/HybridMind
   * ChatNotes RAG: Live Demo https://chat-with-your-notes-dusx.onrender.com/ | GitHub https://github.com/Raj-Rathod-Ai/ChatNotes

@@ -942,7 +942,7 @@ export class Chatbot {
     // Format full repo metadata for context with explicit Live Demo URLs
     const repoListText = sortedRepos.length > 0
       ? sortedRepos.map((r, idx) => `${idx + 1}. ${r.name} (Category: ${r.category || 'ML/AI'}, Lang: ${r.language || 'Python'}, Updated: ${r.updated_at ? new Date(r.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}) - Description: ${r.description || 'N/A'} [Topics: ${(r.topics || []).join(', ')}] Live Demo URL: ${r.live || r.homepage || 'None (Code on GitHub)'} | GitHub Repo: ${r.html_url}`).join('\n')
-      : `- Movie-Recommendations-Using-NLP-and-ML (Category: NLP): Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML\n- Taxi-Fare-Prediction (Category: Machine Learning): Live Demo: https://taxi-price-prediction.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction\n- Food_Delivery_Time-Using-ML (Category: Machine Learning): Live Demo: https://fooddelivery-time.streamlit.app/\n- Discover-Your-True-Personality (Category: Machine Learning): Live Demo: https://discover-your-true-personality.streamlit.app/\n- AutoPrepAI (Category: Data Science): Live Demo: https://data-eda-processing.streamlit.app/\n- FlowerDiseaseSystem (Category: Deep Learning): Live Demo: https://flower-disease-system.vercel.app\n- ChatNotes (Category: RAG): Live Demo: https://chat-with-your-notes-dusx.onrender.com/\n- HybridMind (Category: Generative AI): Live Demo: https://hybridmind.netlify.app/\n- Fake-News-Detection-Using-ML-Real-time (Category: NLP): Live Demo: https://truthlens5.netlify.app/\n- stone-paper-scissors-python (Category: Python Concepts): Live Demo: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/\n- Library-Mangement (Category: Software Systems): Live Demo: https://librarymangement1.streamlit.app/`;
+      : `- Movie-Recommendations-Using-NLP-and-ML (Category: NLP): Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML\n- Taxi-Fare-Prediction (Category: Machine Learning): Live Demo: https://taxi-price-prediction.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction\n- Food_Delivery_Time-Using-ML (Category: Machine Learning): Live Demo: https://fooddelivery-time.streamlit.app/\n- Discover-Your-True-Personality (Category: Machine Learning): Live Demo: https://discover-your-true-personality.streamlit.app/\n- AutoPrepAI (Category: Data Science): Live Demo: https://data-eda-processing.streamlit.app/\n- FlowerDiseaseSystem (Category: Deep Learning): Live Demo: https://flower-disease-system.vercel.app\n- ChatNotes (Category: RAG): Live Demo: https://chat-with-your-notes-dusx.onrender.com/\n- HybridMind (Category: Generative AI): Live Demo: https://hybridmind.netlify.app/\n- Fake-News-Detection-Using-DL-Real-time (Category: NLP): Live Demo: https://truthlens5.netlify.app/ & https://truthlens5.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time\n- stone-paper-scissors-python (Category: Python Concepts): Live Demo: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/\n- Library-Mangement (Category: Software Systems): Live Demo: https://librarymangement1.streamlit.app/`;
 
     const latestProject = sortedRepos[0];
     const latestProjSummary = latestProject
@@ -1022,7 +1022,7 @@ Contact Details:
 CRITICAL CONVERSATIONAL & ACCURACY RULES:
 - When the user asks for a project's demo link (e.g. "demo link of movie", "live link of fake news", "give link", "demo"), check the Live Demo URL in the project list above:
   * Movie Recommendations: Live Demo https://cinema-verse.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
-  * Fake News Detection: Live Demo https://truthlens5.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time
+  * Fake News Detection: Live Demo https://truthlens5.netlify.app/ or https://truthlens5.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
   * AutoPrepAI: Live Demo https://data-eda-processing.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/AutoPrepAI
   * Flower Disease: Live Demo https://flower-disease-system.vercel.app | GitHub https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
   * HybridMind: Live Demo https://hybridmind.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/HybridMind
@@ -1085,7 +1085,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                  `• **ChatNotes PDF Assistant**: [Launch Live Demo](https://chat-with-your-notes-dusx.onrender.com/)\n\n` +
                  `🔤 **Natural Language Processing (NLP)**:\n` +
                  `• **Movie Recommendations Engine**: [Launch Live Demo](https://cinema-verse.streamlit.app/)\n` +
-                 `• **Real-Time Fake News Detector**: [Launch Live Demo](https://truthlens5.netlify.app/)\n\n` +
+                 `• **Real-Time Fake News Detector (TruthLens)**: [Launch Netlify Demo](https://truthlens5.netlify.app/) | [Launch Streamlit Demo](https://truthlens5.streamlit.app/)\n\n` +
                  `🌸 **Deep Learning & Computer Vision**:\n` +
                  `• **Flower & Leaf Disease Detection**: [Launch Live Demo](https://flower-disease-system.vercel.app)\n\n` +
                  `⚡ **Data Science & Preprocessing**:\n` +
@@ -1244,14 +1244,14 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
       },
       {
         id: 'fake_news',
-        title: 'Real-Time Fake News Detection System',
-        keywords: ['fake news', 'news detection', 'real time fake news', 'nlp fake news'],
+        title: 'Real-Time Fake News Detection System (TruthLens)',
+        keywords: ['fake news', 'news detection', 'real time fake news', 'nlp fake news', 'truthlens', 'fake news dl'],
         category: 'NLP',
-        content: `📰 **REAL-TIME FAKE NEWS DETECTION SYSTEM** (NLP / Machine Learning)\n\n` +
-                 `• **Overview**: A real-time Natural Language Processing system analyzing news articles and classifying them as credible or deceptive with **~92% accuracy**.\n` +
-                 `• **Tech Stack**: Python, Scikit-Learn, NLTK, TF-IDF Vectorization, Passive-Aggressive Classifier, Flask, Three.js\n` +
-                 `• 🚀 **Live Demo**: [truthlens5.netlify.app](https://truthlens5.netlify.app/)\n` +
-                 `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)`
+        content: `📰 **REAL-TIME FAKE NEWS DETECTION SYSTEM (TRUTHLENS)** (NLP / Deep Learning)\n\n` +
+                 `• **Overview**: A real-time Natural Language Processing and Deep Learning system analyzing news articles and classifying them as credible or deceptive with **~92% accuracy**.\n` +
+                 `• **Tech Stack**: Python, Deep Learning, Scikit-Learn, NLTK, TF-IDF Vectorization, Passive-Aggressive Classifier, Streamlit, Flask, Three.js\n` +
+                 `• 🚀 **Live Demos**: [truthlens5.netlify.app](https://truthlens5.netlify.app/) & [truthlens5.streamlit.app](https://truthlens5.streamlit.app/)\n` +
+                 `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time)`
       },
       {
         id: 'movie_rec',
@@ -1455,10 +1455,10 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
              `• **Objective**: Content-based recommendation system suggesting movies based on plot summaries, genres, and keywords.\n` +
              `• 🚀 **Live Demo**: [cinema-verse.streamlit.app](https://cinema-verse.streamlit.app/)\n` +
              `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML)\n\n` +
-             `🕵️ **2. Fake News Detection Using ML Real Time**\n` +
+             `🕵️ **2. Fake News Detection Using DL Real Time (TruthLens)**\n` +
              `• **Objective**: Real-time fake news detection analyzing news text (~92% accuracy).\n` +
-             `• 🚀 **Live Demo**: [truthlens5.netlify.app](https://truthlens5.netlify.app/)\n` +
-             `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-ML-Real-time)\n\n` +
+             `• 🚀 **Live Demos**: [truthlens5.netlify.app](https://truthlens5.netlify.app/) & [truthlens5.streamlit.app](https://truthlens5.streamlit.app/)\n` +
+             `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time)\n\n` +
              `💡 *Tip: Both NLP projects are live deployed and ready to test!*`;
     }
 

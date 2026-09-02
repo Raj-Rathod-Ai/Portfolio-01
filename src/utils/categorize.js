@@ -187,8 +187,8 @@ const DETECTION_RULES = [
   },
   {
     category: 'NLP',
-    topics: ['movie-recommendations-using-nlp-and-ml', 'movie-recommendations-using-nlp-ml', 'fake-news-detection-using-ml-real-time', 'nlp', 'text-mining', 'transformers', 'natural-language-processing', 'sentiment-analysis', 'text-classification', 'bert', 'word2vec', 'fake-news'],
-    keywords: ['movie-recommendations', 'movie recommendations', 'fake-news', 'fake news', 'nlp', 'natural language', 'text class', 'sentiment', 'bert', 'word2vec', 'text mining']
+    topics: ['movie-recommendations-using-nlp-and-ml', 'movie-recommendations-using-nlp-ml', 'fake-news-detection-using-dl-real-time', 'fake-news-detection-using-ml-real-time', 'truthlens', 'nlp', 'text-mining', 'transformers', 'natural-language-processing', 'sentiment-analysis', 'text-classification', 'bert', 'word2vec', 'fake-news'],
+    keywords: ['movie-recommendations', 'movie recommendations', 'fake-news', 'fake news', 'truthlens', 'truth lens', 'nlp', 'natural language', 'text class', 'sentiment', 'bert', 'word2vec', 'text mining']
   },
   {
     category: 'Data Science',

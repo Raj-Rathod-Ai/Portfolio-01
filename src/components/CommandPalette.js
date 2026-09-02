@@ -18,7 +18,7 @@ export class CommandPalette {
       { title: 'SENTI.AI Emotion Intelligence', category: 'Deep Learning', url: 'https://github.com/Raj-Rathod-Ai/senti.ai', icon: 'fa-solid fa-brain', tech: 'BiGRU · Deep Learning · Python', external: true },
       { title: 'AutoPrepAI Data Platform', category: 'Live Demo', url: 'https://data-eda-processing.streamlit.app/', icon: 'fa-solid fa-wand-magic-sparkles', tech: 'Streamlit · Python · EDA', external: true },
       { title: 'Movie Recommendations Engine', category: 'Live Demo', url: 'https://cinema-verse.streamlit.app/', icon: 'fa-solid fa-film', tech: 'NLP · Cosine Similarity · ML', external: true },
-      { title: 'Fake News Detection System', category: 'Live Demo', url: 'https://truthlens5.netlify.app/', icon: 'fa-solid fa-shield-halved', tech: 'NLP · Real-Time Classifier', external: true },
+      { title: 'TruthLens Fake News Detection', category: 'Live Demo', url: ['https://truthlens5.netlify.app/', 'https://truthlens5.streamlit.app/'], icon: 'fa-solid fa-shield-halved', tech: 'NLP · Deep Learning · Streamlit · Netlify', external: true },
       { title: 'ChatNotes RAG PDF Assistant', category: 'Live Demo', url: 'https://chat-with-your-notes-dusx.onrender.com/', icon: 'fa-solid fa-comments', tech: 'Generative AI · RAG · Python', external: true },
       { title: 'HybridMind Multi-Model Platform', category: 'Live Demo', url: 'https://hybridmind.netlify.app/', icon: 'fa-solid fa-brain', tech: 'Gemini · Mistral · Tavily', external: true },
       { title: 'Flower & Leaf Disease Detection', category: 'Live Demo', url: 'https://flower-disease-system.vercel.app', icon: 'fa-solid fa-leaf', tech: 'CNN · Deep Learning · Vercel', external: true },
@@ -43,74 +43,66 @@ export class CommandPalette {
   setup() {
     // Inject Command Palette Modal into DOM
     if (!document.getElementById('cmd-palette-modal')) {
-      const modal = document.createElement('div');
-      modal.id = 'cmd-palette-modal';
-      modal.setAttribute('data-lenis-prevent', 'true');
-      modal.className = 'fixed inset-0 z-[100000] hidden items-start justify-center pt-16 sm:pt-24 px-4 bg-black/85 backdrop-blur-xl transition-all duration-200';
-      modal.style.cssText = 'overscroll-behavior: contain !important; touch-action: pan-y;';
-      modal.innerHTML = `
-        <div class="w-full max-w-2xl bg-[#0d1117] border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-all duration-200 scale-95 opacity-0" id="cmd-palette-card" data-lenis-prevent="true" style="overscroll-behavior: contain !important;">
-          <!-- Search Header -->
-          <div class="flex items-center px-4 py-3.5 border-b border-white/10 gap-3">
-            <i class="fa-solid fa-magnifying-glass text-indigo-400 text-sm"></i>
-            <input id="cmd-palette-input" type="text" placeholder="Search 21 Live Project Deployments..." class="w-full bg-transparent text-gray-100 placeholder-gray-500 text-sm sm:text-base outline-none font-inter" autocomplete="off" />
-            <kbd class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono text-gray-400 bg-white/5 border border-white/10 rounded">ESC</kbd>
-          </div>
-          <!-- Results List with Native Scroll Interception -->
-          <div id="cmd-palette-results" class="max-h-[55vh] overflow-y-auto p-2 space-y-1.5" data-lenis-prevent="true" style="overscroll-behavior: contain !important; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
-            <!-- Dynamic 21 Live Projects Populated Here -->
-          </div>
-          <!-- Footer HUD -->
-          <div class="px-4 py-2.5 bg-white/[0.02] border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-gray-400">
-            <div class="flex items-center gap-3">
-              <span><kbd class="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded">↑</kbd> <kbd class="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded">↓</kbd> Navigate</span>
-              <span><kbd class="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded">↵</kbd> Open Live Project</span>
+      const modalHTML = `
+        <div id="cmd-palette-modal" class="fixed inset-0 z-[9999] hidden items-start justify-center pt-[15vh] px-4 bg-black/60 backdrop-blur-md transition-opacity duration-200">
+          <div id="cmd-palette-backdrop" class="absolute inset-0"></div>
+          <div id="cmd-palette-card" class="relative w-full max-w-xl bg-[#0b0f19] border border-white/10 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden transform scale-95 opacity-0 transition-all duration-200 z-10 flex flex-col max-h-[70vh]">
+            
+            <!-- Search Header -->
+            <div class="flex items-center px-4 py-3.5 border-b border-white/10 gap-3">
+              <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
+              <input id="cmd-palette-input" type="text" placeholder="Search 21 verified live apps, models, or technologies..." class="w-full bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none font-sans" autocomplete="off" spellcheck="false" />
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-gray-400 border border-white/10">ESC</span>
             </div>
-            <span class="text-teal-400 font-semibold flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
-              21 Live Deployments
-            </span>
+
+            <!-- Scrollable Results Container with Wheel Interception -->
+            <div id="cmd-palette-results" class="flex-1 overflow-y-auto p-2 space-y-1 overscroll-contain">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Footer Meta -->
+            <div class="px-4 py-2.5 bg-white/[0.02] border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-gray-500">
+              <div class="flex items-center gap-3">
+                <span><kbd class="px-1.5 py-0.5 rounded bg-white/10 border border-white/10 text-[9px]">↑</kbd> <kbd class="px-1.5 py-0.5 rounded bg-white/10 border border-white/10 text-[9px]">↓</kbd> Navigate</span>
+                <span><kbd class="px-1.5 py-0.5 rounded bg-white/10 border border-white/10 text-[9px]">↵</kbd> Launch Live App</span>
+              </div>
+              <span>21 Live Deployments</span>
+            </div>
+
           </div>
         </div>
       `;
-      document.body.appendChild(modal);
-
-      // Direct Mouse Wheel Scroll Interceptor: Ensures scrolling directly moves the palette list
-      const resultsContainer = modal.querySelector('#cmd-palette-results');
-      const handleWheelScroll = (e) => {
-        if (!this.isOpen) return;
-        e.preventDefault();
-        e.stopPropagation();
-        if (resultsContainer) {
-          resultsContainer.scrollTop += e.deltaY;
-        }
-      };
-
-      modal.addEventListener('wheel', handleWheelScroll, { passive: false });
-      if (resultsContainer) {
-        resultsContainer.addEventListener('wheel', handleWheelScroll, { passive: false });
-      }
-
-      // Desktop Floating HUD Shortcut Pill
-      const triggerPill = document.createElement('div');
-      triggerPill.id = 'cmd-palette-trigger-pill';
-      triggerPill.className = 'fixed bottom-6 left-6 z-40 hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-full border border-white/15 bg-black/70 backdrop-blur-xl text-xs font-mono text-gray-300 shadow-2xl hover:border-primary hover:text-white cursor-pointer transition-all duration-200 group';
-      triggerPill.innerHTML = `
-        <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-        <span class="text-gray-400 group-hover:text-gray-200">Live Projects</span>
-        <kbd class="px-1.5 py-0.5 text-[10px] bg-white/10 border border-white/15 rounded text-gray-300 group-hover:border-primary">⌘K</kbd>
-      `;
-      document.body.appendChild(triggerPill);
-
-      triggerPill.addEventListener('click', () => this.open());
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
 
-    // Global Key Listener (Cmd+K / Ctrl+K / Escape)
-    window.addEventListener('keydown', (e) => {
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    const modal = document.getElementById('cmd-palette-modal');
+    const backdrop = document.getElementById('cmd-palette-backdrop');
+    const input = document.getElementById('cmd-palette-input');
+    const resultsContainer = document.getElementById('cmd-palette-results');
+
+    // Prevent background wheel scrolling from bleeding when scrolling inside the palette modal
+    if (resultsContainer) {
+      resultsContainer.addEventListener('wheel', (e) => {
+        const atTop = resultsContainer.scrollTop === 0 && e.deltaY < 0;
+        const atBottom = (resultsContainer.scrollHeight - resultsContainer.scrollTop <= resultsContainer.clientHeight + 1) && e.deltaY > 0;
+        if (atTop || atBottom) {
+          e.preventDefault();
+        }
+        e.stopPropagation();
+      }, { passive: false });
+    }
+
+    // Keyboard shortcut listeners (Cmd+K / Ctrl+K / Escape)
+    document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         this.toggle();
       } else if (e.key === 'Escape' && this.isOpen) {
+        e.preventDefault();
         this.close();
       } else if (this.isOpen) {
         if (e.key === 'ArrowDown') {
@@ -128,14 +120,24 @@ export class CommandPalette {
       }
     });
 
-    const modal = document.getElementById('cmd-palette-modal');
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) this.close();
-    });
+    // Close on backdrop click
+    if (backdrop) {
+      backdrop.addEventListener('click', () => this.close());
+    }
 
-    const input = document.getElementById('cmd-palette-input');
-    input.addEventListener('input', () => {
-      this.filterItems(input.value);
+    // Filter on input change
+    if (input) {
+      input.addEventListener('input', (e) => {
+        this.filterItems(e.target.value);
+      });
+    }
+
+    // Connect any UI elements that have [data-cmd-palette-trigger]
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('[data-cmd-palette-trigger]')) {
+        e.preventDefault();
+        this.open();
+      }
     });
   }
 
@@ -149,13 +151,10 @@ export class CommandPalette {
     const card = document.getElementById('cmd-palette-card');
     const input = document.getElementById('cmd-palette-input');
 
-    // Pause Lenis background smooth scroll & lock body scroll
     if (window.lenis && typeof window.lenis.stop === 'function') {
       window.lenis.stop();
     }
-    document.documentElement.classList.add('noscroll');
-    document.body.classList.add('noscroll');
-
+    
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 
@@ -173,12 +172,9 @@ export class CommandPalette {
     const modal = document.getElementById('cmd-palette-modal');
     const card = document.getElementById('cmd-palette-card');
 
-    // Resume Lenis smooth scroll
     if (window.lenis && typeof window.lenis.start === 'function') {
       window.lenis.start();
     }
-    document.documentElement.classList.remove('noscroll');
-    document.body.classList.remove('noscroll');
 
     card.classList.remove('scale-100', 'opacity-100');
     card.classList.add('scale-95', 'opacity-0');
@@ -239,7 +235,6 @@ export class CommandPalette {
       `;
     }).join('');
 
-    // Bind click events
     container.querySelectorAll('.cmd-item').forEach(el => {
       el.addEventListener('click', () => {
         const idx = parseInt(el.getAttribute('data-idx'), 10);
@@ -248,7 +243,6 @@ export class CommandPalette {
       });
     });
 
-    // Auto-scroll selected item into view if navigating with keyboard
     if (autoScroll) {
       const selectedEl = container.querySelector(`[data-idx="${this.selectedIndex}"]`);
       if (selectedEl && typeof selectedEl.scrollIntoView === 'function') {
@@ -264,7 +258,10 @@ export class CommandPalette {
     this.close();
 
     if (item.url) {
-      window.open(item.url, '_blank', 'noopener,noreferrer');
+      const urlToOpen = Array.isArray(item.url)
+        ? item.url[Math.floor(Math.random() * item.url.length)]
+        : item.url;
+      window.open(urlToOpen, '_blank', 'noopener,noreferrer');
     }
   }
 }

@@ -217,9 +217,22 @@
     "category": "Data Science"
   },
   {
+    "repo": "Fake-News-Detection-Using-DL-Real-time",
+    "type": "group",
+    "live": [
+      "https://truthlens5.netlify.app/",
+      "https://truthlens5.streamlit.app/"
+    ],
+    "featured": true,
+    "category": "NLP"
+  },
+  {
     "repo": "Fake-News-Detection-Using-ML-Real-time",
     "type": "group",
-    "live": "https://truthlens5.netlify.app/",
+    "live": [
+      "https://truthlens5.netlify.app/",
+      "https://truthlens5.streamlit.app/"
+    ],
     "featured": true,
     "category": "NLP"
   },

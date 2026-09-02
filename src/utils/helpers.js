@@ -112,6 +112,7 @@ export function getRepoIcon(repo) {
 
 /**
  * Get the live deployment demo URL for a project.
+ * Automatically supports multiple URLs with random selection (e.g. Netlify / Streamlit).
  * @param {object} repo - GitHub Repository object.
  * @param {Array} localMetadata - Local metadata array.
  * @returns {string} Live demo link.
@@ -119,18 +120,34 @@ export function getRepoIcon(repo) {
 export function getLiveUrl(repo, localMetadata = []) {
   if (!repo) return '';
 
-  // 1. Live homepage set directly on GitHub repository (highest priority)
+  const truthLensUrls = [
+    'https://truthlens5.netlify.app/',
+    'https://truthlens5.streamlit.app/'
+  ];
+
+  const key = (repo.name || '').toLowerCase().trim();
+
+  // 1. Direct random selection for Fake News Detection (TruthLens DL / ML)
+  if (key === 'fake-news-detection-using-dl-real-time' || key === 'fake-news-detection-using-ml-real-time') {
+    return truthLensUrls[Math.floor(Math.random() * truthLensUrls.length)];
+  }
+
+  let target = null;
+
+  // 2. Live homepage set directly on GitHub repository (highest priority)
   if (repo.homepage && typeof repo.homepage === 'string' && repo.homepage.trim().length > 5) {
-    return repo.homepage.trim();
+    target = repo.homepage.trim();
   }
 
-  // 2. Local metadata override from projects.json
-  const meta = localMetadata.find(m => m.repo && m.repo.toLowerCase() === (repo.name || '').toLowerCase());
-  if (meta && meta.live && meta.live.trim().length > 5) {
-    return meta.live.trim();
+  // 3. Local metadata override from projects.json
+  if (!target && Array.isArray(localMetadata)) {
+    const meta = localMetadata.find(m => m.repo && m.repo.toLowerCase() === key);
+    if (meta && meta.live) {
+      target = meta.live;
+    }
   }
 
-  // 3. Fallback default deployment links
+  // 4. Fallback default deployment links
   const overrides = {
     'fruitscheck-cnn-fruit-freshness': 'https://fruits-check.streamlit.app/',
     'sukoon-saathi': 'https://sukoonsaathi-frontend.onrender.com/',
@@ -144,7 +161,8 @@ export function getLiveUrl(repo, localMetadata = []) {
     'meetnote': 'https://meetnotes.streamlit.app/',
     'discover-your-true-personality': 'https://discover-your-true-personality.streamlit.app/',
     'drug-recommendation-system': 'https://drug-recommendation-systems.streamlit.app/',
-    'fake-news-detection-using-ml-real-time': 'https://truthlens5.netlify.app/',
+    'fake-news-detection-using-dl-real-time': truthLensUrls,
+    'fake-news-detection-using-ml-real-time': truthLensUrls,
     'flowerdiseasesystem': 'https://flower-disease-system.vercel.app',
     'food_delivery_time-using-ml': 'https://fooddelivery-time.streamlit.app/',
     'healthy-lifestyle-prediction': 'https://healthy-lifestyle-prediction.streamlit.app/',
@@ -162,6 +180,25 @@ export function getLiveUrl(repo, localMetadata = []) {
     'usa-house-price-prediction': 'https://usa-house-price-predictions.streamlit.app/'
   };
 
-  const key = (repo.name || '').toLowerCase();
-  return overrides[key] || '';
+  if (!target) {
+    target = overrides[key] || '';
+  }
+
+  // Handle array of URLs or comma-separated URLs with random selection
+  if (Array.isArray(target)) {
+    const valid = target.filter(u => typeof u === 'string' && u.trim().length > 5);
+    if (valid.length > 0) {
+      return valid[Math.floor(Math.random() * valid.length)].trim();
+    }
+  } else if (typeof target === 'string') {
+    if (target.includes(',')) {
+      const parts = target.split(',').map(s => s.trim()).filter(s => s.length > 5);
+      if (parts.length > 0) {
+        return parts[Math.floor(Math.random() * parts.length)];
+      }
+    }
+    return target.trim();
+  }
+
+  return '';
 }

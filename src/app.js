@@ -80,16 +80,25 @@ document.addEventListener('click', (e) => {
     return;
   }
 
-  // 2. Live Demo links
+  // 2. Live Demo links & TruthLens random switcher
   const linkEl = target.closest('a');
-  if (linkEl && linkEl.textContent.toLowerCase().includes('demo')) {
-    const card = linkEl.closest('.flip-card, .spotlight-card') || document;
-    const titleEl = card.querySelector('h3, h4, h2');
-    const title = titleEl ? titleEl.textContent.trim() : 'Live Demo';
-    const catEl = card.querySelector('[class*="cat-badge"]');
-    const category = catEl ? catEl.textContent.trim() : 'General';
-    trackInteraction('live_demo_click', title, category, linkEl.href);
-    return;
+  if (linkEl) {
+    const href = linkEl.getAttribute('href') || '';
+    if (href.includes('truthlens5.netlify.app') || href.includes('truthlens5.streamlit.app') || linkEl.hasAttribute('data-random-urls')) {
+      const truthLensPool = ['https://truthlens5.netlify.app/', 'https://truthlens5.streamlit.app/'];
+      const randomUrl = truthLensPool[Math.floor(Math.random() * truthLensPool.length)];
+      linkEl.setAttribute('href', randomUrl);
+    }
+
+    if (linkEl.textContent.toLowerCase().includes('demo')) {
+      const card = linkEl.closest('.flip-card, .spotlight-card') || document;
+      const titleEl = card.querySelector('h3, h4, h2');
+      const title = titleEl ? titleEl.textContent.trim() : 'Live Demo';
+      const catEl = card.querySelector('[class*="cat-badge"]');
+      const category = catEl ? catEl.textContent.trim() : 'General';
+      trackInteraction('live_demo_click', title, category, linkEl.href);
+      return;
+    }
   }
 
   // 3. View Details buttons
