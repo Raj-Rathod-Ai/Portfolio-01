@@ -1,4 +1,4 @@
-import { Hero } from '../components/Hero.js';
+﻿import { Hero } from '../components/Hero.js';
 import { CategoryCard } from '../components/CategoryCard.js';
 import { getAllCategories } from '../utils/categorize.js';
 import { containsAbusiveContent } from '../utils/profanityFilter.js';
@@ -37,24 +37,24 @@ export class Home {
             </div>
             
             <p class="font-inter text-gray-400 leading-relaxed">
-              I'm a Computer Science engineering student at Parul University, specializing in AI and Machine Learning. I love building end-to-end ML pipelines — from data preprocessing and model training to deployment with Streamlit and Vercel.
+              I'm a Computer Science engineering student at Parul University, specializing in AI and Machine Learning. I love building end-to-end ML pipelines â€” from data preprocessing and model training to deployment with Streamlit and Vercel.
             </p>
 
             <div class="grid grid-cols-2 gap-4">
-              <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-primary">7.66</span>
+              <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card stat-card">
+                <span data-stat="cgpa" class="block font-jakarta font-extrabold text-2xl text-primary">7.66</span>
                 <span class="block text-xs text-gray-500 mt-1">B.Tech CGPA</span>
               </div>
-              <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-secondary">25+</span>
+              <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card stat-card">
+                <span data-stat="projects" class="block font-jakarta font-extrabold text-2xl text-secondary">25+</span>
                 <span class="block text-xs text-gray-500 mt-1">Projects Built</span>
               </div>
-              <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-accent">350+</span>
+              <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card stat-card">
+                <span data-stat="leetcode" class="block font-jakarta font-extrabold text-2xl text-accent">350+</span>
                 <span class="block text-xs text-gray-500 mt-1">LeetCode Solved</span>
               </div>
-              <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-teal">2027</span>
+              <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card stat-card">
+                <span data-stat="year" class="block font-jakarta font-extrabold text-2xl text-teal">2027</span>
                 <span class="block text-xs text-gray-500 mt-1">Expected Graduation</span>
               </div>
             </div>
@@ -66,15 +66,15 @@ export class Home {
               <h2 class="text-3xl sm:text-4xl font-jakarta font-extrabold text-gray-100">Academic Journey</h2>
             </div>
 
-            <div class="relative border-l border-white/8 ml-4 pl-8 space-y-10">
+            <div class="relative border-l border-white/8 ml-4 pl-8 space-y-10 timeline-line">
               <div class="relative group">
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-primary bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-primary/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-primary">2023 — 2027</span>
+                    <span class="font-mono text-xs text-primary">2023 â€” 2027</span>
                     <span class="px-2 py-0.5 rounded-md bg-primary/10 text-[10px] text-primary font-mono border border-primary/20">GPA 7.66</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">B.Tech — Computer Science & Engineering with AI</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">B.Tech â€” Computer Science & Engineering with AI</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Parul University, Vadodara</p>
                 </div>
               </div>
@@ -83,10 +83,10 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-secondary bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-secondary/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-secondary">2022 — 2023</span>
+                    <span class="font-mono text-xs text-secondary">2022 â€” 2023</span>
                     <span class="px-2 py-0.5 rounded-md bg-secondary/10 text-[10px] text-secondary font-mono border border-secondary/20">60.61%</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">HSC — Science Stream</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">HSC â€” Science Stream</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Shri Rajshakha School, Porbandar</p>
                 </div>
               </div>
@@ -95,10 +95,10 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-rose bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-rose/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-rose">2020 — 2021</span>
+                    <span class="font-mono text-xs text-rose">2020 â€” 2021</span>
                     <span class="px-2 py-0.5 rounded-md bg-rose/10 text-[10px] text-rose font-mono border border-rose/20">79.81%</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">SSC — Secondary School</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">SSC â€” Secondary School</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Sigma School, Porbandar</p>
                 </div>
               </div>
@@ -315,13 +315,13 @@ export class Home {
             <span class="w-6 h-px bg-teal inline-block"></span>Tools & Platforms
           </h3>
           <div class="flex flex-wrap gap-3">
-            <span class="px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-primary/40 hover:text-primary transition-all flex items-center gap-1.5"><i class="fa-brands fa-github"></i> Git / GitHub</span>
-            <span class="px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-sky/40 hover:text-sky transition-all flex items-center gap-1.5"><i class="fa-brands fa-docker"></i> Docker</span>
-            <span class="px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-accent/40 hover:text-accent transition-all flex items-center gap-1.5"><i class="fa-solid fa-chart-column"></i> Power BI</span>
-            <span class="px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-secondary/40 hover:text-secondary transition-all flex items-center gap-1.5"><i class="fa-solid fa-terminal"></i> Linux CLI</span>
-            <span class="px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-rose/40 hover:text-rose transition-all flex items-center gap-1.5"><i class="fa-solid fa-code"></i> VS Code</span>
-            <span class="px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-accent/40 hover:text-accent transition-all flex items-center gap-1.5"><i class="fa-brands fa-python"></i> Jupyter Notebook</span>
-            <span class="px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-primary/40 hover:text-primary transition-all flex items-center gap-1.5"><i class="fa-solid fa-server"></i> Vercel / Netlify</span>
+            <span class="tools-chip px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-primary/40 hover:text-primary transition-all flex items-center gap-1.5"><i class="fa-brands fa-github"></i> Git / GitHub</span>
+            <span class="tools-chip px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-sky/40 hover:text-sky transition-all flex items-center gap-1.5"><i class="fa-brands fa-docker"></i> Docker</span>
+            <span class="tools-chip px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-accent/40 hover:text-accent transition-all flex items-center gap-1.5"><i class="fa-solid fa-chart-column"></i> Power BI</span>
+            <span class="tools-chip px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-secondary/40 hover:text-secondary transition-all flex items-center gap-1.5"><i class="fa-solid fa-terminal"></i> Linux CLI</span>
+            <span class="tools-chip px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-rose/40 hover:text-rose transition-all flex items-center gap-1.5"><i class="fa-solid fa-code"></i> VS Code</span>
+            <span class="tools-chip px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-accent/40 hover:text-accent transition-all flex items-center gap-1.5"><i class="fa-brands fa-python"></i> Jupyter Notebook</span>
+            <span class="tools-chip px-3 py-1.5 rounded-lg border border-white/8 bg-white/3 text-xs font-mono text-gray-300 hover:border-primary/40 hover:text-primary transition-all flex items-center gap-1.5"><i class="fa-solid fa-server"></i> Vercel / Netlify</span>
           </div>
         </div>
       </section>
@@ -366,7 +366,7 @@ export class Home {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <!-- Stats Cards -->
           <div class="lg:col-span-5 flex flex-col gap-4">
-            <div class="rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
+            <div class="github-stat-card rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
               <div>
                 <span class="block font-mono text-xs text-gray-500 uppercase tracking-widest mb-1">Public Repositories</span>
                 <span id="git-repos-count" class="block font-jakarta font-extrabold text-3xl text-primary">30</span>
@@ -375,7 +375,7 @@ export class Home {
                 <i class="fa-solid fa-code-fork text-primary text-lg"></i>
               </div>
             </div>
-            <div class="rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
+            <div class="github-stat-card rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
               <div>
                 <span class="block font-mono text-xs text-gray-500 uppercase tracking-widest mb-1">GitHub Followers</span>
                 <span id="git-followers-count" class="block font-jakarta font-extrabold text-3xl text-secondary">9</span>
@@ -384,7 +384,7 @@ export class Home {
                 <i class="fa-solid fa-users text-secondary text-lg"></i>
               </div>
             </div>
-            <div class="rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
+            <div class="github-stat-card rounded-xl border border-white/8 p-6 bg-white/3 flex items-center justify-between spotlight-card">
               <div>
                 <span class="block font-mono text-xs text-gray-500 uppercase tracking-widest mb-1">Total Stars</span>
                 <span id="git-stars-count" class="block font-jakarta font-extrabold text-3xl text-accent">76</span>
@@ -428,23 +428,23 @@ export class Home {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- 1. Microsoft Applied Skills: Developing Agents in Microsoft Foundry -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-sky-500/40 hover:bg-sky-500/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
+          <div class="cert-card-hover rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-sky-500/40 hover:bg-sky-500/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
                   <i class="fa-brands fa-microsoft text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-sky-500/10 border-sky-500/30 text-sky-300">Microsoft · Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-sky-500/10 border-sky-500/30 text-sky-300">Microsoft Â· Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-sky-400 transition-colors">Developing Agents in Microsoft Foundry</h3>
-                <p class="text-xs text-gray-400 mt-1">Microsoft Applied Skills · September 2026</p>
+                <p class="text-xs text-gray-400 mt-1">Microsoft Applied Skills Â· September 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Developing autonomous agents, multi-agent workflows & Azure AI Foundry integration.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Microsoft Applied Skills: Get started developing agents in Microsoft Foundry","issuer":"Microsoft · September 2026","verifyUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","previewUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","type":"credential","credId":"653B346FEC048451","icon":"fa-microsoft","iconPrefix":"fa-brands","bgClass":"bg-sky-500/10","borderClass":"border-sky-500/20","colorClass":"text-sky-400"}'>
+                      data-cert='{"title":"Microsoft Applied Skills: Get started developing agents in Microsoft Foundry","issuer":"Microsoft Â· September 2026","verifyUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","previewUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","type":"credential","credId":"653B346FEC048451","icon":"fa-microsoft","iconPrefix":"fa-brands","bgClass":"bg-sky-500/10","borderClass":"border-sky-500/20","colorClass":"text-sky-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -454,23 +454,23 @@ export class Home {
           </div>
 
           <!-- 2. OneRoadmap AI and Data Scientist -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-indigo-500/40 hover:bg-indigo-500/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
+          <div class="cert-card-hover rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-indigo-500/40 hover:bg-indigo-500/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-chart-pie text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-indigo-500/10 border-indigo-500/30 text-indigo-300">OneRoadmap · Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-indigo-500/10 border-indigo-500/30 text-indigo-300">OneRoadmap Â· Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-indigo-400 transition-colors">AI and Data Scientist</h3>
-                <p class="text-xs text-gray-400 mt-1">OneRoadmap · September 2026</p>
+                <p class="text-xs text-gray-400 mt-1">OneRoadmap Â· September 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Data science pipelines, machine learning architectures & statistical modeling.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"AI and Data Scientist","issuer":"OneRoadmap · September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","previewUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","type":"credential","credId":"CERT-0B760053","icon":"fa-chart-pie","iconPrefix":"fa-solid","bgClass":"bg-indigo-500/10","borderClass":"border-indigo-500/20","colorClass":"text-indigo-400"}'>
+                      data-cert='{"title":"AI and Data Scientist","issuer":"OneRoadmap Â· September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","previewUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","type":"credential","credId":"CERT-0B760053","icon":"fa-chart-pie","iconPrefix":"fa-solid","bgClass":"bg-indigo-500/10","borderClass":"border-indigo-500/20","colorClass":"text-indigo-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -480,23 +480,23 @@ export class Home {
           </div>
 
           <!-- 3. OneRoadmap Applied AI & ML Readiness -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-emerald-500/40 hover:bg-emerald-500/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
+          <div class="cert-card-hover rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-brain text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-emerald-500/10 border-emerald-500/30 text-emerald-300">OneRoadmap · Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-emerald-500/10 border-emerald-500/30 text-emerald-300">OneRoadmap Â· Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-emerald-400 transition-colors">Applied AI & Machine Learning</h3>
-                <p class="text-xs text-gray-400 mt-1">OneRoadmap Associate Readiness · Sept 2026</p>
+                <p class="text-xs text-gray-400 mt-1">OneRoadmap Associate Readiness Â· Sept 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Applied machine learning algorithms, model readiness & production evaluation.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Applied AI & Machine Learning - Associate Readiness","issuer":"OneRoadmap · September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","previewUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","type":"credential","credId":"CERT-A93F0D60","icon":"fa-brain","iconPrefix":"fa-solid","bgClass":"bg-emerald-500/10","borderClass":"border-emerald-500/20","colorClass":"text-emerald-400"}'>
+                      data-cert='{"title":"Applied AI & Machine Learning - Associate Readiness","issuer":"OneRoadmap Â· September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","previewUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","type":"credential","credId":"CERT-A93F0D60","icon":"fa-brain","iconPrefix":"fa-solid","bgClass":"bg-emerald-500/10","borderClass":"border-emerald-500/20","colorClass":"text-emerald-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -506,7 +506,7 @@ export class Home {
           </div>
 
           <!-- 4. Sheryians GenAI Certificate -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-amber-500/40 hover:bg-amber-500/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
+          <div class="cert-card-hover rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
@@ -516,13 +516,13 @@ export class Home {
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-amber-400 transition-colors">Data Science & Analytics with GenAI</h3>
-                <p class="text-xs text-gray-400 mt-1">Sheryians Coding School · July 2026</p>
+                <p class="text-xs text-gray-400 mt-1">Sheryians Coding School Â· July 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Real-world applications, GenAI integration & job-ready technical skills.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Data Science & Analytics with GenAI","issuer":"Sheryians Coding School · July 2026","verifyUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","previewUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","type":"iframe","icon":"fa-wand-magic-sparkles","iconPrefix":"fa-solid","bgClass":"bg-amber-500/10","borderClass":"border-amber-500/20","colorClass":"text-amber-400"}'>
+                      data-cert='{"title":"Data Science & Analytics with GenAI","issuer":"Sheryians Coding School Â· July 2026","verifyUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","previewUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","type":"iframe","icon":"fa-wand-magic-sparkles","iconPrefix":"fa-solid","bgClass":"bg-amber-500/10","borderClass":"border-amber-500/20","colorClass":"text-amber-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://sheryians.com/certificate/311726923637568120a0faf6" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -532,7 +532,7 @@ export class Home {
           </div>
 
           <!-- 5. Java Programming -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-primary/40 hover:bg-primary/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
+          <div class="cert-card-hover rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
@@ -558,7 +558,7 @@ export class Home {
           </div>
 
           <!-- 6. Prompt Engineering -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-secondary/40 hover:bg-secondary/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
+          <div class="cert-card-hover rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-secondary/40 hover:bg-secondary/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
@@ -584,7 +584,7 @@ export class Home {
           </div>
 
           <!-- 7. Python Programming -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-teal/40 hover:bg-teal/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
+          <div class="cert-card-hover rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-teal/40 hover:bg-teal/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-teal/10 border border-teal/20 flex items-center justify-center text-teal group-hover:scale-110 transition-transform">
@@ -610,7 +610,7 @@ export class Home {
           </div>
 
           <!-- 8. Computer Networks & Protocols -->
-          <div class="rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-rose/40 hover:bg-rose/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
+          <div class="cert-card-hover rounded-2xl border border-white/8 p-6 bg-white/3 hover:border-rose/40 hover:bg-rose/5 transition-all duration-300 group flex flex-col justify-between min-h-[220px] spotlight-card relative overflow-hidden">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-rose/10 border border-rose/20 flex items-center justify-center text-rose group-hover:scale-110 transition-transform">
@@ -1135,16 +1135,17 @@ export class Home {
 
     // 4.1 Certificate Preview Modal Handlers
     const closeCertModal = () => {
-      if (certModal) {
-        document.documentElement.classList.remove('noscroll');
-        document.body.classList.remove('noscroll');
-        certModal.classList.add('hidden');
-        certModal.classList.remove('flex');
-        const bodyEl = document.getElementById('cert-modal-body');
-        if (bodyEl) bodyEl.innerHTML = '';
-      }
+    if (certModal) {
+      document.documentElement.classList.remove('noscroll');
+      document.body.classList.remove('noscroll');
+      certModal.classList.add('hidden');
+      certModal.classList.remove('flex');
+      const bodyEl = document.getElementById('cert-modal-body');
+      if (bodyEl) bodyEl.innerHTML = '';
+    }
     };
 
+    const certCloseBtn = certModal ? certModal.querySelector('#cert-modal-close-btn') : null;
     if (certCloseBtn) certCloseBtn.addEventListener('click', closeCertModal);
     if (certModal) {
       certModal.addEventListener('click', (e) => {
@@ -1163,7 +1164,7 @@ export class Home {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         const title = btn.dataset.title || 'Upcoming Project';
-        showModal('info', `🔒 ${title}`, `Raj Rathod is actively developing this project! Full repository details, source code, and live preview links will automatically sync as soon as it is uploaded to GitHub.`);
+        showModal('info', `ðŸ”’ ${title}`, `Raj Rathod is actively developing this project! Full repository details, source code, and live preview links will automatically sync as soon as it is uploaded to GitHub.`);
       });
     });
 
@@ -1249,7 +1250,7 @@ export class Home {
                   <span class="px-3 py-1 rounded-full text-xs font-mono bg-amber-500/10 border border-amber-500/30 text-amber-300">Official Accreditation</span>
                   <h3 class="font-jakarta font-extrabold text-2xl text-gray-100">${certData.title}</h3>
                   <p class="text-xs text-gray-400 font-mono">${certData.issuer}</p>
-                  <p class="text-xs text-gray-400">Student: <strong class="text-gray-200">Rathod Raj</strong> · Cert ID: <code class="text-amber-400 font-mono bg-amber-500/10 px-2 py-0.5 rounded">311726923637568120a0faf6</code></p>
+                  <p class="text-xs text-gray-400">Student: <strong class="text-gray-200">Rathod Raj</strong> Â· Cert ID: <code class="text-amber-400 font-mono bg-amber-500/10 px-2 py-0.5 rounded">311726923637568120a0faf6</code></p>
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-jakarta text-xs font-bold text-black shadow-lg shadow-amber-500/20 hover:scale-105 transition-all flex items-center gap-2">
@@ -1306,7 +1307,7 @@ export class Home {
                   <span class="px-3 py-1 rounded-full text-xs font-mono ${certData.bgClass || 'bg-primary/10'} border ${certData.borderClass || 'border-primary/30'} ${certData.colorClass || 'text-primary'}">Official Verified Credential</span>
                   <h3 class="font-jakarta font-extrabold text-2xl text-gray-100">${certData.title}</h3>
                   <p class="text-xs text-gray-400 font-mono">${certData.issuer}</p>
-                  ${certData.credId ? `<p class="text-xs text-gray-400">Recipient: <strong class="text-gray-200">Rathod Raj</strong> · Credential ID: <code class="${certData.colorClass} font-mono ${certData.bgClass} px-2 py-0.5 rounded border ${certData.borderClass}">${certData.credId}</code></p>` : ''}
+                  ${certData.credId ? `<p class="text-xs text-gray-400">Recipient: <strong class="text-gray-200">Rathod Raj</strong> Â· Credential ID: <code class="${certData.colorClass} font-mono ${certData.bgClass} px-2 py-0.5 rounded border ${certData.borderClass}">${certData.credId}</code></p>` : ''}
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta text-xs font-bold text-white shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">

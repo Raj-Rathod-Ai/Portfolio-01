@@ -1,13 +1,14 @@
 /**
- * PREMIUM AI-NATIVE ANIMATIONS ENGINE
- * Upgrade layer — adds sophisticated micro-interactions, GPU-accelerated effects,
- * magnetic buttons, scroll-triggered reveals, depth parallax, and cursor enhancements.
+ * PREMIUM ANIMATIONS ENGINE v2
+ * Full upgrade: skill bar scroll-trigger, stat counters, navbar active indicator,
+ * navbar glass scroll state, hero profile ring, timeline entrance,
+ * magnetic buttons, parallax, glow trail, click ripple, GSAP section reveals.
  *
  * RULES:
- *  - No content changes, no layout shifts
- *  - Only transform / opacity / filter / box-shadow for GPU compositing
- *  - Reduced-motion support via prefers-reduced-motion media query
- *  - Desktop + mobile performance safe
+ *  - Zero content/layout/functionality changes
+ *  - GPU-composited: only transform / opacity / filter / box-shadow
+ *  - All expensive effects disabled for: touch devices, prefers-reduced-motion
+ *  - Re-entrant safe: all observers/bindings guard against double-mount
  */
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -15,39 +16,310 @@ const isTouch = window.matchMedia('(pointer: coarse)').matches;
 const isDesktop = window.innerWidth >= 1024;
 
 // ─────────────────────────────────────────────────────────────
-// 1. MAGNETIC BUTTON EFFECT
-//    Buttons with class .magnetic-btn get pulled toward cursor
+// 1. SKILL BARS — Scroll-triggered IntersectionObserver fill
+//    Replaces hover-only with scroll reveal at 70% visibility
+// ─────────────────────────────────────────────────────────────
+export function initSkillBarScrollReveal() {
+  if (prefersReducedMotion) {
+    // On reduced motion, just set them to full width immediately
+    document.querySelectorAll('.skill-card [data-skill-val]').forEach(card => {
+      const bar = card.closest('.skill-card')?.querySelector('.h-full.rounded-full');
+      if (bar) {
+        const val = card.dataset?.skillVal || card.closest('.skill-card')?.dataset?.skillVal || '80';
+        bar.classList.add('skill-bar-fill', 'skill-bar-animate');
+        bar.style.setProperty('--skill-width', `${val}%`);
+      }
+    });
+    return;
+  }
+
+  function bindSkillBars() {
+    // Convert existing hover-only bars to scroll-triggered
+    document.querySelectorAll('.skill-card').forEach(card => {
+      if (card.dataset.skillBarBound) return;
+      card.dataset.skillBarBound = '1';
+
+      const bar = card.querySelector('.h-full.rounded-full');
+      if (!bar) return;
+
+      const val = card.dataset.skillVal || '80';
+
+      // Replace w-0 and group-hover width class with our CSS system
+      // Remove all existing width classes added inline by Tailwind group-hover
+      bar.classList.remove('w-0');
+      // Remove any group-hover:w-[...] via removing inline style
+      bar.classList.add('skill-bar-fill');
+      bar.style.setProperty('--skill-width', `${val}%`);
+
+      skillBarObserver.observe(card);
+    });
+  }
+
+  const skillBarObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const card = entry.target;
+      const bar = card.querySelector('.skill-bar-fill');
+      if (bar) {
+        // Slight stagger based on card position in grid
+        const cards = Array.from(card.parentElement?.children || []);
+        const idx = cards.indexOf(card);
+        setTimeout(() => {
+          bar.classList.add('skill-bar-animate');
+        }, idx * 60);
+      }
+      skillBarObserver.unobserve(card);
+    });
+  }, { threshold: 0.4 });
+
+  bindSkillBars();
+
+  // Re-bind on portfolioDataUpdated (project cards injected)
+  window.addEventListener('portfolioDataUpdated', () => {
+    setTimeout(bindSkillBars, 300);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// 2. STAT COUNTERS — Count up from 0 when scrolled into view
+//    Targets the About section stat cards (7.66, 25+, 350+, 2027)
+// ─────────────────────────────────────────────────────────────
+export function initStatCounters() {
+  if (prefersReducedMotion) return;
+
+  // Config: el selector, target, suffix, decimals
+  const STAT_CONFIGS = [
+    { selector: '[data-stat="cgpa"]',    target: 7.66,  suffix: '',   decimals: 2 },
+    { selector: '[data-stat="projects"]',target: 25,    suffix: '+',  decimals: 0 },
+    { selector: '[data-stat="leetcode"]',target: 350,   suffix: '+',  decimals: 0 },
+    { selector: '[data-stat="year"]',    target: 2027,  suffix: '',   decimals: 0 },
+  ];
+
+  function easeOutExpo(t) {
+    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+  }
+
+  function animateCounter(el, target, suffix, decimals) {
+    if (el.dataset.counted) return;
+    el.dataset.counted = '1';
+    el.classList.add('stat-number');
+
+    const duration = 1500;
+    const startTime = performance.now();
+
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const value = target * easeOutExpo(progress);
+      el.textContent = value.toFixed(decimals) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const config = STAT_CONFIGS.find(c => el.matches(c.selector));
+      if (config) animateCounter(el, config.target, config.suffix, config.decimals);
+      counterObserver.unobserve(el);
+    });
+  }, { threshold: 0.6 });
+
+  function bindCounters() {
+    STAT_CONFIGS.forEach(({ selector }) => {
+      document.querySelectorAll(selector).forEach(el => {
+        if (!el.dataset.counted) counterObserver.observe(el);
+      });
+    });
+
+    // Also handle [data-counter] attribute pattern from existing markup
+    document.querySelectorAll('[data-counter]:not([data-counted])').forEach(el => {
+      const target = parseFloat(el.dataset.target || el.textContent.replace(/[^0-9.]/g, ''));
+      const suffix = el.dataset.suffix || '';
+      const decimals = parseInt(el.dataset.decimals || '0');
+      if (!isNaN(target)) {
+        counterObserver.observe(el);
+      }
+    });
+  }
+
+  bindCounters();
+  window.addEventListener('portfolioDataUpdated', () => setTimeout(bindCounters, 300));
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3. NAVBAR — Active indicator + glass scroll state
+//    Upgrades existing scroll spy to also toggle nav-active class
+//    and adds navbar-scrolled class to header on scroll
+// ─────────────────────────────────────────────────────────────
+export function initNavbarUpgrade() {
+  const header = document.querySelector('header');
+
+  // Glass scroll state
+  if (header) {
+    let ticking = false;
+    function updateNavbar() {
+      if (window.scrollY > 60) {
+        header.classList.add('navbar-scrolled');
+      } else {
+        header.classList.remove('navbar-scrolled');
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateNavbar);
+        ticking = true;
+      }
+    }, { passive: true });
+    updateNavbar();
+  }
+
+  // Active section underline — piggyback on existing scroll spy
+  const spySections = ['about', 'skills', 'projects', 'github', 'reviews', 'contact'];
+  const navLinks = document.querySelectorAll('.nav-section-link, .nav-projects-link');
+
+  function updateActiveUnderline() {
+    const isHome = window.location.pathname === '/' || window.location.pathname === '/index.html';
+    if (!isHome) {
+      navLinks.forEach(l => l.classList.remove('nav-active'));
+      return;
+    }
+    const scrollY = window.scrollY + 140;
+    let activeId = '';
+    for (const id of spySections) {
+      const el = document.getElementById(id);
+      if (el && scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight) {
+        activeId = id;
+        break;
+      }
+    }
+    navLinks.forEach(link => {
+      if (link.getAttribute('data-section') === activeId) {
+        link.classList.add('nav-active');
+      } else {
+        link.classList.remove('nav-active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveUnderline, { passive: true });
+  updateActiveUnderline();
+}
+
+// ─────────────────────────────────────────────────────────────
+// 4. HERO — Profile card ring injection
+//    Injects two CSS-animated ring divs around the profile picture
+// ─────────────────────────────────────────────────────────────
+export function initHeroProfileRing() {
+  if (prefersReducedMotion) return;
+
+  const profilePic = document.querySelector('.profile-pic-container');
+  if (!profilePic || profilePic.dataset.ringBound) return;
+  profilePic.dataset.ringBound = '1';
+
+  const parent = profilePic.parentElement;
+  if (!parent) return;
+
+  // Ensure relative positioning
+  parent.style.position = 'relative';
+
+  const outerRing = document.createElement('div');
+  outerRing.className = 'hero-profile-ring-outer';
+
+  const innerRing = document.createElement('div');
+  innerRing.className = 'hero-profile-ring-inner';
+
+  parent.appendChild(outerRing);
+  parent.appendChild(innerRing);
+
+  // Disable on mobile
+  if (isTouch) {
+    outerRing.style.display = 'none';
+    innerRing.style.display = 'none';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 5. HERO BADGES — Stagger entrance animation class injection
+// ─────────────────────────────────────────────────────────────
+export function initHeroBadges() {
+  if (prefersReducedMotion) return;
+
+  const badgeContainer = document.querySelector('section#hero .flex.flex-wrap.gap-2');
+  if (!badgeContainer || badgeContainer.dataset.badgesBound) return;
+  badgeContainer.dataset.badgesBound = '1';
+
+  Array.from(badgeContainer.children).forEach(badge => {
+    badge.classList.add('hero-badge');
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// 6. TIMELINE — Line draw + stagger item reveal
+// ─────────────────────────────────────────────────────────────
+export function initTimelineAnimation() {
+  if (prefersReducedMotion) return;
+
+  // Find the timeline container (border-l line)
+  const timelineContainers = document.querySelectorAll('.border-l.border-white\\/8.ml-4.pl-8');
+  if (!timelineContainers.length) return;
+
+  timelineContainers.forEach(container => {
+    if (container.dataset.timelineBound) return;
+    container.dataset.timelineBound = '1';
+
+    // Add our class for the CSS line-draw animation
+    container.classList.add('timeline-line');
+
+    // Add timeline-item class to each child for stagger
+    const items = Array.from(container.children);
+    items.forEach(item => {
+      item.classList.add('timeline-item');
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        container.classList.add('timeline-drawn');
+        items.forEach((item, i) => {
+          setTimeout(() => item.classList.add('timeline-visible'), 200 + i * 150);
+        });
+        observer.unobserve(container);
+      });
+    }, { threshold: 0.15 });
+
+    observer.observe(container);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// 7. MAGNETIC BUTTON PHYSICS
+//    Smooth spring attraction toward cursor on desktop
 // ─────────────────────────────────────────────────────────────
 export function initMagneticButtons() {
-  if (prefersReducedMotion || isTouch) return;
+  if (prefersReducedMotion || isTouch || !isDesktop) return;
 
   function applyMagnetic(el) {
     if (el.dataset.magneticBound) return;
     el.dataset.magneticBound = '1';
 
     let animFrame = null;
-    let targetX = 0, targetY = 0;
-    let currentX = 0, currentY = 0;
+    let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
 
-    el.addEventListener('mousemove', (e) => {
+    el.addEventListener('mousemove', e => {
       const rect = el.getBoundingClientRect();
-      const x = e.clientX - (rect.left + rect.width / 2);
-      const y = e.clientY - (rect.top + rect.height / 2);
-      targetX = x * 0.38;
-      targetY = y * 0.38;
+      targetX = (e.clientX - (rect.left + rect.width / 2)) * 0.35;
+      targetY = (e.clientY - (rect.top + rect.height / 2)) * 0.35;
     }, { passive: true });
 
-    el.addEventListener('mouseleave', () => {
-      targetX = 0;
-      targetY = 0;
-    });
-
-    function lerp(a, b, t) { return a + (b - a) * t; }
+    el.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; });
 
     function tick() {
-      currentX = lerp(currentX, targetX, 0.12);
-      currentY = lerp(currentY, targetY, 0.12);
-
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
       if (Math.abs(currentX) > 0.05 || Math.abs(currentY) > 0.05) {
         el.style.transform = `translate(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px)`;
         animFrame = requestAnimationFrame(tick);
@@ -62,79 +334,20 @@ export function initMagneticButtons() {
     });
   }
 
-  // Apply to all magnetic targets
   function bindAll() {
-    document.querySelectorAll(
-      'a[class*="rounded"], button:not(.flip-btn):not(.chat-chip):not(#chatbot-toggle-btn):not(#chatbot-close-btn):not(#chatbot-send-btn)'
-    ).forEach(el => {
-      // Only apply to visible, non-tiny buttons
+    document.querySelectorAll('a.rounded-xl, a.rounded-full, button.rounded-xl:not(.flip-btn):not(.chat-chip):not(#chatbot-toggle-btn):not(#chatbot-close-btn):not(#chatbot-send-btn)').forEach(el => {
       const rect = el.getBoundingClientRect();
-      if (rect.width > 40 && rect.width < 400) applyMagnetic(el);
+      if (rect.width > 50 && rect.width < 350) applyMagnetic(el);
     });
   }
 
-  // Run on initial load and re-run when page content changes
   bindAll();
   window.addEventListener('portfolioDataUpdated', () => setTimeout(bindAll, 500));
 }
 
 // ─────────────────────────────────────────────────────────────
-// 2. ENHANCED SCROLL REVEALS
-//    Staggered children reveal with blur-to-focus spring easing
-// ─────────────────────────────────────────────────────────────
-export function initEnhancedScrollReveals() {
-  if (prefersReducedMotion) {
-    // Immediately make all visible if reduced motion
-    document.querySelectorAll('.scroll-reveal').forEach(el => el.classList.add('active'));
-    return;
-  }
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      el.classList.add('active');
-
-      // Stagger direct children if .stagger-children class present
-      if (el.classList.contains('stagger-children')) {
-        const children = Array.from(el.children);
-        children.forEach((child, i) => {
-          child.style.transitionDelay = `${i * 0.07}s`;
-          child.classList.add('active');
-        });
-      }
-
-      observer.unobserve(el);
-    });
-  }, { threshold: 0.04, rootMargin: '0px 0px -40px 0px' });
-
-  document.querySelectorAll('.scroll-reveal').forEach(el => {
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight) {
-      el.classList.add('active');
-    } else {
-      observer.observe(el);
-    }
-  });
-
-  // Re-observe when new content is injected (project cards, etc.)
-  window.addEventListener('portfolioDataUpdated', () => {
-    setTimeout(() => {
-      document.querySelectorAll('.scroll-reveal:not(.active)').forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight) {
-          el.classList.add('active');
-        } else {
-          observer.observe(el);
-        }
-      });
-    }, 200);
-  });
-}
-
-// ─────────────────────────────────────────────────────────────
-// 3. GLOW TRAIL CURSOR UPGRADE
-//    Adds a soft colored ambient glow that follows cursor
+// 8. AMBIENT GLOW TRAIL CURSOR
+//    Soft radial gradient follows cursor lazily (desktop only)
 // ─────────────────────────────────────────────────────────────
 export function initGlowTrail() {
   if (prefersReducedMotion || isTouch || !isDesktop) return;
@@ -146,245 +359,115 @@ export function initGlowTrail() {
     position: fixed;
     pointer-events: none;
     z-index: 9999;
-    width: 420px;
-    height: 420px;
+    width: 380px;
+    height: 380px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(99,102,241,0.06) 0%, rgba(139,92,246,0.03) 40%, transparent 70%);
+    background: radial-gradient(circle, rgba(14,165,233,0.05) 0%, rgba(16,185,129,0.025) 45%, transparent 70%);
     transform: translate(-50%, -50%);
     will-change: left, top;
-    transition: opacity 0.4s ease;
     left: -500px;
     top: -500px;
+    transition: opacity 0.4s ease;
   `;
   document.body.appendChild(glow);
 
-  let glowX = -500, glowY = -500;
-  let targetX = -500, targetY = -500;
+  let glowX = -500, glowY = -500, targetX = -500, targetY = -500;
 
-  window.addEventListener('mousemove', (e) => {
+  window.addEventListener('mousemove', e => {
     targetX = e.clientX;
     targetY = e.clientY;
   }, { passive: true });
 
-  function animateGlow() {
-    glowX += (targetX - glowX) * 0.065;
-    glowY += (targetY - glowY) * 0.065;
+  function animate() {
+    glowX += (targetX - glowX) * 0.06;
+    glowY += (targetY - glowY) * 0.06;
     glow.style.left = `${glowX}px`;
     glow.style.top = `${glowY}px`;
-    requestAnimationFrame(animateGlow);
+    requestAnimationFrame(animate);
   }
-  requestAnimationFrame(animateGlow);
+  requestAnimationFrame(animate);
 
   document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; });
   document.addEventListener('mouseenter', () => { glow.style.opacity = '1'; });
 }
 
 // ─────────────────────────────────────────────────────────────
-// 4. ANIMATED COUNTER FOR STAT NUMBERS
-//    Numbers count up when scrolled into view
-// ─────────────────────────────────────────────────────────────
-export function initCounterAnimations() {
-  if (prefersReducedMotion) return;
-
-  function animateCounter(el) {
-    if (el.dataset.counted) return;
-    el.dataset.counted = '1';
-
-    const target = parseFloat(el.dataset.target || el.textContent.replace(/[^0-9.]/g, ''));
-    const suffix = el.dataset.suffix || el.textContent.replace(/[0-9.]/g, '').trim();
-    const decimals = el.dataset.decimals ? parseInt(el.dataset.decimals) : (target % 1 !== 0 ? 2 : 0);
-    const duration = 1400;
-    const startTime = performance.now();
-
-    function easeOutExpo(t) {
-      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-    }
-
-    function update(now) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easedProgress = easeOutExpo(progress);
-      const current = target * easedProgress;
-      el.textContent = current.toFixed(decimals) + suffix;
-      if (progress < 1) requestAnimationFrame(update);
-    }
-    requestAnimationFrame(update);
-  }
-
-  const counterObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        animateCounter(entry.target);
-        counterObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.5 });
-
-  function bindCounters() {
-    document.querySelectorAll('[data-counter]').forEach(el => {
-      counterObserver.observe(el);
-    });
-  }
-
-  bindCounters();
-  window.addEventListener('portfolioDataUpdated', () => setTimeout(bindCounters, 300));
-}
-
-// ─────────────────────────────────────────────────────────────
-// 5. PARALLAX DEPTH EFFECT ON HERO ELEMENTS
-//    Subtle vertical movement at different speeds on scroll
-// ─────────────────────────────────────────────────────────────
-export function initParallaxDepth() {
-  if (prefersReducedMotion || isTouch) return;
-
-  let ticking = false;
-  let lastScrollY = 0;
-
-  function updateParallax() {
-    const scrollY = window.scrollY;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollFraction = Math.min(scrollY / maxScroll, 1);
-
-    // Aurora blobs — slow parallax drift
-    const blobs = document.querySelectorAll('.aurora-blob');
-    blobs.forEach((blob, i) => {
-      const speed = 0.15 + i * 0.08;
-      const direction = i % 2 === 0 ? 1 : -1;
-      blob.style.transform = `translateY(${scrollY * speed * direction}px)`;
-    });
-
-    // Hero section — very subtle translate
-    const heroSection = document.querySelector('#hero, .hero-section, section:first-of-type');
-    if (heroSection && scrollY < window.innerHeight) {
-      const progress = scrollY / window.innerHeight;
-      heroSection.style.setProperty('--scroll-progress', progress.toFixed(3));
-    }
-
-    ticking = false;
-  }
-
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(updateParallax);
-      ticking = true;
-    }
-  }, { passive: true });
-}
-
-// ─────────────────────────────────────────────────────────────
-// 6. PREMIUM CARD HOVER GLOW BORDER TRACE
-//    Cards get an animated gradient border on hover
-// ─────────────────────────────────────────────────────────────
-export function initCardGlowBorders() {
-  if (prefersReducedMotion) return;
-
-  // Listen for mouse position on skill cards and certification cards
-  document.addEventListener('mousemove', (e) => {
-    const card = e.target.closest('.skill-card, .cert-card, .glass-card, .spotlight-card');
-    if (!card) return;
-
-    const rect = card.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-    card.style.setProperty('--glow-x', `${x}%`);
-    card.style.setProperty('--glow-y', `${y}%`);
-  }, { passive: true });
-}
-
-// ─────────────────────────────────────────────────────────────
-// 7. SMOOTH NAVBAR SCROLL SHRINK
-//    Navbar compresses and glass-ifies on scroll
-// ─────────────────────────────────────────────────────────────
-export function initNavbarScrollEffect() {
-  const header = document.querySelector('header, #navbar-header-mount header, nav');
-  if (!header) return;
-
-  let lastScrollY = 0;
-  let ticking = false;
-
-  function updateNavbar() {
-    const scrollY = window.scrollY;
-    const isScrolled = scrollY > 60;
-    const isScrollingDown = scrollY > lastScrollY;
-
-    if (isScrolled) {
-      header.style.setProperty('--navbar-blur', '20px');
-      header.style.setProperty('--navbar-bg', 'rgba(13, 17, 23, 0.92)');
-    } else {
-      header.style.setProperty('--navbar-blur', '0px');
-      header.style.setProperty('--navbar-bg', 'rgba(13, 17, 23, 0.4)');
-    }
-
-    lastScrollY = scrollY;
-    ticking = false;
-  }
-
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(updateNavbar);
-      ticking = true;
-    }
-  }, { passive: true });
-}
-
-// ─────────────────────────────────────────────────────────────
-// 8. TYPING INDICATOR PULSE ON HERO TITLE
-//    Adds a subtle breathing animation to title area
-// ─────────────────────────────────────────────────────────────
-export function initHeroSubtleAnimations() {
-  if (prefersReducedMotion) return;
-
-  // Add ambient glow pulse to hero profile image
-  const profileImg = document.querySelector('.profile-pic-container, img[alt*="Raj"]');
-  if (profileImg) {
-    profileImg.style.animation = 'profileGlowPulse 4s ease-in-out infinite';
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 9. LINK HOVER RIPPLE EFFECT
-//    Buttons get a subtle ripple on click
+// 9. CLICK RIPPLE on buttons/links
 // ─────────────────────────────────────────────────────────────
 export function initClickRipple() {
   if (prefersReducedMotion) return;
 
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button, a.rounded-xl, a.rounded-lg, a.rounded-full, a[class*="py-"]');
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('button.rounded-xl, a.rounded-xl, a.rounded-full, a[class*="py-3"], button[class*="py-3"]');
     if (!btn || btn.closest('#chatbot-window') || btn.closest('#preloader')) return;
 
     const rect = btn.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
     const ripple = document.createElement('span');
     ripple.style.cssText = `
       position: absolute;
       border-radius: 50%;
       pointer-events: none;
-      background: rgba(255, 255, 255, 0.15);
-      width: 0;
-      height: 0;
-      left: ${x}px;
-      top: ${y}px;
+      background: rgba(255,255,255,0.14);
+      width: 0; height: 0;
+      left: ${e.clientX - rect.left}px;
+      top: ${e.clientY - rect.top}px;
       transform: translate(-50%, -50%);
-      animation: rippleExpand 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: rippleExpand 0.55s cubic-bezier(0.16,1,0.3,1) forwards;
       z-index: 100;
     `;
 
-    // Only add ripple to relatively positioned elements
-    const position = getComputedStyle(btn).position;
-    if (position === 'static') btn.style.position = 'relative';
+    if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
     btn.style.overflow = 'hidden';
-
     btn.appendChild(ripple);
     setTimeout(() => ripple.remove(), 600);
   });
 }
 
 // ─────────────────────────────────────────────────────────────
-// 10. SECTION ENTRANCE ORCHESTRATION
-//     Uses GSAP if available, falls back to CSS transitions
+// 10. PARALLAX DEPTH — Aurora blobs drift on scroll
+// ─────────────────────────────────────────────────────────────
+export function initParallaxDepth() {
+  if (prefersReducedMotion || isTouch) return;
+
+  let ticking = false;
+  function update() {
+    const scrollY = window.scrollY;
+    document.querySelectorAll('.aurora-blob').forEach((blob, i) => {
+      const speed = 0.12 + i * 0.06;
+      const dir = i % 2 === 0 ? 1 : -1;
+      blob.style.transform = `translateY(${scrollY * speed * dir}px)`;
+    });
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+}
+
+// ─────────────────────────────────────────────────────────────
+// 11. SCROLL PROGRESS BAR — smooth update
+// ─────────────────────────────────────────────────────────────
+export function initScrollProgressBar() {
+  const bar = document.getElementById('scroll-progress');
+  if (!bar) return;
+
+  let ticking = false;
+  function update() {
+    const scrollTop = window.scrollY;
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = docH > 0 ? `${(scrollTop / docH) * 100}%` : '0%';
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+}
+
+// ─────────────────────────────────────────────────────────────
+// 12. GSAP SECTION HEADING REVEALS
+//     Smooth blur-to-focus reveal on section headings + cert cards
 // ─────────────────────────────────────────────────────────────
 export function initGSAPEnhancements() {
   if (prefersReducedMotion) return;
@@ -392,114 +475,89 @@ export function initGSAPEnhancements() {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // Animate section headings with a premium split-word reveal
-  document.querySelectorAll('.section-heading, h2.font-jakarta, h2.font-outfit').forEach(heading => {
-    if (heading.dataset.gsapBound) return;
-    heading.dataset.gsapBound = '1';
-
-    gsap.from(heading, {
-      scrollTrigger: {
-        trigger: heading,
-        start: 'top 88%',
-        toggleActions: 'play none none none'
-      },
+  // Section h2 headings
+  document.querySelectorAll('section h2').forEach(el => {
+    if (el.dataset.gsapBound) return;
+    el.dataset.gsapBound = '1';
+    gsap.from(el, {
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
       opacity: 0,
-      y: 28,
-      filter: 'blur(8px)',
-      duration: 0.85,
+      y: 24,
+      filter: 'blur(6px)',
+      duration: 0.8,
       ease: 'power3.out',
     });
   });
 
-  // Skill cards stagger reveal
-  document.querySelectorAll('.skill-card').forEach((card, i) => {
+  // Certification cards stagger
+  const certGrid = document.querySelector('#certifications .grid');
+  if (certGrid && !certGrid.dataset.gsapBound) {
+    certGrid.dataset.gsapBound = '1';
+    gsap.from(certGrid.children, {
+      scrollTrigger: { trigger: certGrid, start: 'top 86%', toggleActions: 'play none none none' },
+      opacity: 0,
+      y: 30,
+      scale: 0.96,
+      duration: 0.55,
+      stagger: 0.08,
+      ease: 'power2.out',
+    });
+  }
+
+  // GitHub stat cards stagger
+  const githubStatCards = document.querySelectorAll('.github-stat-card');
+  githubStatCards.forEach((card, i) => {
     if (card.dataset.gsapBound) return;
     card.dataset.gsapBound = '1';
-
     gsap.from(card, {
-      scrollTrigger: {
-        trigger: card,
-        start: 'top 90%',
-        toggleActions: 'play none none none'
-      },
+      scrollTrigger: { trigger: card, start: 'top 90%', toggleActions: 'play none none none' },
       opacity: 0,
-      y: 20,
-      scale: 0.97,
-      duration: 0.55,
-      delay: (i % 6) * 0.05,
+      x: -20,
+      duration: 0.5,
+      delay: i * 0.08,
       ease: 'power2.out',
     });
   });
 }
 
 // ─────────────────────────────────────────────────────────────
-// 11. SCROLL PROGRESS GLOW UPDATE
-//     Enhances the existing scroll progress bar with live glow
-// ─────────────────────────────────────────────────────────────
-export function initScrollProgressBar() {
-  const progressBar = document.getElementById('scroll-progress');
-  if (!progressBar) return;
-
-  let ticking = false;
-
-  function updateProgress() {
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-    progressBar.style.width = `${progress}%`;
-    ticking = false;
-  }
-
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(updateProgress);
-      ticking = true;
-    }
-  }, { passive: true });
-}
-
-// ─────────────────────────────────────────────────────────────
-// 12. PREMIUM LINK HOVER UNDERLINE TRACE
-//     Nav links get a flowing gradient underline trace on hover
-// ─────────────────────────────────────────────────────────────
-export function initNavLinkEffects() {
-  if (prefersReducedMotion) return;
-
-  document.querySelectorAll('nav a, header a').forEach(link => {
-    if (link.dataset.navBound) return;
-    link.dataset.navBound = '1';
-    link.classList.add('nav-link-premium');
-  });
-}
-
-// ─────────────────────────────────────────────────────────────
-// INIT ALL — call this after DOM is ready
+// INIT ALL — call once after page is ready, re-call after SPA nav
 // ─────────────────────────────────────────────────────────────
 export function initAllPremiumAnimations() {
-  // Core interactive effects
-  initGlowTrail();
-  initMagneticButtons();
-  initEnhancedScrollReveals();
-  initCounterAnimations();
-  initCardGlowBorders();
-  initClickRipple();
-  initParallaxDepth();
-  initNavbarScrollEffect();
-  initHeroSubtleAnimations();
+  // Core effects
   initScrollProgressBar();
-  initNavLinkEffects();
+  initNavbarUpgrade();
+  initGlowTrail();
+  initParallaxDepth();
+  initClickRipple();
 
-  // GSAP enhancements (non-blocking, uses existing GSAP CDN)
+  // Hero
+  initHeroProfileRing();
+  initHeroBadges();
+
+  // Content reveals
+  initSkillBarScrollReveal();
+  initStatCounters();
+  initTimelineAnimation();
+
+  // Interactive
+  initMagneticButtons();
+
+  // GSAP (non-blocking, uses existing CDN loaded in index.html)
   if (typeof gsap !== 'undefined') {
-    setTimeout(initGSAPEnhancements, 100);
+    setTimeout(initGSAPEnhancements, 80);
   }
 
-  // Re-initialize magnetic buttons after project cards render
+  // Re-run content-dependent inits when GitHub data arrives
   window.addEventListener('portfolioDataUpdated', () => {
     setTimeout(() => {
+      initSkillBarScrollReveal();
+      initStatCounters();
+      initTimelineAnimation();
       initMagneticButtons();
-      initCounterAnimations();
+      initHeroProfileRing();
+      initHeroBadges();
       if (typeof gsap !== 'undefined') initGSAPEnhancements();
-    }, 400);
+    }, 350);
   });
 }

@@ -72,9 +72,9 @@
           colors: {
             darkBg: '#0d1117',
             darkCard: 'rgba(22, 27, 34, 0.85)',
-            primary: '#6366f1',
-            secondary: '#8b5cf6',
-            accent: '#f59e0b',
+            primary: '#0ea5e9',
+            secondary: '#10b981',
+            accent: '#f97316',
             rose: '#f43f5e',
             teal: '#14b8a6',
             sky: '#38bdf8',
@@ -90,7 +90,7 @@
     }
   </script>
 </head>
-<body class="bg-darkBg text-gray-100 font-inter transition-colors duration-300">
+<body class="bg-darkBg text-gray-100 font-inter transition-colors duration-300" style="color: #e8f4f8;">
 
   <!-- Scroll Progress Indicator -->
   <div id="scroll-progress"></div>
@@ -104,17 +104,17 @@
   <div id="preloader" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center select-none overflow-hidden" style="background:#000000 !important;">
     
     <!-- Ambient Hologram Radial Glow -->
-    <div class="absolute w-[450px] h-[450px] rounded-full bg-gradient-to-tr from-purple-600/15 via-indigo-600/15 to-teal-400/10 blur-[130px] pointer-events-none animate-pulse"></div>
+    <div class="absolute w-[450px] h-[450px] rounded-full bg-gradient-to-tr from-sky-500/15 via-emerald-500/12 to-teal-400/10 blur-[130px] pointer-events-none animate-pulse"></div>
 
     <div class="relative z-10 flex flex-col items-center text-center max-w-xl px-6 space-y-7">
       
       <!-- Quantum Neural Orbit Badge -->
       <div class="relative w-20 h-20 flex items-center justify-center">
         <div class="absolute inset-0 rounded-full border border-dashed border-white/20 animate-spin-slow"></div>
-        <div class="absolute inset-2 rounded-full border-2 border-t-purple-500 border-r-transparent border-b-indigo-400 border-l-transparent animate-spin-reverse"></div>
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-teal-400 p-[1px] shadow-[0_0_25px_rgba(168,85,247,0.5)] animate-pulse-core flex items-center justify-center">
+        <div class="absolute inset-2 rounded-full border-2 border-t-sky-400 border-r-transparent border-b-emerald-400 border-l-transparent animate-spin-reverse"></div>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 via-emerald-400 to-teal-400 p-[1px] shadow-[0_0_25px_rgba(14,165,233,0.5)] animate-pulse-core flex items-center justify-center">
           <div class="w-full h-full bg-black rounded-[11px] flex items-center justify-center text-white text-base">
-            <i class="fa-solid fa-brain text-transparent bg-clip-text bg-gradient-to-tr from-indigo-300 via-purple-300 to-teal-300"></i>
+            <i class="fa-solid fa-brain text-transparent bg-clip-text bg-gradient-to-tr from-sky-300 via-emerald-300 to-teal-300"></i>
           </div>
         </div>
       </div>
@@ -136,11 +136,11 @@
           <span id="pl-status" class="text-teal-400 text-[11px] tracking-widest uppercase flex items-center gap-1.5">
             Initializing AI Engine...
           </span>
-          <span id="pl-perc" class="text-indigo-300 font-bold text-[11px]">0%</span>
+          <span id="pl-perc" class="text-sky-300 font-bold text-[11px]">0%</span>
         </div>
         
         <div style="width:100%;height:2px;background:rgba(255,255,255,0.08);position:relative;overflow:hidden;border-radius:10px;">
-          <div id="pl-bar" style="position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#a855f7,#3b82f6,#14b8a6);box-shadow:0 0 20px #a855f7;border-radius:10px;"></div>
+          <div id="pl-bar" style="position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#0ea5e9,#10b981,#14b8a6);box-shadow:0 0 20px #0ea5e9;border-radius:10px;"></div>
         </div>
       </div>
 
@@ -158,7 +158,7 @@
     <!-- Static semantic SEO fallback for search engine crawlers (Googlebot, Bingbot) -->
     <noscript>
       <div style="max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; color: #f3f4f6; font-family: sans-serif;">
-        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; color: #6366f1;">Raj Rathod — AI & Machine Learning Engineer</h1>
+        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; color: #0ea5e9;">Raj Rathod — AI &amp; Machine Learning Engineer</h1>
         <p style="font-size: 1.1rem; line-height: 1.6; color: #9ca3af; margin-bottom: 1.5rem;">
           Raj Rathod is an AI & Machine Learning Engineer specializing in Python, Deep Learning, Generative AI, LLMs, RAG, NLP, TensorFlow, and predictive modeling.
         </p>
