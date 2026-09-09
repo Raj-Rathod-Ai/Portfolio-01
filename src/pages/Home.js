@@ -808,16 +808,25 @@ export class Home {
       </section>
 
       <!-- Transmission Success/Error Modal -->
-      <div id="transmission-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-6 bg-black/70 backdrop-blur-lg">
-        <div class="max-w-md w-full rounded-2xl border border-white/10 p-8 text-center space-y-5" style="background: rgba(22,27,34,0.95)">
-          <div id="transmission-icon-container" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl border"></div>
-          <div class="space-y-2">
-            <h3 id="transmission-title" class="font-jakarta font-extrabold text-xl text-gray-100"></h3>
-            <p id="transmission-desc" class="font-inter text-sm text-gray-400 leading-relaxed"></p>
+      <div id="transmission-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-xl transition-all duration-300">
+        <div class="max-w-md w-full rounded-2xl border border-white/15 p-7 sm:p-8 text-center space-y-5 shadow-2xl relative overflow-hidden" style="background: rgba(18, 22, 30, 0.98); box-shadow: 0 25px 60px rgba(0,0,0,0.7);">
+          <!-- Top glowing gradient accent bar -->
+          <div id="transmission-accent-bar" class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal via-primary to-secondary"></div>
+
+          <div id="transmission-icon-container" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl border bg-teal/15 border-teal/40 text-teal shadow-lg shadow-teal/20 transition-all duration-300">
+            <i class="fa-solid fa-check"></i>
           </div>
-          <button id="transmission-close-btn" class="px-6 py-2.5 rounded-xl border border-white/10 hover:border-white/30 transition-all text-xs font-mono text-gray-400 hover:text-white">
-            Close
-          </button>
+
+          <div class="space-y-2">
+            <h3 id="transmission-title" class="font-jakarta font-extrabold text-xl text-gray-100 tracking-tight">Message Sent Successfully!</h3>
+            <p id="transmission-desc" class="font-inter text-sm text-gray-300 leading-relaxed">Thank you! Your proposal has been transmitted directly to Raj Rathod. A confirmation acknowledgment has also been dispatched to your inbox.</p>
+          </div>
+
+          <div class="pt-2">
+            <button id="transmission-close-btn" class="w-full sm:w-auto px-8 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 hover:border-white/30 transition-all text-xs font-mono text-gray-200 hover:text-white active:scale-95 shadow-lg cursor-pointer">
+              Close
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1045,10 +1054,12 @@ export class Home {
     fetchGitHubData();
 
     // 4. Modal Handlers (Root Body Mounting & Viewport Scroll Locking)
+    // Remove any previously orphaned duplicate modals in document.body to prevent ID collisions across page renders
+    document.querySelectorAll('body > #transmission-modal').forEach(el => el.remove());
+    document.querySelectorAll('body > #cert-modal').forEach(el => el.remove());
+
     const modal = document.getElementById('transmission-modal');
-    const modalCloseBtn = document.getElementById('transmission-close-btn');
     const certModal = document.getElementById('cert-modal');
-    const certCloseBtn = document.getElementById('cert-modal-close-btn');
 
     // Mount modals directly to body root to prevent CSS transform displacement
     if (modal && modal.parentElement !== document.body) {
@@ -1059,42 +1070,67 @@ export class Home {
     }
 
     const showModal = (type, title, desc) => {
-      const iconContainer = document.getElementById('transmission-icon-container');
-      const titleEl = document.getElementById('transmission-title');
-      const descEl = document.getElementById('transmission-desc');
-      if (!modal) return;
+      const activeModal = document.getElementById('transmission-modal');
+      if (!activeModal) return;
+
+      const iconContainer = activeModal.querySelector('#transmission-icon-container');
+      const titleEl = activeModal.querySelector('#transmission-title');
+      const descEl = activeModal.querySelector('#transmission-desc');
+      const accentBar = activeModal.querySelector('#transmission-accent-bar');
 
       const isSuccess = type === 'success';
+      const isInfo = type === 'info';
+
       if (iconContainer) {
-        iconContainer.className = `w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl border ${isSuccess ? 'bg-teal/10 border-teal/30 text-teal' : 'bg-rose/10 border-rose/30 text-rose'}`;
-        iconContainer.innerHTML = `<i class="fa-solid ${isSuccess ? 'fa-check' : 'fa-triangle-exclamation'}"></i>`;
+        if (isSuccess) {
+          iconContainer.className = 'w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl border bg-teal/15 border-teal/40 text-teal shadow-lg shadow-teal/20 transition-all duration-300';
+          iconContainer.innerHTML = '<i class="fa-solid fa-check"></i>';
+          if (accentBar) accentBar.className = 'absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal via-primary to-secondary';
+        } else if (isInfo) {
+          iconContainer.className = 'w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl border bg-primary/15 border-primary/40 text-primary shadow-lg shadow-primary/20 transition-all duration-300';
+          iconContainer.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+          if (accentBar) accentBar.className = 'absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent';
+        } else {
+          iconContainer.className = 'w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl border bg-rose/15 border-rose/40 text-rose shadow-lg shadow-rose/20 transition-all duration-300';
+          iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+          if (accentBar) accentBar.className = 'absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose via-accent to-secondary';
+        }
       }
-      if (titleEl) titleEl.textContent = title;
-      if (descEl) descEl.textContent = desc;
+
+      if (titleEl) {
+        titleEl.textContent = title || (isSuccess ? 'Message Sent Successfully!' : 'Notification');
+      }
+      if (descEl) {
+        descEl.textContent = desc || (isSuccess ? 'Thank you! Your proposal has been transmitted directly to Raj Rathod. A confirmation acknowledgment has also been dispatched to your inbox.' : '');
+      }
 
       document.documentElement.classList.add('noscroll');
       document.body.classList.add('noscroll');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      activeModal.classList.remove('hidden');
+      activeModal.classList.add('flex');
     };
 
+    window.showPortfolioModal = showModal;
+
     const closeModal = () => {
-      if (modal) {
+      const activeModal = document.getElementById('transmission-modal');
+      if (activeModal) {
         document.documentElement.classList.remove('noscroll');
         document.body.classList.remove('noscroll');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        activeModal.classList.add('hidden');
+        activeModal.classList.remove('flex');
       }
     };
 
+    const modalCloseBtn = modal ? modal.querySelector('#transmission-close-btn') : null;
     if (modalCloseBtn) {
-      modalCloseBtn.addEventListener('click', closeModal);
+      modalCloseBtn.onclick = closeModal;
     }
 
     if (modal) {
-      modal.addEventListener('click', (e) => {
+      modal.onclick = (e) => {
         if (e.target === modal) closeModal();
-      });
+      };
     }
 
     // 4.1 Certificate Preview Modal Handlers
@@ -1184,12 +1220,15 @@ export class Home {
     document.querySelectorAll('.cert-preview-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
+        const activeCertModal = document.getElementById('cert-modal');
+        if (!activeCertModal) return;
+
         const certData = JSON.parse(btn.dataset.cert || '{}');
-        const titleEl = document.getElementById('cert-modal-title');
-        const issuerEl = document.getElementById('cert-modal-issuer');
-        const verifyBtn = document.getElementById('cert-modal-verify-btn');
-        const iconEl = document.getElementById('cert-modal-icon');
-        const bodyEl = document.getElementById('cert-modal-body');
+        const titleEl = activeCertModal.querySelector('#cert-modal-title');
+        const issuerEl = activeCertModal.querySelector('#cert-modal-issuer');
+        const verifyBtn = activeCertModal.querySelector('#cert-modal-verify-btn');
+        const iconEl = activeCertModal.querySelector('#cert-modal-icon');
+        const bodyEl = activeCertModal.querySelector('#cert-modal-body');
 
         if (titleEl) titleEl.textContent = certData.title || 'Certificate Preview';
         if (issuerEl) issuerEl.textContent = certData.issuer || '';
