@@ -9,6 +9,7 @@ import { commandPalette } from './components/CommandPalette.js';
 import { initMagneticCursor } from './utils/magneticCursor.js';
 import { initCardTilt } from './utils/cardTilt.js';
 import { trackVisit, trackInteraction, getApiBaseUrl } from './utils/analytics.js';
+import { OVERRIDES_MAP } from './data/projectOverrides.js';
 
 // Pre-warm Render backend server immediately on page load to prevent cold start delay
 (function prewarmBackend() {
@@ -147,6 +148,43 @@ export function applyBossOverrides(reposList) {
   } catch (e) {
     return reposList;
   }
+}
+
+/**
+ * Apply manual project overrides from projectOverrides.js onto a repo list.
+ * Overrides take priority over GitHub-fetched data for:
+ *   category, live URL, description, displayTitle, featured, technologies, pushed_at.
+ * Repos with `manualOnly: true` in the overrides file are injected separately
+ * via processAndSetRepos — this function only patches existing repos.
+ *
+ * @param {Array} reposList - Array of processed repo objects
+ * @returns {Array} repos with override fields merged in
+ */
+export function applyProjectOverrides(reposList) {
+  if (!Array.isArray(reposList)) return reposList;
+  return reposList.map(repo => {
+    const key = (repo.name || '').toLowerCase().trim();
+    const override = OVERRIDES_MAP[key];
+    if (!override) return repo;
+
+    return {
+      ...repo,
+      // Category override — the most important fix
+      category: override.category || repo.category,
+      // Live URL override
+      live: override.live !== undefined ? override.live : (repo.live || repo.homepage || ''),
+      // Description override
+      description: override.description || repo.description,
+      // Featured override
+      featured: typeof override.featured === 'boolean' ? override.featured : repo.featured,
+      // Display title override
+      displayTitle: override.displayTitle || repo.displayTitle || repo.name,
+      // Technology tags for chatbot context
+      technologies: override.technologies || repo.technologies || [],
+      // pushed_at override for correct "recent" ordering
+      pushed_at: override.pushed_at_override || repo.pushed_at || repo.updated_at || repo.created_at,
+    };
+  });
 }
 
 export function deduplicateRepos(reposList) {
@@ -583,24 +621,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {}
 
   const processAndSetRepos = (rawGithubRepos) => {
+    // Step 1: Map GitHub API data → normalised repo objects with category + group info
     const merged = rawGithubRepos.map(repo => {
       const match = meta.find(m => m.repo && m.repo.toLowerCase() === (repo.name || '').toLowerCase());
+      // projects.json still provides initial featured + live URL hints
       const category = getProjectCategory(repo, meta);
       const isGroup = isGroupProject(repo.name, meta);
       const featured = match ? match.featured === true : false;
+      const live = match?.live || repo.homepage || '';
       return {
         ...repo,
         category,
         isGroup,
-        featured
+        featured,
+        live
       };
     });
+
+    // Step 2: Apply manual overrides from projectOverrides.js
+    // These take priority over GitHub data and projects.json for correcting
+    // categories, live URLs, descriptions, featured status, and date ordering.
+    const withOverrides = applyProjectOverrides(merged);
+
+    // Step 3: Inject upcoming projects (only if not already present)
     UPCOMING_PROJECTS.forEach(up => {
-      const exists = merged.some(r => r.name.toLowerCase() === up.name.toLowerCase());
-      if (!exists) merged.unshift(up);
+      const exists = withOverrides.some(r => r.name.toLowerCase() === up.name.toLowerCase());
+      if (!exists) withOverrides.unshift(up);
     });
-    const sorted = sortReposWithFeaturedTop(merged);
+
+    // Step 4: Deduplicate, apply boss localStorage overrides, then sort
+    const sorted = sortReposWithFeaturedTop(withOverrides);
     window.portfolioData = { repos: sorted, meta };
+
+    // Notify components that project data has been updated
+    window.dispatchEvent(new CustomEvent('portfolioDataUpdated', { detail: { repos: sorted } }));
     return sorted;
   };
 
@@ -643,21 +697,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const fresh = await fetchGitHubRepositories(true);
         if (fresh && Array.isArray(fresh) && fresh.length > 0) {
-          const freshMapped = fresh.map(repo => {
-            const match = meta.find(m => m.repo.toLowerCase() === repo.name.toLowerCase());
-            const category = getProjectCategory(repo, meta);
-            const isGroup = isGroupProject(repo.name, meta);
-            const featured = match ? match.featured === true : false;
-            return { ...repo, category, isGroup, featured };
-          });
-          UPCOMING_PROJECTS.forEach(up => {
-            if (!freshMapped.some(r => r.name.toLowerCase() === up.name.toLowerCase())) {
-              freshMapped.unshift(up);
-            }
-          });
-          const updatedRepos = sortReposWithFeaturedTop(freshMapped);
-          window.portfolioData = { repos: updatedRepos, meta };
-          window.dispatchEvent(new CustomEvent('portfolioDataUpdated', { detail: { repos: updatedRepos } }));
+          // Re-use processAndSetRepos to ensure overrides are always applied on sync
+          processAndSetRepos(fresh);
         }
       } catch (e) {
         console.log('Background repo auto-sync notice:', e.message);
