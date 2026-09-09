@@ -60,7 +60,7 @@ export class Hero {
               <div class="relative border border-white/10 rounded-2xl p-6 flex flex-col items-center text-center space-y-5 spotlight-card" style="background: rgba(22,27,34,0.85);">
                 <div class="relative">
                   <div class="w-32 h-32 rounded-full p-0.5 bg-gradient-to-tr from-primary via-secondary to-accent profile-pic-container">
-                    <img src="/raj.jpeg" alt="Raj Rathod" class="w-full h-full object-cover rounded-full filter grayscale hover:grayscale-0 transition-[filter] duration-300">
+                    <img src="/raj.jpeg" alt="Raj Rathod - AI & Machine Learning Engineer" class="w-full h-full object-cover rounded-full filter grayscale hover:grayscale-0 transition-[filter] duration-300">
                   </div>
                   <div class="absolute -top-1 -right-1 w-7 h-7 rounded-full border border-white/10 flex items-center justify-center text-xs animate-bounce" style="background: rgba(22,27,34,0.9)"><i class="fa-solid fa-robot text-primary"></i></div>
                 </div>
