@@ -781,7 +781,7 @@ export class Home {
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1">
                   <label for="msg-name" class="block font-mono text-[10px] text-gray-500 uppercase">Name</label>
-                  <input type="text" id="msg-name" name="name" required placeholder="Your name" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary text-gray-100 transition-colors placeholder-gray-600">
+                  <input type="text" id="msg-name" name="name" placeholder="Your name" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary text-gray-100 transition-colors placeholder-gray-600">
                 </div>
                 <div class="space-y-1">
                   <label for="msg-email" class="block font-mono text-[10px] text-gray-500 uppercase">Email</label>
@@ -791,7 +791,7 @@ export class Home {
 
               <div class="space-y-1">
                 <label for="msg-subj" class="block font-mono text-[10px] text-gray-500 uppercase">Subject</label>
-                <input type="text" id="msg-subj" name="_subject_custom" required placeholder="Project / Collaboration / Internship" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary text-gray-100 transition-colors placeholder-gray-600">
+                <input type="text" id="msg-subj" name="_subject_custom" placeholder="Project / Collaboration / Internship" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary text-gray-100 transition-colors placeholder-gray-600">
               </div>
 
               <div class="space-y-1">
@@ -1518,12 +1518,23 @@ export class Home {
       contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('contact-btn');
-        if (btn) { btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Sending...'; btn.disabled = true; }
 
-        const nameVal = document.getElementById('msg-name')?.value.trim();
-        const emailVal = document.getElementById('msg-email')?.value.trim();
-        const subjectVal = document.getElementById('msg-subj')?.value.trim();
-        const messageVal = document.getElementById('msg-content')?.value.trim();
+        const nameVal = document.getElementById('msg-name')?.value.trim() || '';
+        const emailVal = document.getElementById('msg-email')?.value.trim() || '';
+        const subjectVal = document.getElementById('msg-subj')?.value.trim() || '';
+        const messageVal = document.getElementById('msg-content')?.value.trim() || '';
+
+        // Minimal, non-restrictive validation: only require email & message
+        if (!emailVal || !emailVal.includes('@') || !emailVal.includes('.')) {
+          showModal('error', 'Valid Email Required', 'Please provide a valid email address so I can respond to your message.');
+          return;
+        }
+        if (!messageVal) {
+          showModal('error', 'Message Required', 'Please enter your message or proposal details before sending.');
+          return;
+        }
+
+        if (btn) { btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Sending...'; btn.disabled = true; }
 
         const tempContact = { name: nameVal, email: emailVal, subject: subjectVal, message: messageVal, timestamp: Date.now() };
         localStorage.setItem('tempContactMessage', JSON.stringify(tempContact));
@@ -1532,17 +1543,25 @@ export class Home {
           const res = await fetch(getApiBaseUrl() + '/api/contact', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: nameVal, email: emailVal, subject: subjectVal, message: messageVal })
+            body: JSON.stringify({
+              name: nameVal || 'Visitor / Colleague',
+              email: emailVal,
+              subject: subjectVal || 'Project Proposal / Collaboration Inquiry',
+              message: messageVal
+            })
           });
-          
-          if (!res.ok) throw new Error('Backend contact submission failed');
-          
-          showModal('success', 'Message Sent!', 'Thank you! I will get back to you soon.');
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'Backend contact submission failed');
+          }
+
+          showModal('success', 'Message Sent Successfully', 'Thank you! Your proposal has been transmitted directly to Raj Rathod. A confirmation acknowledgment has also been dispatched to your inbox.');
           contactForm.reset();
           localStorage.removeItem('tempContactMessage');
         } catch (err) {
           console.error('Contact submission error:', err);
-          showModal('error', 'Failed to Send', 'Could not establish connection to the mail server. Please try emailing directly at rathodraj1504@gmail.com');
+          showModal('error', 'Transmission Notice', 'Could not establish connection with the mail gateway. Please reach out directly to Raj at rathodraj1504@gmail.com');
         }
 
         if (btn) { btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message'; btn.disabled = false; }
