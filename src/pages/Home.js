@@ -1134,7 +1134,6 @@ export class Home {
     }
 
     // 4.1 Certificate Preview Modal Handlers
-    const certModal = document.getElementById('cert-preview-modal');
     const certCloseBtn = document.getElementById('cert-modal-close-btn');
 
     const closeCertModal = () => {

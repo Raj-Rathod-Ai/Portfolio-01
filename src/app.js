@@ -1,4 +1,4 @@
-import { fetchGitHubRepositories } from './api/github.js';
+import { fetchGitHubRepositories, FALLBACK_REPOS } from './api/github.js';
 import { getProjectCategory, UPCOMING_PROJECTS } from './utils/categorize.js';
 import { isGroupProject } from './utils/helpers.js';
 import { initRouter } from './router.js';
@@ -453,7 +453,28 @@ function initPreloader(onLoadedCallback) {
     'Calibrating Multi-Turn Assistant...',
     'Portfolio Ready.'
   ];
-  let currentStepIdx = 0;
+  // Safety watchdog timer: guarantees preloader dismisses within 3.0s under any circumstance
+  let preloaderDismissed = false;
+  const dismissPreloader = () => {
+    if (preloaderDismissed) return;
+    preloaderDismissed = true;
+    clearInterval(preloaderInterval);
+    if (preloader && preloader.parentNode) {
+      preloader.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease';
+      preloader.style.opacity = '0';
+      preloader.style.filter = 'blur(12px)';
+      document.documentElement.classList.remove('noscroll');
+      setTimeout(() => {
+        if (preloader.parentNode) preloader.remove();
+        onLoadedCallback();
+      }, 650);
+    } else {
+      document.documentElement.classList.remove('noscroll');
+      onLoadedCallback();
+    }
+  };
+
+  const watchdog = setTimeout(dismissPreloader, 3000);
 
   const preloaderInterval = setInterval(() => {
     progress += Math.random() * 3.6 + 1.4;
@@ -461,23 +482,13 @@ function initPreloader(onLoadedCallback) {
     if (progress >= 100) {
       progress = 100;
       clearInterval(preloaderInterval);
+      clearTimeout(watchdog);
 
       if (bar) bar.style.width = '100%';
       if (perc) perc.textContent = '100%';
       if (status) status.textContent = 'Portfolio Ready.';
 
-      setTimeout(() => {
-        preloader.style.transition = 'opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease, transform 0.75s ease';
-        preloader.style.opacity = '0';
-        preloader.style.filter = 'blur(16px)';
-        preloader.style.transform = 'scale(1.03)';
-        document.documentElement.classList.remove('noscroll');
-
-        setTimeout(() => {
-          if (preloader.parentNode) preloader.remove();
-          onLoadedCallback(); // Initialize SPA routes
-        }, 800);
-      }, 300);
+      setTimeout(dismissPreloader, 250);
       return;
     }
 
@@ -518,6 +529,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNeuralCanvas();
   initMouseSpotlight();
 
+  // ─── START PRELOADER IMMEDIATELY (no blocking!) ───────────────────────
+  const preloaderPromise = new Promise(resolve => {
+    initPreloader(resolve);
+  });
+
   // Clear any legacy cached duplicate repos from browser localStorage
   try {
     const cachedStr = localStorage.getItem('github_repositories_cache');
@@ -540,7 +556,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const apiUrl = getApiBaseUrl();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1500);
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
     const overrideRes = await fetch(apiUrl + '/api/project-overrides', { signal: controller.signal });
     clearTimeout(timeoutId);
     if (overrideRes.ok && overrideRes.headers.get('content-type')?.includes('application/json')) {
@@ -580,32 +596,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  try {
-    const githubRepos = await fetchGitHubRepositories();
-    repos = processAndSetRepos(githubRepos);
-  } catch (err) {
-    console.error('Failed fetching repository datasets:', err.message);
-    repos = processAndSetRepos(UPCOMING_PROJECTS);
-  }
+  // Populate repos immediately from FALLBACK_REPOS so app can mount instantly
+  repos = processAndSetRepos(FALLBACK_REPOS);
 
-  // Trigger preloader and start routing on completion
-  initPreloader(() => {
-    // Setup navbar, footer, and AI Chatbot
-    navbar.setup();
-    footer.setup();
+  // Concurrently fetch fresh GitHub repositories in background without blocking mount
+  fetchGitHubRepositories().then(githubRepos => {
+    if (Array.isArray(githubRepos) && githubRepos.length > 0) {
+      repos = processAndSetRepos(githubRepos);
+    }
+  }).catch(err => {
+    console.warn('Background GitHub sync notice:', err.message);
+  });
 
-    const chatMount = document.createElement('div');
-    chatMount.id = 'chatbot-mount';
-    chatMount.innerHTML = chatbot.render();
-    document.body.appendChild(chatMount);
-    chatbot.setup();
+  // Wait for preloader to finish its smooth entrance
+  await preloaderPromise;
 
-    // Register animations, 3D tilt, command palette, and routes
-    initIntersectionObservers();
-    initMagneticCursor();
-    initCardTilt();
-    commandPalette.setup();
-    initRouter();
+  // Setup navbar, footer, and AI Chatbot
+  navbar.setup();
+  footer.setup();
+
+  const chatMount = document.createElement('div');
+  chatMount.id = 'chatbot-mount';
+  chatMount.innerHTML = chatbot.render();
+  document.body.appendChild(chatMount);
+  chatbot.setup();
+
+  // Register animations, 3D tilt, command palette, and routes
+  initIntersectionObservers();
+  initMagneticCursor();
+  initCardTilt();
+  commandPalette.setup();
+  initRouter();
 
     // Background auto-sync engine: Silently fetch fresh GitHub repositories & URLs
     const syncFreshRepos = async () => {
@@ -645,5 +666,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         syncFreshRepos();
       }
     });
-  });
 });
