@@ -1798,11 +1798,14 @@ RAJ RATHOD'S PROFILE DATA:
     1. Library Management System: Book cataloging and inventory app. Live Demo: https://librarymangement1.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Library-Mangement
     2. NeuroOS: AI-powered operating system web interface. GitHub: https://github.com/Raj-Rathod-Ai/neuro-os
 - Certifications:
-  1. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
-  2. Java Programming Certification.
-  3. Prompt Engineering & GenAI Certification.
-  4. Python Programming Certification.
-  5. Networks & Protocols (NPTEL IIT).
+  1. Microsoft Applied Skills: Developing Agents in Microsoft Foundry (Microsoft - Credential ID: 653B346FEC048451, Sept 2026).
+  2. AI and Data Scientist (OneRoadmap - Credential ID: CERT-0B760053, Sept 2026).
+  3. Applied AI & Machine Learning - Associate Readiness (OneRoadmap - Credential ID: CERT-A93F0D60, Sept 2026).
+  4. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
+  5. Java Programming Certification.
+  6. Prompt Engineering & GenAI Certification.
+  7. Python Programming Certification.
+  8. Networks & Protocols (NPTEL IIT).
 - Contact Details & Profiles:
   * Email: rathodraj1504@gmail.com
   * GitHub Profile: https://github.com/Raj-Rathod-Ai

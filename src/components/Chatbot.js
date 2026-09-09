@@ -1008,11 +1008,14 @@ ALL REPOSITORIES & PROJECTS (WITH VERIFIED LIVE DEMOS & GITHUB REPOS):
 ${repoListText}
 
 Certifications & Accreditations:
-1. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
-2. Java Programming Certification.
-3. Prompt Engineering & GenAI Certification.
-4. Python Programming Certification.
-5. Networks & Protocols (NPTEL IIT).
+1. Microsoft Applied Skills: Developing Agents in Microsoft Foundry (Microsoft - Credential ID: 653B346FEC048451, Sept 2026).
+2. AI and Data Scientist (OneRoadmap - Credential ID: CERT-0B760053, Sept 2026).
+3. Applied AI & Machine Learning - Associate Readiness (OneRoadmap - Credential ID: CERT-A93F0D60, Sept 2026).
+4. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
+5. Java Programming Certification.
+6. Prompt Engineering & GenAI Certification.
+7. Python Programming Certification.
+8. Networks & Protocols (NPTEL IIT).
 
 Contact Details:
 - Email: rathodraj1504@gmail.com
@@ -1120,7 +1123,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                  `• 📈 **Academic Performance**: **7.66 CGPA**\n` +
                  `• 💻 **Algorithmic Rigor**: Solved **350+ problems on LeetCode** ([leetcode.com/u/Raj-Rathod](https://leetcode.com))\n` +
                  `• 🧠 **Specialization**: Deep Learning (BiGRU, RNN, CNN), NLP, Predictive Modeling, GenAI & RAG systems\n` +
-                 `• 🏆 **Certifications**: Data Science & Analytics with GenAI (Sheryians Coding School), Java, Python, Prompt Engineering, NPTEL\n` +
+                 `• 🏆 **Certifications**: Microsoft Applied Skills (Agentic AI), OneRoadmap (AI & Data Scientist), Data Science & Analytics with GenAI (Sheryians), Java, Python, Prompt Engineering, NPTEL\n` +
                  `• 📂 **Portfolio**: 24+ open-source AI & web engineering repositories on GitHub\n\n` +
                  `📄 **Resumes**: [AI/ML Resume](/Rathod_Raj_Ai_Update.pdf) | [Full-Stack Resume](/Rathod_Raj_FullStack.pdf)\n` +
                  `📬 **Contact**: rathodraj1504@gmail.com | [LinkedIn](https://linkedin.com/in/raj-rathod-ai)`
