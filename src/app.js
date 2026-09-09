@@ -1,4 +1,4 @@
-import { fetchGitHubRepositories } from './api/github.js';
+import { fetchGitHubRepositories, FALLBACK_REPOS } from './api/github.js';
 import { getProjectCategory, UPCOMING_PROJECTS } from './utils/categorize.js';
 import { isGroupProject } from './utils/helpers.js';
 import { initRouter } from './router.js';
@@ -432,6 +432,8 @@ function initMouseSpotlight() {
 
 
 /**
+ * Initialize cinematic kinetic preloader.
+ */
 function initPreloader(onLoadedCallback) {
   const brand = document.getElementById('preloader-brand');
   const bar = document.getElementById('pl-bar');
@@ -493,7 +495,28 @@ function initPreloader(onLoadedCallback) {
     'Calibrating Assistant...',
     'Portfolio Ready.'
   ];
-  let currentStepIdx = 0;
+  // Safety watchdog timer: guarantees preloader dismisses within 3.2s even on slow devices
+  let preloaderDismissed = false;
+  const dismissPreloader = () => {
+    if (preloaderDismissed) return;
+    preloaderDismissed = true;
+    clearInterval(preloaderInterval);
+    if (preloader && preloader.parentNode) {
+      preloader.style.transition = 'opacity 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.6s ease';
+      preloader.style.opacity = '0';
+      preloader.style.filter = 'blur(10px)';
+      document.documentElement.classList.remove('noscroll');
+      setTimeout(() => {
+        if (preloader.parentNode) preloader.remove();
+        onLoadedCallback();
+      }, 650);
+    } else {
+      document.documentElement.classList.remove('noscroll');
+      onLoadedCallback();
+    }
+  };
+
+  const watchdog = setTimeout(dismissPreloader, 3200);
 
   const preloaderInterval = setInterval(() => {
     progress += Math.random() * 3.6 + 1.4;
@@ -501,23 +524,13 @@ function initPreloader(onLoadedCallback) {
     if (progress >= 100) {
       progress = 100;
       clearInterval(preloaderInterval);
+      clearTimeout(watchdog);
 
       if (bar) bar.style.width = '100%';
       if (perc) perc.textContent = '100%';
       if (status) status.textContent = 'Portfolio Ready.';
 
-      setTimeout(() => {
-        preloader.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), filter 0.7s ease, transform 0.7s ease';
-        preloader.style.opacity = '0';
-        preloader.style.filter = 'blur(12px)';
-        preloader.style.transform = 'scale(1.02)';
-        document.documentElement.classList.remove('noscroll');
-
-        setTimeout(() => {
-          if (preloader.parentNode) preloader.remove();
-          onLoadedCallback();
-        }, 750);
-      }, 300);
+      setTimeout(dismissPreloader, 250);
       return;
     }
 
@@ -673,18 +686,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // Fetch GitHub repos — max 3.5s timeout, then fall back to static data
-  try {
-    const githubRepos = await fetchGitHubRepositories();
-    repos = processAndSetRepos(githubRepos);
-  } catch (err) {
-    console.error('Failed fetching repository datasets:', err.message);
-    repos = processAndSetRepos(UPCOMING_PROJECTS);
-  }
+  // ─── INSTANT DATA INITIALIZATION (Zero-blocking) ────────────────────
+  // 1. Immediately initialize with FALLBACK_REPOS so window.portfolioData is ready in 0ms
+  repos = processAndSetRepos(FALLBACK_REPOS);
+
+  // 2. Concurrently fetch fresh GitHub repositories in background without blocking mount
+  fetchGitHubRepositories().then(githubRepos => {
+    if (Array.isArray(githubRepos) && githubRepos.length > 0) {
+      repos = processAndSetRepos(githubRepos);
+    }
+  }).catch(err => {
+    console.warn('Background GitHub sync notice:', err.message);
+  });
 
   // ─── WAIT FOR PRELOADER ANIMATION TO FINISH ──────────────────────────
-  // By now data is loaded. If preloader already finished, this resolves instantly.
-  // If still animating (unlikely since it runs ~2.5s and data takes ~0-3.5s), we wait.
   await preloaderReady;
 
   // ─── BOOTSTRAP APP ───────────────────────────────────────────────────
