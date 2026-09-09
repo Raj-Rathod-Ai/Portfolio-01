@@ -59,20 +59,15 @@ export class Chatbot {
   }
 
   /**
-   * Get recently added / updated projects dynamically sorted by real last-push date.
-   * Sort priority: pushed_at > updated_at > created_at
-   *
-   * NOTE: pushed_at is set by applyProjectOverrides() in app.js from pushed_at_override,
-   * so manually specified ordering from projectOverrides.js is respected here automatically.
-   * @param {number} count
+   * Get recently added / updated projects dynamically sorted by real creation/push date.
+   * @param {number} count 
    * @returns {Array}
    */
   getRecentProjects(count = 5) {
     const valid = this.getValidRepos();
-    return [...valid].filter(r => !r.isUpcoming).sort((a, b) => {
-      // pushed_at = last real git commit activity (most accurate "recently worked on" signal)
-      const dateA = new Date(a.pushed_at || a.updated_at || a.created_at || 0).getTime();
-      const dateB = new Date(b.pushed_at || b.updated_at || b.created_at || 0).getTime();
+    return [...valid].sort((a, b) => {
+      const dateA = new Date(a.created_at || a.pushed_at || a.updated_at || 0).getTime();
+      const dateB = new Date(b.created_at || b.pushed_at || b.updated_at || 0).getTime();
       return dateB - dateA;
     }).slice(0, count);
   }
@@ -994,14 +989,9 @@ export class Chatbot {
     // Format full repo metadata for context with explicit Live Demo URLs
     const repoListText = validRepos.length > 0
       ? validRepos.map((r, idx) => {
-          // Use pushed_at (last git push) as the most accurate "when was this worked on" date
-          const activityDate = r.pushed_at || r.updated_at || r.created_at;
-          const dateStr = activityDate ? new Date(activityDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
-          // Handle both string and array live URLs (e.g. TruthLens multi-deploy)
-          const liveRaw = r.live || r.homepage;
-          const liveUrl = Array.isArray(liveRaw) ? liveRaw.join(' & ') : (liveRaw || 'None (Code on GitHub)');
-          const techStr = (r.technologies || r.topics || []).join(', ') || r.language || 'Python';
-          return `${idx + 1}. ${r.displayTitle || r.name} [repo: ${r.name}] (Category: ${r.category || 'ML/AI'}, Stack: ${techStr}, Last Activity: ${dateStr}) - ${r.description || 'N/A'} | Live Demo: ${liveUrl} | GitHub: ${r.html_url}`;
+          const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+          const liveUrl = r.live || r.homepage || 'None (Code on GitHub)';
+          return `${idx + 1}. ${r.name} (Category: ${r.category || 'ML/AI'}, Stack: ${r.language || 'Python'}, Added: ${dateStr}) - Description: ${r.description || 'N/A'} [Topics: ${(r.topics || []).join(', ')}] Live Demo URL: ${liveUrl} | GitHub Repo: ${r.html_url}`;
         }).join('\n')
       : `- FruitsCheck-CNN-Fruit-Freshness (Category: Deep Learning): Live Demo: https://fruits-check.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness
 - Sukoon-Saathi (Category: Machine Learning): Live Demo: https://sukoonsaathi-frontend.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/Sukoon-Saathi
@@ -1018,14 +1008,11 @@ export class Chatbot {
 - Food_Delivery_Time-Using-ML (Category: Machine Learning): Live Demo: https://fooddelivery-time.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML
 - Discover-Your-True-Personality (Category: Machine Learning): Live Demo: https://discover-your-true-personality.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
 - stone-paper-scissors-python (Category: Python Concepts): Live Demo: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/
-- Library-Mangement (Category: Normal Projects): Live Demo: https://librarymangement1.streamlit.app/`;
+- Library-Mangement (Category: Software Systems): Live Demo: https://librarymangement1.streamlit.app/`;
 
     const recentTopSummary = sortedRecent.map((p, idx) => {
-      const activityDate = p.pushed_at || p.updated_at || p.created_at;
-      const createdDate = activityDate ? new Date(activityDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
-      const liveRaw = p.live || p.homepage;
-      const liveUrl = Array.isArray(liveRaw) ? liveRaw.join(' & ') : (liveRaw || 'None (Code on GitHub)');
-
+      const createdDate = p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+      const liveUrl = p.live || p.homepage || 'None (Code on GitHub)';
       return `${idx + 1}. ${p.name} (Category: ${p.category || 'AI/ML'}, Added: ${createdDate}, Live Demo: ${liveUrl}, GitHub: ${p.html_url}) - ${p.description || ''}`;
     }).join('\n');
 

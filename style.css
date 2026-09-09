@@ -11,7 +11,7 @@
 
 
 html {
-  /* scroll-behavior: smooth; â€” Lenis handles this */
+  /* scroll-behavior: smooth; — Lenis handles this */
   overflow-x: hidden;
 }
 
@@ -49,11 +49,11 @@ html.noscroll, body.noscroll, .noscroll {
   background: #0d1117;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #10b981;
+  background: #8b5cf6;
 }
 
 /* ===== SCROLL PROGRESS BAR ===== */
@@ -62,7 +62,7 @@ html.noscroll, body.noscroll, .noscroll {
   top: 0;
   left: 0;
   height: 3px;
-  background: linear-gradient(to right, #0ea5e9, #10b981, #f97316, #14b8a6);
+  background: linear-gradient(to right, #6366f1, #8b5cf6, #f59e0b, #14b8a6);
   z-index: 99999;
   width: 0%;
   transition: width 0.1s ease-out;
@@ -83,18 +83,18 @@ html.noscroll, body.noscroll, .noscroll {
   animation: floatBlob 25s infinite alternate ease-in-out;
 }
 .blob-primary {
-  background: radial-gradient(circle, #0ea5e9 0%, transparent 80%);
+  background: radial-gradient(circle, #6366f1 0%, transparent 80%);
   top: -10%; left: -10%;
   animation-duration: 22s;
 }
 .blob-secondary {
-  background: radial-gradient(circle, #10b981 0%, transparent 80%);
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 80%);
   bottom: -15%; right: -10%;
   animation-duration: 28s;
   animation-delay: -5s;
 }
 .blob-accent {
-  background: radial-gradient(circle, #f97316 0%, transparent 80%);
+  background: radial-gradient(circle, #f59e0b 0%, transparent 80%);
   top: 35%; left: 55%;
   animation-duration: 24s;
   animation-delay: -12s;
@@ -129,7 +129,7 @@ html.noscroll, body.noscroll, .noscroll {
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0ea5e9, #10b981, #f97316);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #f59e0b);
   z-index: -1;
   opacity: 0.6;
   filter: blur(8px);
@@ -152,7 +152,7 @@ html.noscroll, body.noscroll, .noscroll {
   position: absolute;
   top: 0; left: 0;
   right: 0; bottom: 0;
-  background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(14, 165, 233, 0.08), transparent 40%);
+  background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(99, 102, 241, 0.08), transparent 40%);
   z-index: 1;
   pointer-events: none;
   opacity: 0;
@@ -164,7 +164,7 @@ html.noscroll, body.noscroll, .noscroll {
 
 /* ===== PREMIUM HOVER DECORATIONS ===== */
 .hover-glow:hover {
-  box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
 }
 
 .hover-underline {
@@ -177,7 +177,7 @@ html.noscroll, body.noscroll, .noscroll {
   left: 0;
   width: 0%;
   height: 2px;
-  background: linear-gradient(90deg, #0ea5e9, #10b981);
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
   transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .hover-underline:hover::after {
@@ -186,7 +186,7 @@ html.noscroll, body.noscroll, .noscroll {
 
 /* ===== UNIQUE SCROLL ANIMATIONS FOR EVERY SECTION ===== */
 
-/* Base transition parameters â€” ultra smooth spring easing */
+/* Base transition parameters — ultra smooth spring easing */
 .scroll-reveal {
   opacity: 0;
   filter: blur(6px);
@@ -273,8 +273,8 @@ html.noscroll, body.noscroll, .noscroll {
 }
 .skill-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -10px rgba(14, 165, 233, 0.35);
-  border-color: rgba(14, 165, 233, 0.4);
+  box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.35);
+  border-color: rgba(99, 102, 241, 0.4);
 }
 
 /* Shimmer overlay effect for skills */
@@ -316,8 +316,8 @@ html.noscroll, body.noscroll, .noscroll {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #0ea5e9;
-  box-shadow: 0 0 12px #0ea5e9;
+  background: #6366f1;
+  box-shadow: 0 0 12px #6366f1;
 }
 
 /* ===== COMPAT SCROLL UTILS ===== */
@@ -353,19 +353,13 @@ html.noscroll, body.noscroll, .noscroll {
 .typewriter-cursor {
   display: inline-block;
   width: 2px;
-  background-color: #f97316; /* Accent color */
+  background-color: #f59e0b; /* Accent color */
   margin-left: 2px;
   animation: blink 0.75s step-end infinite;
 }
 @keyframes blink {
   from, to { background-color: transparent }
-  50% { background-color: #f97316; }
-}
-
-/* ===== CLICK RIPPLE EXPAND ===== */
-@keyframes rippleExpand {
-  0%   { width: 0; height: 0; opacity: 0.6; }
-  100% { width: 280px; height: 280px; opacity: 0; }
+  50% { background-color: #f59e0b; }
 }
 
 /* ===== MOBILE OPTIMIZATIONS ===== */
@@ -395,7 +389,7 @@ html.noscroll, body.noscroll, .noscroll {
 }
 
 /* ============================================================
-   PREMIUM PROJECT SECTION â€” FLIP CARDS & INTERACTIONS
+   PREMIUM PROJECT SECTION — FLIP CARDS & INTERACTIONS
    ============================================================ */
 
 /* --- Stagger Delay Utilities --- */
@@ -419,9 +413,9 @@ html.noscroll, body.noscroll, .noscroll {
   height: 420px;
   width: 100%;
   cursor: pointer;
-  /* NO transform here â€” transforms on the outer element break perspective */
+  /* NO transform here — transforms on the outer element break perspective */
   position: relative;
-  /* Contain the flip completely â€” back face must never leak outside card bounds */
+  /* Contain the flip completely — back face must never leak outside card bounds */
   overflow: visible;
 }
 
@@ -435,13 +429,13 @@ html.noscroll, body.noscroll, .noscroll {
   will-change: transform;
 }
 
-/* Desktop: flip ONLY via .is-flipped â€” explicit 0.65s flip, no Y-offset */
+/* Desktop: flip ONLY via .is-flipped — explicit 0.65s flip, no Y-offset */
 .flip-card.is-flipped .flip-card-inner {
   transform: rotateY(180deg);
   transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* NOTE: No hover translateY on flip-card-inner â€” it causes a visible drop
+/* NOTE: No hover translateY on flip-card-inner — it causes a visible drop
    when the Y-offset resets to 0 simultaneously with the rotateY starting */
 
 
@@ -467,14 +461,14 @@ html.noscroll, body.noscroll, .noscroll {
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-/* Hover: glow border on front face only â€” no transform, no jump */
+/* Hover: glow border on front face only — no transform, no jump */
 .flip-card:not(.is-flipped):hover .flip-card-front {
-  border-color: rgba(14, 165, 233, 0.3);
-  box-shadow: 0 0 0 1px rgba(14,165,233,0.15), 0 8px 32px -8px rgba(14,165,233,0.2);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.15), 0 8px 32px -8px rgba(99,102,241,0.2);
 }
 
 .flip-card-back {
-  /* Back face starts at 180deg â€” transform-origin must match inner */
+  /* Back face starts at 180deg — transform-origin must match inner */
   transform: rotateY(180deg);
   transform-origin: center center;
   background: rgba(16, 20, 30, 0.98);
@@ -498,7 +492,7 @@ html.noscroll, body.noscroll, .noscroll {
 /* Custom smooth thin scrollbar for all scrollable containers (Chatbot & Cards) */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(14, 165, 233, 0.4) rgba(0, 0, 0, 0.2);
+  scrollbar-color: rgba(99, 102, 241, 0.4) rgba(0, 0, 0, 0.2);
   overscroll-behavior: contain;
 }
 .scrollbar-thin::-webkit-scrollbar {
@@ -509,22 +503,22 @@ html.noscroll, body.noscroll, .noscroll {
   border-radius: 4px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(14, 165, 233, 0.4);
+  background: rgba(99, 102, 241, 0.4);
   border-radius: 4px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.8);
+  background: rgba(139, 92, 246, 0.8);
 }
 
 .flip-card:hover .flip-card-front,
 .flip-card.is-flipped .flip-card-front {
-  box-shadow: 0 20px 50px -10px rgba(14, 165, 233, 0.25);
-  border-color: rgba(14, 165, 233, 0.3);
+  box-shadow: 0 20px 50px -10px rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
 .flip-card.is-flipped .flip-card-back {
-  box-shadow: 0 20px 50px -10px rgba(16, 185, 129, 0.3);
-  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 20px 50px -10px rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.35);
 }
 
 /* Spotlight glow overlay on flip-card-front */
@@ -532,7 +526,7 @@ html.noscroll, body.noscroll, .noscroll {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(14,165,233,0.07), transparent 40%);
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99,102,241,0.07), transparent 40%);
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.4s;
@@ -550,7 +544,7 @@ html.noscroll, body.noscroll, .noscroll {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #0ea5e9, #10b981, #f97316, #14b8a6);
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #f59e0b, #14b8a6);
   background-size: 200% 100%;
   animation: shimmerBar 2.5s linear infinite;
   z-index: 3;
@@ -577,18 +571,18 @@ html.noscroll, body.noscroll, .noscroll {
   backdrop-filter: blur(4px);
 }
 .flip-btn:hover {
-  background: rgba(14,165,233,0.2);
-  border-color: rgba(14,165,233,0.45);
+  background: rgba(99,102,241,0.2);
+  border-color: rgba(99,102,241,0.45);
   color: #a5b4fc;
   transform: rotate(180deg);
 }
 
 
 /* --- Category Badge Colors --- */
-.cat-badge-genai        { background: rgba(14,165,233,0.12); color: #818cf8; border-color: rgba(14,165,233,0.25); }
+.cat-badge-genai        { background: rgba(99,102,241,0.12); color: #818cf8; border-color: rgba(99,102,241,0.25); }
 .cat-badge-rag          { background: rgba(244,63,94,0.12);  color: #fb7185; border-color: rgba(244,63,94,0.25); }
 .cat-badge-dl           { background: rgba(20,184,166,0.12); color: #2dd4bf; border-color: rgba(20,184,166,0.25); }
-.cat-badge-nlp          { background: rgba(14,165,233,0.12); color: #c084fc; border-color: rgba(14,165,233,0.25); }
+.cat-badge-nlp          { background: rgba(168,85,247,0.12); color: #c084fc; border-color: rgba(168,85,247,0.25); }
 .cat-badge-ml           { background: rgba(59,130,246,0.12); color: #60a5fa; border-color: rgba(59,130,246,0.25); }
 .cat-badge-ds           { background: rgba(245,158,11,0.12); color: #fbbf24; border-color: rgba(245,158,11,0.25); }
 .cat-badge-cv           { background: rgba(6,182,212,0.12);  color: #22d3ee; border-color: rgba(6,182,212,0.25); }
@@ -630,8 +624,8 @@ html.noscroll, body.noscroll, .noscroll {
 }
 .premium-search-input::placeholder { color: rgba(156,163,175,0.5); }
 .premium-search-input:focus {
-  border-color: rgba(14,165,233,0.55);
-  box-shadow: 0 0 0 3px rgba(14,165,233,0.12), 0 4px 20px rgba(14,165,233,0.1);
+  border-color: rgba(99,102,241,0.55);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12), 0 4px 20px rgba(99,102,241,0.1);
   background: rgba(22,27,34,0.9);
 }
 .premium-search-input:focus ~ .search-icon,
@@ -679,15 +673,15 @@ html.noscroll, body.noscroll, .noscroll {
   user-select: none;
 }
 .filter-chip:hover {
-  border-color: rgba(14,165,233,0.4);
+  border-color: rgba(99,102,241,0.4);
   color: #e2e8f0;
-  background: rgba(14,165,233,0.08);
+  background: rgba(99,102,241,0.08);
 }
 .filter-chip.active {
-  background: linear-gradient(135deg, rgba(14,165,233,0.25), rgba(16,185,129,0.2));
-  border-color: rgba(14,165,233,0.5);
+  background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.2));
+  border-color: rgba(99,102,241,0.5);
   color: #c7d2fe;
-  box-shadow: 0 0 14px rgba(14,165,233,0.15);
+  box-shadow: 0 0 14px rgba(99,102,241,0.15);
 }
 
 /* --- Sort Dropdown --- */
@@ -715,10 +709,10 @@ html.noscroll, body.noscroll, .noscroll {
   transition: border-color 0.3s, box-shadow 0.3s;
   min-width: 160px;
 }
-.premium-sort-select:hover  { border-color: rgba(14,165,233,0.4); }
+.premium-sort-select:hover  { border-color: rgba(99,102,241,0.4); }
 .premium-sort-select:focus  {
-  border-color: rgba(14,165,233,0.55);
-  box-shadow: 0 0 0 3px rgba(14,165,233,0.12);
+  border-color: rgba(99,102,241,0.55);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
 }
 .sort-chevron {
   position: absolute;
@@ -744,7 +738,7 @@ html.noscroll, body.noscroll, .noscroll {
   position: absolute;
   inset: -1px;
   border-radius: 18px;
-  background: conic-gradient(from var(--angle, 0deg), #0ea5e9, #10b981, #f97316, #14b8a6, #0ea5e9);
+  background: conic-gradient(from var(--angle, 0deg), #6366f1, #8b5cf6, #f59e0b, #14b8a6, #6366f1);
   opacity: 0;
   transition: opacity 0.4s;
   z-index: 0;
@@ -817,14 +811,14 @@ html.noscroll, body.noscroll, .noscroll {
 
 /* Smooth hover glow pulse on Featured cards */
 .flip-card-front.is-featured {
-  box-shadow: 0 0 0 1px rgba(14,165,233,0.25), 0 8px 32px -8px rgba(14,165,233,0.2);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.25), 0 8px 32px -8px rgba(99,102,241,0.2);
 }
 .flip-card:hover .flip-card-front.is-featured {
-  box-shadow: 0 0 0 1px rgba(14,165,233,0.4), 0 16px 48px -8px rgba(14,165,233,0.35);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.4), 0 16px 48px -8px rgba(99,102,241,0.35);
   transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Upcoming card â€” default cursor since no flip */
+/* Upcoming card — default cursor since no flip */
 .flip-card-upcoming {
   cursor: default;
 }
@@ -842,11 +836,11 @@ html.noscroll, body.noscroll, .noscroll {
 
 @keyframes pulseCoreGlow {
   0%, 100% {
-    box-shadow: 0 0 35px rgba(14, 165, 233, 0.5), 0 0 70px rgba(14, 165, 233, 0.3), inset 0 0 20px rgba(14, 165, 233, 0.4);
+    box-shadow: 0 0 35px rgba(99, 102, 241, 0.5), 0 0 70px rgba(168, 85, 247, 0.3), inset 0 0 20px rgba(99, 102, 241, 0.4);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 55px rgba(14, 165, 233, 0.8), 0 0 100px rgba(20, 184, 166, 0.5), inset 0 0 30px rgba(20, 184, 166, 0.6);
+    box-shadow: 0 0 55px rgba(168, 85, 247, 0.8), 0 0 100px rgba(20, 184, 166, 0.5), inset 0 0 30px rgba(20, 184, 166, 0.6);
     transform: scale(1.06);
   }
 }
@@ -854,15 +848,15 @@ html.noscroll, body.noscroll, .noscroll {
 @keyframes chromaticTextShine {
   0% {
     background-position: 0% 50%;
-    filter: drop-shadow(0 0 20px rgba(14, 165, 233, 0.4));
+    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.4));
   }
   50% {
     background-position: 100% 50%;
-    filter: drop-shadow(0 0 35px rgba(14, 165, 233, 0.8));
+    filter: drop-shadow(0 0 35px rgba(168, 85, 247, 0.8));
   }
   100% {
     background-position: 0% 50%;
-    filter: drop-shadow(0 0 20px rgba(14, 165, 233, 0.4));
+    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.4));
   }
 }
 
@@ -909,8 +903,8 @@ html.noscroll, body.noscroll, .noscroll {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #0ea5e9, #10b981, #14b8a6, transparent);
-  box-shadow: 0 0 15px #0ea5e9;
+  background: linear-gradient(90deg, transparent, #38bdf8, #a855f7, #6366f1, transparent);
+  box-shadow: 0 0 15px #38bdf8;
   animation: scanBeam 3s ease-in-out infinite;
   pointer-events: none;
 }
@@ -922,7 +916,7 @@ html.noscroll, body.noscroll, .noscroll {
 }
 
 .text-flow-gradient {
-  background: linear-gradient(90deg, #ffffff 0%, #67e8f9 25%, #6ee7b7 50%, #38bdf8 75%, #ffffff 100%);
+  background: linear-gradient(90deg, #ffffff 0%, #c084fc 25%, #38bdf8 50%, #f472b6 75%, #ffffff 100%);
   background-size: 250% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -950,669 +944,4 @@ body::before {
 .flip-card-inner {
   transform-style: preserve-3d;
   will-change: transform;
-}
-
-/* =====================================================================
-   PREMIUM AI-NATIVE ANIMATION UPGRADE LAYER
-   Appended upgrade â€” only visual polish, zero content/layout changes
-   All animations use transform/opacity/filter for GPU compositing
-   ===================================================================== */
-
-/* --- Click Ripple Keyframe --- */
-@keyframes rippleExpand {
-  0%   { width: 0;     height: 0;    opacity: 0.8; }
-  100% { width: 240px; height: 240px; opacity: 0; }
-}
-
-/* --- Profile image ambient glow pulse --- */
-@keyframes profileGlowPulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 12px rgba(14,165,233,0.35)) drop-shadow(0 0 28px rgba(16,185,129,0.18));
-  }
-  50% {
-    filter: drop-shadow(0 0 22px rgba(16,185,129,0.55)) drop-shadow(0 0 50px rgba(14,165,233,0.25));
-  }
-}
-
-/* --- Magnetic button base (physics applied via JS translate) --- */
-.magnetic-btn-wrap {
-  display: inline-block;
-  will-change: transform;
-}
-
-/* --- Enhanced glass morphism (upgrade over existing .glass-card) --- */
-.glass-card {
-  background: rgba(18, 22, 30, 0.65) !important;
-  backdrop-filter: blur(20px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.07) !important;
-  transition: border-color 0.4s cubic-bezier(0.16,1,0.3,1),
-              box-shadow   0.4s cubic-bezier(0.16,1,0.3,1),
-              transform    0.4s cubic-bezier(0.16,1,0.3,1) !important;
-}
-.glass-card:hover {
-  border-color: rgba(14,165,233,0.22) !important;
-  box-shadow: 0 0 0 1px rgba(14,165,233,0.1),
-              0 20px 60px -15px rgba(0,0,0,0.5),
-              0 0 40px -20px rgba(14,165,233,0.15) !important;
-}
-
-/* --- Premium nav link hover trace --- */
-.nav-link-premium {
-  position: relative;
-  transition: color 0.25s ease;
-}
-.nav-link-premium::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: linear-gradient(90deg, #0ea5e9, #10b981, #14b8a6);
-  transition: width 0.38s cubic-bezier(0.16,1,0.3,1);
-  border-radius: 2px;
-}
-.nav-link-premium:hover::after {
-  width: 100%;
-}
-
-/* --- Skill card enhanced hover (upgrade over existing .skill-card:hover) --- */
-.skill-card {
-  border: 1px solid rgba(255,255,255,0.06) !important;
-  transition: all 0.4s cubic-bezier(0.16,1,0.3,1) !important;
-}
-.skill-card:hover {
-  transform: translateY(-5px) scale(1.015) !important;
-  border-color: rgba(14,165,233,0.3) !important;
-  box-shadow:
-    0 0 0 1px rgba(14,165,233,0.12),
-    0 16px 40px -12px rgba(0,0,0,0.45),
-    0 0 30px -15px rgba(14,165,233,0.25) !important;
-  background: rgba(22,27,34,0.9) !important;
-}
-
-/* --- Animated gradient border for certification cards --- */
-.cert-card {
-  position: relative;
-  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s;
-}
-.cert-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(14,165,233,0.4), rgba(16,185,129,0.2), rgba(20,184,166,0.3));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s;
-  pointer-events: none;
-}
-.cert-card:hover::before { opacity: 1; }
-.cert-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 50px -15px rgba(0,0,0,0.5), 0 0 20px -10px rgba(14,165,233,0.2);
-}
-
-/* --- Enhanced flip card hover shadow depth --- */
-.flip-card:not(.is-flipped):hover .flip-card-front {
-  box-shadow:
-    0 0 0 1px rgba(14,165,233,0.25),
-    0 24px 60px -12px rgba(0,0,0,0.55),
-    0 0 40px -20px rgba(14,165,233,0.3) !important;
-  border-color: rgba(14,165,233,0.35) !important;
-}
-
-/* --- Scroll reveal enhancements (upgrade timing for spring feel) --- */
-.scroll-reveal {
-  transition-duration: 0.8s !important;
-  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-/* --- Section heading premium reveal --- */
-.section-heading {
-  position: relative;
-}
-
-/* --- Hero section subtle scroll fade --- */
-#hero {
-  transition: opacity 0.3s ease;
-}
-
-/* --- Floating action button glow pulse (chatbot trigger) --- */
-#chatbot-toggle-btn {
-  animation: chatbotGlowPulse 3.5s ease-in-out infinite;
-  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s, opacity 0.3s !important;
-}
-#chatbot-toggle-btn:hover {
-  animation-play-state: paused;
-  transform: scale(1.14) !important;
-  box-shadow: 0 0 30px rgba(14,165,233,0.5), 0 8px 24px rgba(0,0,0,0.4) !important;
-}
-@keyframes chatbotGlowPulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(14,165,233,0.35), 0 4px 20px rgba(0,0,0,0.3); }
-  50%       { box-shadow: 0 0 24px rgba(16,185,129,0.5), 0 4px 20px rgba(0,0,0,0.3); }
-}
-
-/* --- Aurora blob enhanced with smoother easing --- */
-.aurora-blob {
-  transition: transform 0.1s linear;
-  will-change: transform;
-}
-
-/* --- Premium category card hover (upgrade .cat-card-premium) --- */
-.cat-card-premium {
-  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s !important;
-}
-.cat-card-premium:hover {
-  transform: translateY(-6px) scale(1.018) !important;
-  box-shadow: 0 24px 60px -12px rgba(0,0,0,0.5), 0 0 30px -15px rgba(14,165,233,0.25) !important;
-}
-
-/* --- Filter chip premium hover (upgrade .filter-chip) --- */
-.filter-chip {
-  transition: all 0.28s cubic-bezier(0.16,1,0.3,1) !important;
-}
-.filter-chip:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 16px -4px rgba(14,165,233,0.2) !important;
-}
-.filter-chip.active {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 20px -4px rgba(14,165,233,0.3), 0 0 0 1px rgba(14,165,233,0.2) !important;
-}
-
-/* --- Timeline dot enhanced pulse --- */
-.timeline-dot {
-  animation: timelinePulse 2.5s ease-in-out infinite;
-}
-@keyframes timelinePulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(14,165,233,0.6); }
-  50%       { box-shadow: 0 0 20px rgba(14,165,233,0.9), 0 0 40px rgba(14,165,233,0.35); }
-}
-
-/* --- Scroll progress bar glow enhancement --- */
-#scroll-progress {
-  box-shadow: 0 0 8px rgba(14,165,233,0.5);
-  transition: width 0.08s linear !important;
-}
-
-/* --- Data counter element entrance --- */
-[data-counter] {
-  will-change: contents;
-}
-
-/* --- Neural canvas subtle vignette depth --- */
-#neural-canvas {
-  opacity: 0.18 !important;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
-}
-
-/* --- Page transition fade (SPA route changes) --- */
-#page-content {
-  animation: pageEntrance 0.5s cubic-bezier(0.16,1,0.3,1) both;
-}
-@keyframes pageEntrance {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-    filter: blur(3px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-/* --- Hero section gradient text shimmer enhancement --- */
-.animate-gradient-text {
-  background-size: 300% auto !important;
-  animation: gradientMove 4s ease infinite !important;
-}
-
-/* --- Holographic shimmer on featured shimmer bar (upgrade) --- */
-@keyframes shimmerBar {
-  0%   { background-position: 300% 0; }
-  100% { background-position: -300% 0; }
-}
-
-/* --- Text flow gradient enhancement --- */
-.text-flow-gradient {
-  background: linear-gradient(90deg,
-    #ffffff 0%,
-    #c4b5fd 20%,
-    #60a5fa 40%,
-    #34d399 55%,
-    #f472b6 75%,
-    #ffffff 100%
-  ) !important;
-  background-size: 300% auto !important;
-  animation: textGradientFlow 3.5s ease infinite !important;
-}
-
-/* --- Preloader exit enhancement --- */
-#preloader {
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.8s ease, transform 0.8s ease;
-}
-
-/* --- Premium body noise overlay (subtle film grain texture) --- */
-body::before {
-  opacity: 0.028 !important;
-}
-
-/* =====================================================================
-   REDUCED MOTION â€” disable all animation enhancements
-   ===================================================================== */
-@media (prefers-reduced-motion: reduce) {
-  .aurora-blob,
-  .timeline-dot,
-  #chatbot-toggle-btn,
-  .text-flow-gradient,
-  .animate-gradient-text,
-  .flip-card-front.is-featured::before,
-  #scroll-progress {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  .scroll-reveal {
-    opacity: 1 !important;
-    filter: none !important;
-    transform: none !important;
-    transition: none !important;
-  }
-
-  .skill-card:hover,
-  .glass-card:hover,
-  .cert-card:hover,
-  .cat-card-premium:hover,
-  .flip-card:not(.is-flipped):hover .flip-card-front {
-    transform: none !important;
-    transition: none !important;
-  }
-
-  #page-content {
-    animation: none !important;
-  }
-}
-
-/* =====================================================================
-   MOBILE PERFORMANCE GUARDS
-   Disable heavy effects on coarse-pointer / small screens
-   ===================================================================== */
-@media (max-width: 768px) {
-  /* Disable aurora parallax on mobile */
-  .aurora-blob {
-    transition: none !important;
-  }
-
-  /* Disable glass on mobile flip cards */
-  .flip-card-front,
-  .flip-card-back {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(22,27,34,0.97) !important;
-  }
-
-  /* Simplify category card hover */
-  .cat-card-premium:hover {
-    transform: translateY(-3px) !important;
-  }
-
-  /* Lighter chatbot glow on mobile */
-  #chatbot-toggle-btn {
-    animation: none !important;
-    box-shadow: 0 4px 16px rgba(14,165,233,0.3) !important;
-  }
-
-  /* Disable card glow borders on mobile for perf */
-  .skill-card:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4) !important;
-  }
-}
-
-/* =====================================================================
-   SECTION 2 â€” PREMIUM VISUAL UPGRADE v2
-   Navbar â€¢ Skill Bars â€¢ Stat Counters â€¢ Chatbot â€¢ Timeline â€¢ Hero
-   All GPU-safe: only transform / opacity / filter / clip-path
-   ===================================================================== */
-
-/* â”€â”€ NAVBAR â€” Active Section Indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-/* Gradient underline drawn on active nav link */
-.nav-section-link,
-.nav-projects-link {
-  position: relative;
-  transition: color 0.25s ease;
-}
-.nav-section-link::after,
-.nav-projects-link::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #0ea5e9, #10b981, #14b8a6);
-  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.nav-section-link:hover::after,
-.nav-projects-link:hover::after {
-  width: 100%;
-}
-/* Active section: bright color + persistent underline */
-.nav-section-link.nav-active,
-.nav-projects-link.nav-active {
-  color: #e2e8f0 !important;
-}
-.nav-section-link.nav-active::after,
-.nav-projects-link.nav-active::after {
-  width: 100%;
-}
-
-/* Navbar scroll-down glass intensification */
-header.navbar-scrolled {
-  background: rgba(13, 17, 23, 0.95) !important;
-  backdrop-filter: blur(24px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
-  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 1px 40px -10px rgba(0, 0, 0, 0.6) !important;
-}
-
-
-/* â”€â”€ SKILL BARS â€” Scroll-triggered fill â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-/* Bars start at 0 and animate via JS adding .skill-bar-animate class */
-.skill-bar-fill {
-  width: 0% !important;
-  transition: width 1.1s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-.skill-bar-fill.skill-bar-animate {
-  width: var(--skill-width, 0%) !important;
-}
-/* Keep hover as secondary trigger on desktop */
-.skill-card:hover .skill-bar-fill.skill-bar-animate {
-  opacity: 1;
-}
-
-
-/* â”€â”€ STAT COUNTERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.stat-number {
-  display: inline-block;
-  font-variant-numeric: tabular-nums;
-  transition: color 0.3s ease;
-}
-
-/* â”€â”€ TIMELINE â€” Entrance draw animation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-/* Left border line draws from top to bottom on scroll reveal */
-.timeline-line {
-  position: relative;
-}
-.timeline-line::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -1px;
-  width: 1px;
-  height: 0%;
-  background: linear-gradient(to bottom, #0ea5e9, #10b981, rgba(14,165,233,0.1));
-  transition: height 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.timeline-line.timeline-drawn::before {
-  height: 100%;
-}
-
-/* Timeline items stagger-reveal */
-.timeline-item {
-  opacity: 0;
-  transform: translateX(20px);
-  transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1),
-              transform 0.6s cubic-bezier(0.16,1,0.3,1);
-}
-.timeline-item.timeline-visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* â”€â”€ HERO â€” Profile Card Ambient Ring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-@keyframes heroRingRotate {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-@keyframes heroRingRotateReverse {
-  from { transform: rotate(360deg); }
-  to   { transform: rotate(0deg); }
-}
-.hero-profile-ring-outer {
-  position: absolute;
-  inset: -18px;
-  border-radius: 50%;
-  border: 1px dashed rgba(14,165,233,0.25);
-  animation: heroRingRotate 18s linear infinite;
-  pointer-events: none;
-}
-.hero-profile-ring-inner {
-  position: absolute;
-  inset: -10px;
-  border-radius: 50%;
-  border: 1px solid transparent;
-  background: linear-gradient(#0d1117, #0d1117) padding-box,
-              linear-gradient(135deg, rgba(14,165,233,0.45), rgba(14,165,233,0.2), rgba(20,184,166,0.3)) border-box;
-  animation: heroRingRotateReverse 12s linear infinite;
-  pointer-events: none;
-}
-
-/* â”€â”€ HERO â€” Tech Badge Stagger Entrance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-@keyframes badgeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.9);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
-.hero-badge {
-  animation: badgeSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.hero-badge:nth-child(1) { animation-delay: 0.55s; }
-.hero-badge:nth-child(2) { animation-delay: 0.65s; }
-.hero-badge:nth-child(3) { animation-delay: 0.75s; }
-.hero-badge:nth-child(4) { animation-delay: 0.85s; }
-.hero-badge:nth-child(5) { animation-delay: 0.95s; }
-
-/* â”€â”€ CHATBOT â€” Premium Spring Open/Close â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-#chatbot-window {
-  transform-origin: bottom right;
-  transition:
-    opacity    0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    transform  0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    filter     0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-#chatbot-window.opacity-0 {
-  opacity: 0 !important;
-  transform: scale(0.92) translateY(12px) !important;
-  filter: blur(4px) !important;
-  pointer-events: none !important;
-}
-#chatbot-window.opacity-100 {
-  opacity: 1 !important;
-  transform: scale(1) translateY(0) !important;
-  filter: blur(0) !important;
-  pointer-events: auto !important;
-}
-
-/* Chatbot message bubble slide-in */
-@keyframes msgSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-#chatbot-messages > div {
-  animation: msgSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* â”€â”€ SECTION HEADING â€” Micro-divider variety â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-/* Section label pill â€” upgraded from plain mono text */
-.section-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 100px;
-  background: rgba(14,165,233,0.06);
-  border: 1px solid rgba(14,165,233,0.2);
-  color: #38bdf8;
-}
-.section-label::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  animation: sectionDotPing 2s ease-in-out infinite;
-}
-@keyframes sectionDotPing {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.7); }
-}
-
-/* â”€â”€ ABOUT â€” Stat Card Hover Depth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.stat-card {
-  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1),
-              box-shadow 0.35s,
-              border-color 0.35s !important;
-}
-.stat-card:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 0 16px 40px -12px rgba(0,0,0,0.5),
-              0 0 0 1px rgba(14,165,233,0.12) !important;
-  border-color: rgba(14,165,233,0.2) !important;
-}
-
-/* â”€â”€ TOOLS CHIPS â€” Premium hover â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.tools-chip {
-  cursor: default;
-  transition: all 0.25s cubic-bezier(0.16,1,0.3,1) !important;
-}
-.tools-chip:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px -6px rgba(14,165,233,0.25) !important;
-}
-
-/* â”€â”€ CERT CARD â€” Gradient border on hover â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.cert-card-hover {
-  transition: all 0.35s cubic-bezier(0.16,1,0.3,1) !important;
-}
-.cert-card-hover:hover {
-  transform: translateY(-5px) !important;
-  box-shadow: 0 20px 50px -14px rgba(0,0,0,0.55),
-              0 0 0 1px rgba(14,165,233,0.15) !important;
-}
-
-/* â”€â”€ GITHUB STAT CARDS â€” Entrance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.github-stat-card {
-  transition: all 0.35s cubic-bezier(0.16,1,0.3,1) !important;
-}
-.github-stat-card:hover {
-  transform: translateY(-3px) !important;
-  box-shadow: 0 12px 32px -10px rgba(0,0,0,0.5) !important;
-}
-
-/* â”€â”€ CONTACT FORM â€” Input focus glow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(14,165,233,0.25), 0 0 12px -4px rgba(14,165,233,0.15) !important;
-  border-color: rgba(14,165,233,0.4) !important;
-}
-
-/* â”€â”€ MOBILE â€” Hero typewriter fix at 375px â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-@media (max-width: 420px) {
-  #typewriter-role {
-    display: block;
-    font-size: 1.1rem !important;
-    max-width: 100%;
-  }
-  .typewriter-cursor {
-    display: inline-block;
-  }
-  section#hero h1 {
-    font-size: 2.1rem !important;
-    line-height: 1.15;
-  }
-  section#hero .flex.flex-col.sm\:flex-row {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-}
-
-/* â”€â”€ CONTACT BUTTON SEND ICON â€” Micro-interaction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-#contact-btn:hover i.fa-paper-plane {
-  transform: translateX(3px) translateY(-3px) rotate(-20deg);
-  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-#contact-btn i.fa-paper-plane {
-  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-
-/* â”€â”€ FOOTER â€” subtle entrance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-footer {
-  position: relative;
-}
-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(14,165,233,0.3), rgba(14,165,233,0.2), transparent);
-}
-
-/* â”€â”€ REDUCED MOTION v2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-@media (prefers-reduced-motion: reduce) {
-  .hero-badge,
-  .hero-profile-ring-outer,
-  .hero-profile-ring-inner,
-  .timeline-item,
-  .timeline-line::before,
-  .skill-bar-fill,
-  .stat-number,
-  #chatbot-window,
-  #chatbot-messages > div,
-  .stat-card,
-  .tools-chip,
-  .cert-card-hover,
-  .github-stat-card {
-    animation: none !important;
-    transition: none !important;
-  }
-  .timeline-item {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-  .skill-bar-fill.skill-bar-animate {
-    width: var(--skill-width, 0%) !important;
-    transition: none !important;
-  }
 }

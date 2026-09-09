@@ -123,13 +123,10 @@ export async function navigate(path, pushState = true) {
   if (typeof gsap !== 'undefined') {
     gsap.killTweensOf(container);
     await new Promise(resolve => {
-      // Premium exit: fade + slight scale down + blur
       gsap.to(container, {
         opacity: 0,
-        y: -8,
-        scale: 0.985,
-        filter: 'blur(4px)',
-        duration: 0.18,
+        y: -10,
+        duration: 0.14,
         ease: 'power2.in',
         onComplete: () => {
           swapContent();
@@ -137,19 +134,10 @@ export async function navigate(path, pushState = true) {
         }
       });
     });
-    // Premium entrance: blur-to-focus spring reveal
-    gsap.fromTo(container,
-      { opacity: 0, y: 14, scale: 0.992, filter: 'blur(6px)' },
-      { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.45, ease: 'power3.out' }
-    );
+    gsap.to(container, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' });
   } else {
     swapContent();
   }
-
-  // Re-trigger premium animations for the new page content
-  setTimeout(() => {
-    if (window.initAllPremiumAnimations) window.initAllPremiumAnimations();
-  }, 200);
 }
 
 /**

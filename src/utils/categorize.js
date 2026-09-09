@@ -322,9 +322,9 @@ export function getProjectCategory(repo, localMetadata = []) {
     return 'Machine Learning';
   }
 
-  // Rule 3: Library Management is explicitly Normal Projects (not Machine Learning)
-  if (name.includes('library') || combined.includes('library management')) {
-    return 'Normal Projects';
+  // Rule 3: Library Management is explicitly Machine Learning
+  if (name.includes('library') || combined.includes('library')) {
+    return 'Machine Learning';
   }
 
   // Rule 4: Tic Tac Toe is explicitly Python Concepts

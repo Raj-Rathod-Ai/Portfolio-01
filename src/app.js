@@ -1,4 +1,4 @@
-import { fetchGitHubRepositories, FALLBACK_REPOS } from './api/github.js';
+import { fetchGitHubRepositories } from './api/github.js';
 import { getProjectCategory, UPCOMING_PROJECTS } from './utils/categorize.js';
 import { isGroupProject } from './utils/helpers.js';
 import { initRouter } from './router.js';
@@ -9,8 +9,6 @@ import { commandPalette } from './components/CommandPalette.js';
 import { initMagneticCursor } from './utils/magneticCursor.js';
 import { initCardTilt } from './utils/cardTilt.js';
 import { trackVisit, trackInteraction, getApiBaseUrl } from './utils/analytics.js';
-import { OVERRIDES_MAP } from './data/projectOverrides.js';
-import { initAllPremiumAnimations } from './utils/premiumAnimations.js';
 
 // Pre-warm Render backend server immediately on page load to prevent cold start delay
 (function prewarmBackend() {
@@ -149,43 +147,6 @@ export function applyBossOverrides(reposList) {
   } catch (e) {
     return reposList;
   }
-}
-
-/**
- * Apply manual project overrides from projectOverrides.js onto a repo list.
- * Overrides take priority over GitHub-fetched data for:
- *   category, live URL, description, displayTitle, featured, technologies, pushed_at.
- * Repos with `manualOnly: true` in the overrides file are injected separately
- * via processAndSetRepos — this function only patches existing repos.
- *
- * @param {Array} reposList - Array of processed repo objects
- * @returns {Array} repos with override fields merged in
- */
-export function applyProjectOverrides(reposList) {
-  if (!Array.isArray(reposList)) return reposList;
-  return reposList.map(repo => {
-    const key = (repo.name || '').toLowerCase().trim();
-    const override = OVERRIDES_MAP[key];
-    if (!override) return repo;
-
-    return {
-      ...repo,
-      // Category override — the most important fix
-      category: override.category || repo.category,
-      // Live URL override
-      live: override.live !== undefined ? override.live : (repo.live || repo.homepage || ''),
-      // Description override
-      description: override.description || repo.description,
-      // Featured override
-      featured: typeof override.featured === 'boolean' ? override.featured : repo.featured,
-      // Display title override
-      displayTitle: override.displayTitle || repo.displayTitle || repo.name,
-      // Technology tags for chatbot context
-      technologies: override.technologies || repo.technologies || [],
-      // pushed_at override for correct "recent" ordering
-      pushed_at: override.pushed_at_override || repo.pushed_at || repo.updated_at || repo.created_at,
-    };
-  });
 }
 
 export function deduplicateRepos(reposList) {
@@ -358,7 +319,7 @@ function initNeuralCanvas() {
 
                 const avgDist = (dist1 + dist2 + dist3) / 3;
                 const opacity = (1 - avgDist / MAX_DIST) * 0.15;
-                ctx.fillStyle = `rgba(14, 165, 233, ${opacity})`;
+                ctx.fillStyle = `rgba(99, 102, 241, ${opacity})`;
                 ctx.fill();
               }
             }
@@ -366,7 +327,7 @@ function initNeuralCanvas() {
 
           // Draw connector line
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(14, 165, 233, ${(1 - dist1 / MAX_DIST) * 0.55})`;
+          ctx.strokeStyle = `rgba(99, 102, 241, ${(1 - dist1 / MAX_DIST) * 0.7})`;
           ctx.lineWidth = 1.2;
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -377,7 +338,7 @@ function initNeuralCanvas() {
       // Draw node circle
       ctx.beginPath();
       ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(14, 165, 233, 0.9)';
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.95)';
       ctx.fill();
     }
     requestAnimationFrame(drawCanvas);
@@ -432,7 +393,7 @@ function initMouseSpotlight() {
 
 
 /**
- * Initialize cinematic kinetic preloader.
+ * Initialize loading preloader progression page overlays.
  */
 function initPreloader(onLoadedCallback) {
   const brand = document.getElementById('preloader-brand');
@@ -446,77 +407,56 @@ function initPreloader(onLoadedCallback) {
     return;
   }
 
-  // Clean GPT/Astra-style: pure white text, smooth stagger
-  const text = 'Raj Rathod';
+  // Multi-Color Glowing Hologram Character Stagger Suite
+  const text = 'RAJ RATHOD';
+  const colors = ['#818cf8', '#a855f7', '#38bdf8', '#34d399', '#fbbf24', '#f472b6'];
   brand.innerHTML = '';
 
-  const chars = Array.from(text).map((c, i) => {
+  const chars = Array.from(text).map((c) => {
     const span = document.createElement('span');
     span.textContent = c === ' ' ? '\u00A0' : c;
-    // Start hidden — will animate in
-    span.style.cssText = `
-      font-family:'Outfit','Plus Jakarta Sans',sans-serif;
-      font-weight:900;
-      display:inline-block;
-      opacity:0;
-      color:#ffffff;
-      filter:blur(18px);
-      transform:translateY(16px);
-      transition:opacity 0.55s cubic-bezier(0.16,1,0.3,1),
-                 filter 0.55s cubic-bezier(0.16,1,0.3,1),
-                 transform 0.55s cubic-bezier(0.16,1,0.3,1);
-      will-change:opacity,filter,transform;
-    `;
+    span.style.cssText = 'font-family:\'Outfit\',\'Plus Jakarta Sans\',sans-serif;font-weight:900;display:inline-block;opacity:0;filter:blur(24px);transform:translateY(22px) scale(0.92);background:linear-gradient(135deg,#ffffff 20%,#c7d2fe 60%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;will-change:filter,opacity,transform;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),filter 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1),text-shadow 0.25s;';
     brand.appendChild(span);
     return span;
   });
 
-  // Stagger reveal each letter — blur-to-focus, translateY pop-up
+  // Stagger reveal each letter with blur-to-focus and flowing text shimmer
   chars.forEach((span, i) => {
     setTimeout(() => {
       span.style.opacity = '1';
       span.style.filter = 'blur(0)';
-      span.style.transform = 'translateY(0)';
-    }, i * 60 + 120);
+      span.style.transform = 'translateY(0) scale(1)';
+      setTimeout(() => {
+        span.classList.add('text-flow-gradient');
+      }, 400);
+    }, i * 75 + 160);
   });
 
-  // After name is visible, add subtle sky glow effect to whole word
-  setTimeout(() => {
-    brand.style.transition = 'text-shadow 0.6s ease';
-    brand.style.textShadow = '0 0 40px rgba(14,165,233,0.35), 0 0 80px rgba(16,185,129,0.15)';
-  }, chars.length * 60 + 400);
+  // Interactive Neon Hover effect on individual characters
+  chars.forEach((span) => {
+    span.addEventListener('mouseenter', () => {
+      const col = colors[Math.floor(Math.random() * colors.length)];
+      span.style.webkitTextFillColor = col;
+      span.style.transform = 'translateY(-10px) scale(1.12)';
+      span.style.filter = `drop-shadow(0 0 25px ${col}) drop-shadow(0 0 50px ${col}88)`;
+    });
+    span.addEventListener('mouseleave', () => {
+      span.style.webkitTextFillColor = 'transparent';
+      span.style.transform = 'translateY(0) scale(1)';
+      span.style.filter = 'none';
+    });
+  });
 
-  // Progress bar
+  // Laser Progress Bar Animation & Status Stepper
   let progress = 0;
   const statusSteps = [
-    'Initializing AI Engine...',
-    'Loading Projects & Models...',
-    'Connecting GitHub Data...',
-    'Calibrating Assistant...',
+    'Initializing Neural Engine...',
+    'Loading AI Architectures & Models...',
+    'Synchronizing 21 Live Deployments...',
+    'Calibrating Multi-Turn Assistant...',
     'Portfolio Ready.'
   ];
-  // Safety watchdog timer: guarantees preloader dismisses within 3.2s even on slow devices
-  let preloaderDismissed = false;
-  const dismissPreloader = () => {
-    if (preloaderDismissed) return;
-    preloaderDismissed = true;
-    clearInterval(preloaderInterval);
-    if (preloader && preloader.parentNode) {
-      preloader.style.transition = 'opacity 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.6s ease';
-      preloader.style.opacity = '0';
-      preloader.style.filter = 'blur(10px)';
-      document.documentElement.classList.remove('noscroll');
-      setTimeout(() => {
-        if (preloader.parentNode) preloader.remove();
-        onLoadedCallback();
-      }, 650);
-    } else {
-      document.documentElement.classList.remove('noscroll');
-      onLoadedCallback();
-    }
-  };
-
-  const watchdog = setTimeout(dismissPreloader, 3200);
+  let currentStepIdx = 0;
 
   const preloaderInterval = setInterval(() => {
     progress += Math.random() * 3.6 + 1.4;
@@ -524,13 +464,23 @@ function initPreloader(onLoadedCallback) {
     if (progress >= 100) {
       progress = 100;
       clearInterval(preloaderInterval);
-      clearTimeout(watchdog);
 
       if (bar) bar.style.width = '100%';
       if (perc) perc.textContent = '100%';
       if (status) status.textContent = 'Portfolio Ready.';
 
-      setTimeout(dismissPreloader, 250);
+      setTimeout(() => {
+        preloader.style.transition = 'opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease, transform 0.75s ease';
+        preloader.style.opacity = '0';
+        preloader.style.filter = 'blur(16px)';
+        preloader.style.transform = 'scale(1.03)';
+        document.documentElement.classList.remove('noscroll');
+
+        setTimeout(() => {
+          if (preloader.parentNode) preloader.remove();
+          onLoadedCallback(); // Initialize SPA routes
+        }, 800);
+      }, 300);
       return;
     }
 
@@ -547,7 +497,6 @@ function initPreloader(onLoadedCallback) {
     }
   }, 35);
 }
-
 
 /**
  * Initialize Lenis Smooth Scroll engine for ultra-smooth inertia scrolling.
@@ -588,28 +537,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Render static Navbar and Footer placeholders in index.html shells
   const headerPlaceholder = document.getElementById('navbar-header-mount');
   const footerPlaceholder = document.getElementById('footer-mount');
-  if (headerPlaceholder) headerPlaceholder.innerHTML = navbar.render();
-  if (footerPlaceholder) footerPlaceholder.innerHTML = footer.render();
+  if (headerPlaceholder) {
+    headerPlaceholder.innerHTML = navbar.render();
+  }
+  if (footerPlaceholder) {
+    footerPlaceholder.innerHTML = footer.render();
+  }
 
-  // Bind background effects immediately
+  // Bind active spotlight glows, background particles canvas, and Lenis smooth scroll
   initNeuralCanvas();
   initMouseSpotlight();
   initLenisSmoothScroll();
 
-  // ─── START PRELOADER IMMEDIATELY (no blocking!) ───────────────────────
-  // Preloader resolves on its own animation timer (~2.5s)
-  // Data loading runs in parallel below.
-  let preloaderDone = false;
-  let preloaderCallback = null;
-  const preloaderReady = new Promise(resolve => {
-    initPreloader(() => {
-      preloaderDone = true;
-      if (preloaderCallback) preloaderCallback();
-      resolve();
-    });
-  });
-
-  // ─── LOAD DATA IN PARALLEL WITH PRELOADER ────────────────────────────
   // Clear any legacy cached duplicate repos from browser localStorage
   try {
     const cachedStr = localStorage.getItem('github_repositories_cache');
@@ -618,7 +557,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) {}
 
-  // Load local project metadata
+  // Load and merge local database with live API repositories
   let repos = [];
   let meta = [];
   try {
@@ -628,11 +567,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Failed to load local projects metadata:', err.message);
   }
 
-  // Load global database project overrides (capped at 1200ms — non-blocking)
+  // Load global database project overrides if backend connected (with timeout guard)
   try {
     const apiUrl = getApiBaseUrl();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const timeoutId = setTimeout(() => controller.abort(), 1500);
     const overrideRes = await fetch(apiUrl + '/api/project-overrides', { signal: controller.signal });
     clearTimeout(timeoutId);
     if (overrideRes.ok && overrideRes.headers.get('content-type')?.includes('application/json')) {
@@ -644,38 +583,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {}
 
   const processAndSetRepos = (rawGithubRepos) => {
-    // Step 1: Map GitHub API data → normalised repo objects with category + group info
     const merged = rawGithubRepos.map(repo => {
       const match = meta.find(m => m.repo && m.repo.toLowerCase() === (repo.name || '').toLowerCase());
-      // projects.json still provides initial featured + live URL hints
       const category = getProjectCategory(repo, meta);
       const isGroup = isGroupProject(repo.name, meta);
       const featured = match ? match.featured === true : false;
-      const live = match?.live || repo.homepage || '';
       return {
         ...repo,
         category,
         isGroup,
-        featured,
-        live
+        featured
       };
     });
-
-    // Step 2: Apply manual overrides from projectOverrides.js
-    const withOverrides = applyProjectOverrides(merged);
-
-    // Step 3: Inject upcoming projects (only if not already present)
     UPCOMING_PROJECTS.forEach(up => {
-      const exists = withOverrides.some(r => r.name.toLowerCase() === up.name.toLowerCase());
-      if (!exists) withOverrides.unshift(up);
+      const exists = merged.some(r => r.name.toLowerCase() === up.name.toLowerCase());
+      if (!exists) merged.unshift(up);
     });
-
-    // Step 4: Deduplicate, apply boss localStorage overrides, then sort
-    const sorted = sortReposWithFeaturedTop(withOverrides);
+    const sorted = sortReposWithFeaturedTop(merged);
     window.portfolioData = { repos: sorted, meta };
-
-    // Notify components that project data has been updated
-    window.dispatchEvent(new CustomEvent('portfolioDataUpdated', { detail: { repos: sorted } }));
     return sorted;
   };
 
@@ -686,71 +611,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // ─── INSTANT DATA INITIALIZATION (Zero-blocking) ────────────────────
-  // 1. Immediately initialize with FALLBACK_REPOS so window.portfolioData is ready in 0ms
-  repos = processAndSetRepos(FALLBACK_REPOS);
+  try {
+    const githubRepos = await fetchGitHubRepositories();
+    repos = processAndSetRepos(githubRepos);
+  } catch (err) {
+    console.error('Failed fetching repository datasets:', err.message);
+    repos = processAndSetRepos(UPCOMING_PROJECTS);
+  }
 
-  // 2. Concurrently fetch fresh GitHub repositories in background without blocking mount
-  fetchGitHubRepositories().then(githubRepos => {
-    if (Array.isArray(githubRepos) && githubRepos.length > 0) {
-      repos = processAndSetRepos(githubRepos);
-    }
-  }).catch(err => {
-    console.warn('Background GitHub sync notice:', err.message);
-  });
+  // Trigger preloader and start routing on completion
+  initPreloader(() => {
+    // Setup navbar, footer, and AI Chatbot
+    navbar.setup();
+    footer.setup();
 
-  // ─── WAIT FOR PRELOADER ANIMATION TO FINISH ──────────────────────────
-  await preloaderReady;
+    const chatMount = document.createElement('div');
+    chatMount.id = 'chatbot-mount';
+    chatMount.innerHTML = chatbot.render();
+    document.body.appendChild(chatMount);
+    chatbot.setup();
 
-  // ─── BOOTSTRAP APP ───────────────────────────────────────────────────
-  // Setup navbar, footer, and AI Chatbot
-  navbar.setup();
-  footer.setup();
+    // Register animations, 3D tilt, command palette, and routes
+    initIntersectionObservers();
+    initMagneticCursor();
+    initCardTilt();
+    commandPalette.setup();
+    initRouter();
 
-  const chatMount = document.createElement('div');
-  chatMount.id = 'chatbot-mount';
-  chatMount.innerHTML = chatbot.render();
-  document.body.appendChild(chatMount);
-  chatbot.setup();
-
-  // Register animations, 3D tilt, command palette, and routes
-  initIntersectionObservers();
-  initMagneticCursor();
-  initCardTilt();
-  commandPalette.setup();
-
-  // Initialize premium animation upgrade layer
-  initAllPremiumAnimations();
-  // Expose on window so router.js can re-trigger after SPA page swaps
-  window.initAllPremiumAnimations = initAllPremiumAnimations;
-
-  initRouter();
-
-  // Background auto-sync engine: Silently fetch fresh GitHub repositories & URLs
-  const syncFreshRepos = async () => {
-    try {
-      const fresh = await fetchGitHubRepositories(true);
-      if (fresh && Array.isArray(fresh) && fresh.length > 0) {
-        // Re-use processAndSetRepos to ensure overrides are always applied on sync
-        processAndSetRepos(fresh);
+    // Background auto-sync engine: Silently fetch fresh GitHub repositories & URLs
+    const syncFreshRepos = async () => {
+      try {
+        const fresh = await fetchGitHubRepositories(true);
+        if (fresh && Array.isArray(fresh) && fresh.length > 0) {
+          const freshMapped = fresh.map(repo => {
+            const match = meta.find(m => m.repo.toLowerCase() === repo.name.toLowerCase());
+            const category = getProjectCategory(repo, meta);
+            const isGroup = isGroupProject(repo.name, meta);
+            const featured = match ? match.featured === true : false;
+            return { ...repo, category, isGroup, featured };
+          });
+          UPCOMING_PROJECTS.forEach(up => {
+            if (!freshMapped.some(r => r.name.toLowerCase() === up.name.toLowerCase())) {
+              freshMapped.unshift(up);
+            }
+          });
+          const updatedRepos = sortReposWithFeaturedTop(freshMapped);
+          window.portfolioData = { repos: updatedRepos, meta };
+          window.dispatchEvent(new CustomEvent('portfolioDataUpdated', { detail: { repos: updatedRepos } }));
+        }
+      } catch (e) {
+        console.log('Background repo auto-sync notice:', e.message);
       }
-    } catch (e) {
-      console.log('Background repo auto-sync notice:', e.message);
-    }
-  };
+    };
 
-  // Trigger immediate background sync after load
-  setTimeout(syncFreshRepos, 200);
+    // Trigger immediate background sync after load
+    setTimeout(syncFreshRepos, 200);
 
-  // Periodic auto-sync every 5 minutes to keep new GitHub repos completely synchronized
-  setInterval(syncFreshRepos, 5 * 60 * 1000);
+    // Periodic auto-sync every 5 minutes to keep new GitHub repos completely synchronized
+    setInterval(syncFreshRepos, 5 * 60 * 1000);
 
-  // Auto-revalidate whenever user switches back to portfolio tab
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      syncFreshRepos();
-    }
+    // Auto-revalidate whenever user switches back to portfolio tab
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        syncFreshRepos();
+      }
+    });
   });
 });
-
-
