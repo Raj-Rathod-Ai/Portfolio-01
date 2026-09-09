@@ -575,18 +575,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Render static Navbar and Footer placeholders in index.html shells
   const headerPlaceholder = document.getElementById('navbar-header-mount');
   const footerPlaceholder = document.getElementById('footer-mount');
-  if (headerPlaceholder) {
-    headerPlaceholder.innerHTML = navbar.render();
-  }
-  if (footerPlaceholder) {
-    footerPlaceholder.innerHTML = footer.render();
-  }
+  if (headerPlaceholder) headerPlaceholder.innerHTML = navbar.render();
+  if (footerPlaceholder) footerPlaceholder.innerHTML = footer.render();
 
-  // Bind active spotlight glows, background particles canvas, and Lenis smooth scroll
+  // Bind background effects immediately
   initNeuralCanvas();
   initMouseSpotlight();
   initLenisSmoothScroll();
 
+  // ─── START PRELOADER IMMEDIATELY (no blocking!) ───────────────────────
+  // Preloader resolves on its own animation timer (~2.5s)
+  // Data loading runs in parallel below.
+  let preloaderDone = false;
+  let preloaderCallback = null;
+  const preloaderReady = new Promise(resolve => {
+    initPreloader(() => {
+      preloaderDone = true;
+      if (preloaderCallback) preloaderCallback();
+      resolve();
+    });
+  });
+
+  // ─── LOAD DATA IN PARALLEL WITH PRELOADER ────────────────────────────
   // Clear any legacy cached duplicate repos from browser localStorage
   try {
     const cachedStr = localStorage.getItem('github_repositories_cache');
@@ -595,7 +605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) {}
 
-  // Load and merge local database with live API repositories
+  // Load local project metadata
   let repos = [];
   let meta = [];
   try {
@@ -605,11 +615,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Failed to load local projects metadata:', err.message);
   }
 
-  // Load global database project overrides if backend connected (with timeout guard)
+  // Load global database project overrides (capped at 1200ms — non-blocking)
   try {
     const apiUrl = getApiBaseUrl();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1500);
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
     const overrideRes = await fetch(apiUrl + '/api/project-overrides', { signal: controller.signal });
     clearTimeout(timeoutId);
     if (overrideRes.ok && overrideRes.headers.get('content-type')?.includes('application/json')) {
@@ -639,8 +649,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Step 2: Apply manual overrides from projectOverrides.js
-    // These take priority over GitHub data and projects.json for correcting
-    // categories, live URLs, descriptions, featured status, and date ordering.
     const withOverrides = applyProjectOverrides(merged);
 
     // Step 3: Inject upcoming projects (only if not already present)
@@ -665,6 +673,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
+  // Fetch GitHub repos — max 3.5s timeout, then fall back to static data
   try {
     const githubRepos = await fetchGitHubRepositories();
     repos = processAndSetRepos(githubRepos);
@@ -673,55 +682,60 @@ document.addEventListener('DOMContentLoaded', async () => {
     repos = processAndSetRepos(UPCOMING_PROJECTS);
   }
 
-  // Trigger preloader and start routing on completion
-  initPreloader(() => {
-    // Setup navbar, footer, and AI Chatbot
-    navbar.setup();
-    footer.setup();
+  // ─── WAIT FOR PRELOADER ANIMATION TO FINISH ──────────────────────────
+  // By now data is loaded. If preloader already finished, this resolves instantly.
+  // If still animating (unlikely since it runs ~2.5s and data takes ~0-3.5s), we wait.
+  await preloaderReady;
 
-    const chatMount = document.createElement('div');
-    chatMount.id = 'chatbot-mount';
-    chatMount.innerHTML = chatbot.render();
-    document.body.appendChild(chatMount);
-    chatbot.setup();
+  // ─── BOOTSTRAP APP ───────────────────────────────────────────────────
+  // Setup navbar, footer, and AI Chatbot
+  navbar.setup();
+  footer.setup();
 
-    // Register animations, 3D tilt, command palette, and routes
-    initIntersectionObservers();
-    initMagneticCursor();
-    initCardTilt();
-    commandPalette.setup();
+  const chatMount = document.createElement('div');
+  chatMount.id = 'chatbot-mount';
+  chatMount.innerHTML = chatbot.render();
+  document.body.appendChild(chatMount);
+  chatbot.setup();
 
-    // Initialize premium animation upgrade layer
-    initAllPremiumAnimations();
-    // Expose on window so router.js can re-trigger after SPA page swaps
-    window.initAllPremiumAnimations = initAllPremiumAnimations;
+  // Register animations, 3D tilt, command palette, and routes
+  initIntersectionObservers();
+  initMagneticCursor();
+  initCardTilt();
+  commandPalette.setup();
 
-    initRouter();
+  // Initialize premium animation upgrade layer
+  initAllPremiumAnimations();
+  // Expose on window so router.js can re-trigger after SPA page swaps
+  window.initAllPremiumAnimations = initAllPremiumAnimations;
 
-    // Background auto-sync engine: Silently fetch fresh GitHub repositories & URLs
-    const syncFreshRepos = async () => {
-      try {
-        const fresh = await fetchGitHubRepositories(true);
-        if (fresh && Array.isArray(fresh) && fresh.length > 0) {
-          // Re-use processAndSetRepos to ensure overrides are always applied on sync
-          processAndSetRepos(fresh);
-        }
-      } catch (e) {
-        console.log('Background repo auto-sync notice:', e.message);
+  initRouter();
+
+  // Background auto-sync engine: Silently fetch fresh GitHub repositories & URLs
+  const syncFreshRepos = async () => {
+    try {
+      const fresh = await fetchGitHubRepositories(true);
+      if (fresh && Array.isArray(fresh) && fresh.length > 0) {
+        // Re-use processAndSetRepos to ensure overrides are always applied on sync
+        processAndSetRepos(fresh);
       }
-    };
+    } catch (e) {
+      console.log('Background repo auto-sync notice:', e.message);
+    }
+  };
 
-    // Trigger immediate background sync after load
-    setTimeout(syncFreshRepos, 200);
+  // Trigger immediate background sync after load
+  setTimeout(syncFreshRepos, 200);
 
-    // Periodic auto-sync every 5 minutes to keep new GitHub repos completely synchronized
-    setInterval(syncFreshRepos, 5 * 60 * 1000);
+  // Periodic auto-sync every 5 minutes to keep new GitHub repos completely synchronized
+  setInterval(syncFreshRepos, 5 * 60 * 1000);
 
-    // Auto-revalidate whenever user switches back to portfolio tab
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        syncFreshRepos();
-      }
-    });
+  // Auto-revalidate whenever user switches back to portfolio tab
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      syncFreshRepos();
+    }
   });
 });
+
+
