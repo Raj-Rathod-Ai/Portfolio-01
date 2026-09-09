@@ -10,6 +10,7 @@ import { initMagneticCursor } from './utils/magneticCursor.js';
 import { initCardTilt } from './utils/cardTilt.js';
 import { trackVisit, trackInteraction, getApiBaseUrl } from './utils/analytics.js';
 import { OVERRIDES_MAP } from './data/projectOverrides.js';
+import { initAllPremiumAnimations } from './utils/premiumAnimations.js';
 
 // Pre-warm Render backend server immediately on page load to prevent cold start delay
 (function prewarmBackend() {
@@ -690,6 +691,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     initMagneticCursor();
     initCardTilt();
     commandPalette.setup();
+
+    // Initialize premium animation upgrade layer
+    initAllPremiumAnimations();
+    // Expose on window so router.js can re-trigger after SPA page swaps
+    window.initAllPremiumAnimations = initAllPremiumAnimations;
+
     initRouter();
 
     // Background auto-sync engine: Silently fetch fresh GitHub repositories & URLs

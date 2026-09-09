@@ -945,3 +945,329 @@ body::before {
   transform-style: preserve-3d;
   will-change: transform;
 }
+
+/* =====================================================================
+   PREMIUM AI-NATIVE ANIMATION UPGRADE LAYER
+   Appended upgrade — only visual polish, zero content/layout changes
+   All animations use transform/opacity/filter for GPU compositing
+   ===================================================================== */
+
+/* --- Click Ripple Keyframe --- */
+@keyframes rippleExpand {
+  0%   { width: 0;     height: 0;    opacity: 0.8; }
+  100% { width: 240px; height: 240px; opacity: 0; }
+}
+
+/* --- Profile image ambient glow pulse --- */
+@keyframes profileGlowPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 12px rgba(99,102,241,0.35)) drop-shadow(0 0 28px rgba(139,92,246,0.18));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(139,92,246,0.55)) drop-shadow(0 0 50px rgba(99,102,241,0.25));
+  }
+}
+
+/* --- Magnetic button base (physics applied via JS translate) --- */
+.magnetic-btn-wrap {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* --- Enhanced glass morphism (upgrade over existing .glass-card) --- */
+.glass-card {
+  background: rgba(18, 22, 30, 0.65) !important;
+  backdrop-filter: blur(20px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  transition: border-color 0.4s cubic-bezier(0.16,1,0.3,1),
+              box-shadow   0.4s cubic-bezier(0.16,1,0.3,1),
+              transform    0.4s cubic-bezier(0.16,1,0.3,1) !important;
+}
+.glass-card:hover {
+  border-color: rgba(99,102,241,0.22) !important;
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.1),
+              0 20px 60px -15px rgba(0,0,0,0.5),
+              0 0 40px -20px rgba(99,102,241,0.15) !important;
+}
+
+/* --- Premium nav link hover trace --- */
+.nav-link-premium {
+  position: relative;
+  transition: color 0.25s ease;
+}
+.nav-link-premium::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #6366f1, #a855f7, #14b8a6);
+  transition: width 0.38s cubic-bezier(0.16,1,0.3,1);
+  border-radius: 2px;
+}
+.nav-link-premium:hover::after {
+  width: 100%;
+}
+
+/* --- Skill card enhanced hover (upgrade over existing .skill-card:hover) --- */
+.skill-card {
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1) !important;
+}
+.skill-card:hover {
+  transform: translateY(-5px) scale(1.015) !important;
+  border-color: rgba(99,102,241,0.3) !important;
+  box-shadow:
+    0 0 0 1px rgba(99,102,241,0.12),
+    0 16px 40px -12px rgba(0,0,0,0.45),
+    0 0 30px -15px rgba(99,102,241,0.25) !important;
+  background: rgba(22,27,34,0.9) !important;
+}
+
+/* --- Animated gradient border for certification cards --- */
+.cert-card {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s;
+}
+.cert-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.4), rgba(139,92,246,0.2), rgba(20,184,166,0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.cert-card:hover::before { opacity: 1; }
+.cert-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px -15px rgba(0,0,0,0.5), 0 0 20px -10px rgba(99,102,241,0.2);
+}
+
+/* --- Enhanced flip card hover shadow depth --- */
+.flip-card:not(.is-flipped):hover .flip-card-front {
+  box-shadow:
+    0 0 0 1px rgba(99,102,241,0.25),
+    0 24px 60px -12px rgba(0,0,0,0.55),
+    0 0 40px -20px rgba(99,102,241,0.3) !important;
+  border-color: rgba(99,102,241,0.35) !important;
+}
+
+/* --- Scroll reveal enhancements (upgrade timing for spring feel) --- */
+.scroll-reveal {
+  transition-duration: 0.8s !important;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* --- Section heading premium reveal --- */
+.section-heading {
+  position: relative;
+}
+
+/* --- Hero section subtle scroll fade --- */
+#hero {
+  transition: opacity 0.3s ease;
+}
+
+/* --- Floating action button glow pulse (chatbot trigger) --- */
+#chatbot-toggle-btn {
+  animation: chatbotGlowPulse 3.5s ease-in-out infinite;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s, opacity 0.3s !important;
+}
+#chatbot-toggle-btn:hover {
+  animation-play-state: paused;
+  transform: scale(1.14) !important;
+  box-shadow: 0 0 30px rgba(99,102,241,0.5), 0 8px 24px rgba(0,0,0,0.4) !important;
+}
+@keyframes chatbotGlowPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(99,102,241,0.35), 0 4px 20px rgba(0,0,0,0.3); }
+  50%       { box-shadow: 0 0 24px rgba(139,92,246,0.5), 0 4px 20px rgba(0,0,0,0.3); }
+}
+
+/* --- Aurora blob enhanced with smoother easing --- */
+.aurora-blob {
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+
+/* --- Premium category card hover (upgrade .cat-card-premium) --- */
+.cat-card-premium {
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s !important;
+}
+.cat-card-premium:hover {
+  transform: translateY(-6px) scale(1.018) !important;
+  box-shadow: 0 24px 60px -12px rgba(0,0,0,0.5), 0 0 30px -15px rgba(99,102,241,0.25) !important;
+}
+
+/* --- Filter chip premium hover (upgrade .filter-chip) --- */
+.filter-chip {
+  transition: all 0.28s cubic-bezier(0.16,1,0.3,1) !important;
+}
+.filter-chip:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 16px -4px rgba(99,102,241,0.2) !important;
+}
+.filter-chip.active {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 20px -4px rgba(99,102,241,0.3), 0 0 0 1px rgba(99,102,241,0.2) !important;
+}
+
+/* --- Timeline dot enhanced pulse --- */
+.timeline-dot {
+  animation: timelinePulse 2.5s ease-in-out infinite;
+}
+@keyframes timelinePulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(99,102,241,0.6); }
+  50%       { box-shadow: 0 0 20px rgba(99,102,241,0.9), 0 0 40px rgba(99,102,241,0.35); }
+}
+
+/* --- Scroll progress bar glow enhancement --- */
+#scroll-progress {
+  box-shadow: 0 0 8px rgba(99,102,241,0.5);
+  transition: width 0.08s linear !important;
+}
+
+/* --- Data counter element entrance --- */
+[data-counter] {
+  will-change: contents;
+}
+
+/* --- Neural canvas subtle vignette depth --- */
+#neural-canvas {
+  opacity: 0.18 !important;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+
+/* --- Page transition fade (SPA route changes) --- */
+#page-content {
+  animation: pageEntrance 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes pageEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* --- Hero section gradient text shimmer enhancement --- */
+.animate-gradient-text {
+  background-size: 300% auto !important;
+  animation: gradientMove 4s ease infinite !important;
+}
+
+/* --- Holographic shimmer on featured shimmer bar (upgrade) --- */
+@keyframes shimmerBar {
+  0%   { background-position: 300% 0; }
+  100% { background-position: -300% 0; }
+}
+
+/* --- Text flow gradient enhancement --- */
+.text-flow-gradient {
+  background: linear-gradient(90deg,
+    #ffffff 0%,
+    #c4b5fd 20%,
+    #60a5fa 40%,
+    #34d399 55%,
+    #f472b6 75%,
+    #ffffff 100%
+  ) !important;
+  background-size: 300% auto !important;
+  animation: textGradientFlow 3.5s ease infinite !important;
+}
+
+/* --- Preloader exit enhancement --- */
+#preloader {
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.8s ease, transform 0.8s ease;
+}
+
+/* --- Premium body noise overlay (subtle film grain texture) --- */
+body::before {
+  opacity: 0.028 !important;
+}
+
+/* =====================================================================
+   REDUCED MOTION — disable all animation enhancements
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob,
+  .timeline-dot,
+  #chatbot-toggle-btn,
+  .text-flow-gradient,
+  .animate-gradient-text,
+  .flip-card-front.is-featured::before,
+  #scroll-progress {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .scroll-reveal {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .skill-card:hover,
+  .glass-card:hover,
+  .cert-card:hover,
+  .cat-card-premium:hover,
+  .flip-card:not(.is-flipped):hover .flip-card-front {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  #page-content {
+    animation: none !important;
+  }
+}
+
+/* =====================================================================
+   MOBILE PERFORMANCE GUARDS
+   Disable heavy effects on coarse-pointer / small screens
+   ===================================================================== */
+@media (max-width: 768px) {
+  /* Disable aurora parallax on mobile */
+  .aurora-blob {
+    transition: none !important;
+  }
+
+  /* Disable glass on mobile flip cards */
+  .flip-card-front,
+  .flip-card-back {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(22,27,34,0.97) !important;
+  }
+
+  /* Simplify category card hover */
+  .cat-card-premium:hover {
+    transform: translateY(-3px) !important;
+  }
+
+  /* Lighter chatbot glow on mobile */
+  #chatbot-toggle-btn {
+    animation: none !important;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.3) !important;
+  }
+
+  /* Disable card glow borders on mobile for perf */
+  .skill-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4) !important;
+  }
+}
