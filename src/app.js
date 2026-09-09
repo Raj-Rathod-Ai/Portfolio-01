@@ -319,7 +319,7 @@ function initNeuralCanvas() {
 
                 const avgDist = (dist1 + dist2 + dist3) / 3;
                 const opacity = (1 - avgDist / MAX_DIST) * 0.15;
-                ctx.fillStyle = `rgba(99, 102, 241, ${opacity})`;
+                ctx.fillStyle = `rgba(14, 165, 233, ${opacity})`;
                 ctx.fill();
               }
             }
@@ -327,7 +327,7 @@ function initNeuralCanvas() {
 
           // Draw connector line
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(99, 102, 241, ${(1 - dist1 / MAX_DIST) * 0.7})`;
+          ctx.strokeStyle = `rgba(14, 165, 233, ${(1 - dist1 / MAX_DIST) * 0.7})`;
           ctx.lineWidth = 1.2;
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -338,7 +338,7 @@ function initNeuralCanvas() {
       // Draw node circle
       ctx.beginPath();
       ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(99, 102, 241, 0.95)';
+      ctx.fillStyle = 'rgba(14, 165, 233, 0.95)';
       ctx.fill();
     }
     requestAnimationFrame(drawCanvas);
@@ -376,19 +376,16 @@ function initIntersectionObservers() {
 }
 
 /**
- * Handle hover cursor coordinates on premium cards.
+ * Handle hover cursor coordinates on premium cards (optimized for zero scroll lag).
  */
 function initMouseSpotlight() {
   document.addEventListener('mousemove', (e) => {
-    // spotlight-card (detail view) + flip-card-front
-    document.querySelectorAll('.spotlight-card, .flip-card-front').forEach(card => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
-    });
-  });
+    const card = e.target.closest('.spotlight-card, .flip-card-front');
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  }, { passive: true });
 }
 
 
@@ -500,33 +497,6 @@ function initPreloader(onLoadedCallback) {
 
 /**
  * Initialize Lenis Smooth Scroll engine for ultra-smooth inertia scrolling.
- */
-function initLenisSmoothScroll() {
-  if (typeof Lenis === 'undefined') return;
-  try {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
-      infinite: false,
-    });
-
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-    window.lenis = lenis;
-  } catch (e) {
-    console.warn('Lenis smooth scroll initialization warning:', e);
-  }
-}
-
 /**
  * Run application bootsrap load.
  */
@@ -544,10 +514,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     footerPlaceholder.innerHTML = footer.render();
   }
 
-  // Bind active spotlight glows, background particles canvas, and Lenis smooth scroll
+  // Bind active spotlight glows and background particles canvas (native 120fps smooth scroll)
   initNeuralCanvas();
   initMouseSpotlight();
-  initLenisSmoothScroll();
 
   // Clear any legacy cached duplicate repos from browser localStorage
   try {
