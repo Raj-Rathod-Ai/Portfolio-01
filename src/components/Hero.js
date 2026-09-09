@@ -24,6 +24,7 @@ export class Hero {
               <h1 class="text-4xl sm:text-5xl lg:text-6xl font-jakarta font-extrabold tracking-tight leading-tight">
                 <span class="text-gray-100">Hi, I'm </span>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent animate-gradient-text">Raj Rathod</span>
+                <span class="sr-only"> — AI & Machine Learning Engineer</span>
               </h1>
               <p class="text-xl sm:text-2xl font-jakarta font-semibold text-gray-400">
                 <span id="typewriter-role">AI & Machine Learning Developer</span><span class="typewriter-cursor">|</span>
