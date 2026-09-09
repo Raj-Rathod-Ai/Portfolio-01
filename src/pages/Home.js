@@ -685,7 +685,7 @@ export class Home {
                   <i class="fa-brands fa-linkedin text-gray-400 group-hover:text-sky text-lg"></i>
                   <span class="font-inter text-xs text-gray-400 group-hover:text-sky transition-colors">LinkedIn</span>
                 </a>
-                <a href="https://instagram.com/its._.rudra._.19.08_" target="_blank" rel="noopener" class="flex items-center gap-2 p-3 rounded-xl border border-white/8 bg-white/3 hover:border-rose/40 hover:bg-rose/5 transition-all group spotlight-card">
+                <a href="https://www.instagram.com/its._.rudra._.19.08_/" target="_blank" rel="noopener" class="flex items-center gap-2 p-3 rounded-xl border border-white/8 bg-white/3 hover:border-rose/40 hover:bg-rose/5 transition-all group spotlight-card">
                   <i class="fa-brands fa-instagram text-gray-400 group-hover:text-rose text-lg"></i>
                   <span class="font-inter text-xs text-gray-400 group-hover:text-rose transition-colors">Instagram</span>
                 </a>
