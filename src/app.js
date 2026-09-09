@@ -358,7 +358,7 @@ function initNeuralCanvas() {
 
                 const avgDist = (dist1 + dist2 + dist3) / 3;
                 const opacity = (1 - avgDist / MAX_DIST) * 0.15;
-                ctx.fillStyle = `rgba(99, 102, 241, ${opacity})`;
+                ctx.fillStyle = `rgba(14, 165, 233, ${opacity})`;
                 ctx.fill();
               }
             }
@@ -366,7 +366,7 @@ function initNeuralCanvas() {
 
           // Draw connector line
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(99, 102, 241, ${(1 - dist1 / MAX_DIST) * 0.7})`;
+          ctx.strokeStyle = `rgba(14, 165, 233, ${(1 - dist1 / MAX_DIST) * 0.55})`;
           ctx.lineWidth = 1.2;
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -377,7 +377,7 @@ function initNeuralCanvas() {
       // Draw node circle
       ctx.beginPath();
       ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(99, 102, 241, 0.95)';
+      ctx.fillStyle = 'rgba(14, 165, 233, 0.9)';
       ctx.fill();
     }
     requestAnimationFrame(drawCanvas);
@@ -432,8 +432,6 @@ function initMouseSpotlight() {
 
 
 /**
- * Initialize loading preloader progression page overlays.
- */
 function initPreloader(onLoadedCallback) {
   const brand = document.getElementById('preloader-brand');
   const bar = document.getElementById('pl-bar');
@@ -446,53 +444,53 @@ function initPreloader(onLoadedCallback) {
     return;
   }
 
-  // Multi-Color Glowing Hologram Character Stagger Suite
-  const text = 'RAJ RATHOD';
-  const colors = ['#818cf8', '#a855f7', '#38bdf8', '#34d399', '#fbbf24', '#f472b6'];
+  // Clean GPT/Astra-style: pure white text, smooth stagger
+  const text = 'Raj Rathod';
   brand.innerHTML = '';
 
-  const chars = Array.from(text).map((c) => {
+  const chars = Array.from(text).map((c, i) => {
     const span = document.createElement('span');
     span.textContent = c === ' ' ? '\u00A0' : c;
-    span.style.cssText = 'font-family:\'Outfit\',\'Plus Jakarta Sans\',sans-serif;font-weight:900;display:inline-block;opacity:0;filter:blur(24px);transform:translateY(22px) scale(0.92);background:linear-gradient(135deg,#ffffff 20%,#c7d2fe 60%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;will-change:filter,opacity,transform;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),filter 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1),text-shadow 0.25s;';
+    // Start hidden — will animate in
+    span.style.cssText = `
+      font-family:'Outfit','Plus Jakarta Sans',sans-serif;
+      font-weight:900;
+      display:inline-block;
+      opacity:0;
+      color:#ffffff;
+      filter:blur(18px);
+      transform:translateY(16px);
+      transition:opacity 0.55s cubic-bezier(0.16,1,0.3,1),
+                 filter 0.55s cubic-bezier(0.16,1,0.3,1),
+                 transform 0.55s cubic-bezier(0.16,1,0.3,1);
+      will-change:opacity,filter,transform;
+    `;
     brand.appendChild(span);
     return span;
   });
 
-  // Stagger reveal each letter with blur-to-focus and flowing text shimmer
+  // Stagger reveal each letter — blur-to-focus, translateY pop-up
   chars.forEach((span, i) => {
     setTimeout(() => {
       span.style.opacity = '1';
       span.style.filter = 'blur(0)';
-      span.style.transform = 'translateY(0) scale(1)';
-      setTimeout(() => {
-        span.classList.add('text-flow-gradient');
-      }, 400);
-    }, i * 75 + 160);
+      span.style.transform = 'translateY(0)';
+    }, i * 60 + 120);
   });
 
-  // Interactive Neon Hover effect on individual characters
-  chars.forEach((span) => {
-    span.addEventListener('mouseenter', () => {
-      const col = colors[Math.floor(Math.random() * colors.length)];
-      span.style.webkitTextFillColor = col;
-      span.style.transform = 'translateY(-10px) scale(1.12)';
-      span.style.filter = `drop-shadow(0 0 25px ${col}) drop-shadow(0 0 50px ${col}88)`;
-    });
-    span.addEventListener('mouseleave', () => {
-      span.style.webkitTextFillColor = 'transparent';
-      span.style.transform = 'translateY(0) scale(1)';
-      span.style.filter = 'none';
-    });
-  });
+  // After name is visible, add subtle sky glow effect to whole word
+  setTimeout(() => {
+    brand.style.transition = 'text-shadow 0.6s ease';
+    brand.style.textShadow = '0 0 40px rgba(14,165,233,0.35), 0 0 80px rgba(16,185,129,0.15)';
+  }, chars.length * 60 + 400);
 
-  // Laser Progress Bar Animation & Status Stepper
+  // Progress bar
   let progress = 0;
   const statusSteps = [
-    'Initializing Neural Engine...',
-    'Loading AI Architectures & Models...',
-    'Synchronizing 21 Live Deployments...',
-    'Calibrating Multi-Turn Assistant...',
+    'Initializing AI Engine...',
+    'Loading Projects & Models...',
+    'Connecting GitHub Data...',
+    'Calibrating Assistant...',
     'Portfolio Ready.'
   ];
   let currentStepIdx = 0;
@@ -509,16 +507,16 @@ function initPreloader(onLoadedCallback) {
       if (status) status.textContent = 'Portfolio Ready.';
 
       setTimeout(() => {
-        preloader.style.transition = 'opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease, transform 0.75s ease';
+        preloader.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), filter 0.7s ease, transform 0.7s ease';
         preloader.style.opacity = '0';
-        preloader.style.filter = 'blur(16px)';
-        preloader.style.transform = 'scale(1.03)';
+        preloader.style.filter = 'blur(12px)';
+        preloader.style.transform = 'scale(1.02)';
         document.documentElement.classList.remove('noscroll');
 
         setTimeout(() => {
           if (preloader.parentNode) preloader.remove();
-          onLoadedCallback(); // Initialize SPA routes
-        }, 800);
+          onLoadedCallback();
+        }, 750);
       }, 300);
       return;
     }
@@ -536,6 +534,7 @@ function initPreloader(onLoadedCallback) {
     }
   }, 35);
 }
+
 
 /**
  * Initialize Lenis Smooth Scroll engine for ultra-smooth inertia scrolling.
