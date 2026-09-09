@@ -14,6 +14,9 @@ export class CommandPalette {
 
   getDefaultItems() {
     return [
+      { title: 'FruitsCheck CNN Fruit Freshness', category: 'Live Demo', url: 'https://fruits-check.streamlit.app/', icon: 'fa-solid fa-apple-whole', tech: 'CNN · TensorFlow · Streamlit', external: true },
+      { title: 'Sukoon-Saathi Student Wellness ML', category: 'Live Demo', url: 'https://sukoonsaathi-frontend.onrender.com/', icon: 'fa-solid fa-heart-pulse', tech: 'FastAPI · Scikit-Learn · ML', external: true },
+      { title: 'Laptop Price Prediction ANN', category: 'Live Demo', url: 'https://laptop-price-predicate.streamlit.app/', icon: 'fa-solid fa-laptop', tech: 'ANN · Keras · Streamlit', external: true },
       { title: 'MeetNotes AI Meeting Intelligence', category: 'Live Demo', url: 'https://meetnotes.streamlit.app/', icon: 'fa-solid fa-video', tech: 'RAG · Whisper · Video-Agent · Streamlit', external: true },
       { title: 'SENTI.AI Emotion Intelligence', category: 'Live Demo', url: 'https://senti-ai.onrender.com', icon: 'fa-solid fa-brain', tech: 'BiGRU · Deep Learning · Python', external: true },
       { title: 'AutoPrepAI Data Platform', category: 'Live Demo', url: 'https://data-eda-processing.streamlit.app/', icon: 'fa-solid fa-wand-magic-sparkles', tech: 'Streamlit · Python · EDA', external: true },

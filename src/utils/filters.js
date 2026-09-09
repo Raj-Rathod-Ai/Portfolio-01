@@ -35,8 +35,12 @@ export function filterProjects(projects, filter = 'all') {
     case 'group':
       return projects.filter(p => !!p.isGroup);
     case 'recent': {
-      const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000; // 90 days
-      return projects.filter(p => new Date(p.updated_at || p.pushed_at).getTime() > cutoff);
+      const cutoff = Date.now() - 120 * 24 * 60 * 60 * 1000; // 120 days
+      const recent = projects.filter(p => !p.isUpcoming && new Date(p.created_at || p.pushed_at || p.updated_at || 0).getTime() > cutoff);
+      if (recent.length >= 2) {
+        return recent.sort((a, b) => new Date(b.created_at || b.pushed_at || b.updated_at || 0) - new Date(a.created_at || a.pushed_at || a.updated_at || 0));
+      }
+      return [...projects].filter(p => !p.isUpcoming).sort((a, b) => new Date(b.created_at || b.pushed_at || 0) - new Date(a.created_at || a.pushed_at || 0)).slice(0, 8);
     }
     case 'popular':
       return projects.filter(p => (p.stargazers_count || 0) > 0);

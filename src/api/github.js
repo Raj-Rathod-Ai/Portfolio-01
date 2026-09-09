@@ -4,7 +4,7 @@ import { getApiBaseUrl } from '../utils/analytics.js';
 const CACHE_KEY = 'github_repositories_cache';
 const CACHE_EXPIRY_MINS = 5; // Cache for 5 minutes
 
-const SKIP_REPOS = [
+export const SKIP_REPOS = [
   'raj-rathod-ai',
   '.github',
   'impact-training-parul-university',
@@ -15,7 +15,7 @@ const SKIP_REPOS = [
   'neetcode'
 ];
 
-const FALLBACK_REPOS = [
+export const FALLBACK_REPOS = [
   {
     "name": "FruitsCheck-CNN-Fruit-Freshness",
     "description": "FruitCheck is a CNN-based computer vision application that classifies fruit images as Fresh or Rotten. Built with TensorFlow/Keras, FastAPI, and React, it currently supports apples, bananas, and oranges with image preprocessing using Pillow and NumPy.",

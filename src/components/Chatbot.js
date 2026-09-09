@@ -6,6 +6,7 @@
  */
 
 import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName, authenticateBoss, changeBossPassword, getMasterPassword, getVisitedCategories, trackInteraction, getApiBaseUrl } from '../utils/analytics.js';
+import { FALLBACK_REPOS, SKIP_REPOS } from '../api/github.js';
 
 // Dynamically read runtime client API key (decoded safely to avoid raw scanner triggers)
 const MISTRAL_KEY = atob('d0ZZZUhiSWtuNzdKWkdlcGhtMk13UzZSZldKNUxRQVI=');
@@ -23,6 +24,52 @@ export class Chatbot {
     this.onboardingStep = null; // null | 'ask_name' | 'ask_role' | 'ask_contact' | 'ask_boss_password' | 'change_password_new'
     this.tempProfile = {};
     this.bossAttempts = 0;
+  }
+
+  /**
+   * Dynamically get valid project repositories (window data, local cache, or fallback).
+   * Automatically filters out non-project repos and upcoming stubs.
+   */
+  getValidRepos() {
+    let repos = null;
+    if (window.portfolioData?.repos && Array.isArray(window.portfolioData.repos) && window.portfolioData.repos.length > 0) {
+      repos = window.portfolioData.repos;
+    }
+
+    if (!repos) {
+      try {
+        const cached = localStorage.getItem('github_repositories_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed?.data) && parsed.data.length > 0) {
+            repos = parsed.data;
+          } else if (Array.isArray(parsed) && parsed.length > 0) {
+            repos = parsed;
+          }
+        }
+      } catch (e) { }
+    }
+
+    if (!repos || repos.length === 0) {
+      repos = FALLBACK_REPOS;
+    }
+
+    const skipSet = new Set((SKIP_REPOS || []).map(s => s.toLowerCase()));
+    return repos.filter(r => !r.isUpcoming && !skipSet.has((r.name || '').toLowerCase()));
+  }
+
+  /**
+   * Get recently added / updated projects dynamically sorted by real creation/push date.
+   * @param {number} count 
+   * @returns {Array}
+   */
+  getRecentProjects(count = 5) {
+    const valid = this.getValidRepos();
+    return [...valid].sort((a, b) => {
+      const dateA = new Date(a.created_at || a.pushed_at || a.updated_at || 0).getTime();
+      const dateB = new Date(b.created_at || b.pushed_at || b.updated_at || 0).getTime();
+      return dateB - dateA;
+    }).slice(0, count);
   }
 
   /**
@@ -935,24 +982,64 @@ export class Chatbot {
    * @returns {Promise<string>}
    */
   async getBotReply(prompt) {
-    // Extract live repos from window.portfolioData
-    const repos = window.portfolioData?.repos || [];
-    const sortedRepos = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+    const validRepos = this.getValidRepos();
+    const sortedRecent = this.getRecentProjects(5);
+    const latestProject = sortedRecent[0];
 
     // Format full repo metadata for context with explicit Live Demo URLs
-    const repoListText = sortedRepos.length > 0
-      ? sortedRepos.map((r, idx) => `${idx + 1}. ${r.name} (Category: ${r.category || 'ML/AI'}, Lang: ${r.language || 'Python'}, Updated: ${r.updated_at ? new Date(r.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}) - Description: ${r.description || 'N/A'} [Topics: ${(r.topics || []).join(', ')}] Live Demo URL: ${r.live || r.homepage || 'None (Code on GitHub)'} | GitHub Repo: ${r.html_url}`).join('\n')
-      : `- Movie-Recommendations-Using-NLP-and-ML (Category: NLP): Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML\n- Taxi-Fare-Prediction (Category: Machine Learning): Live Demo: https://taxi-price-prediction.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction\n- Food_Delivery_Time-Using-ML (Category: Machine Learning): Live Demo: https://fooddelivery-time.streamlit.app/\n- Discover-Your-True-Personality (Category: Machine Learning): Live Demo: https://discover-your-true-personality.streamlit.app/\n- AutoPrepAI (Category: Data Science): Live Demo: https://data-eda-processing.streamlit.app/\n- FlowerDiseaseSystem (Category: Deep Learning): Live Demo: https://flower-disease-system.vercel.app\n- ChatNotes (Category: RAG): Live Demo: https://chat-with-your-notes-dusx.onrender.com/\n- HybridMind (Category: Generative AI): Live Demo: https://hybridmind.netlify.app/\n- Fake-News-Detection-Using-DL-Real-time (Category: NLP): Live Demo: https://truthlens5.netlify.app/ & https://truthlens5.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time\n- stone-paper-scissors-python (Category: Python Concepts): Live Demo: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/\n- Library-Mangement (Category: Software Systems): Live Demo: https://librarymangement1.streamlit.app/`;
+    const repoListText = validRepos.length > 0
+      ? validRepos.map((r, idx) => {
+          const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+          const liveUrl = r.live || r.homepage || 'None (Code on GitHub)';
+          return `${idx + 1}. ${r.name} (Category: ${r.category || 'ML/AI'}, Stack: ${r.language || 'Python'}, Added: ${dateStr}) - Description: ${r.description || 'N/A'} [Topics: ${(r.topics || []).join(', ')}] Live Demo URL: ${liveUrl} | GitHub Repo: ${r.html_url}`;
+        }).join('\n')
+      : `- FruitsCheck-CNN-Fruit-Freshness (Category: Deep Learning): Live Demo: https://fruits-check.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness
+- Sukoon-Saathi (Category: Machine Learning): Live Demo: https://sukoonsaathi-frontend.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/Sukoon-Saathi
+- MeetNotes (Category: RAG): Live Demo: https://meetnotes.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/MeetNotes
+- SENTI-AI-BiGRU-Emotion-Detection-Using-DL (Category: Deep Learning): Live Demo: https://senti-ai.onrender.com | GitHub: https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL
+- Laptop-Price-Predicate-Using-DL (Category: Deep Learning): Live Demo: https://laptop-price-predicate.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL
+- Movie-Recommendations-Using-NLP-and-ML (Category: NLP): Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
+- Fake-News-Detection-Using-DL-Real-time (Category: NLP): Live Demo: https://truthlens5.netlify.app/ & https://truthlens5.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
+- AutoPrepAI (Category: Data Science): Live Demo: https://data-eda-processing.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI
+- FlowerDiseaseSystem (Category: Deep Learning): Live Demo: https://flower-disease-system.vercel.app | GitHub: https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
+- ChatNotes (Category: RAG): Live Demo: https://chat-with-your-notes-dusx.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/ChatNotes
+- HybridMind (Category: Generative AI): Live Demo: https://hybridmind.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/HybridMind
+- Taxi-Fare-Prediction (Category: Machine Learning): Live Demo: https://taxi-price-prediction.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction
+- Food_Delivery_Time-Using-ML (Category: Machine Learning): Live Demo: https://fooddelivery-time.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML
+- Discover-Your-True-Personality (Category: Machine Learning): Live Demo: https://discover-your-true-personality.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
+- stone-paper-scissors-python (Category: Python Concepts): Live Demo: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/
+- Library-Mangement (Category: Software Systems): Live Demo: https://librarymangement1.streamlit.app/`;
 
-    const latestProject = sortedRepos[0];
+    const recentTopSummary = sortedRecent.map((p, idx) => {
+      const createdDate = p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+      const liveUrl = p.live || p.homepage || 'None (Code on GitHub)';
+      return `${idx + 1}. ${p.name} (Category: ${p.category || 'AI/ML'}, Added: ${createdDate}, Live Demo: ${liveUrl}, GitHub: ${p.html_url}) - ${p.description || ''}`;
+    }).join('\n');
+
     const latestProjSummary = latestProject
-      ? `MOST RECENT / LAST WORKING PROJECT: ${latestProject.name} (Updated: ${latestProject.updated_at ? new Date(latestProject.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}). Category: ${latestProject.category}, Language: ${latestProject.language}, Description: ${latestProject.description}, Live Demo: ${latestProject.live || latestProject.homepage || 'None'}, GitHub: ${latestProject.html_url}`
-      : `MOST RECENT / LAST WORKING PROJECT: Taxi-Fare-Prediction (Updated: 12 Jun 2026). Category: Machine Learning, Language: Python, Live Demo: https://taxi-price-prediction.netlify.app/, GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction`;
+      ? `MOST RECENT / NEWLY ADDED PROJECT:
+- Name: ${latestProject.name} (Added: ${latestProject.created_at ? new Date(latestProject.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'})
+- Category: ${latestProject.category || 'Deep Learning / Computer Vision'}
+- Description: ${latestProject.description || ''}
+- Verified Live Demo: ${latestProject.live || latestProject.homepage || 'https://fruits-check.streamlit.app/'}
+- GitHub Repository: ${latestProject.html_url}
 
-    // Priority Check: Direct RAG semantic match for high-precision single project link queries
+TOP 5 RECENTLY ADDED / DEVELOPED PROJECTS:
+${recentTopSummary}`
+      : `MOST RECENT / NEWLY ADDED PROJECT: FruitsCheck-CNN-Fruit-Freshness (Fresh vs Rotten Fruit CNN Classifier). Live Demo: https://fruits-check.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness`;
+
+    const lowerPrompt = prompt.toLowerCase();
+    const isLinkQuery = ['demo', 'live', 'link', 'url', 'deploy', 'github', 'repo', 'code', 'cgpa', 'education', 'resume', 'contact'].some(k => lowerPrompt.includes(k));
+    const isRecentQuery = [
+      'latest project', 'recent project', 'recently added', 'recent added',
+      'recent projects', 'new project', 'new projects', 'recently add',
+      'what are you working on', 'what did you build recently', 'what have you built recently',
+      'newest project', 'latest work', 'recent work', 'newest repo', 'latest repos'
+    ].some(k => lowerPrompt.includes(k));
+
+    // Priority Check: Direct RAG semantic match for high-precision queries
     const directRAG = this.retrieveRAGContext(prompt, this.history);
-    const isLinkQuery = ['demo', 'live', 'link', 'url', 'deploy', 'github', 'repo', 'code', 'cgpa', 'education', 'resume', 'contact'].some(k => prompt.toLowerCase().includes(k));
-    if (directRAG && isLinkQuery) {
+    if (directRAG && (isLinkQuery || isRecentQuery)) {
       return directRAG;
     }
 
@@ -990,17 +1077,24 @@ export class Chatbot {
         ? `\nCURRENT USER DETAILS:\n- Name: ${this.userProfile.name}\n- Role: ${this.userProfile.role || 'Guest'}\nAddress user respectfully by name (${this.userProfile.name}) when helpful.`
         : '';
 
-      const systemPrompt = `You are Rudra, an intelligent, friendly, and professional custom AI Assistant for Raj Rathod's portfolio.
-Answer user questions naturally, accurately, and concisely (2-4 sentences max unless detailed project lists are explicitly requested).${userCtxStr}
+      const systemPrompt = `You are Rudra, an intelligent, articulate, and technical personal AI Assistant and Agent representing Raj Rathod.
+Your mission is to represent Raj with genuine technical depth, authenticity, and agentic competence. Speak naturally as a top-tier technical representative — never sound robotic, generic, or fake.${userCtxStr}
+
+AGENTIC RESPONSE PRINCIPLES:
+1. Deep Technical Fluency: When explaining projects, clearly articulate architectures and design decisions (e.g. why BiGRU is used for emotional text sentiment, why CNNs with pooling are used for fruit freshness defect detection, why RAG with Whisper + Mistral is used for meeting intelligence, why polynomial regression/Random Forests are used for price/fare prediction).
+2. Direct Verified Links: Always provide verified live links formatted cleanly in Markdown: [Launch Live Demo](URL) and [GitHub Repo](URL).
+3. Accurate Recent Projects: If asked about "recent", "latest", or "newly added" projects, ALWAYS cite the real newest projects from the context below (FruitsCheck, Sukoon-Saathi, MeetNotes, SENTI-AI, Laptop Price ANN) with their live links. NEVER mention outdated or hardcoded placeholders like Taxi Fare as the latest project!
+4. Conversational Memory: Use previous conversation turns to resolve pronouns ("it", "this", "that", "the demo", "how does it work") accurately.
+5. Conciseness & Precision: Keep answers focused, direct, and well-structured with Markdown headings and bullet points.
 
 RAJ RATHOD'S PROFILE DATA:
 - Role: AI & Machine Learning Developer.
 - Education: B.Tech in Computer Science & Engineering with AI specialization at Parul University, Vadodara (2023 - 2027). CGPA: 7.66.
-- Coding Achievements: Solved 350+ problems on LeetCode.
+- Coding Achievements: Solved 350+ problems on LeetCode (https://leetcode.com/u/Raj-Rathod).
 - Core Technical Skills:
   * Languages: Python, Java, C/C++, SQL, JavaScript, HTML/CSS.
-  * AI/ML/DL Frameworks: PyTorch, TensorFlow, Scikit-Learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit.
-  * Tools & Platforms: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify.
+  * AI/ML/DL Frameworks: PyTorch, TensorFlow, Keras, Scikit-Learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit, FastAPI.
+  * Tools & Platforms: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify, Render.
 
 ${latestProjSummary}
 
@@ -1021,9 +1115,17 @@ Contact Details:
 - Email: rathodraj1504@gmail.com
 - GitHub: https://github.com/Raj-Rathod-Ai
 - LinkedIn: https://linkedin.com/in/raj-rathod-ai
+- AI/ML Resume: [Download AI/ML Resume](/Rathod_Raj_Ai_Update.pdf)
+- Full-Stack Resume: [Download Full-Stack Resume](/Rathod_Raj_FullStack.pdf)
+- Campus / Location: Parul University, Vadodara, Gujarat 391760 ([Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat))
 
 CRITICAL CONVERSATIONAL & ACCURACY RULES:
-- When the user asks for a project's demo link (e.g. "demo link of movie", "live link of fake news", "give link", "demo"), check the Live Demo URL in the project list above:
+- Verified Live Deployments:
+  * FruitsCheck (Fruit Freshness CNN): Live Demo https://fruits-check.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness
+  * Sukoon-Saathi (Student Wellness ML): Live Demo https://sukoonsaathi-frontend.onrender.com/ | GitHub https://github.com/Raj-Rathod-Ai/Sukoon-Saathi
+  * MeetNotes (AI Meeting Intelligence & Video-Agent): Live Demo https://meetnotes.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/MeetNotes
+  * SENTI-AI (BiGRU Emotion Detection): Live Demo https://senti-ai.onrender.com | GitHub https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL
+  * Laptop Price Prediction (ANN): Live Demo https://laptop-price-predicate.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL
   * Movie Recommendations: Live Demo https://cinema-verse.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
   * Fake News Detection: Live Demo https://truthlens5.netlify.app/ or https://truthlens5.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
   * AutoPrepAI: Live Demo https://data-eda-processing.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/AutoPrepAI
@@ -1077,23 +1179,136 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
   getRAGKnowledgeBase() {
     return [
       {
+        id: 'latest_recent_projects',
+        title: 'Recently Added Projects & Latest Engineering Work',
+        keywords: [
+          'latest project', 'recent project', 'recently added', 'recent projects', 'new project',
+          'new projects', 'recently add', 'recent added', 'what are you working on', 'what have you built recently',
+          'what did you build recently', 'newest project', 'latest work', 'recent work', 'last project', 'current project', 'latest repos'
+        ],
+        category: 'Recent Work',
+        content: () => {
+          const recent = this.getRecentProjects(5);
+          if (!recent || recent.length === 0) {
+            return `🚀 **RAJ RATHOD'S LATEST & RECENTLY ADDED PROJECTS**\n\n` +
+                   `Here are Raj's most recently added engineering projects:\n\n` +
+                   `🍎 **1. FruitsCheck-CNN-Fruit-Freshness** (Deep Learning / Computer Vision)\n` +
+                   `• **Architecture**: Deep Convolutional Neural Network (CNN) built with **TensorFlow/Keras** classifying fruit images as Fresh or Rotten across apples, bananas, and oranges.\n` +
+                   `• 🚀 **Live Demo**: [fruits-check.streamlit.app](https://fruits-check.streamlit.app/)\n` +
+                   `• 📂 **GitHub Repo**: [View on GitHub](https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness)\n\n` +
+                   `🧘 **2. Sukoon-Saathi** (Machine Learning / Student Wellness)\n` +
+                   `• **Architecture**: Production-ready ML inference pipeline predicting personalized mental wellness scores based on academic, lifestyle, sleep, and physical activity features.\n` +
+                   `• 🚀 **Live Demo**: [sukoonsaathi-frontend.onrender.com](https://sukoonsaathi-frontend.onrender.com/)\n` +
+                   `• 📂 **GitHub Repo**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Sukoon-Saathi)\n\n` +
+                   `⚡ **3. MeetNotes** (Autonomous AI Meeting Intelligence & Video-Agent)\n` +
+                   `• **Architecture**: Retrieval-Augmented Generation (RAG) system with Whisper speech-to-text and Mistral LLM for automated meeting transcription and structured Q&A.\n` +
+                   `• 🚀 **Live Demo**: [meetnotes.streamlit.app](https://meetnotes.streamlit.app/)\n` +
+                   `• 📂 **GitHub Repo**: [View on GitHub](https://github.com/Raj-Rathod-Ai/MeetNotes)\n\n` +
+                   `🎭 **4. SENTI-AI-BiGRU-Emotion-Detection-Using-DL** (Deep Learning / NLP)\n` +
+                   `• **Architecture**: Bidirectional GRU (BiGRU) neural network with Keras Tokenizer and FastAPI backend classifying text into 6 emotions (Joy, Sadness, Love, Anger, Fear, Surprise).\n` +
+                   `• 🚀 **Live Demo**: [senti-ai.onrender.com](https://senti-ai.onrender.com)\n` +
+                   `• 📂 **GitHub Repo**: [View on GitHub](https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL)\n\n` +
+                   `💻 **5. Laptop-Price-Predicate-Using-DL** (Deep Learning / Neural Networks)\n` +
+                   `• **Architecture**: Artificial Neural Network (ANN) regression model with One-Hot Encoding and StandardScaler for real-time laptop price estimation.\n` +
+                   `• 🚀 **Live Demo**: [laptop-price-predicate.streamlit.app](https://laptop-price-predicate.streamlit.app/)\n` +
+                   `• 📂 **GitHub Repo**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL)\n\n` +
+                   `💡 *Would you like an in-depth breakdown of the architecture, data preprocessing, or model weights for any of these?*`;
+          }
+
+          const items = recent.map((p, i) => {
+            const demoUrl = p.live || p.homepage;
+            const demoStr = demoUrl ? `\n• 🚀 **Live Demo**: [Launch App](${demoUrl})` : '';
+            return `**${i + 1}. ${p.name}** (${p.category || 'AI/ML'})\n• **Overview**: ${p.description || 'Modern AI/ML engineering application.'}${demoStr}\n• 📂 **GitHub Repo**: [View on GitHub](${p.html_url})`;
+          }).join('\n\n');
+
+          return `🚀 **RAJ RATHOD'S LATEST & RECENTLY ADDED PROJECTS**\n\n` +
+                 `Here are the most recently developed and published projects from Raj's GitHub:\n\n` +
+                 items +
+                 `\n\n💡 *All projects are fully open-source and deployed live. Which one would you like to explore in detail?*`;
+        }
+      },
+      {
+        id: 'fruitscheck_cnn',
+        title: 'FruitsCheck — CNN Fruit Freshness Classifier',
+        keywords: ['fruitscheck', 'fruit check', 'fruit freshness', 'fruit classification', 'fruits-check', 'fresh rotten', 'fruit cnn', 'fruit'],
+        category: 'Deep Learning',
+        content: `🍎 **FRUITSCHECK — CNN FRUIT FRESHNESS CLASSIFIER** (Deep Learning / Computer Vision)\n\n` +
+                 `• **Core Objective**: A deep learning computer vision system that classifies fruit images as **Fresh** or **Rotten** across apples, bananas, and oranges.\n` +
+                 `• **Architecture**: Multi-layer Convolutional Neural Network (CNN) with Conv2D, MaxPooling2D, Dropout regularization, and Dense classification layers built in **TensorFlow/Keras**.\n` +
+                 `• **Image Preprocessing**: Pillow and NumPy pipeline performing normalization, resizing (224x224), and data augmentation.\n` +
+                 `• **Tech Stack**: Python, TensorFlow, Keras, Streamlit, Pillow, NumPy\n` +
+                 `• 🚀 **Live Demo**: [fruits-check.streamlit.app](https://fruits-check.streamlit.app/)\n` +
+                 `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness)`
+      },
+      {
+        id: 'sukoonsaathi_ml',
+        title: 'Sukoon-Saathi — Student Wellness Prediction System',
+        keywords: ['sukoon', 'saathi', 'sukoon-saathi', 'sukoonsaathi', 'student wellness', 'wellness prediction', 'mental wellness'],
+        category: 'Machine Learning',
+        content: `🧘 **SUKOON-SAATHI — STUDENT WELLNESS PREDICTION SYSTEM** (Machine Learning)\n\n` +
+                 `• **Core Objective**: A student mental wellness prediction system modeling academic stress, digital screen time, lifestyle patterns, sleep quality, and physical activity to output a personalized wellness score.\n` +
+                 `• **Architecture**: Robust Scikit-Learn data preprocessing, feature scaling, and regression/classification pipelines with serialized PKL model weights and production-ready **FastAPI** inference.\n` +
+                 `• **Tech Stack**: Python, Scikit-Learn, Pandas, NumPy, FastAPI, Render\n` +
+                 `• 🚀 **Live Demo**: [sukoonsaathi-frontend.onrender.com](https://sukoonsaathi-frontend.onrender.com/)\n` +
+                 `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Sukoon-Saathi)`
+      },
+      {
+        id: 'meetnotes_rag',
+        title: 'MeetNotes — Autonomous AI Meeting Intelligence & Video-Agent',
+        keywords: ['meetnotes', 'meet notes', 'meeting intelligence', 'video agent', 'video-agent', 'whisper meeting', 'meeting notes'],
+        category: 'RAG',
+        content: `⚡ **MEETNOTES — AUTONOMOUS AI MEETING INTELLIGENCE & VIDEO-AGENT** (RAG / Multimodal AI)\n\n` +
+                 `• **Core Objective**: Autonomous AI meeting intelligence platform that processes audio/video meeting recordings, produces high-precision transcriptions, auto-extracts action items, and powers semantic search.\n` +
+                 `• **Architecture**: Retrieval-Augmented Generation (RAG) pipeline powered by **OpenAI Whisper** for speech-to-text transcription, vector chunking, and **Mistral LLM** for intelligent summarization and query answering.\n` +
+                 `• **Tech Stack**: Python, Streamlit, Whisper, Mistral LLM, LangChain, Vector Embeddings\n` +
+                 `• 🚀 **Live Demo**: [meetnotes.streamlit.app](https://meetnotes.streamlit.app/)\n` +
+                 `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/MeetNotes)`
+      },
+      {
+        id: 'sentiai_bigru',
+        title: 'SENTI-AI — BiGRU Emotion Detection System',
+        keywords: ['senti', 'senti-ai', 'sentiai', 'emotion detection', 'bigru', 'emotion', 'emotions', 'senti ai'],
+        category: 'Deep Learning',
+        content: `🎭 **SENTI-AI — BiGRU EMOTION DETECTION SYSTEM** (Deep Learning / NLP)\n\n` +
+                 `• **Core Objective**: Deep learning NLP system that analyzes English text input and predicts 6 fine-grained emotional states: **Joy, Sadness, Love, Anger, Fear, and Surprise**.\n` +
+                 `• **Architecture**: Bidirectional Gated Recurrent Unit (**BiGRU**) capturing past and future linguistic contexts simultaneously, tokenized with **Keras Tokenizer** and served through high-performance **FastAPI**.\n` +
+                 `• **Tech Stack**: Python, TensorFlow, Keras, BiGRU, FastAPI, Pandas, NumPy, Render\n` +
+                 `• 🚀 **Live Demo**: [senti-ai.onrender.com](https://senti-ai.onrender.com)\n` +
+                 `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL)`
+      },
+      {
+        id: 'laptop_price_dl',
+        title: 'Laptop Price Predicate Using Deep Learning (ANN)',
+        keywords: ['laptop price', 'laptop price predicate', 'laptop price prediction', 'laptop dl', 'laptop-price-predicate'],
+        category: 'Deep Learning',
+        content: `💻 **LAPTOP PRICE PREDICATE USING DEEP LEARNING (ANN)** (Deep Learning / Regression)\n\n` +
+                 `• **Core Objective**: Real-time laptop market price estimator predicting values based on hardware configurations (RAM, CPU brand & clock speed, GPU, storage type, screen resolution, operating system).\n` +
+                 `• **Architecture**: Deep Artificial Neural Network (ANN) regression model with One-Hot Encoding for categorical specifications and StandardScaler normalization for numerical attributes.\n` +
+                 `• **Tech Stack**: Python, TensorFlow, Keras, Scikit-Learn, Streamlit\n` +
+                 `• 🚀 **Live Demo**: [laptop-price-predicate.streamlit.app](https://laptop-price-predicate.streamlit.app/)\n` +
+                 `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL)`
+      },
+      {
         id: 'live_demos_all',
         title: 'All Active Live Demos & Deployed Projects',
         keywords: ['live demo', 'live link', 'live links', 'live projects', 'deployed projects', 'deployed link', 'working demo', 'give live link', 'give me live', 'live deploy', 'deployed links', 'live demo link', 'interactive demo', 'working projects', 'active demo'],
         category: 'Live Demos',
-        content: `🚀 **RAJ RATHOD'S ACTIVE LIVE DEMOS & DEPLOYED APPS (21 DEPLOYMENTS)**\n\n` +
+        content: `🚀 **RAJ RATHOD'S ACTIVE LIVE DEMOS & DEPLOYED APPS (21+ DEPLOYMENTS)**\n\n` +
                  `Here are Raj's interactive deployed applications ready to test live:\n\n` +
-                 `🤖 **Generative AI & RAG**:\n` +
-                 `• **HybridMind Multi-Model Platform**: [Launch Live Demo](https://hybridmind.netlify.app/)\n` +
-                 `• **ChatNotes PDF Assistant**: [Launch Live Demo](https://chat-with-your-notes-dusx.onrender.com/)\n\n` +
+                 `🤖 **Generative AI, RAG & Video-Agents**:\n` +
+                 `• **MeetNotes AI Meeting Intelligence**: [Launch Live Demo](https://meetnotes.streamlit.app/)\n` +
+                 `• **ChatNotes PDF Assistant**: [Launch Live Demo](https://chat-with-your-notes-dusx.onrender.com/)\n` +
+                 `• **HybridMind Multi-Model Platform**: [Launch Live Demo](https://hybridmind.netlify.app/)\n\n` +
+                 `🌸 **Deep Learning & Computer Vision**:\n` +
+                 `• **FruitsCheck Fruit Freshness CNN**: [Launch Live Demo](https://fruits-check.streamlit.app/)\n` +
+                 `• **SENTI-AI BiGRU Emotion Detection**: [Launch Live Demo](https://senti-ai.onrender.com)\n` +
+                 `• **Laptop Price Prediction ANN**: [Launch Live Demo](https://laptop-price-predicate.streamlit.app/)\n` +
+                 `• **Flower & Leaf Disease Detection CNN**: [Launch Live Demo](https://flower-disease-system.vercel.app)\n\n` +
                  `🔤 **Natural Language Processing (NLP)**:\n` +
                  `• **Movie Recommendations Engine**: [Launch Live Demo](https://cinema-verse.streamlit.app/)\n` +
                  `• **Real-Time Fake News Detector (TruthLens)**: [Launch Netlify Demo](https://truthlens5.netlify.app/) | [Launch Streamlit Demo](https://truthlens5.streamlit.app/)\n\n` +
-                 `🌸 **Deep Learning & Computer Vision**:\n` +
-                 `• **Flower & Leaf Disease Detection**: [Launch Live Demo](https://flower-disease-system.vercel.app)\n\n` +
-                 `⚡ **Data Science & Preprocessing**:\n` +
-                 `• **AutoPrepAI Data Platform**: [Launch Live Demo](https://data-eda-processing.streamlit.app/)\n\n` +
                  `📈 **Machine Learning & Predictive Systems**:\n` +
+                 `• **Sukoon-Saathi Student Wellness**: [Launch Live Demo](https://sukoonsaathi-frontend.onrender.com/)\n` +
                  `• **Taxi Fare Prediction**: [Launch Live Demo](https://taxi-price-prediction.netlify.app/)\n` +
                  `• **Food Delivery Time Prediction**: [Launch Live Demo](https://fooddelivery-time.streamlit.app/)\n` +
                  `• **Discover True Personality**: [Launch Live Demo](https://discover-your-true-personality.streamlit.app/)\n` +
@@ -1106,6 +1321,8 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                  `• **Healthy Lifestyle Analyzer**: [Launch Live Demo](https://healthy-lifestyle-prediction.streamlit.app/)\n` +
                  `• **Drug Recommendation System**: [Launch Live Demo](https://drug-recommendation-systems.streamlit.app/)\n` +
                  `• **Random Forest Delivery Time**: [Launch Live Demo](https://random-forest-food-delivery-time.streamlit.app/)\n\n` +
+                 `⚡ **Data Science & Preprocessing**:\n` +
+                 `• **AutoPrepAI Data Platform**: [Launch Live Demo](https://data-eda-processing.streamlit.app/)\n\n` +
                  `🎮 **Python Concepts & Systems**:\n` +
                  `• **Stone Paper Scissors Python Game**: [Launch Live Demo](https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/)\n` +
                  `• **Tic-Tac-Toe Python Game**: [Launch Live Demo](https://tic-tac-toe-1.streamlit.app/)\n` +
@@ -1339,6 +1556,11 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
     const recentTurns = [...history].reverse();
     for (const turn of recentTurns) {
       const c = (turn.content || '').toLowerCase();
+      if (c.includes('fruit') || c.includes('freshness')) return `${text} fruitscheck cnn fruit freshness`;
+      if (c.includes('sukoon') || c.includes('wellness')) return `${text} sukoon saathi wellness prediction`;
+      if (c.includes('senti') || c.includes('emotion') || c.includes('bigru')) return `${text} senti ai bigru emotion detection`;
+      if (c.includes('laptop') && (c.includes('price') || c.includes('predicate'))) return `${text} laptop price predicate using dl`;
+      if (c.includes('meetnote') || c.includes('meeting') || c.includes('video-agent')) return `${text} meetnotes rag`;
       if (c.includes('movie') || c.includes('cinema-verse')) return `${text} movie recommendations`;
       if (c.includes('fake news') || c.includes('truthlens')) return `${text} fake news detection`;
       if (c.includes('taxi') || c.includes('fare')) return `${text} taxi fare prediction`;
@@ -1390,10 +1612,11 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
         }
       }
       // Check token match
+      const docContentStr = typeof doc.content === 'function' ? doc.content() : (doc.content || '');
       for (const t of tokens) {
         if (doc.title.toLowerCase().includes(t)) score += 5;
         if (doc.keywords.some(k => k.toLowerCase().includes(t))) score += 4;
-        if (doc.content.toLowerCase().includes(t)) score += 1;
+        if (docContentStr.toLowerCase().includes(t)) score += 1;
       }
 
       if (score > maxScore) {
@@ -1403,7 +1626,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
     }
 
     if (bestDoc && maxScore >= 4) {
-      return bestDoc.content;
+      return typeof bestDoc.content === 'function' ? bestDoc.content() : bestDoc.content;
     }
 
     return null;
@@ -1416,15 +1639,14 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
    */
   getOfflineFallback(input) {
     const text = input.toLowerCase().trim();
-    const repos = window.portfolioData?.repos || [];
-    const sorted = [...repos].sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+    const sorted = this.getRecentProjects(5);
     const namePrefix = this.userProfile?.name ? `${this.userProfile.name}, ` : '';
 
     // 0. Greetings & Small Talk
     const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'how are you', 'namaste'];
     const cleanText = text.replace(/[^a-z\s]/g, '').trim();
     if (greetings.some(g => cleanText === g || cleanText.startsWith(g + ' ') || cleanText.endsWith(' ' + g))) {
-      return `Hello ${namePrefix}! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant for **Raj Rathod**. I can help you explore Raj's **AI/ML projects**, **education & university**, **technical skills**, **resumes**, or **contact info**. What would you like to know?`;
+      return `Hello ${namePrefix}! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant & Agent for **Raj Rathod**. I can help you explore Raj's **latest AI/ML projects**, **verified live demos**, **education & university (Parul Univ, 7.66 CGPA)**, **LeetCode record (350+)**, **resumes**, or **contact info**. What would you like to explore?`;
     }
 
     // 0.1 Thank you / Compliments
@@ -1434,14 +1656,28 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
 
     // 0.2 Bot Identity / Capabilities
     if (text.includes('who are you') || text.includes('what can you do') || text.includes('what are you') || text.includes('your name') || text.includes('about rudra')) {
-      return `I am **Rudra** 🤖, Raj Rathod's personal AI Assistant!\n\nHere is what I can help you with:\n` +
-             `• 🧠 **Explore AI & ML Projects**: Deep dives into Computer Vision, NLP, GenAI, RAG, and Regression systems.\n` +
-             `• 🚀 **Live Demos**: Interactive links to all active deployed web applications.\n` +
-             `• 🎓 **Education & Background**: Information about Raj's B.Tech at Parul University, 7.66 CGPA, and 350+ LeetCode record.\n` +
+      return `I am **Rudra** 🤖, Raj Rathod's personal AI Assistant & Engineering Agent!\n\nHere is what I can help you with:\n` +
+             `• 🚀 **Latest Projects**: Real-time insights into FruitsCheck CNN, Sukoon-Saathi ML, MeetNotes RAG, and SENTI-AI.\n` +
+             `• 🧠 **Explore AI & ML Projects**: Deep architectural breakdowns into Computer Vision, NLP, GenAI, RAG, and Regression.\n` +
+             `• 🌐 **Verified Live Demos**: Direct links to all 21+ active deployed web applications.\n` +
+             `• 🎓 **Education & Background**: B.Tech at Parul University, 7.66 CGPA, and 350+ LeetCode problems solved.\n` +
              `• 📄 **Resumes & CVs**: Direct access to AI/ML and Full-Stack resume PDFs.\n` +
              `• 📍 **Location & Campus**: Vadodara, Gujarat location and interactive maps.\n` +
              `• 📬 **Contact & Collaboration**: Direct links to email, LinkedIn, and GitHub.\n\n` +
              `What would you like to explore first?`;
+    }
+
+    // 0.3 Recent & Latest Project Inquiries
+    const isRecentQuery = [
+      'latest project', 'recent project', 'recently added', 'recent added',
+      'recent projects', 'new project', 'new projects', 'recently add',
+      'what are you working on', 'what did you build recently', 'what have you built recently',
+      'newest project', 'latest work', 'recent work', 'newest repo', 'latest repos'
+    ].some(k => text.includes(k));
+
+    if (isRecentQuery) {
+      const recentRAG = this.retrieveRAGContext('latest project', this.history);
+      if (recentRAG) return recentRAG;
     }
 
     // 1. RAG Multi-Turn Semantic Context Retrieval
@@ -1451,37 +1687,42 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
     }
 
     // 2. Domain & Category Level Fallbacks
-    if (text.includes('nlp') || text.includes('text') || text.includes('language') || text.includes('bert') || text.includes('natural language')) {
+    if (text.includes('nlp') || text.includes('text') || text.includes('language') || text.includes('bert') || text.includes('natural language') || text.includes('emotion')) {
       return `🔤 **RAJ RATHOD'S NATURAL LANGUAGE PROCESSING (NLP) PROJECTS**\n\n` +
              `Here are the **NLP Projects** featured in Raj's portfolio:\n\n` +
-             `🎬 **1. Movie Recommendations Using NLP And ML**\n` +
-             `• **Objective**: Content-based recommendation system suggesting movies based on plot summaries, genres, and keywords.\n` +
+             `🎭 **1. SENTI-AI BiGRU Emotion Detection System**\n` +
+             `• **Architecture**: Bidirectional GRU (BiGRU) neural network with Keras Tokenizer and FastAPI backend classifying text into 6 emotions (Joy, Sadness, Love, Anger, Fear, Surprise).\n` +
+             `• 🚀 **Live Demo**: [senti-ai.onrender.com](https://senti-ai.onrender.com)\n` +
+             `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL)\n\n` +
+             `🎬 **2. Movie Recommendations Using NLP And ML**\n` +
+             `• **Architecture**: Content-based recommendation system with CountVectorizer and Cosine Similarity.\n` +
              `• 🚀 **Live Demo**: [cinema-verse.streamlit.app](https://cinema-verse.streamlit.app/)\n` +
              `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML)\n\n` +
-             `🕵️ **2. Fake News Detection Using DL Real Time (TruthLens)**\n` +
-             `• **Objective**: Real-time fake news detection analyzing news text (~92% accuracy).\n` +
+             `🕵️ **3. Fake News Detection Using DL Real Time (TruthLens)**\n` +
+             `• **Architecture**: Real-time TF-IDF and Passive-Aggressive classifier (~92% accuracy).\n` +
              `• 🚀 **Live Demos**: [truthlens5.netlify.app](https://truthlens5.netlify.app/) & [truthlens5.streamlit.app](https://truthlens5.streamlit.app/)\n` +
              `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time)\n\n` +
-             `💡 *Tip: Both NLP projects are live deployed and ready to test!*`;
+             `💡 *All 3 NLP projects are live deployed and ready to test!*`;
     }
 
-    if (text.includes('deep learning') || text.includes('vision') || text.includes('cnn') || text.includes('image') || text.includes('opencv') || text.includes('pytorch') || text.includes('tensorflow')) {
+    if (text.includes('deep learning') || text.includes('vision') || text.includes('cnn') || text.includes('image') || text.includes('opencv') || text.includes('pytorch') || text.includes('tensorflow') || text.includes('neural')) {
       return `👁️ **COMPUTER VISION & DEEP LEARNING PROJECTS**\n\n` +
-             `• **Flower Disease System**: A Convolutional Neural Network (CNN) built with **PyTorch** and **OpenCV** to detect and classify diseases in plant and flower leaves.\n` +
-             `• **Live Demo**: [flower-disease-system.vercel.app](https://flower-disease-system.vercel.app)\n` +
-             `• **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem)\n\n` +
+             `• **FruitsCheck CNN Fruit Freshness**: Deep CNN classifying apples, bananas, and oranges as Fresh or Rotten ([Live Demo](https://fruits-check.streamlit.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness)).\n` +
+             `• **Flower Disease System**: PyTorch & OpenCV CNN detecting diseases in plant/flower leaves ([Live Demo](https://flower-disease-system.vercel.app) | [GitHub](https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem)).\n` +
+             `• **Laptop Price Prediction ANN**: Deep Artificial Neural Network regression model ([Live Demo](https://laptop-price-predicate.streamlit.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL)).\n` +
+             `• **SENTI-AI BiGRU**: Deep Bidirectional GRU emotion detection network ([Live Demo](https://senti-ai.onrender.com) | [GitHub](https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL)).\n\n` +
              `Explore the **Deep Learning** category on the Projects page for interactive details!`;
     }
 
     if (text.includes('machine learning') || text.includes('regression') || text.includes('predict') || text.includes('scikit') || text.includes('ml')) {
       return `🤖 **MACHINE LEARNING PROJECTS (13+ PROJECTS)**\n\n` +
              `Raj has developed a rich catalogue of Machine Learning models including:\n` +
-             `• **Taxi Fare Prediction**: ML regression predicting trip fares based on distance and traffic ([Live Demo](https://taxi-price-prediction.netlify.app/)).\n` +
+             `• **Sukoon-Saathi**: Student wellness prediction pipeline deployed on FastAPI ([Live Demo](https://sukoonsaathi-frontend.onrender.com/) | [GitHub](https://github.com/Raj-Rathod-Ai/Sukoon-Saathi)).\n` +
+             `• **Taxi Fare Prediction**: ML regression predicting trip fares ([Live Demo](https://taxi-price-prediction.netlify.app/)).\n` +
              `• **Food Delivery Time Prediction**: Streamlit ML app estimating delivery duration ([Live Demo](https://fooddelivery-time.streamlit.app/)).\n` +
-             `• **Discover Your True Personality**: 26-trait classification model analyzing psychometric data ([Live Demo](https://discover-your-true-personality.streamlit.app/)).\n` +
-             `• **Car Selling Price Prediction**: Resale price estimation model.\n` +
-             `• **Loan Risk Assessment App**: Gaussian Naive Bayes default risk predictor.\n` +
-             `• **USA House Price Prediction**: Residential property price regressor.\n\n` +
+             `• **Discover Your True Personality**: 26-trait classification model ([Live Demo](https://discover-your-true-personality.streamlit.app/)).\n` +
+             `• **Car Selling Price Prediction**: Resale price estimation model ([Live Demo](https://car-selling-price-prediction.streamlit.app/)).\n` +
+             `• **Loan Risk Assessment App**: Gaussian Naive Bayes default risk predictor ([Live Demo](https://loan-risk-assessment-app.streamlit.app/)).\n\n` +
              `Explore the **Machine Learning** category to view all interactive projects!`;
     }
 
@@ -1492,10 +1733,11 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
              `• **Data Science & Analytics with GenAI**: Verified Sheryians Coding School certification.`;
     }
 
-    if (text.includes('rag') || text.includes('retrieval') || text.includes('vector') || text.includes('chatnotes')) {
-      return `📑 **RAG (RETRIEVAL-AUGMENTED GENERATION) PROJECTS**\n\n` +
+    if (text.includes('rag') || text.includes('retrieval') || text.includes('vector') || text.includes('chatnotes') || text.includes('meetnotes')) {
+      return `📑 **RAG (RETRIEVAL-AUGMENTED GENERATION) & VIDEO-AGENTS**\n\n` +
+             `• **MeetNotes**: Autonomous AI Meeting Intelligence & Video-Agent system using Whisper speech-to-text & Mistral LLM ([Launch Live Demo](https://meetnotes.streamlit.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/MeetNotes)).\n` +
              `• **ChatNotes**: High-speed RAG-powered document assistant to chat with PDF documents without token limits ([Launch Live Demo](https://chat-with-your-notes-dusx.onrender.com/) | [GitHub](https://github.com/Raj-Rathod-Ai/ChatNotes)).\n` +
-             `• **Enterprise RAG Workflows**: High-accuracy retrieval pipelines with semantic search and chunking.`;
+             `• **Enterprise RAG Workflows**: High-accuracy retrieval pipelines with semantic search and vector embeddings.`;
     }
 
     if (text.includes('genai') || text.includes('generative ai') || text.includes('llm') || text.includes('hybridmind')) {
@@ -1505,7 +1747,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
     }
 
     // Default Fallback
-    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in Deep Learning, NLP, Computer Vision, and Predictive Modeling. You can ask me about his **projects**, **live demos**, **education & university (Parul Univ, 7.66 CGPA)**, **skills**, **resumes**, or **contact info**!`;
+    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in Deep Learning, NLP, Computer Vision, and Predictive Modeling. You can ask me about his **recently added projects (FruitsCheck, Sukoon-Saathi, MeetNotes, SENTI-AI)**, **live demos**, **education & university (Parul Univ, 7.66 CGPA)**, **LeetCode record (350+)**, **resumes**, or **contact info**!`;
   }
 
   /**
