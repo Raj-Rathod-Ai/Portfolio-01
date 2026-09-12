@@ -999,7 +999,7 @@ body::before {
 .marquee-section {
   background: #0C0C0C;
   overflow: hidden;
-  padding: 6rem 0 2.5rem;
+  padding: 5rem 0 3rem;
 }
 .marquee-row {
   display: flex;
@@ -1008,21 +1008,80 @@ body::before {
 }
 .marquee-tile {
   flex-shrink: 0;
-  width: 380px;
-  height: 240px;
-  border-radius: 16px;
+  width: 420px;
+  height: 260px;
+  border-radius: 20px;
   overflow: hidden;
   background: #111;
+  position: relative;
+  cursor: pointer;
 }
 .marquee-tile img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 16px;
+  border-radius: 20px;
+  transition: transform 0.5s cubic-bezier(0.25,0.1,0.25,1), filter 0.4s;
+  filter: brightness(0.85) saturate(0.95);
+}
+.marquee-tile:hover img {
+  transform: scale(1.05);
+  filter: brightness(1) saturate(1.1);
+}
+/* Bottom label overlay */
+.marquee-tile-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2.5rem 1rem 0.85rem;
+  background: linear-gradient(to top, rgba(12,12,12,0.92) 0%, transparent 100%);
+  font-family: 'Kanit', sans-serif;
+  font-weight: 500;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(215,226,234,0.75);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+}
+.marquee-tile:hover .marquee-tile-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Section heading bar above marquee */
+.marquee-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1.5rem, 5vw, 5rem);
+  margin-bottom: 2rem;
+}
+.marquee-section-label {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(215,226,234,0.4);
+}
+.marquee-section-title {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 @media (max-width: 768px) {
-  .marquee-tile { width: 280px; height: 180px; }
+  .marquee-tile { width: 300px; height: 190px; }
 }
 
 /* ── Magnetic Portrait Wrapper ─────────────────────────────────── */

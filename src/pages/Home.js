@@ -27,41 +27,30 @@ export class Home {
       </div>
 
       <!-- ================= MARQUEE SECTION ================= -->
-      <section class="marquee-section" id="marquee-section" aria-hidden="true">
+      <section class="marquee-section" id="marquee-section">
+        <!-- Section Header -->
+        <div class="marquee-section-header vp-fade">
+          <span class="marquee-section-label">Selected Work &bull; AI &bull; ML &bull; CV &bull; NLP</span>
+          <h2 class="marquee-section-title">My Expertise</h2>
+          <span class="marquee-section-label">Raj Rathod &bull; AI Developer &bull; 2024 &ndash; 2026</span>
+        </div>
         <div class="marquee-row" id="marquee-row-1" style="transform:translateX(-200px);">
-          ${[
-            'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
-            'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
-            'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
-            'https://motionsites.ai/assets/hero-stellar-ai-v2-preview-DjvxjG3C.gif',
-            'https://motionsites.ai/assets/hero-asme-preview-B_nGDnTP.gif',
-            'https://motionsites.ai/assets/hero-transform-data-preview-Cx5OU29N.gif',
-            'https://motionsites.ai/assets/hero-vitara-preview-Cjz2QYyU.gif',
-            'https://motionsites.ai/assets/hero-terra-preview-BFjrCr7T.gif',
-            'https://motionsites.ai/assets/hero-skyelite-preview-DHaZIgUv.gif',
-            'https://motionsites.ai/assets/hero-aethera-preview-DknSlcTa.gif',
-            'https://motionsites.ai/assets/hero-designpro-preview-D8c5_een.gif',
-            'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
-            'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
-            'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
-          ].map(u => `<div class="marquee-tile"><img src="${u}" alt="" loading="lazy"></div>`).join('')}
+          <div class="marquee-tile"><img src="/assets/marquee/banner_neural_network.jpg" alt="Neural Network Visualization" loading="lazy"><div class="marquee-tile-label">Neural Networks</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_ml_code.jpg" alt="Machine Learning Code" loading="lazy"><div class="marquee-tile-label">ML Engineering</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_data_dashboard.jpg" alt="Data Dashboard" loading="lazy"><div class="marquee-tile-label">Data Science</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_computer_vision.jpg" alt="Computer Vision" loading="lazy"><div class="marquee-tile-label">Computer Vision</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_chatbot_ai.jpg" alt="AI Chatbot" loading="lazy"><div class="marquee-tile-label">AI Chatbot</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_neural_network.jpg" alt="Neural Network" loading="lazy"><div class="marquee-tile-label">Neural Networks</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_ml_code.jpg" alt="ML Code" loading="lazy"><div class="marquee-tile-label">ML Engineering</div></div>
         </div>
         <div class="marquee-row mt-3" id="marquee-row-2" style="transform:translateX(200px);">
-          ${[
-            'https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif',
-            'https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif',
-            'https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif',
-            'https://motionsites.ai/assets/hero-nexora-preview-cx5HmUgo.gif',
-            'https://motionsites.ai/assets/hero-evr-ventures-preview-DZxeVFEX.gif',
-            'https://motionsites.ai/assets/hero-planet-orbit-preview-DWAP8Z1P.gif',
-            'https://motionsites.ai/assets/hero-new-era-preview-CocuDUm9.gif',
-            'https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif',
-            'https://motionsites.ai/assets/hero-luminex-preview-CxOP7ce6.gif',
-            'https://motionsites.ai/assets/hero-celestia-preview-0yO3jXO8.gif',
-            'https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif',
-            'https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif',
-            'https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif',
-          ].map(u => `<div class="marquee-tile"><img src="${u}" alt="" loading="lazy"></div>`).join('')}
+          <div class="marquee-tile"><img src="/assets/marquee/banner_nlp_llm.jpg" alt="NLP and LLM" loading="lazy"><div class="marquee-tile-label">NLP & LLMs</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_deep_learning.jpg" alt="Deep Learning Brain" loading="lazy"><div class="marquee-tile-label">Deep Learning</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_model_training.jpg" alt="Model Training" loading="lazy"><div class="marquee-tile-label">Model Training</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_streamlit_app.jpg" alt="Streamlit App" loading="lazy"><div class="marquee-tile-label">Streamlit Apps</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_rag_pipeline.jpg" alt="RAG Pipeline" loading="lazy"><div class="marquee-tile-label">RAG Pipelines</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_github_stats.jpg" alt="GitHub Stats" loading="lazy"><div class="marquee-tile-label">Open Source</div></div>
+          <div class="marquee-tile"><img src="/assets/marquee/banner_nlp_llm.jpg" alt="NLP" loading="lazy"><div class="marquee-tile-label">NLP & LLMs</div></div>
         </div>
       </section>
 
@@ -1730,4 +1719,6 @@ export class Home {
     }
   }
 }
+
+
 
