@@ -57,28 +57,46 @@ export class Home {
       <!-- ================= TECH STACK TICKER ================= -->
       <section class="tech-ticker-section" aria-label="Technology Stack">
         <div class="tech-ticker-track">
-          ${[
-            {icon:'fa-brands fa-python',        col:'#3b82f6', name:'Python'},
-            {icon:'fa-solid fa-diagram-project', col:'#f97316', name:'TensorFlow'},
-            {icon:'fa-solid fa-fire',            col:'#ef4444', name:'PyTorch'},
-            {icon:'fa-solid fa-chart-simple',    col:'#0ea5e9', name:'Scikit-learn'},
-            {icon:'fa-solid fa-eye',             col:'#14b8a6', name:'OpenCV'},
-            {icon:'fa-solid fa-face-smile',      col:'#facc15', name:'Hugging Face'},
-            {icon:'fa-solid fa-link',            col:'#a855f7', name:'LangChain'},
-            {icon:'fa-solid fa-bolt',            col:'#10b981', name:'FastAPI'},
-            {icon:'fa-solid fa-database',        col:'#22c55e', name:'MongoDB'},
-            {icon:'fa-solid fa-chart-pie',       col:'#f43f5e', name:'Streamlit'},
-            {icon:'fa-solid fa-table',           col:'#38bdf8', name:'Pandas'},
-            {icon:'fa-solid fa-superscript',     col:'#fb923c', name:'NumPy'},
-            {icon:'fa-solid fa-crosshairs',      col:'#06b6d4', name:'YOLO'},
-            {icon:'fa-solid fa-robot',           col:'#c084fc', name:'Transformers'},
-            {icon:'fa-brands fa-docker',         col:'#38bdf8', name:'Docker'},
-            {icon:'fa-brands fa-git-alt',        col:'#f97316', name:'Git'},
-            {icon:'fa-solid fa-gem',             col:'#818cf8', name:'ChromaDB'},
-            {icon:'fa-solid fa-language',        col:'#60a5fa', name:'NLTK'},
-            {icon:'fa-solid fa-brain',           col:'#ef4444', name:'Keras'},
-            {icon:'fa-brands fa-github',         col:'#94a3b8', name:'GitHub'},
-          ].flatMap(t => [t,t]).map(t => <span class="tech-tag"><i class="" style="color:"></i><span class="tech-tag-text"></span></span>).join('')}
+          <span class="tech-tag"><i class="fa-brands fa-python" style="color:#3b82f6"></i><span class="tech-tag-text">Python</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-diagram-project" style="color:#f97316"></i><span class="tech-tag-text">TensorFlow</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-fire" style="color:#ef4444"></i><span class="tech-tag-text">PyTorch</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-chart-simple" style="color:#0ea5e9"></i><span class="tech-tag-text">Scikit-learn</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-eye" style="color:#14b8a6"></i><span class="tech-tag-text">OpenCV</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-face-smile" style="color:#facc15"></i><span class="tech-tag-text">Hugging Face</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-link" style="color:#a855f7"></i><span class="tech-tag-text">LangChain</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-bolt" style="color:#10b981"></i><span class="tech-tag-text">FastAPI</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-database" style="color:#22c55e"></i><span class="tech-tag-text">MongoDB</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-chart-pie" style="color:#f43f5e"></i><span class="tech-tag-text">Streamlit</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-table" style="color:#38bdf8"></i><span class="tech-tag-text">Pandas</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-superscript" style="color:#fb923c"></i><span class="tech-tag-text">NumPy</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-crosshairs" style="color:#06b6d4"></i><span class="tech-tag-text">YOLO</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-robot" style="color:#c084fc"></i><span class="tech-tag-text">Transformers</span></span>
+          <span class="tech-tag"><i class="fa-brands fa-docker" style="color:#38bdf8"></i><span class="tech-tag-text">Docker</span></span>
+          <span class="tech-tag"><i class="fa-brands fa-git-alt" style="color:#f97316"></i><span class="tech-tag-text">Git</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-gem" style="color:#818cf8"></i><span class="tech-tag-text">ChromaDB</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-language" style="color:#60a5fa"></i><span class="tech-tag-text">NLTK</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-brain" style="color:#ef4444"></i><span class="tech-tag-text">Keras</span></span>
+          <span class="tech-tag"><i class="fa-brands fa-github" style="color:#94a3b8"></i><span class="tech-tag-text">GitHub</span></span>
+          <span class="tech-tag"><i class="fa-brands fa-python" style="color:#3b82f6"></i><span class="tech-tag-text">Python</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-diagram-project" style="color:#f97316"></i><span class="tech-tag-text">TensorFlow</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-fire" style="color:#ef4444"></i><span class="tech-tag-text">PyTorch</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-chart-simple" style="color:#0ea5e9"></i><span class="tech-tag-text">Scikit-learn</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-eye" style="color:#14b8a6"></i><span class="tech-tag-text">OpenCV</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-face-smile" style="color:#facc15"></i><span class="tech-tag-text">Hugging Face</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-link" style="color:#a855f7"></i><span class="tech-tag-text">LangChain</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-bolt" style="color:#10b981"></i><span class="tech-tag-text">FastAPI</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-database" style="color:#22c55e"></i><span class="tech-tag-text">MongoDB</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-chart-pie" style="color:#f43f5e"></i><span class="tech-tag-text">Streamlit</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-table" style="color:#38bdf8"></i><span class="tech-tag-text">Pandas</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-superscript" style="color:#fb923c"></i><span class="tech-tag-text">NumPy</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-crosshairs" style="color:#06b6d4"></i><span class="tech-tag-text">YOLO</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-robot" style="color:#c084fc"></i><span class="tech-tag-text">Transformers</span></span>
+          <span class="tech-tag"><i class="fa-brands fa-docker" style="color:#38bdf8"></i><span class="tech-tag-text">Docker</span></span>
+          <span class="tech-tag"><i class="fa-brands fa-git-alt" style="color:#f97316"></i><span class="tech-tag-text">Git</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-gem" style="color:#818cf8"></i><span class="tech-tag-text">ChromaDB</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-language" style="color:#60a5fa"></i><span class="tech-tag-text">NLTK</span></span>
+          <span class="tech-tag"><i class="fa-solid fa-brain" style="color:#ef4444"></i><span class="tech-tag-text">Keras</span></span>
+          <span class="tech-tag"><i class="fa-brands fa-github" style="color:#94a3b8"></i><span class="tech-tag-text">GitHub</span></span>
         </div>
       </section>
       <!-- ================= ABOUT ================= -->
@@ -1770,6 +1788,7 @@ export class Home {
     }
   }
 }
+
 
 
 
