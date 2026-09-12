@@ -1322,3 +1322,282 @@ body::before {
     background: rgba(12, 12, 12, 0.98) !important;
   }
 }
+/* ============================================================
+   MOTIONSITES.AI INSPIRED — PREMIUM MOTION & ICON ANIMATION
+   ============================================================ */
+
+/* ── Hero Floating Tech Orbs ─────────────────────────────── */
+.hero-orb-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(12,12,12,0.75);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: orbDrift ease-in-out infinite;
+}
+@keyframes orbDrift {
+  0%   { transform: translate(0,0) scale(1); }
+  20%  { transform: translate(18px,-28px) scale(1.07); }
+  45%  { transform: translate(-12px,-42px) scale(1.03); }
+  70%  { transform: translate(-22px,-18px) scale(1.08); }
+  100% { transform: translate(0,0) scale(1); }
+}
+@media (max-width: 768px) { .hero-orb-field { display: none; } }
+
+/* ── Portrait Orbital Rings ──────────────────────────────── */
+.portrait-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px dashed rgba(14,165,233,0.35);
+  animation: ringRotate 18s linear infinite;
+  pointer-events: none;
+  top: 50%; left: 50%;
+}
+.portrait-ring::before {
+  content: '';
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  box-shadow: 0 0 10px 2px rgba(14,165,233,0.8);
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+}
+.portrait-ring-outer {
+  border-color: rgba(16,185,129,0.22);
+  animation-duration: 26s;
+  animation-direction: reverse;
+}
+.portrait-ring-outer::before {
+  background: #10b981;
+  box-shadow: 0 0 10px 2px rgba(16,185,129,0.8);
+}
+@keyframes ringRotate {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to   { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+/* ── Tech Stack Auto-Ticker ──────────────────────────────── */
+.tech-ticker-section {
+  padding: 2.2rem 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: #0C0C0C;
+  position: relative;
+  z-index: 2;
+}
+.tech-ticker-section::before,
+.tech-ticker-section::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 140px;
+  z-index: 3;
+  pointer-events: none;
+}
+.tech-ticker-section::before { left: 0; background: linear-gradient(to right, #0C0C0C 30%, transparent); }
+.tech-ticker-section::after  { right: 0; background: linear-gradient(to left, #0C0C0C 30%, transparent); }
+
+.tech-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: techTick 35s linear infinite;
+  gap: 0;
+}
+.tech-ticker-track:hover { animation-play-state: paused; }
+
+@keyframes techTick {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.tech-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 1.3rem;
+  margin: 0 0.35rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  white-space: nowrap;
+  cursor: default;
+  flex-shrink: 0;
+  transition: border-color 0.35s, background 0.35s, box-shadow 0.35s, transform 0.35s;
+  position: relative;
+}
+.tech-tag:hover {
+  border-color: rgba(14,165,233,0.5);
+  background: rgba(14,165,233,0.07);
+  box-shadow: 0 0 28px rgba(14,165,233,0.14);
+  transform: translateY(-4px) scale(1.05);
+}
+.tech-tag i {
+  font-size: 0.95rem;
+  display: inline-block;
+  transition: transform 0.55s cubic-bezier(0.175,0.885,0.32,1.275), filter 0.35s;
+}
+.tech-tag:hover i {
+  transform: rotate(360deg) scale(1.35);
+  filter: drop-shadow(0 0 6px currentColor);
+}
+.tech-tag-text {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 500;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(215,226,234,0.5);
+  transition: color 0.35s;
+}
+.tech-tag:hover .tech-tag-text { color: rgba(215,226,234,0.95); }
+
+/* ── Global Icon Animation Classes ──────────────────────── */
+
+/* Continuous float */
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-7px) rotate(5deg); }
+}
+.icon-float { animation: iconFloat 3s ease-in-out infinite; }
+
+/* Continuous glow pulse */
+@keyframes iconGlow {
+  0%, 100% { filter: drop-shadow(0 0 3px currentColor); }
+  50%       { filter: drop-shadow(0 0 14px currentColor) brightness(1.4); }
+}
+.icon-glow { animation: iconGlow 2.2s ease-in-out infinite; }
+
+/* Slow spin */
+@keyframes iconSpinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.icon-spin-slow { animation: iconSpinSlow 9s linear infinite; }
+
+/* Bounce on hover — applied via CSS to skill cards */
+@keyframes iconBounce {
+  0%   { transform: scale(1) translateY(0); }
+  28%  { transform: scale(1.18) translateY(-12px); }
+  52%  { transform: scale(0.94) translateY(0); }
+  68%  { transform: scale(1.09) translateY(-5px); }
+  84%  { transform: scale(0.98) translateY(0); }
+  100% { transform: scale(1) translateY(0); }
+}
+.skill-card:hover > div > i,
+.skill-card:hover > div > svg,
+.skill-card .icon-bounce:hover i {
+  animation: iconBounce 0.6s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+
+/* Wiggle on hover */
+@keyframes iconWiggle {
+  0%, 100% { transform: rotate(0) scale(1); }
+  20%  { transform: rotate(-18deg) scale(1.12); }
+  40%  { transform: rotate(18deg) scale(1.12); }
+  60%  { transform: rotate(-10deg) scale(1.06); }
+  80%  { transform: rotate(10deg) scale(1.06); }
+}
+/* Applied to any element with .icon-wiggle on parent hover */
+.group:hover .icon-wiggle,
+.icon-wiggle-parent:hover .icon-wiggle {
+  animation: iconWiggle 0.5s ease;
+}
+
+/* Flip on hover */
+@keyframes iconFlip3D { 0% { transform: rotateY(0); } 100% { transform: rotateY(360deg); } }
+.icon-flip-hover:hover { animation: iconFlip3D 0.7s ease; display: inline-block; }
+
+/* Scale pop on any hover */
+.icon-pop { transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275); display: inline-block; }
+.icon-pop:hover { transform: scale(1.35); filter: drop-shadow(0 0 8px currentColor); }
+
+/* ── Animated Stat Counters ──────────────────────────────── */
+.stat-counter {
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+  transition: color 0.3s;
+}
+
+/* ── Nav brain icon motion ───────────────────────────────── */
+header .fa-brain,
+header .logo-nav-btn i {
+  transition: transform 0.45s cubic-bezier(0.175,0.885,0.32,1.275), filter 0.4s;
+}
+header .logo-nav-btn:hover .fa-brain,
+header .logo-nav-btn:hover i {
+  transform: rotate(20deg) scale(1.2);
+  filter: drop-shadow(0 0 8px rgba(14,165,233,0.9));
+}
+
+/* ── Timeline dot ripple ─────────────────────────────────── */
+.timeline-dot {
+  animation: timelinePulse 2.5s ease-in-out infinite;
+  position: relative;
+}
+@keyframes timelinePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(14,165,233,0.5), 0 0 12px #0ea5e9; }
+  50%       { box-shadow: 0 0 0 10px rgba(14,165,233,0), 0 0 24px #0ea5e9; }
+}
+
+/* ── Contact card icon motion ────────────────────────────── */
+.group:hover .contact-icon-anim {
+  animation: iconWiggle 0.45s ease;
+}
+
+/* ── Scroll progress — gradient bar ─────────────────────── */
+#scroll-progress {
+  background: linear-gradient(90deg, #0ea5e9, #B600A8, #10b981, #f97316, #0ea5e9) !important;
+  background-size: 300% 100% !important;
+  animation: progressShift 4s linear infinite;
+}
+@keyframes progressShift {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 300% 0%; }
+}
+
+/* ── Kanit section headings — subtle shimmer sweep ───────── */
+.hero-heading.section-heading-kanit {
+  background-size: 300% 100%;
+  background-image: linear-gradient(90deg, #646973 0%, #BBCCD7 40%, #e8f4f8 50%, #BBCCD7 60%, #646973 100%);
+  animation: headingShimmer 6s ease-in-out infinite;
+}
+@keyframes headingShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* ── Services number hover motion ───────────────────────── */
+.services-item:hover .services-num {
+  transform: translateX(-6px) scale(1.05);
+  transition: opacity 0.3s, transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+  opacity: 0.5 !important;
+}
+
+/* ── Cert card icon wiggle on hover ─────────────────────── */
+.group:hover .cert-icon-anim {
+  animation: iconWiggle 0.45s ease;
+}
+
+/* ── Availability dot animation ─────────────────────────── */
+.available-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: availPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px #10b981;
+}
+@keyframes availPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 6px #10b981; }
+  50%       { transform: scale(1.4); box-shadow: 0 0 18px #10b981, 0 0 36px rgba(16,185,129,0.4); }
+}

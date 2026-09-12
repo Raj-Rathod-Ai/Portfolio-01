@@ -54,6 +54,33 @@ export class Home {
         </div>
       </section>
 
+      <!-- ================= TECH STACK TICKER ================= -->
+      <section class="tech-ticker-section" aria-label="Technology Stack">
+        <div class="tech-ticker-track">
+          ${[
+            {icon:'fa-brands fa-python',        col:'#3b82f6', name:'Python'},
+            {icon:'fa-solid fa-diagram-project', col:'#f97316', name:'TensorFlow'},
+            {icon:'fa-solid fa-fire',            col:'#ef4444', name:'PyTorch'},
+            {icon:'fa-solid fa-chart-simple',    col:'#0ea5e9', name:'Scikit-learn'},
+            {icon:'fa-solid fa-eye',             col:'#14b8a6', name:'OpenCV'},
+            {icon:'fa-solid fa-face-smile',      col:'#facc15', name:'Hugging Face'},
+            {icon:'fa-solid fa-link',            col:'#a855f7', name:'LangChain'},
+            {icon:'fa-solid fa-bolt',            col:'#10b981', name:'FastAPI'},
+            {icon:'fa-solid fa-database',        col:'#22c55e', name:'MongoDB'},
+            {icon:'fa-solid fa-chart-pie',       col:'#f43f5e', name:'Streamlit'},
+            {icon:'fa-solid fa-table',           col:'#38bdf8', name:'Pandas'},
+            {icon:'fa-solid fa-superscript',     col:'#fb923c', name:'NumPy'},
+            {icon:'fa-solid fa-crosshairs',      col:'#06b6d4', name:'YOLO'},
+            {icon:'fa-solid fa-robot',           col:'#c084fc', name:'Transformers'},
+            {icon:'fa-brands fa-docker',         col:'#38bdf8', name:'Docker'},
+            {icon:'fa-brands fa-git-alt',        col:'#f97316', name:'Git'},
+            {icon:'fa-solid fa-gem',             col:'#818cf8', name:'ChromaDB'},
+            {icon:'fa-solid fa-language',        col:'#60a5fa', name:'NLTK'},
+            {icon:'fa-solid fa-brain',           col:'#ef4444', name:'Keras'},
+            {icon:'fa-brands fa-github',         col:'#94a3b8', name:'GitHub'},
+          ].flatMap(t => [t,t]).map(t => <span class="tech-tag"><i class="" style="color:"></i><span class="tech-tag-text"></span></span>).join('')}
+        </div>
+      </section>
       <!-- ================= ABOUT ================= -->
       <section id="about" class="py-24 px-6 max-w-7xl mx-auto w-full relative">
         <!-- Decorative 3D corner images -->
@@ -80,19 +107,19 @@ export class Home {
 
             <div class="grid grid-cols-2 gap-4">
               <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-primary">7.66</span>
+                <span class="block font-jakarta font-extrabold text-2xl text-primary stat-counter" data-target="7.66" data-decimals="2" data-suffix="">0.00</span>
                 <span class="block text-xs text-gray-500 mt-1">B.Tech CGPA</span>
               </div>
               <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-secondary">25+</span>
+                <span class="block font-jakarta font-extrabold text-2xl text-secondary stat-counter" data-target="25" data-decimals="0" data-suffix="+">0</span>
                 <span class="block text-xs text-gray-500 mt-1">Projects Built</span>
               </div>
               <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-accent">350+</span>
+                <span class="block font-jakarta font-extrabold text-2xl text-accent stat-counter" data-target="350" data-decimals="0" data-suffix="+">0</span>
                 <span class="block text-xs text-gray-500 mt-1">LeetCode Solved</span>
               </div>
               <div class="rounded-xl border border-white/8 p-4 bg-white/3 spotlight-card">
-                <span class="block font-jakarta font-extrabold text-2xl text-teal">2027</span>
+                <span class="block font-jakarta font-extrabold text-2xl text-teal stat-counter" data-target="2027" data-decimals="0" data-suffix="">2025</span>
                 <span class="block text-xs text-gray-500 mt-1">Expected Graduation</span>
               </div>
             </div>
@@ -972,6 +999,30 @@ export class Home {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vp-visible'); });
     }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.vp-fade, .vp-fade-left, .vp-fade-right').forEach(el => vpObs.observe(el));
+    // 1d. Animated stat counters — count up when scrolled into view
+    const counterObs = new IntersectionObserver((entries) => {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        var target = parseFloat(el.dataset.target || '0');
+        var decimals = parseInt(el.dataset.decimals || '0', 10);
+        var suffix = el.dataset.suffix || '';
+        var duration = 1800;
+        var startTime = performance.now();
+        var startVal = parseFloat(el.textContent) || 0;
+        var step = function(now) {
+          var elapsed = now - startTime;
+          var progress = Math.min(elapsed / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          var current = startVal + (target - startVal) * eased;
+          el.textContent = current.toFixed(decimals) + suffix;
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        counterObs.unobserve(el);
+      });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('.stat-counter').forEach(function(el) { counterObs.observe(el); });
 
     // 2. Render and Setup Category Tiles
     const categoriesGrid = document.getElementById('home-categories-grid');
@@ -1719,6 +1770,8 @@ export class Home {
     }
   }
 }
+
+
 
 
 
