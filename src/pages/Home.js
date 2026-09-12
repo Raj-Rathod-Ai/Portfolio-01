@@ -1,4 +1,4 @@
-import { Hero } from '../components/Hero.js';
+﻿import { Hero } from '../components/Hero.js';
 import { CategoryCard } from '../components/CategoryCard.js';
 import { getAllCategories } from '../utils/categorize.js';
 import { containsAbusiveContent } from '../utils/profanityFilter.js';
@@ -26,18 +26,67 @@ export class Home {
         ${this.hero.render()}
       </div>
 
+      <!-- ================= MARQUEE SECTION ================= -->
+      <section class="marquee-section" id="marquee-section" aria-hidden="true">
+        <div class="marquee-row" id="marquee-row-1" style="transform:translateX(-200px);">
+          ${[
+            'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
+            'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
+            'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
+            'https://motionsites.ai/assets/hero-stellar-ai-v2-preview-DjvxjG3C.gif',
+            'https://motionsites.ai/assets/hero-asme-preview-B_nGDnTP.gif',
+            'https://motionsites.ai/assets/hero-transform-data-preview-Cx5OU29N.gif',
+            'https://motionsites.ai/assets/hero-vitara-preview-Cjz2QYyU.gif',
+            'https://motionsites.ai/assets/hero-terra-preview-BFjrCr7T.gif',
+            'https://motionsites.ai/assets/hero-skyelite-preview-DHaZIgUv.gif',
+            'https://motionsites.ai/assets/hero-aethera-preview-DknSlcTa.gif',
+            'https://motionsites.ai/assets/hero-designpro-preview-D8c5_een.gif',
+            'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
+            'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
+            'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
+          ].map(u => `<div class="marquee-tile"><img src="${u}" alt="" loading="lazy"></div>`).join('')}
+        </div>
+        <div class="marquee-row mt-3" id="marquee-row-2" style="transform:translateX(200px);">
+          ${[
+            'https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif',
+            'https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif',
+            'https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif',
+            'https://motionsites.ai/assets/hero-nexora-preview-cx5HmUgo.gif',
+            'https://motionsites.ai/assets/hero-evr-ventures-preview-DZxeVFEX.gif',
+            'https://motionsites.ai/assets/hero-planet-orbit-preview-DWAP8Z1P.gif',
+            'https://motionsites.ai/assets/hero-new-era-preview-CocuDUm9.gif',
+            'https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif',
+            'https://motionsites.ai/assets/hero-luminex-preview-CxOP7ce6.gif',
+            'https://motionsites.ai/assets/hero-celestia-preview-0yO3jXO8.gif',
+            'https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif',
+            'https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif',
+            'https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif',
+          ].map(u => `<div class="marquee-tile"><img src="${u}" alt="" loading="lazy"></div>`).join('')}
+        </div>
+      </section>
+
       <!-- ================= ABOUT ================= -->
-      <section id="about" class="py-24 px-6 max-w-7xl mx-auto w-full">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+      <section id="about" class="py-24 px-6 max-w-7xl mx-auto w-full relative">
+        <!-- Decorative 3D corner images -->
+        <img src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/moon_icon.11395d36.png"
+             alt="" loading="lazy" class="about-deco-img vp-fade-left" style="width:clamp(80px,11vw,160px);top:2%;left:1%;">
+        <img src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/lego_icon-1.703bb594.png"
+             alt="" loading="lazy" class="about-deco-img vp-fade-right" style="width:clamp(80px,11vw,160px);top:2%;right:1%;">
+        <img src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/p59_1.4659672e.png"
+             alt="" loading="lazy" class="about-deco-img vp-fade-left" style="width:clamp(60px,9vw,130px);bottom:6%;left:3%;">
+        <img src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/Group_134-1.2e04f3ce.png"
+             alt="" loading="lazy" class="about-deco-img vp-fade-right" style="width:clamp(70px,10vw,150px);bottom:6%;right:3%;">
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start relative z-10">
           
           <div class="lg:col-span-6 space-y-6 scroll-reveal reveal-left">
             <div class="space-y-2">
               <span class="font-mono text-xs text-primary uppercase tracking-widest">About Me</span>
-              <h2 class="text-3xl sm:text-4xl font-jakarta font-extrabold text-gray-100 leading-tight">Turning Data Into<br>Intelligent Solutions</h2>
+              <h2 class="hero-heading section-heading-kanit" style="font-size:clamp(2.5rem,7vw,5rem);">Turning Data Into<br>Intelligent Solutions</h2>
             </div>
             
             <p class="font-inter text-gray-400 leading-relaxed">
-              I'm a Computer Science engineering student at Parul University, specializing in AI and Machine Learning. I love building end-to-end ML pipelines — from data preprocessing and model training to deployment with Streamlit and Vercel.
+              I'm a Computer Science engineering student at Parul University, specializing in AI and Machine Learning. I love building end-to-end ML pipelines â€” from data preprocessing and model training to deployment with Streamlit and Vercel.
             </p>
 
             <div class="grid grid-cols-2 gap-4">
@@ -63,7 +112,7 @@ export class Home {
           <div class="lg:col-span-6 space-y-6 scroll-reveal reveal-right delay-100">
             <div class="space-y-2">
               <span class="font-mono text-xs text-secondary uppercase tracking-widest">Education</span>
-              <h2 class="text-3xl sm:text-4xl font-jakarta font-extrabold text-gray-100">Academic Journey</h2>
+              <h2 class="hero-heading section-heading-kanit" style="font-size:clamp(2rem,5vw,3.5rem);">Academic Journey</h2>
             </div>
 
             <div class="relative border-l border-white/8 ml-4 pl-8 space-y-10">
@@ -71,10 +120,10 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-primary bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-primary/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-primary">2023 — 2027</span>
+                    <span class="font-mono text-xs text-primary">2023 â€” 2027</span>
                     <span class="px-2 py-0.5 rounded-md bg-primary/10 text-[10px] text-primary font-mono border border-primary/20">GPA 7.66</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">B.Tech — Computer Science & Engineering with AI</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">B.Tech â€” Computer Science & Engineering with AI</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Parul University, Vadodara</p>
                 </div>
               </div>
@@ -83,10 +132,10 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-secondary bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-secondary/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-secondary">2022 — 2023</span>
+                    <span class="font-mono text-xs text-secondary">2022 â€” 2023</span>
                     <span class="px-2 py-0.5 rounded-md bg-secondary/10 text-[10px] text-secondary font-mono border border-secondary/20">60.61%</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">HSC — Science Stream</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">HSC â€” Science Stream</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Shri Rajshakha School, Porbandar</p>
                 </div>
               </div>
@@ -95,10 +144,10 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-rose bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-rose/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-rose">2020 — 2021</span>
+                    <span class="font-mono text-xs text-rose">2020 â€” 2021</span>
                     <span class="px-2 py-0.5 rounded-md bg-rose/10 text-[10px] text-rose font-mono border border-rose/20">79.81%</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">SSC — Secondary School</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">SSC â€” Secondary School</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Sigma School, Porbandar</p>
                 </div>
               </div>
@@ -111,7 +160,7 @@ export class Home {
       <section id="skills" class="py-24 px-6 max-w-7xl mx-auto w-full scroll-reveal reveal-flip">
         <div class="text-center space-y-3 mb-14">
           <span class="font-mono text-xs text-primary uppercase tracking-widest">Capabilities</span>
-          <h2 class="text-3xl sm:text-5xl font-jakarta font-extrabold">Technical Skills</h2>
+          <h2 class="hero-heading section-heading-kanit" style="font-size:clamp(2.5rem,8vw,6rem);">Technical Skills</h2>
           <!-- Premium Animated Separator -->
           <div class="flex items-center justify-center gap-1.5 mt-3 select-none pointer-events-none">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
@@ -326,11 +375,56 @@ export class Home {
         </div>
       </section>
 
+      <!-- ================= CAPABILITIES / SERVICES LIST ================= -->
+      <section id="capabilities" class="py-20 px-6 max-w-5xl mx-auto w-full vp-fade">
+        <div class="text-center mb-16">
+          <span class="font-mono text-xs text-primary uppercase tracking-widest">What I Do</span>
+          <h2 class="hero-heading section-heading-kanit mt-3" style="font-size:clamp(2.5rem,7vw,5.5rem);">Services</h2>
+        </div>
+        <div>
+          <div class="services-item">
+            <span class="services-num">01</span>
+            <div>
+              <div class="services-name">AI / ML Engineering</div>
+              <div class="services-desc">End-to-end machine learning pipelines â€” data preprocessing, model training, hyperparameter tuning, and production deployment with FastAPI and Streamlit.</div>
+            </div>
+          </div>
+          <div class="services-item">
+            <span class="services-num">02</span>
+            <div>
+              <div class="services-name">Deep Learning</div>
+              <div class="services-desc">Architecture design and training of BiGRU, RNN, CNN, and Transformer-based neural networks for classification, regression, and sequence modeling tasks.</div>
+            </div>
+          </div>
+          <div class="services-item">
+            <span class="services-num">03</span>
+            <div>
+              <div class="services-name">Computer Vision</div>
+              <div class="services-desc">Real-time object detection, image classification, and face recognition systems using OpenCV, YOLO, and TensorFlow/Keras on custom datasets.</div>
+            </div>
+          </div>
+          <div class="services-item">
+            <span class="services-num">04</span>
+            <div>
+              <div class="services-name">NLP &amp; LLMs</div>
+              <div class="services-desc">Sentiment analysis, text classification, named-entity recognition, RAG pipelines using LangChain, ChromaDB, and fine-tuned large language models.</div>
+            </div>
+          </div>
+          <div class="services-item">
+            <span class="services-num">05</span>
+            <div>
+              <div class="services-name">Full-Stack Development</div>
+              <div class="services-desc">Clean, modern, and conversion-focused web applications â€” Node.js, Express, MongoDB, REST APIs, and seamless GenAI integration into production systems.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ================= PROJECTS ================= -->
       <section id="projects" class="py-24 px-6 max-w-7xl mx-auto w-full scroll-reveal reveal-zoom-fade">
         <div class="text-center space-y-3 mb-14">
           <span class="font-mono text-xs text-primary uppercase tracking-widest">Work</span>
-          <h2 class="text-3xl sm:text-5xl font-jakarta font-extrabold">Projects</h2>
+          <h2 class="hero-heading section-heading-kanit" style="font-size:clamp(2.5rem,8vw,6rem);">Projects</h2>
           <!-- Premium Animated Separator -->
           <div class="flex items-center justify-center gap-1.5 mt-3 select-none pointer-events-none">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
@@ -352,7 +446,7 @@ export class Home {
       <section id="github" class="py-24 px-6 max-w-7xl mx-auto w-full scroll-reveal reveal-zoom-fade">
         <div class="text-center space-y-3 mb-14">
           <span class="font-mono text-xs text-teal uppercase tracking-widest">GitHub</span>
-          <h2 class="text-3xl sm:text-5xl font-jakarta font-extrabold">Activity Dashboard</h2>
+          <h2 class="hero-heading section-heading-kanit" style="font-size:clamp(2.5rem,8vw,6rem);">Activity Dashboard</h2>
           <!-- Premium Animated Separator -->
           <div class="flex items-center justify-center gap-1.5 mt-3 select-none pointer-events-none">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
@@ -415,7 +509,7 @@ export class Home {
       <section id="certifications" class="py-24 px-6 max-w-7xl mx-auto w-full scroll-reveal reveal-rotate-pop">
         <div class="text-center space-y-3 mb-14">
           <span class="font-mono text-xs text-accent uppercase tracking-widest">Credentials</span>
-          <h2 class="text-3xl sm:text-4xl font-jakarta font-extrabold text-gray-100">Certifications & Accreditations</h2>
+          <h2 class="hero-heading section-heading-kanit" style="font-size:clamp(2rem,6vw,4.5rem);">Certifications &amp; Accreditations</h2>
           <!-- Premium Animated Separator -->
           <div class="flex items-center justify-center gap-1.5 mt-3 select-none pointer-events-none">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
@@ -434,17 +528,17 @@ export class Home {
                 <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
                   <i class="fa-brands fa-microsoft text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-sky-500/10 border-sky-500/30 text-sky-300">Microsoft · Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-sky-500/10 border-sky-500/30 text-sky-300">Microsoft Â· Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-sky-400 transition-colors">Developing Agents in Microsoft Foundry</h3>
-                <p class="text-xs text-gray-400 mt-1">Microsoft Applied Skills · September 2026</p>
+                <p class="text-xs text-gray-400 mt-1">Microsoft Applied Skills Â· September 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Developing autonomous agents, multi-agent workflows & Azure AI Foundry integration.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Microsoft Applied Skills: Get started developing agents in Microsoft Foundry","issuer":"Microsoft · September 2026","verifyUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","previewUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","type":"credential","credId":"653B346FEC048451","icon":"fa-microsoft","iconPrefix":"fa-brands","bgClass":"bg-sky-500/10","borderClass":"border-sky-500/20","colorClass":"text-sky-400"}'>
+                      data-cert='{"title":"Microsoft Applied Skills: Get started developing agents in Microsoft Foundry","issuer":"Microsoft Â· September 2026","verifyUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","previewUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","type":"credential","credId":"653B346FEC048451","icon":"fa-microsoft","iconPrefix":"fa-brands","bgClass":"bg-sky-500/10","borderClass":"border-sky-500/20","colorClass":"text-sky-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -460,17 +554,17 @@ export class Home {
                 <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-chart-pie text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-indigo-500/10 border-indigo-500/30 text-indigo-300">OneRoadmap · Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-indigo-500/10 border-indigo-500/30 text-indigo-300">OneRoadmap Â· Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-indigo-400 transition-colors">AI and Data Scientist</h3>
-                <p class="text-xs text-gray-400 mt-1">OneRoadmap · September 2026</p>
+                <p class="text-xs text-gray-400 mt-1">OneRoadmap Â· September 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Data science pipelines, machine learning architectures & statistical modeling.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"AI and Data Scientist","issuer":"OneRoadmap · September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","previewUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","type":"credential","credId":"CERT-0B760053","icon":"fa-chart-pie","iconPrefix":"fa-solid","bgClass":"bg-indigo-500/10","borderClass":"border-indigo-500/20","colorClass":"text-indigo-400"}'>
+                      data-cert='{"title":"AI and Data Scientist","issuer":"OneRoadmap Â· September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","previewUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","type":"credential","credId":"CERT-0B760053","icon":"fa-chart-pie","iconPrefix":"fa-solid","bgClass":"bg-indigo-500/10","borderClass":"border-indigo-500/20","colorClass":"text-indigo-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -486,17 +580,17 @@ export class Home {
                 <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-brain text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-emerald-500/10 border-emerald-500/30 text-emerald-300">OneRoadmap · Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-emerald-500/10 border-emerald-500/30 text-emerald-300">OneRoadmap Â· Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-emerald-400 transition-colors">Applied AI & Machine Learning</h3>
-                <p class="text-xs text-gray-400 mt-1">OneRoadmap Associate Readiness · Sept 2026</p>
+                <p class="text-xs text-gray-400 mt-1">OneRoadmap Associate Readiness Â· Sept 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Applied machine learning algorithms, model readiness & production evaluation.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Applied AI & Machine Learning - Associate Readiness","issuer":"OneRoadmap · September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","previewUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","type":"credential","credId":"CERT-A93F0D60","icon":"fa-brain","iconPrefix":"fa-solid","bgClass":"bg-emerald-500/10","borderClass":"border-emerald-500/20","colorClass":"text-emerald-400"}'>
+                      data-cert='{"title":"Applied AI & Machine Learning - Associate Readiness","issuer":"OneRoadmap Â· September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","previewUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","type":"credential","credId":"CERT-A93F0D60","icon":"fa-brain","iconPrefix":"fa-solid","bgClass":"bg-emerald-500/10","borderClass":"border-emerald-500/20","colorClass":"text-emerald-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -516,13 +610,13 @@ export class Home {
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-amber-400 transition-colors">Data Science & Analytics with GenAI</h3>
-                <p class="text-xs text-gray-400 mt-1">Sheryians Coding School · July 2026</p>
+                <p class="text-xs text-gray-400 mt-1">Sheryians Coding School Â· July 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Real-world applications, GenAI integration & job-ready technical skills.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Data Science & Analytics with GenAI","issuer":"Sheryians Coding School · July 2026","verifyUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","previewUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","type":"iframe","icon":"fa-wand-magic-sparkles","iconPrefix":"fa-solid","bgClass":"bg-amber-500/10","borderClass":"border-amber-500/20","colorClass":"text-amber-400"}'>
+                      data-cert='{"title":"Data Science & Analytics with GenAI","issuer":"Sheryians Coding School Â· July 2026","verifyUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","previewUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","type":"iframe","icon":"fa-wand-magic-sparkles","iconPrefix":"fa-solid","bgClass":"bg-amber-500/10","borderClass":"border-amber-500/20","colorClass":"text-amber-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://sheryians.com/certificate/311726923637568120a0faf6" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -642,7 +736,7 @@ export class Home {
       <section id="reviews" class="py-24 px-6 max-w-7xl mx-auto w-full scroll-reveal reveal-zoom-fade">
         <div class="text-center space-y-3 mb-14">
           <span class="font-mono text-xs text-rose uppercase tracking-widest">Testimonials</span>
-          <h2 class="text-3xl sm:text-5xl font-jakarta font-extrabold">Reviews</h2>
+          <h2 class="hero-heading section-heading-kanit" style="font-size:clamp(2.5rem,7vw,5rem);">Reviews</h2>
           <!-- Premium Animated Separator -->
           <div class="flex items-center justify-center gap-1.5 mt-3 select-none pointer-events-none">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
@@ -697,7 +791,7 @@ export class Home {
       <section id="contact" class="py-24 px-6 max-w-7xl mx-auto w-full scroll-reveal reveal-zoom-fade">
         <div class="text-center space-y-3 mb-14">
           <span class="font-mono text-xs text-teal uppercase tracking-widest">Contact</span>
-          <h2 class="text-3xl sm:text-5xl font-jakarta font-extrabold">Get in Touch</h2>
+          <h2 class="hero-heading section-heading-kanit" style="font-size:clamp(2.5rem,7vw,5.5rem);">Get in Touch</h2>
           <!-- Premium Animated Separator -->
           <div class="flex items-center justify-center gap-1.5 mt-3 select-none pointer-events-none">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
@@ -868,6 +962,27 @@ export class Home {
   async setup(projects, localMetadata) {
     // 1. Setup Hero Sub-Component
     this.hero.setup();
+
+    // 1b. Marquee scroll-driven parallax
+    const row1 = document.getElementById('marquee-row-1');
+    const row2 = document.getElementById('marquee-row-2');
+    const marqueeSection = document.getElementById('marquee-section');
+    if (row1 && row2 && marqueeSection) {
+      const updateMarquee = () => {
+        const sTop = marqueeSection.getBoundingClientRect().top + window.scrollY;
+        const off = (window.scrollY - sTop + window.innerHeight) * 0.25;
+        row1.style.transform = 'translateX(' + (off - 200) + 'px)';
+        row2.style.transform = 'translateX(' + (-(off - 200)) + 'px)';
+      };
+      window.addEventListener('scroll', updateMarquee, { passive: true });
+      updateMarquee();
+    }
+
+    // 1c. Viewport observer for .vp-fade elements
+    const vpObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vp-visible'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.vp-fade, .vp-fade-left, .vp-fade-right').forEach(el => vpObs.observe(el));
 
     // 2. Render and Setup Category Tiles
     const categoriesGrid = document.getElementById('home-categories-grid');
@@ -1165,7 +1280,7 @@ export class Home {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         const title = btn.dataset.title || 'Upcoming Project';
-        showModal('info', `🔒 ${title}`, `Raj Rathod is actively developing this project! Full repository details, source code, and live preview links will automatically sync as soon as it is uploaded to GitHub.`);
+        showModal('info', `ðŸ”’ ${title}`, `Raj Rathod is actively developing this project! Full repository details, source code, and live preview links will automatically sync as soon as it is uploaded to GitHub.`);
       });
     });
 
@@ -1251,7 +1366,7 @@ export class Home {
                   <span class="px-3 py-1 rounded-full text-xs font-mono bg-amber-500/10 border border-amber-500/30 text-amber-300">Official Accreditation</span>
                   <h3 class="font-jakarta font-extrabold text-2xl text-gray-100">${certData.title}</h3>
                   <p class="text-xs text-gray-400 font-mono">${certData.issuer}</p>
-                  <p class="text-xs text-gray-400">Student: <strong class="text-gray-200">Rathod Raj</strong> · Cert ID: <code class="text-amber-400 font-mono bg-amber-500/10 px-2 py-0.5 rounded">311726923637568120a0faf6</code></p>
+                  <p class="text-xs text-gray-400">Student: <strong class="text-gray-200">Rathod Raj</strong> Â· Cert ID: <code class="text-amber-400 font-mono bg-amber-500/10 px-2 py-0.5 rounded">311726923637568120a0faf6</code></p>
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-jakarta text-xs font-bold text-black shadow-lg shadow-amber-500/20 hover:scale-105 transition-all flex items-center gap-2">
@@ -1308,7 +1423,7 @@ export class Home {
                   <span class="px-3 py-1 rounded-full text-xs font-mono ${certData.bgClass || 'bg-primary/10'} border ${certData.borderClass || 'border-primary/30'} ${certData.colorClass || 'text-primary'}">Official Verified Credential</span>
                   <h3 class="font-jakarta font-extrabold text-2xl text-gray-100">${certData.title}</h3>
                   <p class="text-xs text-gray-400 font-mono">${certData.issuer}</p>
-                  ${certData.credId ? `<p class="text-xs text-gray-400">Recipient: <strong class="text-gray-200">Rathod Raj</strong> · Credential ID: <code class="${certData.colorClass} font-mono ${certData.bgClass} px-2 py-0.5 rounded border ${certData.borderClass}">${certData.credId}</code></p>` : ''}
+                  ${certData.credId ? `<p class="text-xs text-gray-400">Recipient: <strong class="text-gray-200">Rathod Raj</strong> Â· Credential ID: <code class="${certData.colorClass} font-mono ${certData.bgClass} px-2 py-0.5 rounded border ${certData.borderClass}">${certData.credId}</code></p>` : ''}
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta text-xs font-bold text-white shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
@@ -1615,3 +1730,4 @@ export class Home {
     }
   }
 }
+

@@ -10,26 +10,26 @@ export class Navbar {
    */
   render() {
     return `
-      <header class="fixed top-0 left-0 right-0 z-[40] border-b border-white/5 backdrop-blur-xl" style="background: rgba(13,17,23,0.85)">
+      <header class="fixed top-0 left-0 right-0 z-[40] border-b border-white/5 backdrop-blur-xl" style="background: rgba(12,12,12,0.90)">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="/" class="flex items-center space-x-2.5 hover:opacity-80 transition-opacity logo-nav-btn">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
               <i class="fa-solid fa-brain text-white text-sm"></i>
             </div>
-            <span class="font-jakarta font-bold text-lg text-gray-100">Raj Rathod</span>
+            <span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:0.05em;text-transform:uppercase;" class="text-gray-100">Raj Rathod</span>
           </a>
 
-          <nav class="hidden md:flex items-center space-x-8 font-inter text-sm font-medium navbar-links">
-            <a href="#about" class="text-gray-400 hover:text-gray-100 transition-colors nav-section-link" data-section="about">About</a>
-            <a href="#skills" class="text-gray-400 hover:text-gray-100 transition-colors nav-section-link" data-section="skills">Skills</a>
-            <a href="#projects" class="text-gray-400 hover:text-gray-100 transition-colors nav-projects-link" data-section="projects">Projects</a>
-            <a href="#github" class="text-gray-400 hover:text-gray-100 transition-colors nav-section-link" data-section="github">GitHub</a>
-            <a href="#reviews" class="text-gray-400 hover:text-gray-100 transition-colors nav-section-link" data-section="reviews">Reviews</a>
-            <a href="#contact" class="text-gray-400 hover:text-gray-100 transition-colors nav-section-link" data-section="contact">Contact</a>
+          <nav class="hidden md:flex items-center space-x-8 navbar-links">
+            <a href="#about" style="font-family:'Kanit',sans-serif;font-weight:500;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;" class="text-[#D7E2EA] opacity-70 hover:opacity-100 transition-opacity nav-section-link" data-section="about">About</a>
+            <a href="#skills" style="font-family:'Kanit',sans-serif;font-weight:500;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;" class="text-[#D7E2EA] opacity-70 hover:opacity-100 transition-opacity nav-section-link" data-section="skills">Skills</a>
+            <a href="#projects" style="font-family:'Kanit',sans-serif;font-weight:500;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;" class="text-[#D7E2EA] opacity-70 hover:opacity-100 transition-opacity nav-projects-link" data-section="projects">Projects</a>
+            <a href="#github" style="font-family:'Kanit',sans-serif;font-weight:500;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;" class="text-[#D7E2EA] opacity-70 hover:opacity-100 transition-opacity nav-section-link" data-section="github">GitHub</a>
+            <a href="#reviews" style="font-family:'Kanit',sans-serif;font-weight:500;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;" class="text-[#D7E2EA] opacity-70 hover:opacity-100 transition-opacity nav-section-link" data-section="reviews">Reviews</a>
+            <a href="#contact" style="font-family:'Kanit',sans-serif;font-weight:500;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.1em;" class="text-[#D7E2EA] opacity-70 hover:opacity-100 transition-opacity nav-section-link" data-section="contact">Contact</a>
           </nav>
 
           <div class="flex items-center space-x-3">
-            <button class="resume-modal-trigger hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta text-xs font-semibold text-white shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+            <button class="resume-modal-trigger hidden sm:flex items-center gap-1.5 btn-contact-premium cursor-pointer" style="font-size:0.72rem;padding:0.45rem 1.1rem;">
               <i class="fa-solid fa-file-arrow-down"></i>
               <span>Resume</span>
             </button>
@@ -44,19 +44,19 @@ export class Navbar {
       <div id="mobile-menu-backdrop" class="fixed inset-0 z-[45] bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"></div>
 
       <!-- Mobile navigation panel -->
-      <div id="mobile-menu" class="fixed inset-y-0 right-0 z-[50] w-72 bg-[#0d1117] border-l border-white/10 p-6 flex flex-col transform translate-x-full transition-transform duration-300">
+      <div id="mobile-menu" class="fixed inset-y-0 right-0 z-[50] w-72 border-l border-white/10 p-6 flex flex-col transform translate-x-full transition-transform duration-300" style="background:#0C0C0C;">
         <div class="flex justify-between items-center mb-8">
-          <span class="font-jakarta font-bold text-gray-100">Menu</span>
+          <span style="font-family:'Kanit',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;" class="text-gray-100">Menu</span>
           <button id="mobile-menu-close" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
         <nav class="flex flex-col space-y-1">
-          <a href="#about" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-link" data-section="about">About</a>
-          <a href="#skills" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-link" data-section="skills">Skills</a>
-          <a href="#projects" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-projects-link" data-section="projects">Projects</a>
-          <a href="#github" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-link" data-section="github">GitHub</a>
-          <a href="#reviews" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-link" data-section="reviews">Reviews</a>
-          <a href="#contact" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors font-medium mobile-nav-link" data-section="contact">Contact</a>
-          <button class="resume-modal-trigger w-full py-3 px-4 rounded-lg text-primary hover:bg-white/5 transition-colors font-medium flex items-center gap-2 text-left cursor-pointer">
+          <a href="#about" style="font-family:'Kanit',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors mobile-nav-link" data-section="about">About</a>
+          <a href="#skills" style="font-family:'Kanit',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors mobile-nav-link" data-section="skills">Skills</a>
+          <a href="#projects" style="font-family:'Kanit',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors mobile-nav-projects-link" data-section="projects">Projects</a>
+          <a href="#github" style="font-family:'Kanit',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors mobile-nav-link" data-section="github">GitHub</a>
+          <a href="#reviews" style="font-family:'Kanit',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors mobile-nav-link" data-section="reviews">Reviews</a>
+          <a href="#contact" style="font-family:'Kanit',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;" class="py-3 px-4 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors mobile-nav-link" data-section="contact">Contact</a>
+          <button class="resume-modal-trigger w-full py-3 px-4 rounded-lg text-primary hover:bg-white/5 transition-colors flex items-center gap-2 text-left cursor-pointer" style="font-family:'Kanit',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;font-size:0.88rem;">
             <i class="fa-solid fa-file-arrow-down text-sm"></i> Download Resume
           </button>
         </nav>
@@ -192,11 +192,9 @@ export class Navbar {
       navLinks.forEach(link => {
         const section = link.getAttribute('data-section');
         if (section === currentActive) {
-          link.classList.remove('text-gray-400');
-          link.classList.add('text-gray-100');
+          link.style.opacity = '1';
         } else {
-          link.classList.remove('text-gray-100');
-          link.classList.add('text-gray-400');
+          link.style.opacity = '0.7';
         }
       });
     };

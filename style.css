@@ -1,5 +1,5 @@
 /* ===== GOOGLE FONTS ===== */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 /* ===== RESET & ROOT ===== */
 *, *::before, *::after {
@@ -28,7 +28,7 @@ html.lenis, html.lenis body {
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #0d1117;
+  background-color: #0C0C0C;
   color: #f0f6fc;
   overflow-x: hidden;
   position: relative;
@@ -948,4 +948,318 @@ body::before {
 .flip-card-inner {
   transform-style: preserve-3d;
   will-change: transform;
+}
+
+/* ============================================================
+   PREMIUM UI UPGRADE — JACK 3D DESIGN LANGUAGE APPLIED
+   ============================================================ */
+
+/* ── Hero Heading Gradient Text ─────────────────────────────── */
+.hero-heading {
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Section headings use Kanit ──────────────────────────────── */
+.section-heading-kanit {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* ── Premium Contact Button (purple gradient) ─────────────────── */
+.btn-contact-premium {
+  background: linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%);
+  box-shadow: 0px 4px 4px rgba(181, 1, 167, 0.25), inset 4px 4px 12px #7721B1;
+  outline: 2px solid rgba(255,255,255,0.15);
+  outline-offset: -3px;
+  color: #ffffff;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-contact-premium:hover {
+  opacity: 0.88;
+  transform: scale(1.04);
+}
+
+/* ── Marquee Scroll Section ───────────────────────────────────── */
+.marquee-section {
+  background: #0C0C0C;
+  overflow: hidden;
+  padding: 6rem 0 2.5rem;
+}
+.marquee-row {
+  display: flex;
+  gap: 12px;
+  will-change: transform;
+}
+.marquee-tile {
+  flex-shrink: 0;
+  width: 380px;
+  height: 240px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #111;
+}
+.marquee-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+@media (max-width: 768px) {
+  .marquee-tile { width: 280px; height: 180px; }
+}
+
+/* ── Magnetic Portrait Wrapper ─────────────────────────────────── */
+.magnetic-portrait-wrap {
+  display: inline-block;
+  will-change: transform;
+  transition: transform 0.6s ease-in-out;
+}
+.magnetic-portrait-wrap.active {
+  transition: transform 0.3s ease-out;
+}
+
+/* ── Services Vertical List (Capabilities) ─────────────────────── */
+.services-item {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 2.5rem 0;
+  transition: opacity 0.3s;
+}
+.services-item:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+.services-item:hover { opacity: 0.8; }
+.services-num {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 900;
+  font-size: clamp(3rem, 10vw, 8rem);
+  color: #D7E2EA;
+  line-height: 1;
+  opacity: 0.18;
+  min-width: 6rem;
+  text-align: right;
+  flex-shrink: 0;
+  transition: opacity 0.3s;
+}
+.services-item:hover .services-num { opacity: 0.35; }
+.services-name {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: clamp(1rem, 2.2vw, 1.7rem);
+  color: #D7E2EA;
+  letter-spacing: 0.04em;
+}
+.services-desc {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.8rem, 1.4vw, 1rem);
+  color: rgba(215,226,234,0.55);
+  line-height: 1.7;
+  max-width: 520px;
+  margin-top: 0.35rem;
+}
+
+/* ── Sticky Project Cards ──────────────────────────────────────── */
+.sticky-card-section { background: #0C0C0C; }
+.sticky-card-container {
+  position: relative;
+}
+.sticky-card-slot {
+  height: 85vh;
+  position: relative;
+}
+.sticky-card {
+  position: sticky;
+  top: 6rem;
+  border-radius: 40px;
+  border: 2px solid rgba(215,226,234,0.20);
+  background: #0C0C0C;
+  padding: 1.5rem;
+  will-change: transform;
+  transform-origin: top center;
+  transition: transform 0.1s linear;
+  overflow: hidden;
+}
+.sticky-card-num {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 900;
+  font-size: clamp(3.5rem, 10vw, 9rem);
+  line-height: 1;
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.sticky-card-category {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 300;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  color: rgba(215,226,234,0.5);
+}
+.sticky-card-title {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  color: #D7E2EA;
+  letter-spacing: 0.02em;
+}
+.sticky-card-btn {
+  border-radius: 9999px;
+  border: 2px solid #D7E2EA;
+  color: #D7E2EA;
+  background: transparent;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.sticky-card-btn:hover { background: rgba(215,226,234,0.08); }
+.sticky-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24px;
+  display: block;
+}
+
+/* ── About Section Corner Decorations ─────────────────────────── */
+.about-deco-img {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+}
+
+/* ── Character Animated Text ──────────────────────────────────── */
+.char-animated-text {
+  display: inline;
+}
+.char-animated-text .char-wrap {
+  position: relative;
+  display: inline-block;
+}
+.char-animated-text .char-ghost {
+  opacity: 0;
+  user-select: none;
+}
+.char-animated-text .char-visible {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0.18;
+  transition: opacity 0.4s ease;
+}
+.char-animated-text.active .char-visible {
+  /* JS handles per-char opacity via inline style */
+}
+
+/* ── Fade-In Utility Animations ───────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-80px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(80px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.fade-in-up    { animation: fadeInUp    0.9s cubic-bezier(0.25,0.1,0.25,1) both; }
+.fade-in-down  { animation: fadeInDown  0.9s cubic-bezier(0.25,0.1,0.25,1) both; }
+.fade-in-left  { animation: fadeInLeft  0.9s cubic-bezier(0.25,0.1,0.25,1) both; }
+.fade-in-right { animation: fadeInRight 0.9s cubic-bezier(0.25,0.1,0.25,1) both; }
+
+.anim-delay-1 { animation-delay: 0.1s; }
+.anim-delay-2 { animation-delay: 0.25s; }
+.anim-delay-3 { animation-delay: 0.4s; }
+.anim-delay-4 { animation-delay: 0.55s; }
+.anim-delay-5 { animation-delay: 0.7s; }
+
+/* Viewport-triggered fade for scroll sections */
+.vp-fade {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.25,0.1,0.25,1), transform 0.8s cubic-bezier(0.25,0.1,0.25,1);
+}
+.vp-fade.vp-visible { opacity: 1; transform: translateY(0); }
+.vp-fade-left {
+  opacity: 0;
+  transform: translateX(-80px);
+  transition: opacity 0.9s cubic-bezier(0.25,0.1,0.25,1), transform 0.9s cubic-bezier(0.25,0.1,0.25,1);
+}
+.vp-fade-left.vp-visible { opacity: 1; transform: translateX(0); }
+.vp-fade-right {
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 0.9s cubic-bezier(0.25,0.1,0.25,1), transform 0.9s cubic-bezier(0.25,0.1,0.25,1);
+}
+.vp-fade-right.vp-visible { opacity: 1; transform: translateX(0); }
+
+/* ── Section dividers with rounded tops (dark theme) ──────────── */
+.rounded-top-section {
+  border-radius: 50px 50px 0 0;
+  margin-top: -2.5rem;
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 768px) {
+  .rounded-top-section { border-radius: 32px 32px 0 0; margin-top: -1.5rem; }
+}
+
+/* ── Updated glassmorphism cards for #0C0C0C bg ───────────────── */
+.glass-card {
+  background: rgba(18, 18, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+/* ── Scrollbar matches new dark theme ────────────────────────── */
+::-webkit-scrollbar-track { background: #0C0C0C; }
+
+/* ── Updated mobile optimizations for #0C0C0C ───────────────── */
+@media (max-width: 768px) {
+  .glass-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(18, 18, 20, 0.98) !important;
+  }
+  header {
+    background: rgba(12, 12, 12, 0.98) !important;
+  }
 }
