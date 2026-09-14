@@ -1,4 +1,4 @@
-﻿import { Hero } from '../components/Hero.js';
+﻿﻿import { Hero } from '../components/Hero.js';
 import { CategoryCard } from '../components/CategoryCard.js';
 import { getAllCategories } from '../utils/categorize.js';
 import { containsAbusiveContent } from '../utils/profanityFilter.js';
@@ -120,7 +120,7 @@ export class Home {
             </div>
             
             <p class="font-inter text-gray-400 leading-relaxed">
-              I'm a Computer Science engineering student at Parul University, specializing in AI and Machine Learning. I love building end-to-end ML pipelines â€” from data preprocessing and model training to deployment with Streamlit and Vercel.
+              I'm a Computer Science engineering student at Parul University, specializing in AI and Machine Learning. I love building end-to-end ML pipelines – from data preprocessing and model training to deployment with Streamlit and Vercel.
             </p>
 
             <div class="grid grid-cols-2 gap-4">
@@ -154,10 +154,10 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-primary bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-primary/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-primary">2023 â€” 2027</span>
+                    <span class="font-mono text-xs text-primary">2023 – 2027</span>
                     <span class="px-2 py-0.5 rounded-md bg-primary/10 text-[10px] text-primary font-mono border border-primary/20">GPA 7.66</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">B.Tech â€” Computer Science & Engineering with AI</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">B.Tech – Computer Science & Engineering with AI</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Parul University, Vadodara</p>
                 </div>
               </div>
@@ -166,10 +166,10 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-secondary bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-secondary/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-secondary">2022 â€” 2023</span>
+                    <span class="font-mono text-xs text-secondary">2022 – 2023</span>
                     <span class="px-2 py-0.5 rounded-md bg-secondary/10 text-[10px] text-secondary font-mono border border-secondary/20">60.61%</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">HSC â€” Science Stream</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">HSC – Science Stream</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Shri Rajshakha School, Porbandar</p>
                 </div>
               </div>
@@ -178,10 +178,10 @@ export class Home {
                 <div class="absolute -left-10 top-1 w-3 h-3 rounded-full border border-rose bg-darkBg timeline-dot"></div>
                 <div class="rounded-xl border border-white/8 p-5 bg-white/3 group-hover:border-rose/30 transition-colors spotlight-card">
                   <div class="flex justify-between items-start gap-2 mb-2">
-                    <span class="font-mono text-xs text-rose">2020 â€” 2021</span>
+                    <span class="font-mono text-xs text-rose">2020 – 2021</span>
                     <span class="px-2 py-0.5 rounded-md bg-rose/10 text-[10px] text-rose font-mono border border-rose/20">79.81%</span>
                   </div>
-                  <h3 class="font-jakarta font-bold text-gray-100">SSC â€” Secondary School</h3>
+                  <h3 class="font-jakarta font-bold text-gray-100">SSC – Secondary School</h3>
                   <p class="text-sm text-gray-500 mt-0.5">Sigma School, Porbandar</p>
                 </div>
               </div>
@@ -420,7 +420,7 @@ export class Home {
             <span class="services-num">01</span>
             <div>
               <div class="services-name">AI / ML Engineering</div>
-              <div class="services-desc">End-to-end machine learning pipelines â€” data preprocessing, model training, hyperparameter tuning, and production deployment with FastAPI and Streamlit.</div>
+              <div class="services-desc">End-to-end machine learning pipelines – data preprocessing, model training, hyperparameter tuning, and production deployment with FastAPI and Streamlit.</div>
             </div>
           </div>
           <div class="services-item">
@@ -448,7 +448,7 @@ export class Home {
             <span class="services-num">05</span>
             <div>
               <div class="services-name">Full-Stack Development</div>
-              <div class="services-desc">Clean, modern, and conversion-focused web applications â€” Node.js, Express, MongoDB, REST APIs, and seamless GenAI integration into production systems.</div>
+              <div class="services-desc">Clean, modern, and conversion-focused web applications – Node.js, Express, MongoDB, REST APIs, and seamless GenAI integration into production systems.</div>
             </div>
           </div>
         </div>
@@ -562,17 +562,17 @@ export class Home {
                 <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
                   <i class="fa-brands fa-microsoft text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-sky-500/10 border-sky-500/30 text-sky-300">Microsoft Â· Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-sky-500/10 border-sky-500/30 text-sky-300">Microsoft · Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-sky-400 transition-colors">Developing Agents in Microsoft Foundry</h3>
-                <p class="text-xs text-gray-400 mt-1">Microsoft Applied Skills Â· September 2026</p>
+                <p class="text-xs text-gray-400 mt-1">Microsoft Applied Skills · September 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Developing autonomous agents, multi-agent workflows & Azure AI Foundry integration.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Microsoft Applied Skills: Get started developing agents in Microsoft Foundry","issuer":"Microsoft Â· September 2026","verifyUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","previewUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","type":"credential","credId":"653B346FEC048451","icon":"fa-microsoft","iconPrefix":"fa-brands","bgClass":"bg-sky-500/10","borderClass":"border-sky-500/20","colorClass":"text-sky-400"}'>
+                      data-cert='{"title":"Microsoft Applied Skills: Get started developing agents in Microsoft Foundry","issuer":"Microsoft · September 2026","verifyUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","previewUrl":"https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId","type":"credential","credId":"653B346FEC048451","icon":"fa-microsoft","iconPrefix":"fa-brands","bgClass":"bg-sky-500/10","borderClass":"border-sky-500/20","colorClass":"text-sky-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://learn.microsoft.com/api/credentials/share/en-us/RathodRaj-8938/653B346FEC048451?sharingId" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -588,17 +588,17 @@ export class Home {
                 <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-chart-pie text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-indigo-500/10 border-indigo-500/30 text-indigo-300">OneRoadmap Â· Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-indigo-500/10 border-indigo-500/30 text-indigo-300">OneRoadmap · Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-indigo-400 transition-colors">AI and Data Scientist</h3>
-                <p class="text-xs text-gray-400 mt-1">OneRoadmap Â· September 2026</p>
+                <p class="text-xs text-gray-400 mt-1">OneRoadmap · September 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Data science pipelines, machine learning architectures & statistical modeling.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"AI and Data Scientist","issuer":"OneRoadmap Â· September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","previewUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","type":"credential","credId":"CERT-0B760053","icon":"fa-chart-pie","iconPrefix":"fa-solid","bgClass":"bg-indigo-500/10","borderClass":"border-indigo-500/20","colorClass":"text-indigo-400"}'>
+                      data-cert='{"title":"AI and Data Scientist","issuer":"OneRoadmap · September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","previewUrl":"https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053","type":"credential","credId":"CERT-0B760053","icon":"fa-chart-pie","iconPrefix":"fa-solid","bgClass":"bg-indigo-500/10","borderClass":"border-indigo-500/20","colorClass":"text-indigo-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://www.oneroadmap.io/skills/ai-ds/certificate/CERT-0B760053" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -614,17 +614,17 @@ export class Home {
                 <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-brain text-lg"></i>
                 </div>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-emerald-500/10 border-emerald-500/30 text-emerald-300">OneRoadmap Â· Verified</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono border bg-emerald-500/10 border-emerald-500/30 text-emerald-300">OneRoadmap · Verified</span>
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-emerald-400 transition-colors">Applied AI & Machine Learning</h3>
-                <p class="text-xs text-gray-400 mt-1">OneRoadmap Associate Readiness Â· Sept 2026</p>
+                <p class="text-xs text-gray-400 mt-1">OneRoadmap Associate Readiness · Sept 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Applied machine learning algorithms, model readiness & production evaluation.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Applied AI & Machine Learning - Associate Readiness","issuer":"OneRoadmap Â· September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","previewUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","type":"credential","credId":"CERT-A93F0D60","icon":"fa-brain","iconPrefix":"fa-solid","bgClass":"bg-emerald-500/10","borderClass":"border-emerald-500/20","colorClass":"text-emerald-400"}'>
+                      data-cert='{"title":"Applied AI & Machine Learning – Associate Readiness","issuer":"OneRoadmap · September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","previewUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","type":"credential","credId":"CERT-A93F0D60","icon":"fa-brain","iconPrefix":"fa-solid","bgClass":"bg-emerald-500/10","borderClass":"border-emerald-500/20","colorClass":"text-emerald-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -644,13 +644,13 @@ export class Home {
               </div>
               <div>
                 <h3 class="font-jakarta font-bold text-base text-gray-100 group-hover:text-amber-400 transition-colors">Data Science & Analytics with GenAI</h3>
-                <p class="text-xs text-gray-400 mt-1">Sheryians Coding School Â· July 2026</p>
+                <p class="text-xs text-gray-400 mt-1">Sheryians Coding School · July 2026</p>
                 <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">Real-world applications, GenAI integration & job-ready technical skills.</p>
               </div>
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Data Science & Analytics with GenAI","issuer":"Sheryians Coding School Â· July 2026","verifyUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","previewUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","type":"iframe","icon":"fa-wand-magic-sparkles","iconPrefix":"fa-solid","bgClass":"bg-amber-500/10","borderClass":"border-amber-500/20","colorClass":"text-amber-400"}'>
+                      data-cert='{"title":"Data Science & Analytics with GenAI","issuer":"Sheryians Coding School · July 2026","verifyUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","previewUrl":"https://sheryians.com/certificate/311726923637568120a0faf6","type":"iframe","icon":"fa-wand-magic-sparkles","iconPrefix":"fa-solid","bgClass":"bg-amber-500/10","borderClass":"border-amber-500/20","colorClass":"text-amber-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://sheryians.com/certificate/311726923637568120a0faf6" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -873,7 +873,7 @@ export class Home {
                 </div>
                 <div>
                   <span class="block font-mono text-[10px] text-gray-600 uppercase">Location</span>
-                  <span class="block font-inter text-sm text-gray-200 group-hover:text-rose transition-colors">Amardad, Ranavav, Porbandar - 360560, Gujarat, India</span>
+                  <span class="block font-inter text-sm text-gray-200 group-hover:text-rose transition-colors">Amardad, Ranavav, Porbandar – 360560, Gujarat, India</span>
                 </div>
                 <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-600 ml-auto group-hover:text-rose transition-colors"></i>
               </a>
@@ -1004,9 +1004,9 @@ export class Home {
     if (row1 && row2 && marqueeSection) {
       const updateMarquee = () => {
         const sTop = marqueeSection.getBoundingClientRect().top + window.scrollY;
-        const off = (window.scrollY - sTop + window.innerHeight) * 0.25;
-        row1.style.transform = 'translateX(' + (off - 200) + 'px)';
-        row2.style.transform = 'translateX(' + (-(off - 200)) + 'px)';
+        const off = (window.scrollY – sTop + window.innerHeight) * 0.25;
+        row1.style.transform = 'translateX(' + (off – 200) + 'px)';
+        row2.style.transform = 'translateX(' + (-(off – 200)) + 'px)';
       };
       window.addEventListener('scroll', updateMarquee, { passive: true });
       updateMarquee();
@@ -1029,10 +1029,10 @@ export class Home {
         var startTime = performance.now();
         var startVal = parseFloat(el.textContent) || 0;
         var step = function(now) {
-          var elapsed = now - startTime;
+          var elapsed = now – startTime;
           var progress = Math.min(elapsed / duration, 1);
-          var eased = 1 - Math.pow(1 - progress, 3);
-          var current = startVal + (target - startVal) * eased;
+          var eased = 1 – Math.pow(1 – progress, 3);
+          var current = startVal + (target – startVal) * eased;
           el.textContent = current.toFixed(decimals) + suffix;
           if (progress < 1) requestAnimationFrame(step);
         };
@@ -1208,7 +1208,7 @@ export class Home {
         if (Array.isArray(repos) && repos.length > 0) {
           repos.forEach(r => { if (r.language) langMap[r.language] = (langMap[r.language] || 0) + 1; });
         }
-        const sorted = Object.entries(langMap).sort((a, b) => b[1] - a[1]).slice(0, 7);
+        const sorted = Object.entries(langMap).sort((a, b) => b[1] – a[1]).slice(0, 7);
         if (sorted.length > 0) {
           updateGitChart(sorted.map(s => s[0]), sorted.map(s => s[1]));
           return;
@@ -1424,7 +1424,7 @@ export class Home {
                   <span class="px-3 py-1 rounded-full text-xs font-mono bg-amber-500/10 border border-amber-500/30 text-amber-300">Official Accreditation</span>
                   <h3 class="font-jakarta font-extrabold text-2xl text-gray-100">${certData.title}</h3>
                   <p class="text-xs text-gray-400 font-mono">${certData.issuer}</p>
-                  <p class="text-xs text-gray-400">Student: <strong class="text-gray-200">Rathod Raj</strong> Â· Cert ID: <code class="text-amber-400 font-mono bg-amber-500/10 px-2 py-0.5 rounded">311726923637568120a0faf6</code></p>
+                  <p class="text-xs text-gray-400">Student: <strong class="text-gray-200">Rathod Raj</strong> · Cert ID: <code class="text-amber-400 font-mono bg-amber-500/10 px-2 py-0.5 rounded">311726923637568120a0faf6</code></p>
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-jakarta text-xs font-bold text-black shadow-lg shadow-amber-500/20 hover:scale-105 transition-all flex items-center gap-2">
@@ -1481,7 +1481,7 @@ export class Home {
                   <span class="px-3 py-1 rounded-full text-xs font-mono ${certData.bgClass || 'bg-primary/10'} border ${certData.borderClass || 'border-primary/30'} ${certData.colorClass || 'text-primary'}">Official Verified Credential</span>
                   <h3 class="font-jakarta font-extrabold text-2xl text-gray-100">${certData.title}</h3>
                   <p class="text-xs text-gray-400 font-mono">${certData.issuer}</p>
-                  ${certData.credId ? `<p class="text-xs text-gray-400">Recipient: <strong class="text-gray-200">Rathod Raj</strong> Â· Credential ID: <code class="${certData.colorClass} font-mono ${certData.bgClass} px-2 py-0.5 rounded border ${certData.borderClass}">${certData.credId}</code></p>` : ''}
+                  ${certData.credId ? `<p class="text-xs text-gray-400">Recipient: <strong class="text-gray-200">Rathod Raj</strong> · Credential ID: <code class="${certData.colorClass} font-mono ${certData.bgClass} px-2 py-0.5 rounded border ${certData.borderClass}">${certData.credId}</code></p>` : ''}
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <a href="${certData.verifyUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta text-xs font-bold text-white shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">

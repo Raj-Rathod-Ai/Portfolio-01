@@ -1601,3 +1601,261 @@ header .logo-nav-btn:hover i {
   0%, 100% { transform: scale(1); box-shadow: 0 0 6px #10b981; }
   50%       { transform: scale(1.4); box-shadow: 0 0 18px #10b981, 0 0 36px rgba(16,185,129,0.4); }
 }
+
+/* ============================================================
+   COMPREHENSIVE MOBILE UI FIXES — DEEP AUDIT PATCH
+   ============================================================ */
+
+/* ── Marquee Section Header: stack vertically on mobile ──────── */
+@media (max-width: 768px) {
+  .marquee-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0 1.25rem;
+  }
+  .marquee-section-title {
+    font-size: clamp(2.2rem, 10vw, 3.5rem);
+  }
+  .marquee-section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    /* Prevent horizontal overflow on very long label text */
+    word-break: break-word;
+    white-space: normal;
+    max-width: 100%;
+  }
+}
+
+/* ── Tech Ticker: allow wrapping on very small screens ───────── */
+@media (max-width: 480px) {
+  .tech-ticker-section::before,
+  .tech-ticker-section::after {
+    width: 60px;
+  }
+}
+
+/* ── About decorative corner images: hide on mobile to avoid
+   collision with text content ─────────────────────────────── */
+@media (max-width: 1024px) {
+  .about-deco-img {
+    display: none !important;
+  }
+}
+
+/* ── Hero section: prevent badge row overflow on mobile ──────── */
+@media (max-width: 640px) {
+  #hero .flex.flex-wrap {
+    gap: 6px;
+  }
+  #hero .flex.flex-wrap > span {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+  /* Hero buttons: ensure they don't overflow */
+  #hero .flex.flex-col.sm\\:flex-row {
+    gap: 10px;
+  }
+}
+
+/* ── Services item: better mobile layout ────────────────────── */
+@media (max-width: 640px) {
+  .services-item {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem 0;
+  }
+  .services-num {
+    min-width: auto;
+    font-size: clamp(2.5rem, 12vw, 5rem);
+    text-align: left;
+  }
+  .services-name {
+    font-size: clamp(1rem, 4.5vw, 1.5rem);
+  }
+  .services-desc {
+    font-size: 0.85rem;
+    max-width: 100%;
+  }
+}
+
+/* ── Skills grid: 2 columns on mobile (instead of 5/4) ──────── */
+@media (max-width: 640px) {
+  .skill-card {
+    height: auto !important;
+    min-height: 110px;
+  }
+}
+
+/* ── About section stats grid: ensure 2x2 on small mobile ───── */
+@media (max-width: 400px) {
+  #about .grid.grid-cols-2 {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  #about .grid.grid-cols-2 > div {
+    padding: 12px;
+  }
+}
+
+/* ── Education timeline: better mobile spacing ───────────────── */
+@media (max-width: 640px) {
+  #about .relative.border-l {
+    margin-left: 12px;
+    padding-left: 20px;
+  }
+  #about .absolute.-left-10 {
+    left: -16px !important;
+  }
+}
+
+/* ── Sticky cards: reduce height on mobile ───────────────────── */
+@media (max-width: 768px) {
+  .sticky-card-slot {
+    height: 70vh;
+  }
+  .sticky-card {
+    border-radius: 24px;
+    padding: 1rem;
+  }
+}
+
+/* ── Project cards section: better mobile grid ───────────────── */
+@media (max-width: 640px) {
+  .flip-card {
+    height: 380px !important;
+  }
+}
+
+/* ── Certifications grid: single column on mobile ────────────── */
+@media (max-width: 640px) {
+  #certifications .grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Contact section: better mobile form layout ──────────────── */
+@media (max-width: 640px) {
+  #contact .grid.grid-cols-1.md\\:grid-cols-2 {
+    gap: 1rem;
+  }
+}
+
+/* ── Prevent horizontal scroll globally ─────────────────────── */
+body, html {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* ── Fix marquee overflow on mobile ─────────────────────────── */
+.marquee-section {
+  overflow: hidden;
+  max-width: 100vw;
+}
+
+/* ── Navbar: ensure hamburger icon visible on mobile ─────────── */
+@media (max-width: 768px) {
+  header nav {
+    padding: 0 1rem;
+  }
+}
+
+/* ── Section padding on mobile ───────────────────────────────── */
+@media (max-width: 640px) {
+  section.py-24 {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+  }
+  section.px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* ── Hero heading: better mobile font size ───────────────────── */
+@media (max-width: 480px) {
+  #hero h1 {
+    font-size: clamp(3rem, 14vw, 5rem) !important;
+    line-height: 0.95 !important;
+  }
+  #hero h1 + p {
+    font-size: 1rem !important;
+  }
+}
+
+/* ── Tech ticker: ensure no clipping ────────────────────────── */
+.tech-ticker-track {
+  padding: 0 4px;
+}
+
+/* ── About grid: full width on tablet ───────────────────────── */
+@media (max-width: 1024px) {
+  #about .grid.lg\\:grid-cols-12 {
+    grid-template-columns: 1fr !important;
+    gap: 3rem;
+  }
+  #about .lg\\:col-span-6 {
+    width: 100%;
+  }
+}
+
+/* ── Force text rendering improvements globally ──────────────── */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Kanit heading text rendering ───────────────────────────── */
+.section-heading-kanit {
+  -webkit-font-smoothing: antialiased;
+  font-display: swap;
+}
+
+/* ── Floating chatbot: avoid covering content on mobile ─────── */
+@media (max-width: 768px) {
+  #chatbot-widget,
+  .chatbot-fab,
+  [id*="chatbot"],
+  [class*="chatbot-fab"] {
+    bottom: 1rem !important;
+    right: 1rem !important;
+  }
+}
+
+/* ── Premium search bar: full width on mobile ───────────────── */
+@media (max-width: 640px) {
+  .premium-search-wrap {
+    min-width: unset;
+    width: 100%;
+  }
+  #projects .flex.flex-wrap.gap-3 {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ── Filter chips: wrap properly ────────────────────────────── */
+@media (max-width: 768px) {
+  .flex.flex-wrap.gap-2.overflow-x-auto {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .flex.flex-wrap.gap-2.overflow-x-auto::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Marquee rows: proper overflow hidden on mobile ─────────── */
+@media (max-width: 768px) {
+  .marquee-section {
+    padding: 3rem 0 2rem;
+  }
+  #marquee-row-1,
+  #marquee-row-2 {
+    gap: 8px;
+  }
+}
