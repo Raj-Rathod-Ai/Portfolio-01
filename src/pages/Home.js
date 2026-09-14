@@ -120,7 +120,7 @@ export class Home {
             </div>
             
             <p class="font-inter text-gray-400 leading-relaxed">
-              I'm a Computer Science engineering student at Parul University, specializing in AI and Machine Learning. I love building end-to-end ML pipelines – from data preprocessing and model training to deployment with Streamlit and Vercel.
+              I'm a Computer Science engineering student at Parul University, specializing in AI and Machine Learning. I love building end-to-end ML pipelines - from data preprocessing and model training to deployment with Streamlit and Vercel.
             </p>
 
             <div class="grid grid-cols-2 gap-4">
@@ -624,7 +624,7 @@ export class Home {
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-white/5 text-xs font-mono">
               <button class="cert-preview-btn inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-semibold select-none"
-                      data-cert='{"title":"Applied AI & Machine Learning – Associate Readiness","issuer":"OneRoadmap · September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","previewUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","type":"credential","credId":"CERT-A93F0D60","icon":"fa-brain","iconPrefix":"fa-solid","bgClass":"bg-emerald-500/10","borderClass":"border-emerald-500/20","colorClass":"text-emerald-400"}'>
+                      data-cert='{"title":"Applied AI & Machine Learning - Associate Readiness","issuer":"OneRoadmap · September 2026","verifyUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","previewUrl":"https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60","type":"credential","credId":"CERT-A93F0D60","icon":"fa-brain","iconPrefix":"fa-solid","bgClass":"bg-emerald-500/10","borderClass":"border-emerald-500/20","colorClass":"text-emerald-400"}'>
                 <i class="fa-solid fa-eye text-xs"></i><span>Live Preview</span>
               </button>
               <a href="https://www.oneroadmap.io/skills/ai-ds-fundamentals/certificate/CERT-A93F0D60" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors">
@@ -1004,9 +1004,9 @@ export class Home {
     if (row1 && row2 && marqueeSection) {
       const updateMarquee = () => {
         const sTop = marqueeSection.getBoundingClientRect().top + window.scrollY;
-        const off = (window.scrollY – sTop + window.innerHeight) * 0.25;
-        row1.style.transform = 'translateX(' + (off – 200) + 'px)';
-        row2.style.transform = 'translateX(' + (-(off – 200)) + 'px)';
+        const off = (window.scrollY - sTop + window.innerHeight) * 0.25;
+        row1.style.transform = 'translateX(' + (off - 200) + 'px)';
+        row2.style.transform = 'translateX(' + (-(off - 200)) + 'px)';
       };
       window.addEventListener('scroll', updateMarquee, { passive: true });
       updateMarquee();
@@ -1029,10 +1029,10 @@ export class Home {
         var startTime = performance.now();
         var startVal = parseFloat(el.textContent) || 0;
         var step = function(now) {
-          var elapsed = now – startTime;
+          var elapsed = now - startTime;
           var progress = Math.min(elapsed / duration, 1);
-          var eased = 1 – Math.pow(1 – progress, 3);
-          var current = startVal + (target – startVal) * eased;
+          var eased = 1 - Math.pow(1 - progress, 3);
+          var current = startVal + (target - startVal) * eased;
           el.textContent = current.toFixed(decimals) + suffix;
           if (progress < 1) requestAnimationFrame(step);
         };
@@ -1208,7 +1208,7 @@ export class Home {
         if (Array.isArray(repos) && repos.length > 0) {
           repos.forEach(r => { if (r.language) langMap[r.language] = (langMap[r.language] || 0) + 1; });
         }
-        const sorted = Object.entries(langMap).sort((a, b) => b[1] – a[1]).slice(0, 7);
+        const sorted = Object.entries(langMap).sort((a, b) => b[1] - a[1]).slice(0, 7);
         if (sorted.length > 0) {
           updateGitChart(sorted.map(s => s[0]), sorted.map(s => s[1]));
           return;
