@@ -999,7 +999,7 @@ export class Chatbot {
 - SENTI-AI-BiGRU-Emotion-Detection-Using-DL (Category: Deep Learning): Live Demo: https://senti-ai.onrender.com | GitHub: https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL
 - Laptop-Price-Predicate-Using-DL (Category: Deep Learning): Live Demo: https://laptop-price-predicate.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL
 - Movie-Recommendations-Using-NLP-and-ML (Category: NLP): Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
-- Fake-News-Detection-Using-DL-Real-time (Category: NLP): Live Demo: https://truthlens5.netlify.app/ & https://truthlens5.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
+- Fake-News-Detection-Using-DL-Real-time (Category: NLP): Live Demo: https://truthlens5.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
 - AutoPrepAI (Category: Data Science): Live Demo: https://data-eda-processing.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI
 - FlowerDiseaseSystem (Category: Deep Learning): Live Demo: https://flower-disease-system.vercel.app | GitHub: https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
 - ChatNotes (Category: RAG): Live Demo: https://chat-with-your-notes-dusx.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/ChatNotes
@@ -1127,7 +1127,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
   * SENTI-AI (BiGRU Emotion Detection): Live Demo https://senti-ai.onrender.com | GitHub https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL
   * Laptop Price Prediction (ANN): Live Demo https://laptop-price-predicate.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL
   * Movie Recommendations: Live Demo https://cinema-verse.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
-  * Fake News Detection: Live Demo https://truthlens5.netlify.app/ or https://truthlens5.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
+  * Fake News Detection: Live Demo https://truthlens5.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
   * AutoPrepAI: Live Demo https://data-eda-processing.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/AutoPrepAI
   * Flower Disease: Live Demo https://flower-disease-system.vercel.app | GitHub https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
   * HybridMind: Live Demo https://hybridmind.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/HybridMind
@@ -1306,7 +1306,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                  `• **Flower & Leaf Disease Detection CNN**: [Launch Live Demo](https://flower-disease-system.vercel.app)\n\n` +
                  `🔤 **Natural Language Processing (NLP)**:\n` +
                  `• **Movie Recommendations Engine**: [Launch Live Demo](https://cinema-verse.streamlit.app/)\n` +
-                 `• **Real-Time Fake News Detector (TruthLens)**: [Launch Netlify Demo](https://truthlens5.netlify.app/) | [Launch Streamlit Demo](https://truthlens5.streamlit.app/)\n\n` +
+                 `• **Real-Time Fake News Detector (TruthLens)**: [Launch Live Demo](https://truthlens5.netlify.app/)\n\n` +
                  `📈 **Machine Learning & Predictive Systems**:\n` +
                  `• **Sukoon-Saathi Student Wellness**: [Launch Live Demo](https://sukoonsaathi-frontend.onrender.com/)\n` +
                  `• **Taxi Fare Prediction**: [Launch Live Demo](https://taxi-price-prediction.netlify.app/)\n` +
@@ -1469,8 +1469,8 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
         category: 'NLP',
         content: `📰 **REAL-TIME FAKE NEWS DETECTION SYSTEM (TRUTHLENS)** (NLP / Deep Learning)\n\n` +
                  `• **Overview**: A real-time Natural Language Processing and Deep Learning system analyzing news articles and classifying them as credible or deceptive with **~92% accuracy**.\n` +
-                 `• **Tech Stack**: Python, Deep Learning, Scikit-Learn, NLTK, TF-IDF Vectorization, Passive-Aggressive Classifier, Streamlit, Flask, Three.js\n` +
-                 `• 🚀 **Live Demos**: [truthlens5.netlify.app](https://truthlens5.netlify.app/) & [truthlens5.streamlit.app](https://truthlens5.streamlit.app/)\n` +
+                 `• **Tech Stack**: Python, Deep Learning, Scikit-Learn, NLTK, TF-IDF Vectorization, Passive-Aggressive Classifier, Flask, Three.js\n` +
+                 `• 🚀 **Live Demo**: [truthlens5.netlify.app](https://truthlens5.netlify.app/)\n` +
                  `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time)`
       },
       {
@@ -1700,7 +1700,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
              `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML)\n\n` +
              `🕵️ **3. Fake News Detection Using DL Real Time (TruthLens)**\n` +
              `• **Architecture**: Real-time TF-IDF and Passive-Aggressive classifier (~92% accuracy).\n` +
-             `• 🚀 **Live Demos**: [truthlens5.netlify.app](https://truthlens5.netlify.app/) & [truthlens5.streamlit.app](https://truthlens5.streamlit.app/)\n` +
+             `• 🚀 **Live Demo**: [truthlens5.netlify.app](https://truthlens5.netlify.app/)\n` +
              `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time)\n\n` +
              `💡 *All 3 NLP projects are live deployed and ready to test!*`;
     }

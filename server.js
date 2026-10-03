@@ -508,7 +508,7 @@ const GITHUB_FALLBACK_REPOS = [
   },
   {
     "name": "Fake-News-Detection-Using-DL-Real-time",
-    "description": "TruthLens — A real-time fake news detection and credibility verification system using deep learning and machine learning. Features dual web portals on Netlify and Streamlit for instant news credibility analysis and truth scoring.",
+    "description": "TruthLens — A real-time fake news detection and credibility verification system using deep learning and machine learning. Features a web portal on Netlify for instant news credibility analysis and truth scoring.",
     "language": "Python",
     "updated_at": "2026-08-21T14:31:46Z",
     "created_at": "2026-01-29T10:22:11Z",
@@ -1878,7 +1878,7 @@ KEY PROJECTS OVERVIEW (21+ Active Live Deployments across 24 Projects):
   12. Drug Recommendation System: Drug category recommender. Live Demo: https://drug-recommendation-systems.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/drug-recommendation-system
   13. Random Forest Food Delivery Time: Random Forest delivery estimator. Live Demo: https://random-forest-food-delivery-time.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Random-Forest-Food-Delivery-Time
 - Natural Language Processing (NLP):
-  1. Real-Time Fake News Detection (TruthLens): Online news credibility classifier (~92% accuracy). Live Demos: https://truthlens5.netlify.app/ & https://truthlens5.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
+  1. Real-Time Fake News Detection (TruthLens): Online news credibility classifier (~92% accuracy). Live Demo: https://truthlens5.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
   2. Movie Recommendations Using NLP & ML: Cosine similarity content-based film recommender. Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
 - Data Science & Analytics:
   1. AutoPrepAI: Automated offline data cleaning, preprocessing & quality analytics platform. Live Demo: https://data-eda-processing.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI

@@ -120,16 +120,13 @@ export function getRepoIcon(repo) {
 export function getLiveUrl(repo, localMetadata = []) {
   if (!repo) return '';
 
-  const truthLensUrls = [
-    'https://truthlens5.netlify.app/',
-    'https://truthlens5.streamlit.app/'
-  ];
+  const truthLensUrl = 'https://truthlens5.netlify.app/';
 
   const key = (repo.name || '').toLowerCase().trim();
 
-  // 1. Direct random selection for Fake News Detection (TruthLens DL / ML)
+  // 1. Direct selection for Fake News Detection (TruthLens DL / ML)
   if (key === 'fake-news-detection-using-dl-real-time' || key === 'fake-news-detection-using-ml-real-time') {
-    return truthLensUrls[Math.floor(Math.random() * truthLensUrls.length)];
+    return truthLensUrl;
   }
 
   let target = null;
@@ -169,8 +166,8 @@ export function getLiveUrl(repo, localMetadata = []) {
     'meetnote': 'https://meetnotes.streamlit.app/',
     'discover-your-true-personality': 'https://discover-your-true-personality.streamlit.app/',
     'drug-recommendation-system': 'https://drug-recommendation-systems.streamlit.app/',
-    'fake-news-detection-using-dl-real-time': truthLensUrls,
-    'fake-news-detection-using-ml-real-time': truthLensUrls,
+    'fake-news-detection-using-dl-real-time': 'https://truthlens5.netlify.app/',
+    'fake-news-detection-using-ml-real-time': 'https://truthlens5.netlify.app/',
     'flowerdiseasesystem': 'https://flower-disease-system.vercel.app',
     'food_delivery_time-using-ml': 'https://fooddelivery-time.streamlit.app/',
     'healthy-lifestyle-prediction': 'https://healthy-lifestyle-prediction.streamlit.app/',

@@ -21,7 +21,7 @@ export class CommandPalette {
       { title: 'SENTI.AI Emotion Intelligence', category: 'Live Demo', url: 'https://senti-ai.onrender.com', icon: 'fa-solid fa-brain', tech: 'BiGRU · Deep Learning · Python', external: true },
       { title: 'AutoPrepAI Data Platform', category: 'Live Demo', url: 'https://data-eda-processing.streamlit.app/', icon: 'fa-solid fa-wand-magic-sparkles', tech: 'Streamlit · Python · EDA', external: true },
       { title: 'Movie Recommendations Engine', category: 'Live Demo', url: 'https://cinema-verse.streamlit.app/', icon: 'fa-solid fa-film', tech: 'NLP · Cosine Similarity · ML', external: true },
-      { title: 'TruthLens Fake News Detection', category: 'Live Demo', url: ['https://truthlens5.netlify.app/', 'https://truthlens5.streamlit.app/'], icon: 'fa-solid fa-shield-halved', tech: 'NLP · Deep Learning · Streamlit · Netlify', external: true },
+      { title: 'TruthLens Fake News Detection', category: 'Live Demo', url: 'https://truthlens5.netlify.app/', icon: 'fa-solid fa-shield-halved', tech: 'NLP · Deep Learning · Netlify', external: true },
       { title: 'ChatNotes RAG PDF Assistant', category: 'Live Demo', url: 'https://chat-with-your-notes-dusx.onrender.com/', icon: 'fa-solid fa-comments', tech: 'Generative AI · RAG · Python', external: true },
       { title: 'HybridMind Multi-Model Platform', category: 'Live Demo', url: 'https://hybridmind.netlify.app/', icon: 'fa-solid fa-brain', tech: 'Gemini · Mistral · Tavily', external: true },
       { title: 'Flower & Leaf Disease Detection', category: 'Live Demo', url: 'https://flower-disease-system.vercel.app', icon: 'fa-solid fa-leaf', tech: 'CNN · Deep Learning · Vercel', external: true },

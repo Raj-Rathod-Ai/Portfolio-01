@@ -80,14 +80,12 @@ document.addEventListener('click', (e) => {
     return;
   }
 
-  // 2. Live Demo links & TruthLens random switcher
+  // 2. Live Demo links & TruthLens URL handler
   const linkEl = target.closest('a');
   if (linkEl) {
     const href = linkEl.getAttribute('href') || '';
     if (href.includes('truthlens5.netlify.app') || href.includes('truthlens5.streamlit.app') || linkEl.hasAttribute('data-random-urls')) {
-      const truthLensPool = ['https://truthlens5.netlify.app/', 'https://truthlens5.streamlit.app/'];
-      const randomUrl = truthLensPool[Math.floor(Math.random() * truthLensPool.length)];
-      linkEl.setAttribute('href', randomUrl);
+      linkEl.setAttribute('href', 'https://truthlens5.netlify.app/');
     }
 
     if (linkEl.textContent.toLowerCase().includes('demo')) {

@@ -211,7 +211,7 @@ export const FALLBACK_REPOS = [
   },
   {
     "name": "Fake-News-Detection-Using-DL-Real-time",
-    "description": "TruthLens — A real-time fake news detection and credibility verification system using deep learning and machine learning. Features dual web portals on Netlify and Streamlit for instant news credibility analysis and truth scoring.",
+    "description": "TruthLens — A real-time fake news detection and credibility verification system using deep learning and machine learning. Features a web portal on Netlify for instant news credibility analysis and truth scoring.",
     "language": "Python",
     "updated_at": "2026-08-21T14:31:46Z",
     "created_at": "2026-01-29T10:22:11Z",
