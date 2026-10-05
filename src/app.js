@@ -202,8 +202,10 @@ function initNeuralCanvas() {
   const canvas = document.getElementById('neural-canvas');
   if (!canvas) return;
 
+  const isMobile = window.innerWidth < 768 || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+
   // On mobile/touch screens (< 768px), disable neural canvas to save CPU, GPU fill-rate, and battery
-  if (window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches) {
+  if (isMobile) {
     canvas.style.display = 'none';
     return;
   }
@@ -609,31 +611,43 @@ function initLenis() {
 /**
  * Run application bootstrap load.
  */
-document.addEventListener('DOMContentLoaded', async () => {
-  // Initialize Lenis smooth scroll engine
-  initLenis();
+async function initApp() {
+  // ─── 1. START PRELOADER IMMEDIATELY FIRST (never blocked by anything) ─
+  const preloaderPromise = new Promise(resolve => {
+    try {
+      initPreloader(resolve);
+    } catch (_) {
+      resolve();
+    }
+  });
 
   // Force dark mode
   document.documentElement.classList.add('dark');
+
+  // Initialize Lenis smooth scroll engine
+  try {
+    initLenis();
+  } catch (_) {}
   
   // Render static Navbar and Footer placeholders in index.html shells
-  const headerPlaceholder = document.getElementById('navbar-header-mount');
-  const footerPlaceholder = document.getElementById('footer-mount');
-  if (headerPlaceholder) {
-    headerPlaceholder.innerHTML = navbar.render();
-  }
-  if (footerPlaceholder) {
-    footerPlaceholder.innerHTML = footer.render();
-  }
+  try {
+    const headerPlaceholder = document.getElementById('navbar-header-mount');
+    const footerPlaceholder = document.getElementById('footer-mount');
+    if (headerPlaceholder) {
+      headerPlaceholder.innerHTML = navbar.render();
+    }
+    if (footerPlaceholder) {
+      footerPlaceholder.innerHTML = footer.render();
+    }
+  } catch (_) {}
 
-  // Bind active spotlight glows and background particles canvas (native 120fps smooth scroll)
-  initNeuralCanvas();
-  initMouseSpotlight();
-
-  // ─── START PRELOADER IMMEDIATELY (no blocking!) ───────────────────────
-  const preloaderPromise = new Promise(resolve => {
-    initPreloader(resolve);
-  });
+  // Bind active spotlight glows and background particles canvas
+  try {
+    initNeuralCanvas();
+  } catch (_) {}
+  try {
+    initMouseSpotlight();
+  } catch (_) {}
 
   // Clear any legacy cached duplicate repos from browser localStorage
   try {
@@ -767,4 +781,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         syncFreshRepos();
       }
     });
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}

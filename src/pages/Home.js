@@ -517,7 +517,7 @@ export class Home {
 
             <!-- Item 2: Video 1 (VID_20261004_194759_022.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/VID_20261004_194759_022.mp4">
-              <video src="/gallery-media/VID_20261004_194759_022.mp4" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
+              <video src="/gallery-media/VID_20261004_194759_022.mp4" poster="/gallery-media/VID_20261004_194759_022_poster.jpg" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
@@ -540,7 +540,7 @@ export class Home {
 
             <!-- Item 3: Video 2 (VID-20250924-WA0000.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/VID-20250924-WA0000.mp4">
-              <video src="/gallery-media/VID-20250924-WA0000.mp4" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
+              <video src="/gallery-media/VID-20250924-WA0000.mp4" poster="/gallery-media/VID-20250924-WA0000_poster.jpg" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
@@ -573,7 +573,7 @@ export class Home {
 
             <!-- Item 5: Video 3 (VID_20260129_122517_951.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/VID_20260129_122517_951.mp4">
-              <video src="/gallery-media/VID_20260129_122517_951.mp4" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
+              <video src="/gallery-media/VID_20260129_122517_951.mp4" poster="/gallery-media/VID_20260129_122517_951_poster.jpg" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
@@ -596,7 +596,7 @@ export class Home {
 
             <!-- Item 6: Video 4 (video_20250927_222326.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/video_20250927_222326.mp4">
-              <video src="/gallery-media/video_20250927_222326.mp4" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
+              <video src="/gallery-media/video_20250927_222326.mp4" poster="/gallery-media/video_20250927_222326_poster.jpg" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
@@ -619,7 +619,7 @@ export class Home {
 
             <!-- Item 7: Video 5 (video_20250927_023728_edit.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/video_20250927_023728_edit.mp4">
-              <video src="/gallery-media/video_20250927_023728_edit.mp4" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
+              <video src="/gallery-media/video_20250927_023728_edit.mp4" poster="/gallery-media/video_20250927_023728_edit_poster.jpg" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
@@ -1051,8 +1051,9 @@ export class Home {
                 cardDiv.className = 'gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer';
                 cardDiv.dataset.mediaType = 'video';
                 cardDiv.dataset.src = item.src;
+                const posterSrc = item.src.replace(/\.[^/.]+$/, '') + '_poster.jpg';
                 cardDiv.innerHTML = `
-                  <video src="${item.src}" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
+                  <video src="${item.src}" poster="${posterSrc}" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
                   <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                     <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                       <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>

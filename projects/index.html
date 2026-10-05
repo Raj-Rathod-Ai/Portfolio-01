@@ -176,6 +176,20 @@
     </div>
   </div>
 
+  <script>
+    // Universal safety watchdog: guarantees preloader dismisses within 2.8s under any circumstance
+    setTimeout(function() {
+      var p = document.getElementById('preloader');
+      if (p && p.parentNode && p.style.display !== 'none') {
+        p.style.transition = 'opacity 0.5s ease, filter 0.5s ease';
+        p.style.opacity = '0';
+        p.style.filter = 'blur(10px)';
+        document.documentElement.classList.remove('noscroll');
+        setTimeout(function() { if (p.parentNode) p.remove(); }, 500);
+      }
+    }, 2800);
+  </script>
+
   <!-- Interactive canvas backdrop -->
   <canvas id="neural-canvas" class="fixed inset-0 z-0 pointer-events-none opacity-25"></canvas>
 
@@ -311,7 +325,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
   <!-- Main dynamic application modules entry point -->
-  <script type="module" src="/src/app.js?v=3.8"></script>
+  <script type="module" src="/src/app.js?v=3.9"></script>
 
 </body>
 </html>
