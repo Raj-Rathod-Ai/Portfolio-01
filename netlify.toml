@@ -1,13 +1,15 @@
 # Netlify Production Configuration for Raj Rathod Portfolio
+# Frontend: Deployed on Netlify (Static SPA + Asset CDN)
+# Backend: Deployed on Render (https://portfolio-raj-qda3.onrender.com)
 
 [build]
   publish = "."
-  command = "echo 'Raj Rathod Portfolio: Production Build Ready'"
+  command = "echo 'Raj Rathod Portfolio: Netlify Build Ready'"
 
 [build.environment]
   NODE_VERSION = "20"
 
-# 1. API proxy rule to Render production backend service
+# 1. API proxy rule: unconditionally proxy all /api requests to Render backend
 [[redirects]]
   from = "/api/*"
   to = "https://portfolio-raj-qda3.onrender.com/api/:splat"
@@ -74,6 +76,16 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
+  for = "/gallery-media/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
   for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/music/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
