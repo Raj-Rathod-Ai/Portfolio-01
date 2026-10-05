@@ -1384,6 +1384,14 @@ CRITICAL INSTRUCTIONS:
   }
 });
 
+// GET /api/whatsapp - Secure WhatsApp redirect keeping phone number in backend
+app.get('/api/whatsapp', (req, res) => {
+  const phone = process.env.WHATSAPP_PHONE || '919624801014';
+  const customMsg = req.query.text || req.query.msg || "Hi Raj, I saw your portfolio and would like to connect!";
+  const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(customMsg)}`;
+  res.redirect(302, waUrl);
+});
+
 // POST /api/analytics/visit - Record silent visitor analytics session
 app.post('/api/analytics/visit', async (req, res) => {
   try {
@@ -1986,6 +1994,42 @@ app.get('/api/projects', (req, res) => {
     res.json(projectsData);
   } catch (err) {
     res.json({ error: 'Projects data offline fallback' });
+  }
+});
+
+// GET /api/gallery - Auto-detect and return all images and videos in gallery-media
+app.get('/api/gallery', (req, res) => {
+  try {
+    const fs = require('fs');
+    const galleryDir = path.join(__dirname, 'gallery-media');
+    if (!fs.existsSync(galleryDir)) {
+      return res.json({ success: true, count: 0, media: [] });
+    }
+    const files = fs.readdirSync(galleryDir);
+    const videoExts = new Set(['.mp4', '.webm', '.mov', '.ogg', '.m4v']);
+    const imageExts = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
+    const media = [];
+
+    for (const file of files) {
+      if (file === 'manifest.json' || file.startsWith('.')) continue;
+      const ext = path.extname(file).toLowerCase();
+      if (videoExts.has(ext)) {
+        media.push({
+          name: file,
+          src: `/gallery-media/${file}`,
+          type: 'video'
+        });
+      } else if (imageExts.has(ext)) {
+        media.push({
+          name: file,
+          src: `/gallery-media/${file}`,
+          type: 'image'
+        });
+      }
+    }
+    res.json({ success: true, count: media.length, media });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to scan gallery media', details: err.message });
   }
 });
 

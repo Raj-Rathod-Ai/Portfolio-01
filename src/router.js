@@ -1,6 +1,6 @@
-import { Home } from './pages/Home.js';
-import { Projects } from './pages/Projects.js';
-import { ProjectDetails } from './pages/ProjectDetails.js';
+import { Home } from './pages/Home.js?v=3.5';
+import { Projects } from './pages/Projects.js?v=3.5';
+import { ProjectDetails } from './pages/ProjectDetails.js?v=3.5';
 import { slugify } from './utils/helpers.js';
 import { getAllCategories } from './utils/categorize.js';
 import { trackVisit } from './utils/analytics.js';
@@ -115,7 +115,11 @@ export async function navigate(path, pushState = true) {
     container.innerHTML = html;
     container.style.opacity = '1';
     setupFn();
-    window.scrollTo(0, 0);
+    if (window.__lenis) {
+      window.__lenis.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
     // Guarantee every page's scroll-reveal elements are observed
     if (window.initializeObservers) window.initializeObservers();
   };
@@ -134,7 +138,7 @@ export async function navigate(path, pushState = true) {
         }
       });
     });
-    gsap.to(container, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' });
+    gsap.to(container, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out', clearProps: 'transform' });
   } else {
     swapContent();
   }

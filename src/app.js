@@ -2,9 +2,9 @@ import { fetchGitHubRepositories, FALLBACK_REPOS } from './api/github.js';
 import { getProjectCategory, UPCOMING_PROJECTS } from './utils/categorize.js';
 import { isGroupProject } from './utils/helpers.js';
 import { initRouter } from './router.js';
-import { Navbar } from './components/Navbar.js';
-import { Footer } from './components/Footer.js';
-import { Chatbot } from './components/Chatbot.js';
+import { Navbar } from './components/Navbar.js?v=3.2';
+import { Footer } from './components/Footer.js?v=3.2';
+import { Chatbot } from './components/Chatbot.js?v=3.2';
 import { commandPalette } from './components/CommandPalette.js';
 import { initMagneticCursor } from './utils/magneticCursor.js';
 import { initCardTilt } from './utils/cardTilt.js';
@@ -68,6 +68,16 @@ if (document.readyState === 'loading') {
 document.addEventListener('click', (e) => {
   const target = e.target;
   
+  // WhatsApp Action links (ensures instant redirect without exposing raw phone in visible text, and prevents 404 on localhost)
+  const waLink = target.closest('a[href*="whatsapp"], a[href*="/api/whatsapp"], #whatsapp-contact-link, [aria-label*="WhatsApp"], [data-action="whatsapp"]');
+  if (waLink) {
+    e.preventDefault();
+    const p = atob('OTE5NjI0ODAxMDE0'); // 919624801014
+    const msg = 'Hi Raj, I saw your portfolio and would like to connect!';
+    window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
   // 1. GitHub Code links
   const githubLink = target.closest('a[href*="github.com"]');
   if (githubLink) {
@@ -199,11 +209,22 @@ function initNeuralCanvas() {
   const NODE_COUNT = isMobile ? 22 : 65;
   const MAX_DIST = isMobile ? 100 : 145;
   let mouse = { x: null, y: null, radius: isMobile ? 100 : 170 };
+  let ripples = [];
 
   if (window.matchMedia('(hover: hover)').matches) {
     window.addEventListener('mousemove', (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
+      if (Math.random() < 0.7) {
+        ripples.push({
+          x: e.clientX,
+          y: e.clientY,
+          r: 8,
+          maxR: 85 + Math.random() * 45,
+          alpha: 0.3,
+          color: Math.random() > 0.5 ? 'rgba(56, 189, 248, ' : 'rgba(99, 102, 241, '
+        });
+      }
     });
 
     window.addEventListener('mouseleave', () => {
@@ -258,6 +279,25 @@ function initNeuralCanvas() {
 
   function drawCanvas() {
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    // Draw fluid ripples / liquid mist
+    for (let rIdx = ripples.length - 1; rIdx >= 0; rIdx--) {
+      const rip = ripples[rIdx];
+      rip.r += 1.8;
+      rip.alpha -= 0.007;
+      if (rip.alpha <= 0 || rip.r >= rip.maxR) {
+        ripples.splice(rIdx, 1);
+        continue;
+      }
+      const grad = ctx.createRadialGradient(rip.x, rip.y, 0, rip.x, rip.y, rip.r);
+      grad.addColorStop(0, rip.color + rip.alpha + ')');
+      grad.addColorStop(0.5, rip.color + (rip.alpha * 0.35) + ')');
+      grad.addColorStop(1, rip.color + '0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(rip.x, rip.y, rip.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     nodes.forEach(n => {
       n.x += n.vx;
@@ -397,7 +437,8 @@ function initPreloader(onLoadedCallback) {
   const perc = document.getElementById('pl-perc');
   const preloader = document.getElementById('preloader');
 
-  if (!brand || !preloader) {
+  if (!brand || !preloader || window.location.search.includes('nopreloader')) {
+    if (preloader) preloader.style.display = 'none';
     onLoadedCallback();
     return;
   }
@@ -444,6 +485,7 @@ function initPreloader(onLoadedCallback) {
 
   // Laser Progress Bar Animation & Status Stepper
   let progress = 0;
+  let currentStepIdx = -1;
   const statusSteps = [
     'Initializing Neural Engine...',
     'Loading AI Architectures & Models...',
@@ -505,11 +547,57 @@ function initPreloader(onLoadedCallback) {
 }
 
 /**
- * Initialize Lenis Smooth Scroll engine for ultra-smooth inertia scrolling.
+ * Initialize Lenis Smooth Scroll engine for ultra-smooth inertia scrolling matching Pranay's portfolio.
+ */
+function initLenis() {
+  if (typeof Lenis === 'undefined') return null;
+
+  try {
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+
+    const isTouch = (window.matchMedia("(hover: none), (pointer: coarse)").matches || window.innerWidth < 1024);
+
+    const lenis = new Lenis({
+      duration: isTouch ? 1.0 : 1.4,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      smoothTouch: false,
+      touchMultiplier: isTouch ? 1.5 : 1.0,
+    });
+
+    window.lenis = lenis;
+    window.__lenis = lenis;
+
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0);
+    } else {
+      const raf = (time) => {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      };
+      requestAnimationFrame(raf);
+    }
+
+    return lenis;
+  } catch (err) {
+    console.warn('Lenis initialization notice:', err);
+    return null;
+  }
+}
+
 /**
- * Run application bootsrap load.
+ * Run application bootstrap load.
  */
 document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize Lenis smooth scroll engine
+  initLenis();
+
   // Force dark mode
   document.documentElement.classList.add('dark');
   

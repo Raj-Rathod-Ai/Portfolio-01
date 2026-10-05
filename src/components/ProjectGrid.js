@@ -33,7 +33,32 @@ export class ProjectGrid {
   setup(container) {
     // Touch flip toggle
     projectCard.setup(container);
-    // Scroll reveal
-    if (window.initializeObservers) window.initializeObservers();
+    
+    // Smooth scroll reveal observer
+    if (container) {
+      const cards = container.querySelectorAll('.flip-card');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.05,
+        rootMargin: '0px 0px -30px 0px'
+      });
+
+      cards.forEach((card, idx) => {
+        const rect = card.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          setTimeout(() => {
+            card.classList.add('active');
+          }, Math.min(idx * 70, 500));
+        } else {
+          observer.observe(card);
+        }
+      });
+    }
   }
 }

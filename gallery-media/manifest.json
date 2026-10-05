@@ -1,0 +1,40 @@
+{
+  "lastUpdated": "2026-10-05T15:38:25.820Z",
+  "media": [
+    {
+      "name": "IMG-20260605-WA0003.jpg",
+      "src": "/gallery-media/IMG-20260605-WA0003.jpg",
+      "type": "image"
+    },
+    {
+      "name": "IMG-20260605-WA0006.jpg",
+      "src": "/gallery-media/IMG-20260605-WA0006.jpg",
+      "type": "image"
+    },
+    {
+      "name": "VID-20250924-WA0000.mp4",
+      "src": "/gallery-media/VID-20250924-WA0000.mp4",
+      "type": "video"
+    },
+    {
+      "name": "video_20250927_023728_edit.mp4",
+      "src": "/gallery-media/video_20250927_023728_edit.mp4",
+      "type": "video"
+    },
+    {
+      "name": "video_20250927_222326.mp4",
+      "src": "/gallery-media/video_20250927_222326.mp4",
+      "type": "video"
+    },
+    {
+      "name": "VID_20260129_122517_951.mp4",
+      "src": "/gallery-media/VID_20260129_122517_951.mp4",
+      "type": "video"
+    },
+    {
+      "name": "VID_20261004_194759_022.mp4",
+      "src": "/gallery-media/VID_20261004_194759_022.mp4",
+      "type": "video"
+    }
+  ]
+}

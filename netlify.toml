@@ -1,0 +1,79 @@
+# Netlify Production Configuration for Raj Rathod Portfolio
+
+[build]
+  publish = "."
+  command = "echo 'Raj Rathod Portfolio: Production Build Ready'"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# 1. API proxy rule to Render production backend service
+[[redirects]]
+  from = "/api/*"
+  to = "https://portfolio-raj-qda3.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# 2. Direct routes for static pages and verification assets
+[[redirects]]
+  from = "/projects"
+  to = "/projects/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/projects/*"
+  to = "/projects/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
+
+[[redirects]]
+  from = "/robots.txt"
+  to = "/robots.txt"
+  status = 200
+
+[[redirects]]
+  from = "/googlec2fa1c5327de2797.html"
+  to = "/googlec2fa1c5327de2797.html"
+  status = 200
+
+# 3. Resume PDF direct mappings
+[[redirects]]
+  from = "/Rathod-Raj-Ai.pdf"
+  to = "/Rathod_Raj_Ai_Update.pdf"
+  status = 200
+
+[[redirects]]
+  from = "/Rathod_Raj_Ai.pdf"
+  to = "/Rathod_Raj_Ai_Update.pdf"
+  status = 200
+
+# 4. Single-Page Application (SPA) client-side routing fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 5. Security & Performance Headers (Google SEO & Core Web Vitals optimized)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

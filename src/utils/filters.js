@@ -44,7 +44,14 @@ export function filterProjects(projects, filter = 'all') {
     }
     case 'popular':
       return projects.filter(p => (p.stargazers_count || 0) > 0);
-    default:
-      return projects;
+    default: {
+      // Category filter match (e.g. 'deep-learning', 'nlp', etc.)
+      const filterLower = filter.toLowerCase().replace(/[-_]/g, ' ');
+      const matched = projects.filter(p => {
+        const cat = (p.category || 'Others').toLowerCase().replace(/[-_]/g, ' ');
+        return cat.includes(filterLower) || filterLower.includes(cat);
+      });
+      return matched.length > 0 ? matched : projects;
+    }
   }
 }

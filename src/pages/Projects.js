@@ -17,95 +17,67 @@ export class Projects {
     this.sortBar      = new SortBar();
     this.skeleton     = new LoadingSkeleton();
 
-    this.searchQuery  = '';
-    this.activeFilter = 'all';
-    this.activeSort   = 'default';
+    this.searchQuery    = '';
+    this.activeFilter   = 'all';
+    this.activeCategory = 'all';
+    this.activeSort     = 'default';
   }
 
   /** Render the HTML shell for the projects page. */
   render(categorySlug = null) {
-    if (!categorySlug) {
-      return `
-      <section id="projects" class="py-16 sm:py-24 px-6 max-w-7xl mx-auto w-full min-h-[70vh]">
-        <!-- Navigation Back Bar -->
-        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+    return `
+    <section id="projects" class="py-14 sm:py-20 px-4 sm:px-6 max-w-7xl mx-auto w-full min-h-[85vh]">
+      <!-- Top Navigation & Live Sync Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-theme-border">
+        <div class="flex items-center gap-3 flex-wrap">
           <a href="/"
-             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-primary/50 text-xs font-mono text-gray-300 hover:text-white transition-all select-none group shadow-sm">
+             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-theme-border bg-bg-alt hover:border-accent text-xs font-mono text-fg transition-all select-none group shadow-sm">
             <i class="fa-solid fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
             <span>Back to Home</span>
           </a>
-          <span class="font-mono text-xs text-gray-500 flex items-center gap-1.5">
-            <i class="fa-solid fa-folder-open text-primary"></i><span>Categories View</span>
+          <span class="text-fg-subtle font-mono text-xs">/</span>
+          <span class="font-mono text-xs text-accent flex items-center gap-1.5">
+            <i class="fa-solid fa-folder-open text-xs"></i>
+            <span id="active-category-breadcrumb">${categorySlug ? slugFromSlug(categorySlug) : 'All Projects'}</span>
           </span>
         </div>
 
-        <!-- Section header -->
-        <div class="text-center space-y-4 mb-14">
-          <span class="font-mono text-xs text-primary uppercase tracking-widest">Portfolio</span>
-          <h2 class="text-4xl sm:text-5xl font-jakarta font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400" style="background-size:200%;animation:gradientMove 6s ease infinite">
-            Project Categories
-          </h2>
-          <div class="flex items-center justify-center gap-1.5 select-none pointer-events-none">
-            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
-            <span class="w-16 h-px bg-gradient-to-r from-primary via-secondary to-transparent rounded-full"></span>
-            <span class="w-2 h-2 rounded-full bg-secondary"></span>
-            <span class="w-16 h-px bg-gradient-to-r from-transparent via-secondary to-primary rounded-full"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping" style="animation-delay:.5s"></span>
-          </div>
-          <p class="font-inter text-sm text-gray-500 max-w-xl mx-auto">
-            All repositories are automatically fetched from GitHub and intelligently categorized.
-            Create a new repo — it appears here instantly.
-          </p>
-        </div>
-
-        <!-- Live sync badge -->
-        <div class="flex justify-center mb-10">
-          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono"
-                style="background:rgba(20,184,166,0.06);border-color:rgba(20,184,166,0.2);color:#2dd4bf">
-            <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping inline-block"></span>
-            Auto-synced from GitHub · Updates every 20 min
-          </span>
-        </div>
-
-        <!-- Dynamic categories grid -->
-        <div id="projects-categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Populated by setup() -->
-        </div>
-      </section>`;
-    }
-
-    // Category-specific workspace
-    return `
-    <section id="projects" class="py-16 sm:py-20 px-6 max-w-7xl mx-auto w-full min-h-[80vh]">
-      <!-- Breadcrumb + heading -->
-      <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 justify-between pb-4 border-b border-white/5">
         <div class="flex items-center gap-3 flex-wrap">
-          <a href="/"
-             class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-mono text-gray-400 hover:text-white hover:border-white/20 transition-all select-none"
-             style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08)">
-            <i class="fa-solid fa-house text-[11px]"></i><span>Home</span>
-          </a>
-          <span class="text-gray-600 font-mono text-xs">/</span>
-          <a href="/projects"
-             class="flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold text-gray-200 hover:text-white hover:border-primary/50 transition-all select-none"
-             style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1)">
-            <i class="fa-solid fa-arrow-left text-[10px]"></i><span>Categories</span>
-          </a>
-          <div>
-            <h2 id="active-category-title" class="text-2xl sm:text-3xl font-jakarta font-extrabold text-gray-100">
-              Category
-            </h2>
-            <p class="text-xs font-mono text-gray-500 mt-0.5">Auto-fetched from GitHub</p>
-          </div>
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-teal-500/30 bg-teal-500/10 text-xs font-mono text-teal-400">
+            <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping inline-block"></span>
+            Auto-synced from GitHub (@Raj-Rathod-Ai)
+          </span>
+          <span id="active-category-count"
+                class="px-3.5 py-1.5 rounded-xl border border-theme-border bg-bg-alt text-xs font-mono text-fg">
+            Loading repositories...
+          </span>
         </div>
-        <span id="active-category-count"
-              class="px-3.5 py-1.5 rounded-xl border text-xs font-mono self-start sm:self-auto"
-              style="background:rgba(20,184,166,0.06);border-color:rgba(20,184,166,0.2);color:#2dd4bf">
-          0 Projects
-        </span>
       </div>
 
-      <!-- Toolbar -->
+      <!-- Section Header -->
+      <div class="text-center space-y-4 mb-10">
+        <span class="font-mono text-xs text-accent uppercase tracking-widest">Portfolio &amp; Production Deployments</span>
+        <h1 id="active-page-title" class="text-3xl sm:text-4xl md:text-5xl font-jakarta font-extrabold text-fg">
+          ${categorySlug ? slugFromSlug(categorySlug) : 'All Projects &amp; Repositories'}
+        </h1>
+        <div class="flex items-center justify-center gap-1.5 select-none pointer-events-none">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent animate-ping"></span>
+          <span class="w-16 h-px bg-gradient-to-r from-accent via-secondary to-transparent rounded-full"></span>
+          <span class="w-2 h-2 rounded-full bg-secondary"></span>
+          <span class="w-16 h-px bg-gradient-to-r from-transparent via-secondary to-accent rounded-full"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-accent animate-ping" style="animation-delay:.5s"></span>
+        </div>
+        <p class="font-inter text-sm sm:text-base text-fg-muted max-w-2xl mx-auto leading-relaxed">
+          Full catalog of AI models, Deep Learning pipelines, computer vision classifiers, and full-stack web applications. Explore live deployments, inspect architectural specs, or browse GitHub source code.
+        </p>
+      </div>
+
+      <!-- Interactive Category Filter Pills -->
+      <div id="category-pills-bar" class="flex items-center gap-2 overflow-x-auto pb-3 mb-8 no-scrollbar">
+        <!-- Rendered in setup() -->
+      </div>
+
+      <!-- Toolbar: Search + Type Filter + Sort -->
       <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-10 pb-6 border-b" style="border-color:rgba(255,255,255,0.05)">
         <div id="search-bar-mount"></div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full xl:w-auto">
@@ -114,116 +86,177 @@ export class Projects {
         </div>
       </div>
 
-      <!-- Project grid mount -->
+      <!-- Projects Grid Mount -->
       <div id="category-projects-mount">
         ${this.skeleton.render(6)}
       </div>
     </section>`;
   }
 
-  setup(projects, localMeta, categorySlug = null) {
-    if (!categorySlug) {
-      // Render category landing cards
-      const grid = document.getElementById('projects-categories-grid');
-      if (grid) {
-        const categories = getAllCategories(projects);
-        grid.innerHTML = categories.map(cat => this.categoryCard.render(cat)).join('');
-      }
-      if (window.initializeObservers) window.initializeObservers();
+  setup(projects = [], localMeta = [], categorySlug = null) {
+    this.searchQuery    = '';
+    this.activeFilter   = 'all';
+    this.activeSort     = 'default';
+    this.activeCategory = categorySlug ? categorySlug.toLowerCase() : 'all';
 
-      // Listen for background GitHub updates and refresh categories seamlessly
-      const updateCategoriesListener = (e) => {
-        const updatedRepos = e.detail?.repos || window.portfolioData?.repos || [];
-        const activeGrid = document.getElementById('projects-categories-grid');
-        if (activeGrid) {
-          const freshCategories = getAllCategories(updatedRepos);
-          activeGrid.innerHTML = freshCategories.map(cat => this.categoryCard.render(cat)).join('');
-          if (window.initializeObservers) window.initializeObservers();
-        }
-      };
-      window.removeEventListener('portfolioDataUpdated', this._categoryUpdateHandler);
-      this._categoryUpdateHandler = updateCategoriesListener;
-      window.addEventListener('portfolioDataUpdated', updateCategoriesListener);
-      return;
-    }
-
-    // Reset state
-    this.searchQuery  = '';
-    this.activeFilter = 'all';
-    this.activeSort   = 'default';
-
-    // Resolve category name from slug
     const categories = getAllCategories(projects);
-    const category   = categories.find(c => c.slug === categorySlug);
-    const catName    = category ? category.name : slugFromSlug(categorySlug);
+    const mountEl    = document.getElementById('category-projects-mount');
+    const pillsBar   = document.getElementById('category-pills-bar');
+    const searchEl   = document.getElementById('search-bar-mount');
+    const filterEl   = document.getElementById('filter-bar-mount');
+    const sortEl     = document.getElementById('sort-bar-mount');
+    const countEl    = document.getElementById('active-category-count');
+    const titleEl    = document.getElementById('active-page-title');
+    const breadEl    = document.getElementById('active-category-breadcrumb');
 
-    const titleEl = document.getElementById('active-category-title');
-    const countEl = document.getElementById('active-category-count');
-    if (titleEl) titleEl.textContent = catName;
+    // Render Category Pills Bar
+    const renderCategoryPills = () => {
+      if (!pillsBar) return;
+      const allCount = projects.length;
+      let pillsHTML = `
+        <button type="button"
+                data-category="all"
+                class="category-pill whitespace-nowrap px-4 py-2 rounded-xl text-xs font-mono border transition-all duration-200 cursor-pointer ${
+                  this.activeCategory === 'all'
+                    ? 'bg-accent text-white border-accent shadow-md shadow-accent/20 font-bold'
+                    : 'bg-bg-alt text-fg-muted border-theme-border hover:border-accent hover:text-fg'
+                }">
+          <i class="fa-solid fa-layer-group mr-1.5 text-[11px]"></i>
+          <span>All (${allCount})</span>
+        </button>
+      `;
 
-    let currentCatProjects = projects.filter(p =>
-      (p.category || 'Others').toLowerCase() === catName.toLowerCase()
-    );
-    if (countEl) countEl.textContent = `${currentCatProjects.length} Project${currentCatProjects.length !== 1 ? 's' : ''}`;
+      categories.forEach(cat => {
+        const isSelected = this.activeCategory === cat.slug.toLowerCase() || 
+                           this.activeCategory === cat.name.toLowerCase();
+        pillsHTML += `
+          <button type="button"
+                  data-category="${cat.slug}"
+                  class="category-pill whitespace-nowrap px-4 py-2 rounded-xl text-xs font-mono border transition-all duration-200 cursor-pointer ${
+                    isSelected
+                      ? 'bg-accent text-white border-accent shadow-md shadow-accent/20 font-bold'
+                      : 'bg-bg-alt text-fg-muted border-theme-border hover:border-accent hover:text-fg'
+                  }">
+            <span>${cat.name}</span>
+            <span class="ml-1.5 px-1.5 py-0.5 rounded-md bg-white/10 text-[10px] opacity-80">${cat.count}</span>
+          </button>
+        `;
+      });
 
-    const mountEl  = document.getElementById('category-projects-mount');
-    const searchEl = document.getElementById('search-bar-mount');
-    const filterEl = document.getElementById('filter-bar-mount');
-    const sortEl   = document.getElementById('sort-bar-mount');
+      pillsBar.innerHTML = pillsHTML;
 
+      pillsBar.querySelectorAll('.category-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.activeCategory = btn.dataset.category;
+          renderCategoryPills();
+          renderGrid();
+        });
+      });
+    };
+
+    renderCategoryPills();
+
+    // Main Grid Filtering and Rendering Engine
     const renderGrid = () => {
       if (!mountEl) return;
-      let filtered = searchProjects(currentCatProjects, this.searchQuery);
-      filtered     = filterProjects(filtered, this.activeFilter);
-      filtered     = sortProjects(filtered, this.activeSort);
-      mountEl.innerHTML = this.projectGrid.render(filtered, localMeta);
+
+      let list = [...projects];
+
+      // 1. Filter by category pill if not 'all'
+      if (this.activeCategory && this.activeCategory !== 'all') {
+        const targetCategory = categories.find(c => 
+          c.slug.toLowerCase() === this.activeCategory.toLowerCase() ||
+          c.name.toLowerCase() === this.activeCategory.toLowerCase()
+        );
+        const catName = targetCategory ? targetCategory.name : slugFromSlug(this.activeCategory);
+
+        list = list.filter(p => {
+          const pCat = (p.category || 'Others').toLowerCase();
+          return pCat === catName.toLowerCase() || pCat.includes(catName.toLowerCase());
+        });
+
+        if (titleEl) titleEl.textContent = `${catName} Projects`;
+        if (breadEl) breadEl.textContent = catName;
+      } else {
+        if (titleEl) titleEl.textContent = 'All Projects & Repositories';
+        if (breadEl) breadEl.textContent = 'All Projects';
+      }
+
+      // 2. Search query filter
+      list = searchProjects(list, this.searchQuery);
+
+      // 3. Type filter chips (solo, group, recent, popular)
+      list = filterProjects(list, this.activeFilter);
+
+      // 4. Sort
+      list = sortProjects(list, this.activeSort);
+
+      // Update count badge
+      if (countEl) {
+        countEl.textContent = `${list.length} Project${list.length !== 1 ? 's' : ''} Shown`;
+      }
+
+      // Render cards
+      mountEl.innerHTML = this.projectGrid.render(list, localMeta);
       this.projectGrid.setup(mountEl);
     };
 
-    // Search
+    // Mount Search Bar
     if (searchEl) {
       searchEl.innerHTML = this.searchBar.render();
-      this.searchBar.setup(searchEl, val => { this.searchQuery = val; renderGrid(); });
+      this.searchBar.setup(searchEl, val => {
+        this.searchQuery = val;
+        renderGrid();
+      });
     }
 
-    // Filter chips (re-render on change)
+    // Mount Type Filter Bar
     const renderFilter = () => {
       if (!filterEl) return;
       filterEl.innerHTML = this.filterBar.render(this.activeFilter);
-      this.filterBar.setup(filterEl, val => { this.activeFilter = val; renderFilter(); renderGrid(); });
+      this.filterBar.setup(filterEl, val => {
+        this.activeFilter = val;
+        renderFilter();
+        renderGrid();
+      });
     };
     renderFilter();
 
-    // Sort dropdown (re-render on change)
+    // Mount Sort Bar
     const renderSort = () => {
       if (!sortEl) return;
       sortEl.innerHTML = this.sortBar.render(this.activeSort);
-      this.sortBar.setup(sortEl, val => { this.activeSort = val; renderSort(); renderGrid(); });
+      this.sortBar.setup(sortEl, val => {
+        this.activeSort = val;
+        renderSort();
+        renderGrid();
+      });
     };
     renderSort();
 
-    // Initial grid render after toolbar mounts
-    setTimeout(renderGrid, 50);
+    // Initial grid render
+    setTimeout(renderGrid, 40);
 
-    // Listen for background GitHub updates and refresh project cards
-    const updateCategoryProjectsListener = (e) => {
+    // Auto-sync listener: re-render dynamically when GitHub sync updates repository list
+    const updateProjectsListener = (e) => {
       const updatedRepos = e.detail?.repos || window.portfolioData?.repos || [];
-      currentCatProjects = updatedRepos.filter(p =>
-        (p.category || 'Others').toLowerCase() === catName.toLowerCase()
-      );
-      const activeCountEl = document.getElementById('active-category-count');
-      if (activeCountEl) {
-        activeCountEl.textContent = `${currentCatProjects.length} Project${currentCatProjects.length !== 1 ? 's' : ''}`;
+      if (Array.isArray(updatedRepos) && updatedRepos.length > 0) {
+        projects = updatedRepos;
+        renderCategoryPills();
+        renderGrid();
       }
-      renderGrid();
     };
-    window.removeEventListener('portfolioDataUpdated', this._categoryProjectUpdateHandler);
-    this._categoryProjectUpdateHandler = updateCategoryProjectsListener;
-    window.addEventListener('portfolioDataUpdated', updateCategoryProjectsListener);
+
+    window.removeEventListener('portfolioDataUpdated', this._allProjectsUpdateHandler);
+    this._allProjectsUpdateHandler = updateProjectsListener;
+    window.addEventListener('portfolioDataUpdated', updateProjectsListener);
   }
 }
 
-/** Fallback: convert slug back to category display name. */
+/** Helper: convert slug back to readable category display name. */
 function slugFromSlug(slug) {
-  return slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  if (!slug) return 'Projects';
+  return slug
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }

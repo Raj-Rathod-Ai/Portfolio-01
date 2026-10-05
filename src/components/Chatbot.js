@@ -210,7 +210,7 @@ export class Chatbot {
 
       <!-- Floating Chatbot Trigger Button -->
       <button id="chatbot-toggle-btn"
-              class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[60] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/25 hover:scale-110 active:scale-95 transition-all flex items-center justify-center border border-white/20 group"
+              class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100002] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/25 hover:scale-110 active:scale-95 transition-all flex items-center justify-center border border-white/20 group"
               title="Chat with Rudra (AI Assistant)" aria-label="Open AI Chatbot">
         <span class="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-teal-400 border-2 border-[#0d1117] rounded-full animate-pulse"></span>
         <i class="fa-solid fa-robot text-lg sm:text-xl group-hover:rotate-12 transition-transform"></i>
@@ -218,7 +218,7 @@ export class Chatbot {
 
       <!-- Floating Chatbot Window -->
       <div id="chatbot-window"
-           class="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 w-[calc(100vw-2rem)] sm:w-[390px] h-[540px] max-h-[82vh] z-[60] rounded-2xl flex flex-col overflow-hidden border border-white/10 shadow-2xl backdrop-blur-2xl transition-all duration-300 transform scale-90 opacity-0 pointer-events-none"
+           class="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 w-[calc(100vw-2rem)] sm:w-[390px] h-[540px] max-h-[82vh] z-[100002] rounded-2xl flex flex-col overflow-hidden border border-white/10 shadow-2xl backdrop-blur-2xl transition-all duration-300 transform scale-90 opacity-0 pointer-events-none"
            style="background: rgba(13, 17, 23, 0.95);">
         
         <!-- Header -->
@@ -1112,12 +1112,14 @@ Certifications & Accreditations:
 8. Networks & Protocols (NPTEL IIT).
 
 Contact Details:
-- Email: rathodraj1504@gmail.com
+- WhatsApp: [Chat on WhatsApp](/api/whatsapp)
+- Email: [Chat on Email](mailto:rathodraj1504@gmail.com)
 - GitHub: https://github.com/Raj-Rathod-Ai
 - LinkedIn: https://linkedin.com/in/raj-rathod-ai
 - AI/ML Resume: [Download AI/ML Resume](/Rathod_Raj_Ai_Update.pdf)
 - Full-Stack Resume: [Download Full-Stack Resume](/Rathod_Raj_FullStack.pdf)
 - Campus / Location: Parul University, Vadodara, Gujarat 391760 ([Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat))
+- PRIVACY RULE: When asked for contact details, do not write raw phone numbers or email text on the frontend; always output action links formatted as [Chat on WhatsApp](/api/whatsapp) and [Chat on Email](mailto:rathodraj1504@gmail.com).
 
 CRITICAL CONVERSATIONAL & ACCURACY RULES:
 - Verified Live Deployments:
@@ -1200,7 +1202,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                    `• **Architecture**: Production-ready ML inference pipeline predicting personalized mental wellness scores based on academic, lifestyle, sleep, and physical activity features.\n` +
                    `• 🚀 **Live Demo**: [sukoonsaathi-frontend.onrender.com](https://sukoonsaathi-frontend.onrender.com/)\n` +
                    `• 📂 **GitHub Repo**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Sukoon-Saathi)\n\n` +
-                   `⚡ **3. MeetNotes** (Autonomous AI Meeting Intelligence & Video-Agent)\n` +
+                   `âš¡ **3. MeetNotes** (Autonomous AI Meeting Intelligence & Video-Agent)\n` +
                    `• **Architecture**: Retrieval-Augmented Generation (RAG) system with Whisper speech-to-text and Mistral LLM for automated meeting transcription and structured Q&A.\n` +
                    `• 🚀 **Live Demo**: [meetnotes.streamlit.app](https://meetnotes.streamlit.app/)\n` +
                    `• 📂 **GitHub Repo**: [View on GitHub](https://github.com/Raj-Rathod-Ai/MeetNotes)\n\n` +
@@ -1321,7 +1323,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                  `• **Healthy Lifestyle Analyzer**: [Launch Live Demo](https://healthy-lifestyle-prediction.streamlit.app/)\n` +
                  `• **Drug Recommendation System**: [Launch Live Demo](https://drug-recommendation-systems.streamlit.app/)\n` +
                  `• **Random Forest Delivery Time**: [Launch Live Demo](https://random-forest-food-delivery-time.streamlit.app/)\n\n` +
-                 `⚡ **Data Science & Preprocessing**:\n` +
+                 `âš¡ **Data Science & Preprocessing**:\n` +
                  `• **AutoPrepAI Data Platform**: [Launch Live Demo](https://data-eda-processing.streamlit.app/)\n\n` +
                  `🎮 **Python Concepts & Systems**:\n` +
                  `• **Stone Paper Scissors Python Game**: [Launch Live Demo](https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/)\n` +
@@ -1336,14 +1338,8 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
         category: 'Bio',
         content: `👨‍💻 **RAJ RATHOD — AI & MACHINE LEARNING DEVELOPER**\n\n` +
                  `Raj is an AI/ML Engineer and undergraduate in **B.Tech Computer Science & Engineering (AI Specialization)** at **Parul University, Vadodara** (2023 - 2027).\n\n` +
-                 `🌟 **Key Highlights**:\n` +
-                 `• 📈 **Academic Performance**: **7.66 CGPA**\n` +
-                 `• 💻 **Algorithmic Rigor**: Solved **350+ problems on LeetCode** ([leetcode.com/u/Raj-Rathod](https://leetcode.com))\n` +
-                 `• 🧠 **Specialization**: Deep Learning (BiGRU, RNN, CNN), NLP, Predictive Modeling, GenAI & RAG systems\n` +
-                 `• 🏆 **Certifications**: Microsoft Applied Skills (Agentic AI), OneRoadmap (AI & Data Scientist), Data Science & Analytics with GenAI (Sheryians), Java, Python, Prompt Engineering, NPTEL\n` +
-                 `• 📂 **Portfolio**: 24+ open-source AI & web engineering repositories on GitHub\n\n` +
-                 `📄 **Resumes**: [AI/ML Resume](/Rathod_Raj_Ai_Update.pdf) | [Full-Stack Resume](/Rathod_Raj_FullStack.pdf)\n` +
-                 `📬 **Contact**: rathodraj1504@gmail.com | [LinkedIn](https://linkedin.com/in/raj-rathod-ai)`
+                               `📄 **Resumes**: [AI/ML Resume](/Rathod_Raj_Ai_Update.pdf) | [Full-Stack Resume](/Rathod_Raj_FullStack.pdf)\n` +
+                  `📬 **Contact**: [Chat on Email](mailto:rathodraj1504@gmail.com) | 💬 [Chat on WhatsApp](/api/whatsapp) | [LinkedIn](https://linkedin.com/in/raj-rathod-ai)`
       },
       {
         id: 'education_cgpa',
@@ -1382,6 +1378,19 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                  `• **University Campus**: [Parul University](https://paruluniversity.ac.in), Vadodara (2023 - 2027)\n` +
                  `• **Address**: P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760, India\n` +
                  `• 🗺️ **Google Maps**: [Open in Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)`
+      },
+      {
+        id: 'contact_info',
+        title: 'Contact Details & WhatsApp',
+        keywords: ['contact', 'phone', 'whatsapp', 'call', 'number', 'mobile', 'reach', 'connect', 'email', 'social', 'linkedin', 'github', 'message', 'text'],
+        category: 'Contact',
+        content: `📬 **GET IN TOUCH WITH RAJ RATHOD**\n\n` +
+                 `• 💬 **WhatsApp**: [**Chat on WhatsApp**](/api/whatsapp)\n` +
+                 `• ✉️ **Email**: [**Chat on Email**](mailto:rathodraj1504@gmail.com)\n` +
+                 `• 💼 **LinkedIn**: [linkedin.com/in/raj-rathod-ai](https://linkedin.com/in/raj-rathod-ai)\n` +
+                 `• 🐙 **GitHub**: [github.com/Raj-Rathod-Ai](https://github.com/Raj-Rathod-Ai)\n` +
+                 `• 📍 **Location**: Vadodara, Gujarat, India (Parul University)\n\n` +
+                 `Click the links above to connect directly via WhatsApp or Email!`
       },
       {
         id: 'taxi_fare',
@@ -1525,7 +1534,7 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
                  `2. 💻 **Algorithmic Rigor**: Solved **350+ LeetCode problems**, ensuring strong data structures, algorithms, and optimization foundations.\n` +
                  `3. 🚀 **Full-Stack Proficiency**: Ability to build complete, production-ready web apps (React, Node, Express, MongoDB, REST APIs) integrated with AI backend microservices.\n` +
                  `4. 📚 **Fast Learner & Certified**: Sheryians GenAI & Data Science, Java, Python, and NPTEL certified with a 7.66 CGPA.\n\n` +
-                 `Contact Raj at **rathodraj1504@gmail.com** or via [LinkedIn](https://linkedin.com/in/raj-rathod-ai)!`
+                 `Contact Raj via [**Chat on Email**](mailto:rathodraj1504@gmail.com), [**Chat on WhatsApp**](/api/whatsapp) or on [LinkedIn](https://linkedin.com/in/raj-rathod-ai)!`
       }
     ];
   }
@@ -1833,3 +1842,4 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
       .replace(/\n/g, '<br>');
   }
 }
+
