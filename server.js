@@ -1119,12 +1119,12 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
       console.error('[Contact] Error saving contact to MongoDB:', dbErr.message);
     }
 
-    // 2. Check if we have Brevo API key for SMTP dispatch
-    const hasBrevo = !!process.env.BREVO_API_KEY;
-    if (!hasBrevo) {
+    // 2. Check if we have Brevo or Resend API key for email dispatch
+    const hasMailGateway = !!process.env.BREVO_API_KEY || !!process.env.RESEND_API_KEY;
+    if (!hasMailGateway) {
       if (dbSaved) {
-        console.log('[Contact] Saved to DB. Brevo SMTP key missing, returning success.');
-        return res.status(200).json({ success: true, status: 'saved_to_db_only' });
+        console.log('[Contact] Saved to DB. Mail gateway not configured, returning success.');
+        return res.status(200).json({ success: true, status: 'saved_to_db_only', receiptDispatched: false });
       }
       return res.status(500).json({ error: 'Database offline and mail gateway unconfigured.' });
     }
@@ -1324,59 +1324,130 @@ CRITICAL INSTRUCTIONS:
       </div>
     `;
 
-    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'rathodraj1504@gmail.com';
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_SENDER || 'rathodraj1504@gmail.com';
+    let notificationSent = false;
+    let userReceiptSent = false;
 
-    // 6. Send notification to Raj
-    try {
-      await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': process.env.BREVO_API_KEY
-        },
-        body: JSON.stringify({
-          sender: { name: `Portfolio: ${cleanName}`, email: senderEmail },
-          to: [{ email: "rathodraj1504@gmail.com", name: "Raj Rathod" }],
-          replyTo: { email: cleanEmail, name: cleanName },
-          subject: `[${categoryTag}] ${cleanSubject} — from ${cleanName}`,
-          htmlContent: rajNotificationHtml
-        })
-      });
-      console.log(`[Contact] Notification email successfully sent to rathodraj1504@gmail.com`);
-    } catch (notifyErr) {
-      console.error('[Contact] Failed to send notification email to Raj:', notifyErr.message);
-    }
-
-    // 7. Send executive acknowledgment to the sender
-    try {
-      const plainTextReply = fullUserEmailHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-      const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': process.env.BREVO_API_KEY
-        },
-        body: JSON.stringify({
-          sender: { name: "Raj Rathod", email: senderEmail },
-          to: [{ email: cleanEmail, name: cleanName }],
-          replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
-          subject: `Re: ${cleanSubject} — Raj Rathod`,
-          htmlContent: fullUserEmailHtml,
-          textContent: plainTextReply
-        })
-      });
-
-      if (!brevoRes.ok) {
-        const errText = await brevoRes.text();
-        console.warn(`[Contact] Brevo auto-reply warning: ${errText}`);
-      } else {
-        console.log(`[Contact] Executive acknowledgment successfully dispatched to ${cleanEmail}`);
+    // 6. Send high-priority notification to Raj
+    if (process.env.BREVO_API_KEY) {
+      try {
+        const notifyRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.BREVO_API_KEY
+          },
+          body: JSON.stringify({
+            sender: { name: `Portfolio: ${cleanName}`, email: senderEmail },
+            to: [{ email: "rathodraj1504@gmail.com", name: "Raj Rathod" }],
+            replyTo: { email: cleanEmail, name: cleanName },
+            subject: `[${categoryTag}] ${cleanSubject} — from ${cleanName}`,
+            htmlContent: rajNotificationHtml
+          })
+        });
+        if (notifyRes.ok) {
+          notificationSent = true;
+          console.log(`[Contact] Notification email successfully sent to rathodraj1504@gmail.com via Brevo`);
+        } else {
+          const errText = await notifyRes.text();
+          console.warn(`[Contact] Brevo notification warning (${notifyRes.status}): ${errText}`);
+        }
+      } catch (notifyErr) {
+        console.error('[Contact] Failed to send notification email to Raj via Brevo:', notifyErr.message);
       }
-    } catch (brevoErr) {
-      console.warn('[Contact] Brevo auto-reply caught error:', brevoErr.message);
+    } else if (process.env.RESEND_API_KEY) {
+      try {
+        const resendNotifyRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+          },
+          body: JSON.stringify({
+            from: process.env.RESEND_SENDER || 'Portfolio Inquiry <onboarding@resend.dev>',
+            to: ['rathodraj1504@gmail.com'],
+            reply_to: cleanEmail,
+            subject: `[${categoryTag}] ${cleanSubject} — from ${cleanName}`,
+            html: rajNotificationHtml
+          })
+        });
+        if (resendNotifyRes.ok) {
+          notificationSent = true;
+          console.log(`[Contact] Notification email successfully sent to rathodraj1504@gmail.com via Resend`);
+        }
+      } catch (rNotifyErr) {
+        console.warn('[Contact] Resend notification error:', rNotifyErr.message);
+      }
     }
 
-    res.status(200).json({ success: true, status: 'dispatched', category: categoryTag });
+    // 7. Send executive acknowledgment receipt to the sender (cleanEmail)
+    const plainTextReply = fullUserEmailHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+    if (process.env.BREVO_API_KEY) {
+      try {
+        const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.BREVO_API_KEY
+          },
+          body: JSON.stringify({
+            sender: { name: "Raj Rathod", email: senderEmail },
+            to: [{ email: cleanEmail, name: cleanName }],
+            replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
+            subject: `Re: ${cleanSubject} — Raj Rathod`,
+            htmlContent: fullUserEmailHtml,
+            textContent: plainTextReply
+          })
+        });
+
+        if (brevoRes.ok) {
+          userReceiptSent = true;
+          console.log(`[Contact] Executive acknowledgment successfully dispatched to ${cleanEmail} via Brevo`);
+        } else {
+          const errText = await brevoRes.text();
+          console.warn(`[Contact] Brevo auto-reply warning (${brevoRes.status}): ${errText}`);
+        }
+      } catch (brevoErr) {
+        console.warn('[Contact] Brevo auto-reply caught error:', brevoErr.message);
+      }
+    }
+
+    // Fallback receipt delivery via Resend if Brevo failed or is unconfigured
+    if (!userReceiptSent && process.env.RESEND_API_KEY) {
+      try {
+        const resendUserRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+          },
+          body: JSON.stringify({
+            from: process.env.RESEND_SENDER || 'Raj Rathod <onboarding@resend.dev>',
+            to: [cleanEmail],
+            reply_to: 'rathodraj1504@gmail.com',
+            subject: `Re: ${cleanSubject} — Raj Rathod`,
+            html: fullUserEmailHtml,
+            text: plainTextReply
+          })
+        });
+        if (resendUserRes.ok) {
+          userReceiptSent = true;
+          console.log(`[Contact] Executive acknowledgment successfully dispatched to ${cleanEmail} via Resend`);
+        }
+      } catch (resendErr) {
+        console.warn('[Contact] Resend auto-reply caught error:', resendErr.message);
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      status: userReceiptSent ? 'receipt_dispatched' : 'received_no_receipt',
+      receiptDispatched: userReceiptSent,
+      notificationSent,
+      savedToDb: dbSaved,
+      category: categoryTag
+    });
 
   } catch (err) {
     console.error('[Contact] Endpoint error:', err.message);

@@ -160,5 +160,19 @@ export class TechOrbit {
         card.style.zIndex = '';
       });
     });
+
+    // Performance: Pause all 3D orbit animations when section is scrolled out of viewport
+    if ('IntersectionObserver' in window) {
+      const orbitObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            techOrbitSec.classList.remove('orbit-paused');
+          } else {
+            techOrbitSec.classList.add('orbit-paused');
+          }
+        });
+      }, { threshold: 0.05 });
+      orbitObserver.observe(techOrbitSec);
+    }
   }
 }

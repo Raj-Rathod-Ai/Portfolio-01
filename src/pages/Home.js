@@ -154,9 +154,10 @@ export class Home {
       <!-- ================= 2. LOGO MARQUEE ================= -->
       <section class="overflow-hidden py-4 w-full select-none bg-bg border-b border-theme-border">
         <div class="w-full">
-          <div class="marquee-container relative overflow-hidden"
-               style="mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
-            <div class="marquee-track flex w-max" style="animation: marquee-scroll 40s linear infinite;">
+          <div class="marquee-container relative overflow-hidden">
+            <div class="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-28 bg-gradient-to-r from-bg to-transparent z-10"></div>
+            <div class="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-28 bg-gradient-to-l from-bg to-transparent z-10"></div>
+            <div class="marquee-track flex w-max will-change-transform" style="animation: marquee-scroll 40s linear infinite;">
               ${[...marqueeItems, ...marqueeItems].map(item => `
                 <div class="flex shrink-0 items-center justify-center px-8 opacity-60 transition-opacity duration-200 hover:opacity-100">
                   <span class="whitespace-nowrap font-semibold text-fg text-lg sm:text-xl tracking-tight font-display">${item}</span>
@@ -343,7 +344,7 @@ export class Home {
             const isAccent = p.tone === 'accent';
             return `
               <article style="--stick-m: ${12 + i * 14}px; --stick-d: ${96 + i * 22}px; z-index: ${10 + i * 5};"
-                       class="project-stack-card relative w-[94%] md:w-[90%] mx-auto mb-10 lg:mb-14 sticky top-[var(--stick-m)] lg:top-[var(--stick-d)] rounded-[2rem] lg:rounded-[2.5rem] p-6 lg:px-12 lg:py-14 shadow-2xl transition-all duration-300 ${
+                       class="project-stack-card relative w-[94%] md:w-[90%] mx-auto mb-10 lg:mb-14 sticky top-[var(--stick-m)] lg:top-[var(--stick-d)] rounded-[2rem] lg:rounded-[2.5rem] p-6 lg:px-12 lg:py-14 shadow-2xl ${
                          isAccent ? 'bg-accent text-white' : 'bg-bg-alt text-fg border border-theme-border'
                        }">
                 
@@ -515,10 +516,15 @@ export class Home {
 
             <!-- Item 2: Video 1 (VID_20261004_194759_022.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/VID_20261004_194759_022.mp4">
-              <video src="/gallery-media/VID_20261004_194759_022.mp4" muted loop playsinline webkit-playsinline preload="none" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
+              <video src="/gallery-media/VID_20261004_194759_022.mp4#t=0.001" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
+                </div>
+              </div>
+              <div class="gallery-buffer-spinner absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+                <div class="w-10 h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-lg">
+                  <i class="fa-solid fa-circle-notch fa-spin text-sm text-accent"></i>
                 </div>
               </div>
               <div class="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -533,10 +539,15 @@ export class Home {
 
             <!-- Item 3: Video 2 (VID-20250924-WA0000.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/VID-20250924-WA0000.mp4">
-              <video src="/gallery-media/VID-20250924-WA0000.mp4" muted loop playsinline webkit-playsinline preload="none" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
+              <video src="/gallery-media/VID-20250924-WA0000.mp4#t=0.001" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
+                </div>
+              </div>
+              <div class="gallery-buffer-spinner absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+                <div class="w-10 h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-lg">
+                  <i class="fa-solid fa-circle-notch fa-spin text-sm text-accent"></i>
                 </div>
               </div>
               <div class="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -561,10 +572,15 @@ export class Home {
 
             <!-- Item 5: Video 3 (VID_20260129_122517_951.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/VID_20260129_122517_951.mp4">
-              <video src="/gallery-media/VID_20260129_122517_951.mp4" muted loop playsinline webkit-playsinline preload="none" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
+              <video src="/gallery-media/VID_20260129_122517_951.mp4#t=0.001" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
+                </div>
+              </div>
+              <div class="gallery-buffer-spinner absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+                <div class="w-10 h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-lg">
+                  <i class="fa-solid fa-circle-notch fa-spin text-sm text-accent"></i>
                 </div>
               </div>
               <div class="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -579,10 +595,15 @@ export class Home {
 
             <!-- Item 6: Video 4 (video_20250927_222326.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/video_20250927_222326.mp4">
-              <video src="/gallery-media/video_20250927_222326.mp4" muted loop playsinline webkit-playsinline preload="none" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
+              <video src="/gallery-media/video_20250927_222326.mp4#t=0.001" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
+                </div>
+              </div>
+              <div class="gallery-buffer-spinner absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+                <div class="w-10 h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-lg">
+                  <i class="fa-solid fa-circle-notch fa-spin text-sm text-accent"></i>
                 </div>
               </div>
               <div class="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -597,10 +618,15 @@ export class Home {
 
             <!-- Item 7: Video 5 (video_20250927_023728_edit.mp4) -->
             <div class="gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer" data-media-type="video" data-src="/gallery-media/video_20250927_023728_edit.mp4">
-              <video src="/gallery-media/video_20250927_023728_edit.mp4" muted loop playsinline webkit-playsinline preload="none" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
+              <video src="/gallery-media/video_20250927_023728_edit.mp4#t=0.001" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
               <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                 <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
+                </div>
+              </div>
+              <div class="gallery-buffer-spinner absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+                <div class="w-10 h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-lg">
+                  <i class="fa-solid fa-circle-notch fa-spin text-sm text-accent"></i>
                 </div>
               </div>
               <div class="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -769,7 +795,14 @@ export class Home {
       if (type === 'video') {
         content.innerHTML = `
           <div class="relative w-full max-w-4xl max-h-[85vh] flex flex-col items-center justify-center p-2 z-10" onclick="event.stopPropagation()">
-            <video id="modal-video-element" src="${src}" autoplay controls playsinline webkit-playsinline class="max-w-full max-h-[78vh] w-auto h-auto rounded-2xl shadow-2xl block object-contain mx-auto bg-black"></video>
+            <div class="relative w-full max-h-[78vh] flex items-center justify-center">
+              <video id="modal-video-element" src="${src}" autoplay controls playsinline webkit-playsinline preload="auto" class="max-w-full max-h-[78vh] w-auto h-auto rounded-2xl shadow-2xl block object-contain mx-auto bg-black"></video>
+              <div id="modal-video-spinner" class="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300">
+                <div class="w-14 h-14 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-2xl">
+                  <i class="fa-solid fa-circle-notch fa-spin text-2xl text-accent"></i>
+                </div>
+              </div>
+            </div>
             <div class="mt-3 flex items-center justify-between w-full max-w-md px-2">
               <button id="modal-fs-btn" class="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-medium flex items-center gap-2 backdrop-blur-md transition-colors cursor-pointer border border-white/20">
                 <i class="fa-solid fa-expand"></i> Fullscreen
@@ -779,7 +812,16 @@ export class Home {
           </div>
         `;
         const vEl = content.querySelector('#modal-video-element');
+        const spinner = content.querySelector('#modal-video-spinner');
         const fsBtn = content.querySelector('#modal-fs-btn');
+        if (vEl && spinner) {
+          vEl.addEventListener('waiting', () => spinner.classList.remove('opacity-0'));
+          vEl.addEventListener('playing', () => spinner.classList.add('opacity-0'));
+          vEl.addEventListener('canplay', () => spinner.classList.add('opacity-0'));
+          vEl.addEventListener('error', () => {
+            spinner.innerHTML = '<span class="text-xs text-red-400">Failed to load video</span>';
+          });
+        }
         if (fsBtn && vEl) {
           fsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -805,6 +847,12 @@ export class Home {
     const closeLightbox = () => {
       const modal = document.getElementById('gallery-lightbox');
       if (!modal) return;
+      const vEl = modal.querySelector('#modal-video-element');
+      if (vEl) {
+        vEl.pause();
+        vEl.removeAttribute('src');
+        vEl.load();
+      }
       modal.classList.remove('active');
       modal.classList.add('opacity-0', 'pointer-events-none');
       setTimeout(() => {
@@ -849,27 +897,31 @@ export class Home {
       const audioBtn = card.querySelector('.gallery-audio-btn');
       const zoomBtn = card.querySelector('.gallery-zoom-btn');
       const playBadge = card.querySelector('.gallery-play-badge');
+      const bufferSpinner = card.querySelector('.gallery-buffer-spinner');
 
       if (type === 'video' && video) {
-        // HOVER TO PLAY: When cursor enters, pause any other video and play ONLY this video
-        card.addEventListener('mouseenter', () => {
-          if (currentlyPlayingVideo && currentlyPlayingVideo !== video) {
-            currentlyPlayingVideo.pause();
-          }
-          currentlyPlayingVideo = video;
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {});
-          }
-        });
+        const isTouch = (window.matchMedia && window.matchMedia('(pointer: coarse), (hover: none)').matches) || window.innerWidth < 768;
 
-        // When cursor leaves, pause this video immediately
-        card.addEventListener('mouseleave', () => {
-          video.pause();
-          if (currentlyPlayingVideo === video) {
-            currentlyPlayingVideo = null;
-          }
-        });
+        if (!isTouch) {
+          // DESKTOP: Smooth Hover To Play
+          card.addEventListener('mouseenter', () => {
+            if (currentlyPlayingVideo && currentlyPlayingVideo !== video) {
+              currentlyPlayingVideo.pause();
+            }
+            currentlyPlayingVideo = video;
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(() => {});
+            }
+          });
+
+          card.addEventListener('mouseleave', () => {
+            video.pause();
+            if (currentlyPlayingVideo === video) {
+              currentlyPlayingVideo = null;
+            }
+          });
+        }
 
         // Clicking card opens centered screen modal player cleanly without page jumps
         card.addEventListener('click', (e) => {
@@ -880,11 +932,19 @@ export class Home {
           openLightbox('video', src);
         });
 
-        // Sync play badge visibility with video play/pause state
-        video.addEventListener('play', () => {
+        // Buffering & play state synchronization
+        video.addEventListener('waiting', () => {
+          if (bufferSpinner) bufferSpinner.classList.remove('opacity-0');
+        });
+        video.addEventListener('playing', () => {
+          if (bufferSpinner) bufferSpinner.classList.add('opacity-0');
           if (playBadge) playBadge.style.opacity = '0';
         });
+        video.addEventListener('canplay', () => {
+          if (bufferSpinner) bufferSpinner.classList.add('opacity-0');
+        });
         video.addEventListener('pause', () => {
+          if (bufferSpinner) bufferSpinner.classList.add('opacity-0');
           if (playBadge) playBadge.style.opacity = '1';
         });
       } else {
@@ -991,10 +1051,15 @@ export class Home {
                 cardDiv.dataset.mediaType = 'video';
                 cardDiv.dataset.src = item.src;
                 cardDiv.innerHTML = `
-                  <video src="${item.src}" muted loop playsinline webkit-playsinline preload="none" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
+                  <video src="${item.src}#t=0.001" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]"></video>
                   <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
                     <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                       <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
+                    </div>
+                  </div>
+                  <div class="gallery-buffer-spinner absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+                    <div class="w-10 h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-lg">
+                      <i class="fa-solid fa-circle-notch fa-spin text-sm text-accent"></i>
                     </div>
                   </div>
                   <div class="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -1198,6 +1263,8 @@ export class Home {
         }
 
         let sentSuccess = false;
+        let receiptDispatched = false;
+
         try {
           const apiUrl = getApiBaseUrl();
           const endpoints = apiUrl ? [`${apiUrl}/api/contact`, '/api/contact'] : ['/api/contact'];
@@ -1211,6 +1278,8 @@ export class Home {
               });
               if (res.ok) {
                 sentSuccess = true;
+                const data = await res.json().catch(() => ({}));
+                receiptDispatched = !!data.receiptDispatched;
                 break;
               }
             } catch (errInner) {
@@ -1231,10 +1300,13 @@ export class Home {
             formStatus.innerHTML = `
               <div class="flex items-center gap-2.5 font-bold text-white mb-1">
                 <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-                <span>Transmission Received Successfully!</span>
+                <span>Message Received Successfully!</span>
               </div>
               <p class="text-xs text-white/80 leading-relaxed font-cond">
-                Thank you, ${name || 'colleague'}. Your message has been sent directly to Raj's desk. An automatic confirmation receipt was dispatched to <strong>${email}</strong>.
+                ${receiptDispatched 
+                  ? `Thank you, ${name || 'colleague'}. Your message has been sent directly to Raj's desk. An automatic confirmation receipt was dispatched to <strong>${email}</strong>.`
+                  : `Thank you, ${name || 'colleague'}. Your transmission has been received directly at Raj's desk. Raj will evaluate your inquiry and reply to <strong>${email}</strong> shortly.`
+                }
               </p>
             `;
           }

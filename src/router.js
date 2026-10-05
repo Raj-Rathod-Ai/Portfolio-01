@@ -1,6 +1,6 @@
-import { Home } from './pages/Home.js?v=3.7';
-import { Projects } from './pages/Projects.js?v=3.7';
-import { ProjectDetails } from './pages/ProjectDetails.js?v=3.7';
+import { Home } from './pages/Home.js?v=3.8';
+import { Projects } from './pages/Projects.js?v=3.8';
+import { ProjectDetails } from './pages/ProjectDetails.js?v=3.8';
 import { slugify } from './utils/helpers.js';
 import { getAllCategories } from './utils/categorize.js';
 import { trackVisit } from './utils/analytics.js';

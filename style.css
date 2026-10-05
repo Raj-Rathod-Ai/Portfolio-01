@@ -3957,8 +3957,9 @@ html:not(.dark) .pranay-marquee-item {
 .project-stack-card {
   position: -webkit-sticky !important;
   position: sticky !important;
-  will-change: transform;
-  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .project-card-light {
@@ -4052,4 +4053,11 @@ html.lightbox-open body {
 #gallery-lightbox-content video,
 #gallery-lightbox-content img {
   box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+/* Pause 3D planetary animations when out of view to save 100% GPU during scroll */
+.orbit-paused *,
+.orbit-paused *::before,
+.orbit-paused *::after {
+  animation-play-state: paused !important;
 }

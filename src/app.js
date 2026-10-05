@@ -422,12 +422,17 @@ function initIntersectionObservers() {
  * Handle hover cursor coordinates on premium cards (optimized for zero scroll lag).
  */
 function initMouseSpotlight() {
+  let rafId = null;
   document.addEventListener('mousemove', (e) => {
-    const card = e.target.closest('.spotlight-card, .flip-card-front');
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      const card = e.target.closest('.spotlight-card, .flip-card-front');
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+      card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+    });
   }, { passive: true });
 }
 
@@ -582,18 +587,17 @@ function initLenis() {
     window.lenis = lenis;
     window.__lenis = lenis;
 
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-      lenis.on('scroll', ScrollTrigger.update);
-      gsap.ticker.add((time) => {
-        lenis.raf(time * 1000);
-      });
-    } else {
-      const raf = (time) => {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-      };
+    lenis.on('scroll', () => {
+      if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.update();
+      }
+    });
+
+    const raf = (time) => {
+      lenis.raf(time);
       requestAnimationFrame(raf);
-    }
+    };
+    requestAnimationFrame(raf);
 
     return lenis;
   } catch (err) {
