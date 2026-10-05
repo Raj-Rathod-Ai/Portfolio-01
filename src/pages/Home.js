@@ -986,9 +986,26 @@ export class Home {
     // Attach hover-to-play interactions to all pre-rendered gallery cards
     document.querySelectorAll('#gallery-grid .gallery-card').forEach(bindGalleryCardEvents);
 
-    // Auto-detect newly added files in gallery-media/
+    // Auto-detect newly added files in gallery-media/ without duplicates or poster thumbnails
     const autoDetectGallery = async () => {
       try {
+        if (!galleryGrid || galleryGrid._hasAutoDetected) return;
+        galleryGrid._hasAutoDetected = true;
+
+        const getBase = (url) => (url || '').split('?')[0].split('#')[0].split('/').pop().toLowerCase();
+        const getStem = (file) => file.replace(/(_poster|-poster|_thumb)$/i, '').replace(/\.[^/.]+$/, '');
+
+        // Map all existing rendered items by both full filename and stem to prevent duplicates
+        const renderedFiles = new Set();
+        galleryGrid.querySelectorAll('.gallery-card').forEach(card => {
+          const s = card.dataset.src || card.querySelector('video, img')?.getAttribute('src');
+          const base = getBase(s);
+          if (base) {
+            renderedFiles.add(base);
+            renderedFiles.add(getStem(base));
+          }
+        });
+
         let discovered = null;
 
         // 1. Try local Express /api/gallery
@@ -1018,6 +1035,9 @@ export class Home {
                 const file = cleanHref.split('/').pop();
                 if (!file || file === 'manifest.json' || file.startsWith('.')) continue;
                 const lower = file.toLowerCase();
+                // Strictly exclude poster thumbnails, preview frames, and meta files
+                if (lower.includes('_poster.') || lower.includes('-poster.') || lower.includes('_thumb.')) continue;
+
                 if (vidExts.some(ext => lower.endsWith(ext))) {
                   list.push({ name: file, src: `/gallery-media/${file}`, type: 'video' });
                 } else if (imgExts.some(ext => lower.endsWith(ext))) {
@@ -1040,55 +1060,60 @@ export class Home {
           } catch (_) {}
         }
 
-        if (discovered && discovered.length > 0 && galleryGrid) {
-          const renderedSrcs = new Set(Array.from(galleryGrid.querySelectorAll('.gallery-card')).map(c => c.dataset.src));
-          let hasNew = false;
+        if (discovered && discovered.length > 0) {
           discovered.forEach(item => {
-            if (!renderedSrcs.has(item.src)) {
-              hasNew = true;
-              const cardDiv = document.createElement('div');
-              if (item.type === 'video') {
-                cardDiv.className = 'gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer';
-                cardDiv.dataset.mediaType = 'video';
-                cardDiv.dataset.src = item.src;
-                const posterSrc = item.src.replace(/\.[^/.]+$/, '') + '_poster.jpg';
-                cardDiv.innerHTML = `
-                  <video src="${item.src}" poster="${posterSrc}" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
-                  <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
-                    <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
-                    </div>
+            const fileBase = getBase(item.src || item.name);
+            const fileStem = getStem(fileBase);
+
+            // Skip if this file or its video/poster counterpart is already rendered
+            if (!fileBase || renderedFiles.has(fileBase) || renderedFiles.has(fileStem)) return;
+            if (fileBase.includes('_poster.') || fileBase.includes('-poster.') || fileBase.includes('_thumb.')) return;
+
+            renderedFiles.add(fileBase);
+            renderedFiles.add(fileStem);
+
+            const cardDiv = document.createElement('div');
+            if (item.type === 'video') {
+              cardDiv.className = 'gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-[#0a0d14] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer';
+              cardDiv.dataset.mediaType = 'video';
+              cardDiv.dataset.src = item.src;
+              const posterSrc = item.src.replace(/\.[^/.]+$/, '') + '_poster.jpg';
+              cardDiv.innerHTML = `
+                <video src="${item.src}" poster="${posterSrc}" muted loop playsinline webkit-playsinline preload="metadata" class="gallery-video w-full h-auto block object-cover"></video>
+                <div class="gallery-play-badge absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300">
+                  <div class="w-11 h-11 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-play text-xs ml-0.5 text-accent"></i>
                   </div>
-                  <div class="gallery-buffer-spinner absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
-                    <div class="w-10 h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-lg">
-                      <i class="fa-solid fa-circle-notch fa-spin text-sm text-accent"></i>
-                    </div>
+                </div>
+                <div class="gallery-buffer-spinner absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300">
+                  <div class="w-10 h-10 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-accent flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-circle-notch fa-spin text-sm text-accent"></i>
                   </div>
-                  <div class="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <button class="gallery-audio-btn w-9 h-9 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-accent transition-colors" title="Toggle Sound" aria-label="Toggle sound">
-                      <i class="fa-solid fa-volume-xmark text-xs"></i>
-                    </button>
-                    <button class="gallery-zoom-btn w-9 h-9 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-accent transition-colors" title="Fullscreen View" aria-label="Fullscreen view">
-                      <i class="fa-solid fa-expand text-xs"></i>
-                    </button>
-                  </div>
-                `;
-              } else {
-                cardDiv.className = 'gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-black/10 shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer';
-                cardDiv.dataset.mediaType = 'image';
-                cardDiv.dataset.src = item.src;
-                cardDiv.innerHTML = `
-                  <img src="${item.src}" alt="Raj Rathod Gallery" loading="lazy" class="w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]">
-                  <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <button class="gallery-zoom-btn w-9 h-9 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-accent transition-colors" title="Fullscreen View" aria-label="Fullscreen view">
-                      <i class="fa-solid fa-expand text-xs"></i>
-                    </button>
-                  </div>
-                `;
-              }
-              galleryGrid.appendChild(cardDiv);
-              bindGalleryCardEvents(cardDiv);
+                </div>
+                <div class="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                  <button class="gallery-audio-btn w-9 h-9 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-accent transition-colors" title="Toggle Sound" aria-label="Toggle sound">
+                    <i class="fa-solid fa-volume-xmark text-xs"></i>
+                  </button>
+                  <button class="gallery-zoom-btn w-9 h-9 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-accent transition-colors" title="Fullscreen View" aria-label="Fullscreen view">
+                    <i class="fa-solid fa-expand text-xs"></i>
+                  </button>
+                </div>
+              `;
+            } else {
+              cardDiv.className = 'gallery-card break-inside-avoid group relative overflow-hidden rounded-2xl md:rounded-3xl border border-theme-border bg-black/10 shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer';
+              cardDiv.dataset.mediaType = 'image';
+              cardDiv.dataset.src = item.src;
+              cardDiv.innerHTML = `
+                <img src="${item.src}" alt="Raj Rathod Gallery" loading="lazy" class="w-full h-auto block object-cover transition-transform duration-700 group-hover:scale-[1.02]">
+                <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                  <button class="gallery-zoom-btn w-9 h-9 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-accent transition-colors" title="Fullscreen View" aria-label="Fullscreen view">
+                    <i class="fa-solid fa-expand text-xs"></i>
+                  </button>
+                </div>
+              `;
             }
+            galleryGrid.appendChild(cardDiv);
+            bindGalleryCardEvents(cardDiv);
           });
         }
       } catch (err) {
@@ -1306,8 +1331,8 @@ export class Home {
               </div>
               <p class="text-xs text-white/80 leading-relaxed font-cond">
                 ${receiptDispatched 
-                  ? `Thank you, ${name || 'colleague'}. Your message has been sent directly to Raj's desk. An automatic confirmation receipt was dispatched to <strong>${email}</strong>.`
-                  : `Thank you, ${name || 'colleague'}. Your transmission has been received directly at Raj's desk. Raj will evaluate your inquiry and reply to <strong>${email}</strong> shortly.`
+                  ? `Thank you, ${name || 'colleague'}. Your request has been transmitted directly onto Raj's desk. An official confirmation receipt was dispatched to <strong>${email}</strong> by Rudra (Raj's AI Assistant). Raj will review and give an answer shortly.`
+                  : `Thank you, ${name || 'colleague'}. Your transmission has been placed directly on Raj's desk. Raj will personally review your inquiry and give an answer shortly at <strong>${email}</strong>.`
                 }
               </p>
             `;

@@ -1096,7 +1096,20 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
       if (!cleanSubject) cleanSubject = 'Engineering & Portfolio Inquiry';
     }
 
-    const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }) + ' at ' + now.toLocaleTimeString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    }) + ' (IST)';
+
     console.log(`[Contact] ${categoryTag} received from: ${cleanName} <${cleanEmail}>`);
 
     // 1. Save the inquiry to MongoDB database if available
@@ -1129,148 +1142,76 @@ app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
       return res.status(500).json({ error: 'Database offline and mail gateway unconfigured.' });
     }
 
-    // 3. Draft satisfied, human, professional auto-reply
-    let htmlReply = '';
+    // 3. Official confirmation receipt from Rudra (Raj Rathod's AI Assistant)
+    const transmissionId = `#RR-${Date.now().toString(36).toUpperCase()}`;
 
-    // If Gemini key is configured, generate a tailored, professional response
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
-
-        const promptText = `You are composing a highly professional, human, and articulate email response from the Office of Raj Rathod (AI & Machine Learning Developer).
-Your goal is to provide a complete, satisfying, and polished acknowledgment to the sender's proposal or inquiry.
-
-Sender Details:
-- Name: ${cleanName}
-- Email: ${cleanEmail}
-- Subject: ${cleanSubject}
-- Message / Proposal: "${cleanMessage}"
-
-Raj Rathod's Background:
-- AI & Machine Learning Developer.
-- B.Tech in Computer Science & Engineering with AI specialization at Parul University, Vadodara (2023 - 2027). CGPA: 7.66.
-- 350+ LeetCode algorithmic problems solved (https://leetcode.com/u/Raj-Rathod).
-- Core Stack: Python, PyTorch, TensorFlow, Scikit-learn, OpenCV, NLP, FastApi, Streamlit, Docker, Git.
-- Live Deployed Applications:
-  * TruthLens (Fake News Detection & Credibility Verification with Deep Learning): https://truthlens5.netlify.app/
-  * FruitsCheck (CNN Computer Vision Fruit Freshness Classifier - TensorFlow & FastAPI): https://fruits-check.streamlit.app/
-  * AutoPrepAI (Automated Machine Learning & Data Processing Engine): https://data-eda-processing.streamlit.app/
-  * Sukoon-Saathi (Mental Wellness Prediction Engine): https://sukoonsaathi-frontend.onrender.com/
-  * ChatNotes (RAG PDF Knowledge Assistant): https://chat-with-your-notes-dusx.onrender.com/
-  * HybridMind (Multi-Model AI Platform): https://hybridmind.netlify.app/
-  * Movie Recommendations Engine (NLP & ML): https://cinema-verse.streamlit.app/
-- Contact: rathodraj1504@gmail.com | Parul University, Vadodara, Gujarat, India.
-
-CRITICAL INSTRUCTIONS:
-1. ABSOLUTELY NO ROBOTIC OR CRINGE AI PHRASING:
-   - Do NOT say "I am an AI assistant", "My name is Rudra", "As an AI language model", or "I have forwarded this to Raj".
-   - Write in an authentic, executive desk voice ("Office of Raj Rathod" / "Raj Rathod").
-2. DIRECT, SATISFYING & SUBSTANTIVE RESPONSE:
-   - Directly address their specific points, proposal, or question.
-   - If this is a project proposal or freelance requirement: address technical feasibility, suggest suitable tools/architectures Raj uses (Python, PyTorch, FastAPI, React/Streamlit), and confirm Raj will evaluate project requirements and deliverables.
-   - If this is a job, internship, or interview offer: acknowledge with enthusiasm, reference Raj's academic and algorithmic record (Parul University, 7.66 CGPA, 350+ LeetCode), and confirm availability.
-   - If they ask technical questions: provide a clear, accurate, high-quality technical response.
-3. STRUCTURE:
-   - Return clean HTML paragraphs (<p>, <ul>, <li>, <strong>) that will sit cleanly inside an email card.
-   - Sign off naturally as:
-     <p style="margin-top: 20px; border-top: 1px solid #30363d; padding-top: 14px; font-size: 13px; color: #8b949e; line-height: 1.6;">
-       Warm regards,<br>
-       <strong style="color: #f0f6fc; font-size: 14px;">Raj Rathod</strong><br>
-       AI & Machine Learning Developer<br>
-       <span style="font-size: 12px; color: #8b949e;">Parul University, Vadodara &bull; <a href="mailto:rathodraj1504@gmail.com" style="color: #a5b4fc; text-decoration: none;">rathodraj1504@gmail.com</a></span>
-     </p>
-   - Return ONLY the raw HTML body. No markdown fences.`;
-
-        const geminiRes = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }]
-          })
-        });
-
-        if (geminiRes.ok) {
-          const geminiData = await geminiRes.json();
-          let rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          htmlReply = rawText.replace(/```html/gi, '').replace(/```/g, '').trim();
-        } else {
-          console.warn(`[Contact] Gemini response not ok (${geminiRes.status}). Using professional human template.`);
-        }
-      } catch (aiErr) {
-        console.warn('[Contact] Gemini call error:', aiErr.message, 'Using professional human template.');
-      }
-    }
-
-    // Fallback: Highly polished, human executive email tailored to the category
-    if (!htmlReply) {
-      let specificContent = '';
-      if (categoryTag === 'Career Opportunity') {
-        specificContent = `
-          <p>Thank you for reaching out regarding a career opportunity (<strong>${cleanSubject}</strong>).</p>
-          <p>I am actively exploring high-impact AI/ML engineering, data science, and software development roles where I can contribute deep learning pipelines, scalable backend microservices, and algorithmic problem-solving.</p>
-          <p><strong>Key Credentials & Highlights:</strong></p>
-          <ul style="padding-left: 20px; margin: 10px 0; color: #c9d1d9;">
-            <li><strong>Education:</strong> B.Tech in CSE (AI Specialization) at Parul University (2023–2027) &bull; <strong>7.66 CGPA</strong></li>
-            <li><strong>Algorithmic Excellence:</strong> <strong>350+ solved problems on LeetCode</strong></li>
-            <li><strong>Production Deployments:</strong> 21 live applications including TruthLens (Deep Learning Fake News Detection), FruitsCheck (CNN Fruit Freshness via FastAPI), and AutoPrepAI</li>
-            <li><strong>Technical Stack:</strong> Python, PyTorch, TensorFlow, Scikit-learn, OpenCV, NLP, FastAPI, Streamlit, Docker</li>
-          </ul>
-          <p>I have received your note directly and will follow up with you promptly with full details and scheduling options.</p>
-        `;
-      } else if (categoryTag === 'Project Proposal') {
-        specificContent = `
-          <p>Thank you for submitting your project proposal regarding <strong>"${cleanSubject}"</strong>.</p>
-          <p>I specialize in engineering end-to-end Machine Learning and AI solutions — from data preprocessing and neural architecture design to production-grade API deployment using FastAPI, Streamlit, and modern cloud infrastructure.</p>
-          <p><strong>Relevant Technical Capabilities:</strong></p>
-          <ul style="padding-left: 20px; margin: 10px 0; color: #c9d1d9;">
-            <li><strong>Computer Vision & CNNs:</strong> Custom classification, object recognition, and real-time inference (e.g. FruitsCheck, Flower Disease System)</li>
-            <li><strong>NLP & Retrieval-Augmented Generation (RAG):</strong> Vector embeddings, semantic search, and document intelligence (e.g. TruthLens, ChatNotes)</li>
-            <li><strong>End-to-End ML Pipelines:</strong> Automated EDA, feature engineering, and high-performance model serving</li>
-          </ul>
-          <p>Your proposal has been logged with high priority. I will evaluate the requirements and follow up with you shortly to discuss architecture, timeline, and next steps.</p>
-        `;
-      } else {
-        specificContent = `
-          <p>Thank you for reaching out regarding <strong>"${cleanSubject}"</strong>.</p>
-          <p>I have received your message and appreciate you taking the time to connect. Whether you are inquiring about technical collaboration, consulting, or project development, I am eager to learn more.</p>
-          <p><strong>Overview of My Work:</strong></p>
-          <ul style="padding-left: 20px; margin: 10px 0; color: #c9d1d9;">
-            <li><strong>AI & ML Development:</strong> 21 live interactive deployments spanning Computer Vision, NLP, and Predictive Analytics</li>
-            <li><strong>Engineering Rigor:</strong> B.Tech in CSE (AI) at Parul University (7.66 CGPA) with 350+ LeetCode problems solved</li>
-            <li><strong>Core Stack:</strong> Python, PyTorch, TensorFlow, OpenCV, FastAPI, Docker, and JavaScript</li>
-          </ul>
-          <p>I have received your inquiry directly and will respond personally as soon as possible.</p>
-        `;
-      }
-
-      htmlReply = `
-        <p style="font-size: 15px; margin-bottom: 12px; color: #f0f6fc;">Hi ${cleanName},</p>
-        ${specificContent}
-        <p style="margin-top: 20px; border-top: 1px solid #30363d; padding-top: 14px; font-size: 13px; color: #8b949e; line-height: 1.6;">
-          Warm regards,<br>
-          <strong style="color: #f0f6fc; font-size: 14px;">Raj Rathod</strong><br>
-          AI & Machine Learning Developer<br>
-          <span style="font-size: 12px; color: #8b949e;">Parul University, Vadodara &bull; <a href="mailto:rathodraj1504@gmail.com" style="color: #a5b4fc; text-decoration: none;">rathodraj1504@gmail.com</a></span>
-        </p>
-      `;
-    }
-
-    // 4. Wrap in dark responsive container with verified links
     const fullUserEmailHtml = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 28px; background: #0d1117; color: #e6edf3; border-radius: 12px; border: 1px solid #30363d; max-width: 620px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.25); line-height: 1.6;">
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 28px; background: #0d1117; color: #e6edf3; border-radius: 14px; border: 1px solid #30363d; max-width: 620px; margin: auto; box-shadow: 0 4px 24px rgba(0,0,0,0.3); line-height: 1.6;">
+        
+        <!-- Header: Rudra - Autonomous AI Assistant to Raj Rathod -->
         <div style="text-align: center; margin-bottom: 24px; border-bottom: 1px solid #30363d; padding-bottom: 18px;">
-          <div style="display: inline-block; width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 48px; font-size: 22px; font-weight: bold; box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);">⚡</div>
-          <h2 style="margin-top: 10px; margin-bottom: 2px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">Raj Rathod</h2>
-          <span style="font-size: 10px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Executive Correspondence Desk &bull; AI & ML Developer</span>
+          <div style="display: inline-block; width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 48px; font-size: 22px; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">⚡</div>
+          <h2 style="margin-top: 10px; margin-bottom: 3px; color: #f0f6fc; font-size: 19px; font-weight: 700; letter-spacing: 0.5px;">Rudra</h2>
+          <span style="font-size: 11px; text-transform: uppercase; color: #a5b4fc; font-family: monospace; letter-spacing: 1.5px; font-weight: 600;">Autonomous AI Assistant to Raj Rathod</span>
         </div>
 
-        <div style="font-size: 14px; color: #e6edf3;">
-          ${htmlReply}
+        <!-- Acknowledgment & Desk Delivery Notice -->
+        <div style="font-size: 14px; color: #e6edf3; margin-bottom: 20px;">
+          <p style="font-size: 15px; margin-bottom: 14px; color: #f0f6fc;">Hi <strong>${cleanName}</strong>,</p>
+          <p style="margin-bottom: 12px;">Thank you for reaching out to <strong>Raj Rathod</strong>.</p>
+          <p style="margin-bottom: 14px; line-height: 1.6;">
+            Your transmission has been officially received and placed directly onto <strong>Raj's Executive Desk</strong>. Raj personally reviews every inquiry and project proposal on his desk, and he will give you a direct answer shortly at <a href="mailto:${cleanEmail}" style="color: #a5b4fc; text-decoration: none; font-weight: 600;">${cleanEmail}</a>.
+          </p>
         </div>
 
+        <!-- Submitted Transmission Receipt Card -->
+        <div style="background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 18px 20px; margin: 20px 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #21262d; padding-bottom: 10px; margin-bottom: 14px;">
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #58a6ff;">📋 Transmission Receipt &amp; Details</span>
+            <span style="font-size: 11px; font-family: monospace; color: #8b949e; background: #0d1117; border: 1px solid #30363d; padding: 2px 8px; border-radius: 12px;">${categoryTag}</span>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.5;">
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e; width: 130px;">Sender Name:</td>
+              <td style="padding: 6px 0; color: #f0f6fc; font-weight: 600;">${cleanName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Sender Email:</td>
+              <td style="padding: 6px 0; color: #f0f6fc;"><a href="mailto:${cleanEmail}" style="color: #58a6ff; text-decoration: none;">${cleanEmail}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Inquiry Subject:</td>
+              <td style="padding: 6px 0; color: #f0f6fc; font-weight: 500;">${cleanSubject}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Submission Date:</td>
+              <td style="padding: 6px 0; color: #e6edf3; font-family: monospace; font-size: 12px;">${dateStr}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Transmission ID:</td>
+              <td style="padding: 6px 0; color: #7ee787; font-family: monospace; font-size: 12px;">${transmissionId}</td>
+            </tr>
+          </table>
+
+          <div style="margin-top: 14px; border-top: 1px dashed #30363d; padding-top: 12px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: #8b949e; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;">Submitted Message:</div>
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; font-size: 13px; line-height: 1.6; color: #c9d1d9; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${cleanMessage}</div>
+          </div>
+        </div>
+
+        <!-- Sign-off from Rudra -->
+        <div style="margin-top: 24px; border-top: 1px solid #30363d; padding-top: 16px; font-size: 13px; color: #8b949e; line-height: 1.6;">
+          Warm regards,<br>
+          <strong style="color: #f0f6fc; font-size: 15px;">Rudra</strong><br>
+          <span style="font-size: 12px; color: #a5b4fc; font-weight: 500;">Autonomous AI Assistant to Raj Rathod</span><br>
+          <span style="font-size: 12px; color: #8b949e;">Office of Raj Rathod &bull; Parul University, Vadodara, Gujarat, India</span><br>
+          <span style="font-size: 12px; color: #8b949e;">Direct Contact: <a href="mailto:rathodraj1504@gmail.com" style="color: #a5b4fc; text-decoration: none;">rathodraj1504@gmail.com</a></span>
+        </div>
+
+        <!-- Verified Links -->
         <div style="margin-top: 25px; padding-top: 18px; border-top: 1px solid #30363d; text-align: center;">
-          <div style="font-size: 10px; text-transform: uppercase; color: #8b949e; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600;">Verified Profiles & Portfolios</div>
+          <div style="font-size: 10px; text-transform: uppercase; color: #8b949e; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600;">Raj Rathod &bull; Verified Portfolios &amp; Profiles</div>
           <div style="text-align: center;">
             <a href="https://rathodrajai.netlify.app/" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); color: #a5b4fc; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🌐 Live Portfolio</a>
             <a href="https://github.com/Raj-Rathod-Ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #e6edf3; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">💻 GitHub</a>
@@ -1280,12 +1221,12 @@ CRITICAL INSTRUCTIONS:
           </div>
         </div>
         <div style="margin-top: 16px; text-align: center; font-size: 11px; color: #484f58;">
-          This receipt was generated by the executive inquiry desk of Raj Rathod.
+          This automated receipt was securely dispatched by Rudra, Autonomous AI Assistant to Raj Rathod.
         </div>
       </div>
     `;
 
-    // 5. Build high-priority notification to Raj with 1-click Direct Reply
+    // 4. Build high-priority notification to Raj with 1-click Direct Reply
     const rajNotificationHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background: #0d1117; color: #f0f6fc; border-radius: 12px; border: 1px solid #30363d; max-width: 620px; margin: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; padding-bottom: 14px; margin-bottom: 18px;">
@@ -1310,7 +1251,11 @@ CRITICAL INSTRUCTIONS:
           </tr>
           <tr>
             <td style="padding: 6px 0; color: #8b949e;">Received At:</td>
-            <td style="padding: 6px 0; color: #8b949e;">${dateStr} (IST)</td>
+            <td style="padding: 6px 0; color: #8b949e;">${dateStr}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; color: #8b949e;">Reference ID:</td>
+            <td style="padding: 6px 0; color: #7ee787; font-family: monospace;">${transmissionId}</td>
           </tr>
         </table>
 
@@ -1328,7 +1273,7 @@ CRITICAL INSTRUCTIONS:
     let notificationSent = false;
     let userReceiptSent = false;
 
-    // 6. Send high-priority notification to Raj
+    // 5. Send high-priority notification to Raj
     if (process.env.BREVO_API_KEY) {
       try {
         const notifyRes = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -1380,7 +1325,7 @@ CRITICAL INSTRUCTIONS:
       }
     }
 
-    // 7. Send executive acknowledgment receipt to the sender (cleanEmail)
+    // 6. Send official acknowledgment receipt to the sender (cleanEmail) from Rudra
     const plainTextReply = fullUserEmailHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
     if (process.env.BREVO_API_KEY) {
@@ -1392,10 +1337,10 @@ CRITICAL INSTRUCTIONS:
             'api-key': process.env.BREVO_API_KEY
           },
           body: JSON.stringify({
-            sender: { name: "Raj Rathod", email: senderEmail },
+            sender: { name: "Rudra (Raj Rathod's AI Assistant)", email: senderEmail },
             to: [{ email: cleanEmail, name: cleanName }],
             replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
-            subject: `Re: ${cleanSubject} — Raj Rathod`,
+            subject: `Transmission Received: ${cleanSubject} — Rudra (Raj Rathod's AI Assistant)`,
             htmlContent: fullUserEmailHtml,
             textContent: plainTextReply
           })
@@ -1403,7 +1348,7 @@ CRITICAL INSTRUCTIONS:
 
         if (brevoRes.ok) {
           userReceiptSent = true;
-          console.log(`[Contact] Executive acknowledgment successfully dispatched to ${cleanEmail} via Brevo`);
+          console.log(`[Contact] Official receipt successfully dispatched to ${cleanEmail} via Brevo`);
         } else {
           const errText = await brevoRes.text();
           console.warn(`[Contact] Brevo auto-reply warning (${brevoRes.status}): ${errText}`);
@@ -1423,17 +1368,17 @@ CRITICAL INSTRUCTIONS:
             'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
           },
           body: JSON.stringify({
-            from: process.env.RESEND_SENDER || 'Raj Rathod <onboarding@resend.dev>',
+            from: process.env.RESEND_SENDER || 'Rudra (Raj Rathod AI Assistant) <onboarding@resend.dev>',
             to: [cleanEmail],
             reply_to: 'rathodraj1504@gmail.com',
-            subject: `Re: ${cleanSubject} — Raj Rathod`,
+            subject: `Transmission Received: ${cleanSubject} — Rudra (Raj Rathod's AI Assistant)`,
             html: fullUserEmailHtml,
             text: plainTextReply
           })
         });
         if (resendUserRes.ok) {
           userReceiptSent = true;
-          console.log(`[Contact] Executive acknowledgment successfully dispatched to ${cleanEmail} via Resend`);
+          console.log(`[Contact] Official receipt successfully dispatched to ${cleanEmail} via Resend`);
         }
       } catch (resendErr) {
         console.warn('[Contact] Resend auto-reply caught error:', resendErr.message);
