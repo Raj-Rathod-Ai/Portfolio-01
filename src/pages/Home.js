@@ -340,51 +340,51 @@ export class Home {
         </a>
 
         <!-- Stacked Sticky Cards -->
-        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 relative">
+        <div class="w-full max-w-7xl 2xl:max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative">
           ${projectsList.map((p, i) => {
             const isAccent = p.tone === 'accent';
             return `
               <article style="--stick-m: ${12 + i * 14}px; --stick-d: ${96 + i * 22}px; z-index: ${10 + i * 5};"
-                       class="project-stack-card relative w-[94%] md:w-[90%] mx-auto mb-10 lg:mb-14 sticky top-[var(--stick-m)] lg:top-[var(--stick-d)] rounded-[2rem] lg:rounded-[2.5rem] p-6 lg:px-12 lg:py-14 shadow-2xl ${
+                       class="project-stack-card relative w-full mx-auto mb-10 lg:mb-14 sticky top-[var(--stick-m)] lg:top-[var(--stick-d)] rounded-[2rem] lg:rounded-[2.5rem] p-6 sm:p-8 lg:p-10 lg:px-12 shadow-2xl ${
                          isAccent ? 'bg-accent text-white' : 'bg-bg-alt text-fg border border-theme-border'
                        }">
                 
-                <div class="flex flex-col-reverse lg:gap-16 gap-6 justify-between items-center ${
+                <div class="flex flex-col-reverse lg:gap-12 xl:gap-16 gap-6 justify-between items-center ${
                   i % 2 === 0 ? 'lg:flex-row-reverse' : 'lg:flex-row'
                 }">
                   
                   <!-- Text side -->
-                  <div class="flex flex-col justify-center flex-1 lg:w-1/2 min-w-0">
+                  <div class="flex flex-col justify-center flex-1 lg:w-[46%] xl:w-[45%] min-w-0">
                     <span class="text-xs font-mono uppercase tracking-widest project-sub ${isAccent ? 'text-white/80' : 'text-accent'} mb-2 font-semibold">
                       ${p.subtitle}
                     </span>
                     <h3 class="font-display font-medium leading-tight text-3xl md:text-4xl lg:text-[3.25rem] mb-3 ${isAccent ? 'text-white' : 'text-fg'}">
                       ${p.title}
                     </h3>
-                    <p class="text-base md:text-xl lg:text-xl font-light tracking-wide ${isAccent ? 'text-white/80' : 'text-fg-muted'}">
+                    <p class="text-base md:text-lg lg:text-xl font-light tracking-wide ${isAccent ? 'text-white/80' : 'text-fg-muted'}">
                       ${p.description}
                     </p>
 
                     <!-- Stats Chips -->
-                    <div class="flex flex-wrap gap-x-8 gap-y-4 mt-6 lg:mt-8">
+                    <div class="flex flex-wrap gap-x-6 sm:gap-x-8 gap-y-4 mt-6 lg:mt-8">
                       ${p.stats.map(s => `
                         <div class="flex items-center gap-2">
-                          <div class="p-3 rounded-xl ${isAccent ? 'bg-white/15 text-white' : 'bg-accent-soft text-accent'}">
-                            <i class="${s.icon} text-lg"></i>
+                          <div class="p-2.5 sm:p-3 rounded-xl ${isAccent ? 'bg-white/15 text-white' : 'bg-accent-soft text-accent'}">
+                            <i class="${s.icon} text-base sm:text-lg"></i>
                           </div>
                           <div>
-                            <p class="font-semibold text-lg leading-tight ${isAccent ? 'text-white' : 'text-fg'}">${s.value}</p>
-                            <p class="font-medium text-sm leading-4 opacity-70 ${isAccent ? 'text-white/80' : 'text-fg-muted'} font-cond">${s.label}</p>
+                            <p class="font-semibold text-base sm:text-lg leading-tight ${isAccent ? 'text-white' : 'text-fg'}">${s.value}</p>
+                            <p class="font-medium text-xs sm:text-sm leading-4 opacity-70 ${isAccent ? 'text-white/80' : 'text-fg-muted'} font-cond">${s.label}</p>
                           </div>
                         </div>
                       `).join('')}
                     </div>
 
                     <!-- Tech Tags + Launch Link -->
-                    <div class="mt-8">
+                    <div class="mt-6 lg:mt-8">
                       <div class="flex flex-wrap gap-2 mb-6">
                         ${p.stack.map(tag => `
-                          <span class="text-sm font-medium px-3.5 py-1 rounded-full border ${
+                          <span class="text-xs sm:text-sm font-medium px-3.5 py-1 rounded-full border ${
                             isAccent ? 'border-white/50 text-white' : 'border-accent/40 text-accent'
                           }">
                             ${tag}
@@ -394,7 +394,7 @@ export class Home {
 
                       <div class="flex items-center gap-4">
                         <a href="${p.liveUrl}" target="_blank" rel="noopener noreferrer"
-                           class="group inline-flex px-8 py-3.5 rounded-2xl font-medium text-lg transition-colors ${
+                           class="group inline-flex px-7 sm:px-8 py-3.5 rounded-2xl font-medium text-base sm:text-lg transition-colors ${
                              isAccent ? 'bg-white text-black hover:bg-neutral-100 shadow-lg' : 'bg-fg text-bg hover:bg-accent hover:text-white'
                            }">
                           <span class="relative block overflow-hidden w-max">
@@ -415,12 +415,39 @@ export class Home {
 
                   </div>
 
-                  <!-- Image side: Clean uncropped app frame matching Pranay -->
-                  <div class="shrink-0 w-full lg:w-[42%] h-[30vh] md:h-[38vh] lg:h-[48vh] rounded-2xl overflow-hidden bg-black/5 border border-black/5 shadow-xl relative group">
-                    <img src="${p.image}"
-                         alt="${p.title} Preview"
-                         loading="lazy"
-                         class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]">
+                  <!-- Image side: Full clean browser mockup frame with zero cropping -->
+                  <div class="project-browser-frame shrink-0 w-full lg:w-[54%] xl:w-[55%] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl border ${
+                    isAccent ? 'border-white/25 bg-black/40' : 'border-theme-border bg-black/20'
+                  } backdrop-blur-md flex flex-col group/img transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
+                    
+                    <!-- Browser topbar with traffic dots & live URL badge -->
+                    <div class="flex items-center justify-between px-4 py-2 sm:py-2.5 border-b select-none ${
+                      isAccent ? 'border-white/15 bg-black/35 text-white/80' : 'border-theme-border bg-black/25 text-fg-muted'
+                    }">
+                      <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56] inline-block shadow-sm"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] inline-block shadow-sm"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f] inline-block shadow-sm"></span>
+                      </div>
+                      <div class="px-3 py-0.5 rounded-full text-[11px] font-mono tracking-tight truncate max-w-[220px] ${
+                        isAccent ? 'bg-white/10 text-white/90' : 'bg-black/30 text-fg-muted'
+                      }">
+                        ${p.liveUrl.replace(/^https?:\/\//, '')}
+                      </div>
+                      <a href="${p.liveUrl}" target="_blank" rel="noopener noreferrer"
+                         class="text-xs hover:opacity-100 opacity-60 transition-opacity p-1"
+                         title="Launch live application">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                      </a>
+                    </div>
+
+                    <!-- Screen Viewport: Proportional 16:9 widescreen ratio ensuring full website UI is visible without cut-off -->
+                    <div class="project-browser-screen relative w-full aspect-[16/9] overflow-hidden bg-black/20 flex items-center justify-center">
+                      <img src="${p.image}"
+                           alt="${p.title} Preview"
+                           loading="lazy"
+                           class="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover/img:scale-[1.02]">
+                    </div>
                   </div>
 
                 </div>

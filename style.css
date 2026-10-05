@@ -4061,3 +4061,38 @@ html.lightbox-open body {
 .orbit-paused *::after {
   animation-play-state: paused !important;
 }
+
+/* ==========================================================================
+   Project Stack Cards: Wide Landscape Layout & Uncropped Browser Mockups
+   ========================================================================== */
+.project-stack-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.project-browser-frame {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.project-browser-screen {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-browser-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.project-browser-frame:hover .project-browser-screen img {
+  transform: scale(1.025);
+}
+
