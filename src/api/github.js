@@ -583,8 +583,8 @@ export async function fetchGitHubRepositories(forceRefresh = false) {
           window.onGitHubReposSynced(liveRepos);
         }
       }
-    }).catch(err => {
-      console.warn('Background GitHub sync notice:', err.message);
+    }).catch(() => {
+      // Quiet background revalidation failure: transparent fallback without console warnings
     });
   };
 
@@ -604,8 +604,8 @@ export async function fetchGitHubRepositories(forceRefresh = false) {
       setCache(CACHE_KEY, liveRepos, CACHE_EXPIRY_MINS);
       return liveRepos;
     }
-  } catch (err) {
-    console.warn('Fast live GitHub sync notice (falling back to cached/fallback data):', err.message);
+  } catch (_) {
+    // Quiet fallback to cached/fallback data without console warnings
   }
 
   // 3. Fallback try direct GitHub API with longer timeout in background
