@@ -202,13 +202,18 @@ function initNeuralCanvas() {
   const canvas = document.getElementById('neural-canvas');
   if (!canvas) return;
 
+  // On mobile/touch screens (< 768px), disable neural canvas to save CPU, GPU fill-rate, and battery
+  if (window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches) {
+    canvas.style.display = 'none';
+    return;
+  }
+
   const ctx = canvas.getContext('2d');
   let nodes = [];
   
-  const isMobile = window.innerWidth < 768;
-  const NODE_COUNT = isMobile ? 22 : 65;
-  const MAX_DIST = isMobile ? 100 : 145;
-  let mouse = { x: null, y: null, radius: isMobile ? 100 : 170 };
+  const NODE_COUNT = 65;
+  const MAX_DIST = 145;
+  let mouse = { x: null, y: null, radius: 170 };
   let ripples = [];
 
   if (window.matchMedia('(hover: hover)').matches) {
@@ -553,18 +558,25 @@ function initLenis() {
   if (typeof Lenis === 'undefined') return null;
 
   try {
+    const isTouch = (window.matchMedia("(hover: none), (pointer: coarse)").matches || window.innerWidth < 1024);
+
+    // On mobile and touch devices, native momentum scrolling runs on the browser compositor thread at 60-120Hz.
+    // Bypassing JS rAF touch interception eliminates scroll lag and input delay completely.
+    if (isTouch) {
+      window.lenis = null;
+      window.__lenis = null;
+      return null;
+    }
+
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
       gsap.registerPlugin(ScrollTrigger);
     }
 
-    const isTouch = (window.matchMedia("(hover: none), (pointer: coarse)").matches || window.innerWidth < 1024);
-
     const lenis = new Lenis({
-      duration: isTouch ? 1.0 : 1.4,
+      duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      smoothTouch: false,
-      touchMultiplier: isTouch ? 1.5 : 1.0,
+      syncTouch: false,
     });
 
     window.lenis = lenis;
@@ -575,7 +587,6 @@ function initLenis() {
       gsap.ticker.add((time) => {
         lenis.raf(time * 1000);
       });
-      gsap.ticker.lagSmoothing(0);
     } else {
       const raf = (time) => {
         lenis.raf(time);

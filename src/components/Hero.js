@@ -75,6 +75,12 @@ export class Hero {
 
     // 1. Mount LiquidEther Three.js WebGL Fluid Shader
     const mountFluid = () => {
+      // On mobile screens (< 768px) or touch devices, skip heavy WebGL simulation to guarantee 60-120fps
+      if (window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches) {
+        if (heroBgFluid) heroBgFluid.style.display = 'none';
+        return;
+      }
+
       if (heroBgFluid && window.THREE && !heroBgFluid.querySelector('canvas')) {
         try {
           const isDark = document.documentElement.dataset.theme === 'dark' || document.documentElement.classList.contains('dark');
@@ -85,9 +91,9 @@ export class Hero {
             cursorSize: 110,
             isViscous: false,
             viscous: 30,
-            iterationsViscous: 32,
-            iterationsPoisson: 32,
-            resolution: 0.55,
+            iterationsViscous: 20,
+            iterationsPoisson: 20,
+            resolution: 0.45,
             autoDemo: true,
             autoSpeed: 0.5,
             autoIntensity: 2.2,
@@ -95,6 +101,18 @@ export class Hero {
             autoResumeDelay: 2500,
             autoRampDuration: 0.6
           });
+
+          // Pause WebGL rendering when hero is scrolled out of viewport
+          if ('IntersectionObserver' in window && heroSection) {
+            const heroObserver = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (heroBgFluid) {
+                  heroBgFluid.style.display = entry.isIntersecting ? 'block' : 'none';
+                }
+              });
+            }, { threshold: 0.05 });
+            heroObserver.observe(heroSection);
+          }
         } catch (err) {
           console.warn('LiquidEther initialization notice:', err);
         }

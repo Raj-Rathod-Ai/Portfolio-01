@@ -993,6 +993,18 @@ html.noscroll, body.noscroll, .noscroll {
   100% { transform: translate(-50px, -70px) scale(0.9); }
 }
 
+@media (max-width: 768px), (pointer: coarse) {
+  .aurora-blob {
+    display: none !important;
+  }
+}
+
+.project-stack-card {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
 
 
 /* ===== GLASSMORPHISM ===== */

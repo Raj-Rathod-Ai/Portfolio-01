@@ -42,6 +42,11 @@
   to = "/googlec2fa1c5327de2797.html"
   status = 200
 
+[[redirects]]
+  from = "/googleee0bef333add2e3f.html"
+  to = "/googleee0bef333add2e3f.html"
+  status = 200
+
 # 3. Resume PDF direct mappings
 [[redirects]]
   from = "/Rathod-Raj-Ai.pdf"
