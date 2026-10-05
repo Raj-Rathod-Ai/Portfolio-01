@@ -233,22 +233,7 @@ body {
   color: var(--color-btn-light-text);
 }
 
-/* ── LOADER ── */
-#loader {
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  background-color: var(--tok-bg);
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: 2rem;
-}
-#loader-counter {
-  font-size: 3rem;
-  font-weight: 600;
-  color: var(--tok-text);
-}
+
 
 /* ── HERO ── */
 #hero-section {
@@ -4033,13 +4018,23 @@ html.lightbox-open body {
   width: 100vw !important;
   height: 100vh !important;
   height: 100dvh !important;
-  display: flex !important;
+  display: none !important;
   align-items: center !important;
   justify-content: center !important;
-  background: rgba(0, 0, 0, 0.92) !important;
+  background: rgba(0, 0, 0, 0.94) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
-  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s;
+}
+
+#gallery-lightbox.active {
+  display: flex !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 #gallery-lightbox-content video,

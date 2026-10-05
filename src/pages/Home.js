@@ -726,7 +726,7 @@ export class Home {
       </section>
 
       <!-- Clean Lightbox Modal (Fixed viewport centered player, no page scroll jump) -->
-      <div id="gallery-lightbox" class="fixed inset-0 z-[999999] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 md:p-8 hidden opacity-0 transition-opacity duration-300">
+      <div id="gallery-lightbox" class="fixed inset-0 z-[999999] bg-black/95 backdrop-blur-2xl items-center justify-center p-4 md:p-8 hidden opacity-0 pointer-events-none transition-opacity duration-300">
         <button id="gallery-lightbox-close" class="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-20 cursor-pointer border border-white/15" title="Close" aria-label="Close modal">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
@@ -798,16 +798,15 @@ export class Home {
         `;
       }
 
-      modal.classList.remove('hidden');
-      requestAnimationFrame(() => {
-        modal.classList.remove('opacity-0');
-      });
+      modal.classList.add('active');
+      modal.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
     };
 
     const closeLightbox = () => {
       const modal = document.getElementById('gallery-lightbox');
       if (!modal) return;
-      modal.classList.add('opacity-0');
+      modal.classList.remove('active');
+      modal.classList.add('opacity-0', 'pointer-events-none');
       setTimeout(() => {
         modal.classList.add('hidden');
         const content = document.getElementById('gallery-lightbox-content');
@@ -826,7 +825,7 @@ export class Home {
       });
     }
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && galleryLightbox && !galleryLightbox.classList.contains('hidden')) {
+      if (e.key === 'Escape' && galleryLightbox && galleryLightbox.classList.contains('active')) {
         closeLightbox();
       }
     });
