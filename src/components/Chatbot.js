@@ -1659,5 +1659,6 @@ ${recentTopSummary}`
       safe = safe.replace(/`([^`]{1,200})`/g, '<code class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono text-amber-300">$1</code>');
       return safe;
     }).join('<br>');
-  }}
+  }
+}
 
