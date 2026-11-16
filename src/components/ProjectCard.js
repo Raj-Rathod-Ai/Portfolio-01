@@ -111,7 +111,7 @@ export class ProjectCard {
     const liveUrl     = getLiveUrl(repo, localMeta);
     const slug        = slugify(repo.name);
     const title       = escapeHtml(repoTitle(repo.name));
-    const desc        = (repo.description || 'No description provided.').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
+    const desc        = escapeHtml((repo.description || 'No description provided.').replace(/[\u{1F300}-\u{1FAFF}\u2600-\u{27BF}]/gu, '').trim());
     const lang        = escapeHtml(repo.language || 'Mixed');
     const updated     = formatDate(repo.updated_at);
     const stars       = repo.stargazers_count || 0;

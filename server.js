@@ -1886,7 +1886,7 @@ app.post('/api/chat', apiRateLimiter(45, 60000), async (req, res) => {
     const normalizedMessage = message.trim();
     if (normalizedMessage.length > 2000) return res.status(413).json({ error: 'Message is too long. Please keep it under 2,000 characters.' });
     const greetingOnly = /^(hi|hello|hey|good morning|good afternoon|good evening|how are you)[.!? ]*$/i.test(normalizedMessage);
-    const portfolioTerms = /\b(raj|rathod|portfolio|project|repository|repo|github|resume|cv|skill|experience|education|college|university|cgpa|certification|certificate|deployment|demo|work|built|develop|technology|tech stack|contact|linkedin|leetcode|rag|machine learning|deep learning|artificial intelligence|ai engineer|internship)\\b/i;
+    const portfolioTerms = /\b(raj|rathod|portfolio|project|repository|repo|github|resume|cv|skill|experience|education|college|university|cgpa|certification|certificate|deployment|demo|work|built|develop|technology|tech stack|contact|linkedin|leetcode|rag|machine learning|deep learning|artificial intelligence|ai engineer|internship)\b/i;
     if (!greetingOnly && !portfolioTerms.test(normalizedMessage)) {
       return res.json({ reply: 'I’m Rudra, Raj Rathod’s portfolio assistant. I can help with Raj’s projects, technical skills, experience, education, certifications, resumes, and GitHub work. What would you like to know about his portfolio?' });
     }
