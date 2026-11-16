@@ -109,6 +109,7 @@ export class ProjectCard {
     const iconData    = getIconData(repo.category);
     const badgeClass  = getBadgeClass(repo.category);
     const liveUrl     = getLiveUrl(repo, localMeta);
+    const liveDemoUrl = safeHttpUrl(liveUrl);
     const slug        = slugify(repo.name);
     const title       = escapeHtml(repoTitle(repo.name));
     const desc        = escapeHtml((repo.description || 'No description provided.').replace(/[\u{1F300}-\u{1FAFF}\u2600-\u{27BF}]/gu, '').trim());
@@ -144,7 +145,6 @@ export class ProjectCard {
     const displayTitle = escapeHtml(repo.displayTitle || title);
     const categoryLabel = escapeHtml(repo.category || 'Others');
     const repoUrl = safeHttpUrl(repo.html_url);
-    const liveDemoUrl = safeHttpUrl(liveUrl);
 
     // Normal topics HTML
     const topicsHTML = topics.length
