@@ -1537,134 +1537,29 @@ ${recentTopSummary}`
    * @returns {string}
    */
   getOfflineFallback(input) {
-    const text = input.toLowerCase().trim();
-    const sorted = this.getRecentProjects(5);
-    const namePrefix = this.userProfile?.name ? `${this.userProfile.name}, ` : '';
-
-    // 0. Greetings & Small Talk
-    const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'how are you', 'namaste'];
-    const cleanText = text.replace(/[^a-z\s]/g, '').trim();
-    if (greetings.some(g => cleanText === g || cleanText.startsWith(g + ' ') || cleanText.endsWith(' ' + g))) {
-      return `Hello ${namePrefix}! 👋 I'm doing great!\n\nI am **Rudra**, the custom AI Assistant & Agent for **Raj Rathod**. I can help you explore Raj's **latest AI/ML projects**, **verified live demos**, **education & university (Parul Univ, 7.66 CGPA)**, **LeetCode record (350+)**, **resumes**, or **contact info**. What would you like to explore?`;
+    const text = String(input || '').toLowerCase().trim();
+    if (/^(hi|hello|hey|namaste|good morning|good afternoon|good evening)[.!? ]*$/.test(text)) {
+      return "Hi! I’m **Rudra**, created by Raj Rathod. I can help with his projects, skills, education, resume and GitHub work. What would you like to know?";
     }
-
-    // 0.1 Thank you / Compliments
-    if (text.includes('thank') || text.includes('thx') || text.includes('appreciate') || text.includes('awesome') || text.includes('great bot') || text.includes('good job') || text.includes('nice')) {
-      return `You're very welcome, ${namePrefix}! 😊 I'm always here to help you explore Raj Rathod's engineering portfolio. Feel free to ask about any specific project, certifications, or download his resume!`;
-    }
-
-    // 0.2 Bot Identity / Capabilities
-    if (text.includes('who are you') || text.includes('what can you do') || text.includes('what are you') || text.includes('your name') || text.includes('about rudra')) {
-      return `I am **Rudra** 🤖, Raj Rathod's personal AI Assistant & Engineering Agent!\n\nHere is what I can help you with:\n` +
-             `• 🚀 **Latest Projects**: Real-time insights into FruitsCheck CNN, Sukoon-Saathi ML, MeetNotes RAG, and SENTI-AI.\n` +
-             `• 🧠 **Explore AI & ML Projects**: Deep architectural breakdowns into Computer Vision, NLP, GenAI, RAG, and Regression.\n` +
-             `• 🌐 **Verified Live Demos**: Direct links to all 21+ active deployed web applications.\n` +
-             `• 🎓 **Education & Background**: B.Tech at Parul University, 7.66 CGPA, and 350+ LeetCode problems solved.\n` +
-             `• 📄 **Resumes & CVs**: Direct access to AI/ML and Full-Stack resume PDFs.\n` +
-             `• 📍 **Location & Campus**: Vadodara, Gujarat location and interactive maps.\n` +
-             `• 📬 **Contact & Collaboration**: Direct links to email, LinkedIn, and GitHub.\n\n` +
-             `What would you like to explore first?`;
-    }
-
-    // 0.25 Creator / identity questions (also handles common short typos).
     if (/who\s+(created|create|made|built)\s+(you|u)|who\s+is\s+your\s+(creator|developer)/i.test(text)) {
-      return "I was created by **Raj Rathod** to help visitors explore his portfolio. What would you like to know about his projects?";
+      return "I was created by **Raj Rathod** to help visitors explore his portfolio. Would you like to know about a project or his technical skills?";
     }
-
-    // 0.26 Concise latest-project answer; offer one relevant next question.
-    if (/latest project|recent project|newest project|most recent project|recently added/i.test(text)) {
+    if (/(latest|recent|newest).{0,24}project|project.{0,24}(latest|recent|newest)/i.test(text)) {
       const latest = this.getRecentProjects(1)[0];
       if (latest) {
-        const title = latest.name || 'the latest repository';
-        const description = latest.description || 'See its repository for the verified project overview.';
-        const demo = latest.live || latest.homepage;
-        const links = (demo ? '\\n[Live demo](' + demo + ')' : '') + (latest.html_url ? '\\n[GitHub](' + latest.html_url + ')' : '');
-        return '**' + title + '** — ' + description.slice(0, 220) + links + '\\n\\nWould you like its tech stack or a short architecture overview?';
+        const title = String(latest.name || 'Latest project');
+        const description = String(latest.description || 'See the repository for the project overview.').slice(0, 200);
+        const links = (latest.live || latest.homepage ? '\\n[Live demo](' + (latest.live || latest.homepage) + ')' : '') +
+          (latest.html_url ? '\\n[GitHub](' + latest.html_url + ')' : '');
+        return '**' + title + '** — ' + description + links + '\\n\\nWould you like its tech stack or architecture?';
       }
-      return 'I can look up Raj’s latest GitHub project, but the repository list is currently unavailable. Would you like to try again?';
     }
-
-    // 0.3 Recent & Latest Project Inquiries
-    const isRecentQuery = [
-      'latest project', 'recent project', 'recently added', 'recent added',
-      'recent projects', 'new project', 'new projects', 'recently add',
-      'what are you working on', 'what did you build recently', 'what have you built recently',
-      'newest project', 'latest work', 'recent work', 'newest repo', 'latest repos'
-    ].some(k => text.includes(k));
-
-    if (isRecentQuery) {
-      const recentRAG = this.retrieveRAGContext('latest project', this.history);
-      if (recentRAG) return recentRAG;
-    }
-
-    // 1. RAG Multi-Turn Semantic Context Retrieval
-    const ragResult = this.retrieveRAGContext(input, this.history);
-    if (ragResult) {
-      return ragResult;
-    }
-
-    // 2. Domain & Category Level Fallbacks
-    if (text.includes('nlp') || text.includes('text') || text.includes('language') || text.includes('bert') || text.includes('natural language') || text.includes('emotion')) {
-      return `🔤 **RAJ RATHOD'S NATURAL LANGUAGE PROCESSING (NLP) PROJECTS**\n\n` +
-             `Here are the **NLP Projects** featured in Raj's portfolio:\n\n` +
-             `🎭 **1. SENTI-AI BiGRU Emotion Detection System**\n` +
-             `• **Architecture**: Bidirectional GRU (BiGRU) neural network with Keras Tokenizer and FastAPI backend classifying text into 6 emotions (Joy, Sadness, Love, Anger, Fear, Surprise).\n` +
-             `• 🚀 **Live Demo**: [senti-ai.onrender.com](https://senti-ai.onrender.com)\n` +
-             `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL)\n\n` +
-             `🎬 **2. Movie Recommendations Using NLP And ML**\n` +
-             `• **Architecture**: Content-based recommendation system with CountVectorizer and Cosine Similarity.\n` +
-             `• 🚀 **Live Demo**: [cinema-verse.streamlit.app](https://cinema-verse.streamlit.app/)\n` +
-             `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML)\n\n` +
-             `🕵️ **3. Fake News Detection Using DL Real Time (TruthLens)**\n` +
-             `• **Architecture**: Real-time TF-IDF and Passive-Aggressive classifier (~92% accuracy).\n` +
-             `• 🚀 **Live Demo**: [truthlens5.netlify.app](https://truthlens5.netlify.app/)\n` +
-             `• 📂 **Repository**: [View on GitHub](https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time)\n\n` +
-             `💡 *All 3 NLP projects are live deployed and ready to test!*`;
-    }
-
-    if (text.includes('deep learning') || text.includes('vision') || text.includes('cnn') || text.includes('image') || text.includes('opencv') || text.includes('pytorch') || text.includes('tensorflow') || text.includes('neural')) {
-      return `👁️ **COMPUTER VISION & DEEP LEARNING PROJECTS**\n\n` +
-             `• **FruitsCheck CNN Fruit Freshness**: Deep CNN classifying apples, bananas, and oranges as Fresh or Rotten ([Live Demo](https://fruits-check.streamlit.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness)).\n` +
-             `• **Flower Disease System**: PyTorch & OpenCV CNN detecting diseases in plant/flower leaves ([Live Demo](https://flower-disease-system.vercel.app) | [GitHub](https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem)).\n` +
-             `• **Laptop Price Prediction ANN**: Deep Artificial Neural Network regression model ([Live Demo](https://laptop-price-predicate.streamlit.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL)).\n` +
-             `• **SENTI-AI BiGRU**: Deep Bidirectional GRU emotion detection network ([Live Demo](https://senti-ai.onrender.com) | [GitHub](https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL)).\n\n` +
-             `Explore the **Deep Learning** category on the Projects page for interactive details!`;
-    }
-
-    if (text.includes('machine learning') || text.includes('regression') || text.includes('predict') || text.includes('scikit') || text.includes('ml')) {
-      return `🤖 **MACHINE LEARNING PROJECTS (13+ PROJECTS)**\n\n` +
-             `Raj has developed a rich catalogue of Machine Learning models including:\n` +
-             `• **Sukoon-Saathi**: Student wellness prediction pipeline deployed on FastAPI ([Live Demo](https://sukoonsaathi-frontend.onrender.com/) | [GitHub](https://github.com/Raj-Rathod-Ai/Sukoon-Saathi)).\n` +
-             `• **Taxi Fare Prediction**: ML regression predicting trip fares ([Live Demo](https://taxi-price-prediction.netlify.app/)).\n` +
-             `• **Food Delivery Time Prediction**: Streamlit ML app estimating delivery duration ([Live Demo](https://fooddelivery-time.streamlit.app/)).\n` +
-             `• **Discover Your True Personality**: 26-trait classification model ([Live Demo](https://discover-your-true-personality.streamlit.app/)).\n` +
-             `• **Car Selling Price Prediction**: Resale price estimation model ([Live Demo](https://car-selling-price-prediction.streamlit.app/)).\n` +
-             `• **Loan Risk Assessment App**: Gaussian Naive Bayes default risk predictor ([Live Demo](https://loan-risk-assessment-app.streamlit.app/)).\n\n` +
-             `Explore the **Machine Learning** category to view all interactive projects!`;
-    }
-
-    if (text.includes('data science') || text.includes('analytic') || text.includes('power bi')) {
-      return `📊 **DATA SCIENCE & ANALYTICS**\n\n` +
-             `• **AutoPrepAI**: Automated data preprocessing & quality analysis platform ([Launch Live Demo](https://data-eda-processing.streamlit.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/AutoPrepAI)).\n` +
-             `• **Job Analysis Dashboard**: Interactive Power BI dashboard evaluating global tech market trends ([GitHub](https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard)).\n` +
-             `• **Data Science & Analytics with GenAI**: Verified Sheryians Coding School certification.`;
-    }
-
-    if (text.includes('rag') || text.includes('retrieval') || text.includes('vector') || text.includes('chatnotes') || text.includes('meetnotes')) {
-      return `📑 **RAG (RETRIEVAL-AUGMENTED GENERATION) & VIDEO-AGENTS**\n\n` +
-             `• **MeetNotes**: Autonomous AI Meeting Intelligence & Video-Agent system using Whisper speech-to-text & Mistral LLM ([Launch Live Demo](https://meetnotes.streamlit.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/MeetNotes)).\n` +
-             `• **ChatNotes**: High-speed RAG-powered document assistant to chat with PDF documents without token limits ([Launch Live Demo](https://chat-with-your-notes-dusx.onrender.com/) | [GitHub](https://github.com/Raj-Rathod-Ai/ChatNotes)).\n` +
-             `• **Enterprise RAG Workflows**: High-accuracy retrieval pipelines with semantic search and vector embeddings.`;
-    }
-
-    if (text.includes('genai') || text.includes('generative ai') || text.includes('llm') || text.includes('hybridmind')) {
-      return `🤖 **GENERATIVE AI & LLM PLATFORMS**\n\n` +
-             `• **HybridMind**: Multi-model platform orchestrating Google Gemini, Mistral, and Tavily search ([Launch Live Demo](https://hybridmind.netlify.app/) | [GitHub](https://github.com/Raj-Rathod-Ai/HybridMind)).\n` +
-             `• **Sheryians GenAI Certified**: Advanced prompt engineering, LLM orchestration, and autonomous agent workflows.`;
-    }
-
-    // Default Fallback
-    return `Raj Rathod is an **AI & Machine Learning Developer** specialized in Deep Learning, NLP, Computer Vision, and Predictive Modeling. You can ask me about his **recently added projects (FruitsCheck, Sukoon-Saathi, MeetNotes, SENTI-AI)**, **live demos**, **education & university (Parul Univ, 7.66 CGPA)**, **LeetCode record (350+)**, **resumes**, or **contact info**!`;
+    if (/thank|thanks|thx/.test(text)) return "You’re welcome! Is there a particular project or part of Raj’s portfolio you’d like to explore?";
+    if (/education|cgpa|university|college/.test(text)) return "Raj is pursuing a B.Tech in Computer Science & Engineering (AI Specialization) at Parul University, with a reported **7.66 CGPA**. Would you like his education details or certifications?";
+    if (/resume|cv/.test(text)) return "Raj’s portfolio includes AI/ML and Full-Stack resume PDFs. Would you like the AI/ML resume or the Full-Stack resume?";
+    if (/contact|email|linkedin/.test(text)) return "You can contact Raj at **rathodraj1504@gmail.com** or connect on [LinkedIn](https://linkedin.com/in/raj-rathod-ai). Would you like his GitHub profile too?";
+    if (/skill|tech stack|technology/.test(text)) return "Raj works across Python, JavaScript, SQL, machine learning, deep learning, NLP and computer vision. Would you like a language, framework or project-focused breakdown?";
+    return "I can help with Raj Rathod’s portfolio, projects, verified technologies, education, resume and GitHub repositories. Which specific item would you like to explore?";
   }
 
   /**
@@ -1745,27 +1640,24 @@ ${recentTopSummary}`
     const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     })[char]);
-    const safeText = String(text).replace(/\r\n?/g, '\n');
-    // Render only safe HTTPS links and same-origin relative resume links.
-    const withLinks = safeText.replace(/\[([^\]]{1,120})\]\(([^)\s]{1,500})\)/g, (match, label, rawUrl) => {
-      let href = '';
-      try {
-        if (rawUrl.startsWith('/') && !rawUrl.startsWith('//')) href = rawUrl;
-        else {
-          const parsed = new URL(rawUrl);
-          if (parsed.protocol === 'https:') href = parsed.href;
-        }
-      } catch (_) { href = ''; }
-      return href
-        ? '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">' + escapeHtml(label) + '</a>'
-        : escapeHtml(label);
-    });
-    return withLinks.split('\n').map(line => {
-      const safeLine = escapeHtml(line);
-      return safeLine
-        .replace(/\*\*([^*]{1,300})\*\*/g, '<strong>$1</strong>')
-        .replace(/`([^`]{1,200})`/g, '<code class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono text-amber-300">$1</code>');
+    return String(text).replace(/\r\n?/g, '\n').split('\n').map(line => {
+      let safe = escapeHtml(line);
+      safe = safe.replace(/\[([^\]]{1,120})\]\(([^)\s]{1,500})\)/g, (match, label, href) => {
+        let safeHref = '';
+        try {
+          if (href.startsWith('/') && !href.startsWith('//')) safeHref = href;
+          else {
+            const parsed = new URL(href);
+            if (parsed.protocol === 'https:') safeHref = parsed.href;
+          }
+        } catch (_) { safeHref = ''; }
+        return safeHref
+          ? '<a href="' + escapeHtml(safeHref) + '" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">' + label + '</a>'
+          : label;
+      });
+      safe = safe.replace(/\*\*([^*]{1,300})\*\*/g, '<strong>$1</strong>');
+      safe = safe.replace(/`([^`]{1,200})`/g, '<code class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono text-amber-300">$1</code>');
+      return safe;
     }).join('<br>');
-  }
-}
+  }}
 
