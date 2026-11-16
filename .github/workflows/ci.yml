@@ -1,0 +1,36 @@
+name: Portfolio CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "feat/**"
+      - "fix/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portfolio-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  syntax:
+    name: Node.js syntax validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Validate backend syntax
+        run: node --check server.js
+      - name: Validate frontend module syntax
+        run: find src -name '*.js' -print0 | xargs -0 -n1 sh -c 'node --input-type=module --check < "$0"'

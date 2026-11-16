@@ -107,7 +107,7 @@ export class ProjectDetails {
               </div>
               <div class="min-w-0">
                 <h1 class="font-jakarta font-extrabold text-2xl sm:text-3xl text-gray-100 truncate">${repoTitle}</h1>
-                <p class="font-mono text-xs text-gray-500 mt-1">Repo: <a href="${repoUrl}" target="_blank" class="hover:underline text-gray-400">${repo.name}</a></p>
+                <p class="font-mono text-xs text-gray-500 mt-1">Repo: <a href="${repoUrl}" target="_blank" class="hover:underline text-gray-400">${repoName}</a></p>
               </div>
             </div>
             
