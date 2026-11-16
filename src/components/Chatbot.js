@@ -1728,16 +1728,30 @@ ${recentTopSummary}`
    */
   formatMarkdown(text) {
     if (!text) return '';
-    const safeText = String(text)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-    return safeText
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-primary hover:underline">$1</a>')
-      .replace(/`([^`]+)`/g, '<code class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono text-amber-300">$1</code>')
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>');
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[char]);
+    const safeText = String(text).replace(/\r\n?/g, '\n');
+    // Render only safe HTTPS links and same-origin relative resume links.
+    const withLinks = safeText.replace(/\[([^\]]{1,120})\]\(([^)\s]{1,500})\)/g, (match, label, rawUrl) => {
+      let href = '';
+      try {
+        if (rawUrl.startsWith('/') && !rawUrl.startsWith('//')) href = rawUrl;
+        else {
+          const parsed = new URL(rawUrl);
+          if (parsed.protocol === 'https:') href = parsed.href;
+        }
+      } catch (_) { href = ''; }
+      return href
+        ? '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">' + escapeHtml(label) + '</a>'
+        : escapeHtml(label);
+    });
+    return withLinks.split('\n').map(line => {
+      const safeLine = escapeHtml(line);
+      return safeLine
+        .replace(/\*\*([^*]{1,300})\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]{1,200})`/g, '<code class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono text-amber-300">$1</code>');
+    }).join('<br>');
   }
 }
 
