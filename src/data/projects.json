@@ -1,0 +1,227 @@
+[
+  {
+    "repo": "Ai-Powered-Discord-Assistant",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Generative AI"
+  },
+  {
+    "repo": "AI-Code-Reviewer",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Generative AI"
+  },
+  {
+    "repo": "FruitsCheck-CNN-Fruit-Freshness",
+    "type": "solo",
+    "live": "https://fruits-check.streamlit.app/",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "Sukoon-Saathi",
+    "type": "solo",
+    "live": "https://sukoonsaathi-frontend.onrender.com/",
+    "featured": true,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "SENTI-AI-BiGRU-Emotion-Detection-Using-DL",
+    "type": "solo",
+    "live": "https://senti-ai.onrender.com",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "Laptop-Price-Predicate-Using-DL",
+    "type": "solo",
+    "live": "https://laptop-price-predicate.streamlit.app/",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "MeetNotes",
+    "type": "solo",
+    "live": "https://meetnotes.streamlit.app/",
+    "featured": true,
+    "category": "RAG"
+  },
+
+  {
+    "repo": "Taxi-Fare-Prediction",
+    "type": "solo",
+    "live": "https://taxi-price-prediction.netlify.app/",
+    "featured": true,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "car-selling-price-prediction",
+    "type": "solo",
+    "live": "https://car-selling-price-prediction.streamlit.app/",
+    "featured": true,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "USA-house-price-prediction",
+    "type": "solo",
+    "live": "https://usa-house-price-predictions.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Salary_predication",
+    "type": "solo",
+    "live": "https://salary-predications.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Student_performance_predication",
+    "type": "solo",
+    "live": "https://student-performance-predication.streamlit.app",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Mark-Predication",
+    "type": "solo",
+    "live": "https://mark-predication.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Loan-Risk-Assessment-App",
+    "type": "solo",
+    "live": "https://loan-risk-assessment-app.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "healthy-lifestyle-prediction",
+    "type": "solo",
+    "live": "https://healthy-lifestyle-prediction.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "drug-recommendation-system",
+    "type": "solo",
+    "live": "https://drug-recommendation-systems.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Food_Delivery_Time-Using-ML",
+    "type": "solo",
+    "live": "https://fooddelivery-time.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Random-Forest-Food-Delivery-Time",
+    "type": "solo",
+    "live": "https://random-forest-food-delivery-time.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Discover-Your-True-Personality",
+    "type": "solo",
+    "live": "https://discover-your-true-personality.streamlit.app/",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "Machine-Learning-Notes",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Machine Learning"
+  },
+  {
+    "repo": "ChatNotes",
+    "type": "solo",
+    "live": "https://chat-with-your-notes-dusx.onrender.com/",
+    "featured": true,
+    "category": "RAG"
+  },
+  {
+    "repo": "HybridMind",
+    "type": "solo",
+    "live": "https://hybridmind.netlify.app/",
+    "featured": true,
+    "category": "Generative AI"
+  },
+  {
+    "repo": "AutoPrepAI",
+    "type": "solo",
+    "live": "https://data-eda-processing.streamlit.app/",
+    "featured": true,
+    "category": "Data Science"
+  },
+  {
+    "repo": "Fake-News-Detection-Using-DL-Real-time",
+    "type": "group",
+    "live": "https://truthlens5.netlify.app/",
+    "featured": true,
+    "category": "NLP"
+  },
+  {
+    "repo": "Fake-News-Detection-Using-ML-Real-time",
+    "type": "group",
+    "live": "https://truthlens5.netlify.app/",
+    "featured": true,
+    "category": "NLP"
+  },
+  {
+    "repo": "Movie-Recommendations-Using-NLP-and-ML",
+    "type": "solo",
+    "live": "https://cinema-verse.streamlit.app/",
+    "featured": true,
+    "category": "NLP"
+  },
+  {
+    "repo": "FlowerDiseaseSystem",
+    "type": "group",
+    "live": "https://flower-disease-system.vercel.app",
+    "featured": true,
+    "category": "Deep Learning"
+  },
+  {
+    "repo": "Job-Analysis-Dashboard",
+    "type": "solo",
+    "live": "",
+    "featured": false,
+    "category": "Data Science"
+  },
+  {
+    "repo": "stone-paper-scissors-python",
+    "type": "solo",
+    "live": "https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/",
+    "featured": false,
+    "category": "Python Concepts"
+  },
+  {
+    "repo": "Tic-Tac-Toe",
+    "type": "solo",
+    "live": "https://tic-tac-toe-1.streamlit.app/",
+    "featured": false,
+    "category": "Python Concepts"
+  },
+  {
+    "repo": "Library-Mangement",
+    "type": "solo",
+    "live": "https://librarymangement1.streamlit.app/",
+    "featured": false,
+    "category": "Normal Projects"
+  },
+  {
+    "repo": "neuro-os",
+    "type": "group",
+    "live": "",
+    "featured": false,
+    "category": "Normal Projects"
+  }
+]

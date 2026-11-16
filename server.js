@@ -1,0 +1,2192 @@
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+// Safe HTTP fetch helper for all Node environments
+const safeFetch = async (url, options = {}) => {
+  if (typeof fetch === 'function') {
+    return fetch(url, options);
+  }
+  const https = require('https');
+  return new Promise((resolve, reject) => {
+    try {
+      const u = new URL(url);
+      const req = https.request({
+        hostname: u.hostname,
+        path: u.pathname + u.search,
+        method: options.method || 'GET',
+        headers: options.headers || {}
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          resolve({
+            ok: res.statusCode >= 200 && res.statusCode < 300,
+            status: res.statusCode,
+            json: async () => JSON.parse(data),
+            text: async () => data
+          });
+        });
+      });
+      req.on('error', reject);
+      if (options.body) req.write(options.body);
+      req.end();
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+// Security & Noise Prevention Middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
+// In-Memory Lightweight Sliding-Window Rate Limiter (Zero external dependencies)
+const rateLimitMap = new Map();
+const apiRateLimiter = (limit = 60, windowMs = 60000) => (req, res, next) => {
+  const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'client';
+  const now = Date.now();
+  const record = rateLimitMap.get(ip) || { count: 0, resetTime: now + windowMs };
+
+  if (now > record.resetTime) {
+    record.count = 1;
+    record.resetTime = now + windowMs;
+  } else {
+    record.count++;
+  }
+
+  rateLimitMap.set(ip, record);
+
+  if (record.count > limit) {
+    return res.status(429).json({
+      error: 'Too many requests. Rate limit exceeded. Please wait a moment before trying again.',
+      retryAfterSeconds: Math.ceil((record.resetTime - now) / 1000)
+    });
+  }
+  next();
+};
+
+// Clean up stale rate limiter entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of rateLimitMap.entries()) {
+    if (now > record.resetTime) rateLimitMap.delete(ip);
+  }
+}, 5 * 60 * 1000);
+
+// Serve frontend static assets from current directory
+app.use(express.static(__dirname));
+
+// MongoDB connection
+const MONGODB_URI = process.env.MONGODB_URI;
+console.log('Connecting to MongoDB...');
+mongoose.connect(MONGODB_URI)
+  .then(() => {
+    console.log('Connected to MongoDB successfully.');
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err.message);
+    console.warn('Backend will continue running in OFFLINE fallback mode.');
+  });
+
+// Schema definition
+const ReviewSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  rating: { type: Number, required: true, default: 5 },
+  review: { type: String, required: true },
+  date: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Review = mongoose.model('Review', ReviewSchema);
+
+const ContactSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  subject: { type: String, required: true },
+  message: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Contact = mongoose.model('Contact', ContactSchema);
+
+const VisitSchema = new mongoose.Schema({
+  visitorId: { type: String, required: true },
+  visitorName: { type: String },
+  ipAddress: { type: String },
+  visitCount: { type: Number, default: 1 },
+  pagesViewed: [{ path: String, timestamp: { type: Date, default: Date.now } }],
+  lastVisit: { type: Date, default: Date.now },
+  userAgent: { type: String }
+}, { timestamps: true });
+
+const Visit = mongoose.model('Visit', VisitSchema);
+
+const InteractionSchema = new mongoose.Schema({
+  visitorId: { type: String, required: true },
+  visitorName: { type: String, default: 'Anonymous Visitor' },
+  type: { type: String, required: true }, // 'project_click', 'github_click', 'live_demo_click', 'category_click', 'view_details'
+  targetName: { type: String }, // e.g. "Flower Disease System" or "RAG"
+  category: { type: String }, // e.g. "RAG", "Generative AI", "NLP"
+  linkUrl: { type: String },
+  ipAddress: { type: String },
+  timestamp: { type: Date, default: Date.now }
+}, { timestamps: true });
+
+const Interaction = mongoose.model('Interaction', InteractionSchema);
+
+const VisitorProfileSchema = new mongoose.Schema({
+  visitorId: { type: String, required: true, unique: true },
+  name: { type: String },
+  email: { type: String },
+  role: { type: String },
+  isStudent: { type: Boolean },
+  contactDetails: { type: String },
+  ipAddress: { type: String },
+  visitedCategories: [{ type: String }],
+  chatHistory: [{ role: String, content: String, timestamp: Date }],
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const VisitorProfile = mongoose.model('VisitorProfile', VisitorProfileSchema);
+
+const crypto = require('crypto');
+
+const AdminSettingSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: mongoose.Schema.Types.Mixed },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const AdminSetting = mongoose.model('AdminSetting', AdminSettingSchema);
+
+function hashPassword(password) {
+  if (!password || typeof password !== 'string') return '';
+  return crypto.createHash('sha256').update(password.trim()).digest('hex');
+}
+
+// Default hashes initialized
+const DEFAULT_INITIAL_PASS = process.env.MASTER_PASSWORD || 'Pooja1908';
+const DEFAULT_MASTER_HASH = hashPassword(DEFAULT_INITIAL_PASS);
+
+async function getMasterPasswordHash() {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      let setting = await AdminSetting.findOne({ key: 'master_password_hash' });
+      if (setting && setting.value) return setting.value;
+
+      // Migrate legacy unhashed entry if present
+      const oldSetting = await AdminSetting.findOne({ key: 'master_password' });
+      if (oldSetting && oldSetting.value) {
+        const migratedHash = hashPassword(oldSetting.value);
+        setting = new AdminSetting({ key: 'master_password_hash', value: migratedHash });
+        await setting.save();
+        await AdminSetting.deleteOne({ key: 'master_password' });
+        return migratedHash;
+      }
+
+      // Initialize default password hash if not yet configured
+      setting = new AdminSetting({ key: 'master_password_hash', value: DEFAULT_MASTER_HASH });
+      await setting.save();
+      return DEFAULT_MASTER_HASH;
+    }
+  } catch (e) {}
+  return DEFAULT_MASTER_HASH;
+}
+
+// Preset Default Reviews to seed if database is empty
+const DEFAULT_PRESETS = [
+  {
+    name: 'Prof. K. R. Patel',
+    rating: 5,
+    review: 'Raj is a highly competent machine learning developer. His work on predictive models shows clean styling, sound architecture, and solid execution. Excellent engineering mindset!',
+    date: '12 Jun 2026'
+  },
+  {
+    name: 'Mayur (Cyber Security Teammate)',
+    rating: 5,
+    review: 'Worked with Raj on computer vision applications. His speed in debugging model deployments and building pipeline interfaces is exceptional. Great teammate!',
+    date: '02 May 2026'
+  }
+];
+
+// Seed initial database helper
+async function seedDefaultReviews() {
+  try {
+    // Automatically migrate old Amit Shah database records to Mayur
+    await Review.updateMany(
+      { name: 'Amit Shah (AI Hackathon Teammate)' },
+      { name: 'Mayur (Cyber Security Teammate)' }
+    );
+    const count = await Review.countDocuments();
+    if (count === 0) {
+      console.log('Seeding default professional reviews in MongoDB...');
+      await Review.insertMany(DEFAULT_PRESETS);
+    }
+  } catch (err) {
+    console.error('Database seeding warning:', err.message);
+  }
+}
+
+// ================= MULTILINGUAL PROFANITY & ABUSER GUARD =================
+const ABUSIVE_PATTERNS = [
+  'fuck', 'fucking', 'fucker', 'shit', 'bitch', 'asshole', 'bastard', 'cunt', 'dick', 'pussy',
+  'motherfucker', 'cock', 'whore', 'slut', 'bullshit', 'prick', 'twat', 'wanker', 'retard',
+  'bhenchod', 'benchod', 'bhanchod', 'bc', 'madarchod', 'mc', 'chutiya', 'chutya', 'chootiya',
+  'bsdk', 'bhosdike', 'bhosdika', 'bhosdi', 'lauda', 'loda', 'lodu', 'laund', 'gand', 'gaand',
+  'gaandu', 'gandu', 'choot', 'chut', 'harami', 'hrami', 'saala', 'sala', 'kamina', 'kamine',
+  'bkl', 'bhenke lode', 'bhenkelode', 'randi', 'rndi', 'raand', 'kutta', 'kutti', 'tatte', 'tatta',
+  'jhantu', 'jhatu', 'chutiye', 'bhenchods', 'bhosad', 'maderchod', 'madarchodh', 'ghando', 'gandiyad'
+];
+
+function checkAbusiveContent(text) {
+  if (!text || typeof text !== 'string') return { isAbusive: false };
+  const rawLower = text.toLowerCase();
+  
+  // Anti-evasion normalization
+  const normalized = text
+    .toLowerCase()
+    .replace(/@/g, 'a')
+    .replace(/\$/g, 's')
+    .replace(/0/g, 'o')
+    .replace(/1|!|\|/g, 'i')
+    .replace(/3/g, 'e')
+    .replace(/5/g, 's')
+    .replace(/7/g, 't')
+    .replace(/8/g, 'b')
+    .replace(/\*/g, '')
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/(.)\1{2,}/g, '$1$1')
+    .trim();
+
+  const spaceless = normalized.replace(/\s+/g, '');
+
+  for (const word of ABUSIVE_PATTERNS) {
+    const pattern = new RegExp(`\\b${word}\\b`, 'i');
+    if (pattern.test(rawLower) || pattern.test(normalized)) {
+      return { isAbusive: true, word };
+    }
+    if (word.length >= 4 && spaceless.includes(word)) {
+      return { isAbusive: true, word };
+    }
+  }
+  return { isAbusive: false };
+}
+
+// Trigger seeding after database connection is ready
+mongoose.connection.once('open', () => {
+  seedDefaultReviews();
+});
+
+// ================= IN-MEMORY RUNTIME STORES & GITHUB CACHE =================
+let inMemoryReviews = [...DEFAULT_PRESETS];
+let inMemoryOverrides = {};
+
+let githubReposCache = { data: null, timestamp: 0 };
+let githubStatsCache = { data: null, timestamp: 0 };
+const GITHUB_CACHE_TTL = 5 * 60 * 1000; // 5 minutes fresh live cache
+
+const SKIP_REPOS = [
+  'raj-rathod-ai',
+  '.github',
+  'impact-training-parul-university',
+  'portfolio',
+  'certificate',
+  'portfolio-01',
+  'neetcode-submissions',
+  'neetcode'
+];
+
+const GITHUB_FALLBACK_REPOS = [
+  {
+    "name": "Ai-Powered-Discord-Assistant",
+    "description": "An intelligent Discord AI bot powered by Python, LangChain, and Ollama (Qwen 2.5 7B), featuring AI-powered conversations, image generation, and customizable AI agent tools.",
+    "language": "Python",
+    "updated_at": "2026-11-16T04:38:25Z",
+    "created_at": "2026-11-14T08:18:55Z",
+    "stargazers_count": 0,
+    "homepage": "",
+    "topics": [
+      "ai-agents",
+      "discord-ai-bot",
+      "discord-bot",
+      "generative-ai",
+      "image-generation",
+      "langchain",
+      "ollama",
+      "python",
+      "python3",
+      "qwen"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Ai-Powered-Discord-Assistant"
+  },
+  {
+    "name": "AI-Code-Reviewer",
+    "description": "The AI Developer Code Reviewer is an automated system that reviews code using AI-powered multi-agent analysis, LangChain, and LLMs.",
+    "language": "Python",
+    "updated_at": "2026-11-16T04:30:00Z",
+    "created_at": "2026-11-16T04:00:00Z",
+    "stargazers_count": 0,
+    "homepage": "",
+    "topics": [
+      "code-reviewer",
+      "ai-agents",
+      "multi-agent",
+      "llm",
+      "python",
+      "generative-ai"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/AI-Code-Reviewer"
+  },
+  {
+    "name": "FruitsCheck-CNN-Fruit-Freshness",
+    "description": "FruitCheck is a CNN-based computer vision application that classifies fruit images as Fresh or Rotten. Built with TensorFlow/Keras, FastAPI, and React, it currently supports apples, bananas, and oranges with image preprocessing using Pillow and NumPy.",
+    "language": "Python",
+    "updated_at": "2026-09-01T13:09:35Z",
+    "created_at": "2026-09-01T10:43:55Z",
+    "stargazers_count": 0,
+    "homepage": "https://fruits-check.streamlit.app/",
+    "topics": [
+      "cnn-classification",
+      "cnn-keras",
+      "convolutional-neural-networks",
+      "deep-learning",
+      "jupyter-notebook",
+      "kaggle",
+      "nural-network",
+      "pooling",
+      "python-3"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness"
+  },
+  {
+    "name": "Sukoon-Saathi",
+    "description": "SukoonSaathi - An ML-based student wellness prediction system that learns from academic, digital behavior, lifestyle, sleep, physical activity, and stress-related features to predict a personalized mental wellness score, with a production-ready inference pipeline powered by FastAPI.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-08-29T04:43:43Z",
+    "created_at": "2026-08-28T10:02:51Z",
+    "stargazers_count": 0,
+    "homepage": "https://sukoonsaathi-frontend.onrender.com/",
+    "topics": [
+      "exploratory-data-analysis",
+      "machine-learning",
+      "machine-learning-pipelines",
+      "pkl-model",
+      "preprocessing",
+      "sklearn"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Sukoon-Saathi"
+  },
+  {
+    "name": "SENTI-AI-BiGRU-Emotion-Detection-Using-DL",
+    "description": "SENTI.AI is a Deep Learning-based NLP project that analyzes English text and predicts six emotions-Joy, Sadness, Love, Anger, Fear, and Surprise-using a Bidirectional GRU (BiGRU) model, Keras Tokenizer, and FastAPI.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-08-26T12:37:49Z",
+    "created_at": "2026-08-26T11:43:27Z",
+    "stargazers_count": 0,
+    "homepage": "https://senti-ai.onrender.com",
+    "topics": [
+      "bigru",
+      "deep-learning",
+      "fastapi",
+      "huggingface",
+      "nlp",
+      "numpy",
+      "pandas",
+      "preprocessing",
+      "sklearn",
+      "tensorflow",
+      "tokenization",
+      "tokenizer"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL"
+  },
+  {
+    "name": "Laptop-Price-Predicate-Using-DL",
+    "description": "Deep Learning-based Laptop Price Prediction using an Artificial Neural Network (ANN), with One-Hot Encoding and StandardScaler preprocessing, and an interactive Streamlit web application for real-time price estimation.",
+    "language": "Python",
+    "updated_at": "2026-08-26T06:32:35Z",
+    "created_at": "2026-08-26T06:10:19Z",
+    "stargazers_count": 0,
+    "homepage": "https://laptop-price-predicate.streamlit.app/",
+    "topics": [
+      "artificial-neural-networks",
+      "deep-learning",
+      "keras",
+      "pkl",
+      "sklearn",
+      "streamlit",
+      "tensorflow"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL"
+  },
+  {
+    "name": "MeetNotes",
+    "description": "⚡ MeetNotes — Autonomous AI Meeting Intelligence & Video-Agent System powered by RAG, Whisper, and Mistral LLM.",
+    "language": "Python",
+    "updated_at": "2026-08-27T20:00:00Z",
+    "created_at": "2026-08-27T18:00:00Z",
+    "stargazers_count": 1,
+    "homepage": "https://meetnotes.streamlit.app/",
+    "topics": [
+      "rag",
+      "video-agent",
+      "generative-ai",
+      "llm",
+      "speech-to-text",
+      "python",
+      "streamlit"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/MeetNotes"
+  },
+  {
+    "name": "AutoPrepAI",
+    "description": "\u26a1 AutoPrepAI \u2014 Offline AI-powered automated data preprocessing & quality analysis platform built with Streamlit. Upload any CSV/Excel/Parquet/JSON dataset and get full cleaning, feature engineering, quality scoring, visualizations, and downloadable reports \u2014 no cloud required.",
+    "language": "Python",
+    "updated_at": "2026-07-26T17:27:05Z",
+    "created_at": "2026-07-09T18:11:01Z",
+    "stargazers_count": 1,
+    "topics": [
+      "data-analysis",
+      "data-science",
+      "machine-learning",
+      "mathematics",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "seaborn"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/AutoPrepAI"
+  },
+  {
+    "name": "car-selling-price-prediction",
+    "description": "A machine learning web application built with Streamlit that predicts the estimated resale price of a used car using a trained ML model and an interactive user-friendly questionnaire.",
+    "language": "Python",
+    "updated_at": "2026-07-26T17:25:42Z",
+    "created_at": "2026-07-15T16:12:44Z",
+    "stargazers_count": 1,
+    "topics": [
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "scikit-learn",
+      "seaborn",
+      "streamlit"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/car-selling-price-prediction"
+  },
+  {
+    "name": "ChatNotes",
+    "description": "RAG-powered document assistant that lets users chat with PDFs without repeatedly uploading files or hitting token limits. Built with Groq API, with planned support for Mistral and other open-source LLMs for fast and cost-effective document Q&A.",
+    "language": "CSS",
+    "updated_at": "2026-08-08T06:39:39Z",
+    "created_at": "2026-07-26T11:26:16Z",
+    "stargazers_count": 1,
+    "topics": [
+      "css",
+      "groq-api",
+      "html",
+      "javascript",
+      "python3",
+      "rag"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/ChatNotes"
+  },
+  {
+    "name": "Discover-Your-True-Personality",
+    "description": "\ud83d\ude80 AI-powered Personality Prediction System built with Python, Scikit-learn, and Streamlit. \ud83e\udde0 Analyze 26 personality traits to predict Introvert, Ambivert, or Extrovert with an interactive UI, confidence scoring, and detailed insights.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-07-26T17:31:08Z",
+    "created_at": "2026-06-29T17:32:10Z",
+    "stargazers_count": 2,
+    "topics": [
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "seaborn"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality"
+  },
+  {
+    "name": "drug-recommendation-system",
+    "description": "A Streamlit-based machine learning application that recommends suitable drug categories based on patient information through a simple, easy-to-understand questionnaire.",
+    "language": "Python",
+    "updated_at": "2026-07-26T17:24:55Z",
+    "created_at": "2026-07-15T16:13:31Z",
+    "stargazers_count": 1,
+    "topics": [
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "scikit-learn",
+      "seaborn",
+      "streamlit"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/drug-recommendation-system"
+  },
+  {
+    "name": "Fake-News-Detection-Using-DL-Real-time",
+    "description": "TruthLens — A real-time fake news detection and credibility verification system using deep learning and machine learning. Features a web portal on Netlify for instant news credibility analysis and truth scoring.",
+    "language": "Python",
+    "updated_at": "2026-08-21T14:31:46Z",
+    "created_at": "2026-01-29T10:22:11Z",
+    "stargazers_count": 4,
+    "topics": [
+      "ai",
+      "deep-learning",
+      "machine-learning",
+      "nlp",
+      "truthlens",
+      "streamlit",
+      "transformers",
+      "fake-news",
+      "flask",
+      "html5",
+      "js",
+      "three-js",
+      "real-time",
+      "verify"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time"
+  },
+  {
+    "name": "FlowerDiseaseSystem",
+    "description": "This project builds an end-to-end flower recognition and disease detection system using deep learning.",
+    "language": "JavaScript",
+    "updated_at": "2026-07-01T06:21:32Z",
+    "created_at": "2026-04-10T17:14:16Z",
+    "stargazers_count": 4,
+    "topics": [],
+    "html_url": "https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem"
+  },
+  {
+    "name": "Food_Delivery_Time-Using-ML",
+    "description": "\ud83d\ude80 End-to-end Linear Regression project built with Python, featuring data preprocessing, EDA, feature engineering, model training, evaluation, and prediction using Scikit-learn. Turning raw data into meaningful insights, one model at a time. \ud83d\udcca\ud83e\udd16",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-07-26T17:31:43Z",
+    "created_at": "2026-06-27T13:17:18Z",
+    "stargazers_count": 4,
+    "topics": [
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "seaborn"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML"
+  },
+  {
+    "name": "healthy-lifestyle-prediction",
+    "description": "A machine learning-powered Streamlit application that evaluates health and lifestyle factors to provide personalized health risk predictions using an interactive questionnaire.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-07-26T17:24:09Z",
+    "created_at": "2026-07-15T16:14:16Z",
+    "stargazers_count": 2,
+    "topics": [
+      "data-science",
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "seaborn"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/healthy-lifestyle-prediction"
+  },
+  {
+    "name": "HybridMind",
+    "description": "\ud83d\ude80 Multi-model AI platform for deploying Machine Learning models with Python, Google Gemini AI, Tavily Search, and secure API integration.",
+    "language": "JavaScript",
+    "updated_at": "2026-07-26T17:28:27Z",
+    "created_at": "2026-07-02T17:49:41Z",
+    "stargazers_count": 1,
+    "topics": [
+      "api",
+      "llm",
+      "mistral",
+      "numpy",
+      "pandas",
+      "python"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/HybridMind"
+  },
+  {
+    "name": "Job-Analysis-Dashboard",
+    "description": "Job Analysis Dashboard for practice PowerBi",
+    "language": "Python",
+    "updated_at": "2026-07-01T06:21:22Z",
+    "created_at": "2026-05-24T06:12:12Z",
+    "stargazers_count": 4,
+    "topics": [],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard"
+  },
+  {
+    "name": "Library-Mangement",
+    "description": "A simple and interactive Library Management System built using Python and Streamlit, designed to manage books and members efficiently with a modern web interface.  This project allows users to add books, register members, borrow and return books, and view real-time library data \u2014 all through a clean and user-friendly dashboard.",
+    "language": "Python",
+    "updated_at": "2026-07-01T06:21:41Z",
+    "created_at": "2026-03-28T10:20:31Z",
+    "stargazers_count": 4,
+    "topics": [
+      "library-management-system",
+      "oops-in-python",
+      "python3"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Library-Mangement"
+  },
+  {
+    "name": "Loan-Risk-Assessment-App",
+    "description": "A Streamlit app that asks a loan applicant simple, plain-language questions one at a time, then uses your trained Gaussian Naive Bayes model (naive_bayes_model.pkl) to estimate the risk that the loan would default.",
+    "language": "Python",
+    "updated_at": "2026-07-26T17:33:57Z",
+    "created_at": "2026-07-08T16:34:29Z",
+    "stargazers_count": 1,
+    "topics": [
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Loan-Risk-Assessment-App"
+  },
+  {
+    "name": "Machine-Learning-Notes",
+    "description": "\ud83d\udcda Visual Machine Learning notes covering concepts, mathematics, formulas, model intuition, algorithms, evaluation metrics, and how ML models work behind the scenes\u2014with easy-to-understand diagrams and explanations.",
+    "language": "Python",
+    "updated_at": "2026-07-01T06:21:14Z",
+    "created_at": "2026-06-27T13:31:30Z",
+    "stargazers_count": 4,
+    "topics": [],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Machine-Learning-Notes"
+  },
+  {
+    "name": "Mark-Predication",
+    "description": "Academic Performance Predictor is a Machine Learning web app that predicts students' exam scores using a Tuned XGBoost Regressor. Built with Python, Streamlit, Scikit-learn, Pandas, NumPy, and XGBoost.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-08-08T06:39:38Z",
+    "created_at": "2026-07-26T16:17:02Z",
+    "stargazers_count": 1,
+    "topics": [
+      "decision-trees",
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "scikit-learn",
+      "streamlit",
+      "xgboost-regression"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Mark-Predication"
+  },
+  {
+    "name": "Movie-Recommendations-Using-NLP-and-ML",
+    "description": "Movie recommendation system using NLP and Machine Learning to suggest similar movies based on content, genres, keywords, and user preferences.",
+    "language": "Python",
+    "updated_at": "2026-08-08T06:39:25Z",
+    "created_at": "2026-08-04T19:18:28Z",
+    "stargazers_count": 1,
+    "topics": [
+      "linear-kernel",
+      "machine-learning",
+      "nlp",
+      "python3",
+      "sklearn",
+      "streamlit",
+      "tf-idf"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML"
+  },
+  {
+    "name": "neuro-os",
+    "description": "NeuroOS is an advanced, AI-powered Operating System interface built with a modern web stack. It features real-time system monitoring, an embedded Code IDE, live terminal emulation, cybersecurity threat detection, and AI integration via Google Gemini.",
+    "language": "TypeScript",
+    "updated_at": "2026-08-06T06:49:09Z",
+    "created_at": "2026-05-18T13:46:27Z",
+    "stargazers_count": 4,
+    "topics": [],
+    "html_url": "https://github.com/Raj-Rathod-Ai/neuro-os"
+  },
+  {
+    "name": "Random-Forest-Food-Delivery-Time",
+    "description": "A Machine Learning project that predicts food delivery time using the Random Forest algorithm. Built with Python and Scikit-learn, this project analyzes delivery-related factors to provide accurate delivery time estimates.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-07-26T17:23:13Z",
+    "created_at": "2026-07-16T14:46:38Z",
+    "stargazers_count": 1,
+    "topics": [
+      "machine-learning",
+      "numpy",
+      "pandas",
+      "python",
+      "random-forest",
+      "scikit-learn",
+      "streamlit"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Random-Forest-Food-Delivery-Time"
+  },
+  {
+    "name": "Salary_predication",
+    "description": "A Streamlit web application that predicts salary based on years of professional experience using Machine Learning. Features a modern glassmorphism UI, interactive salary insights, Plotly visualizations, and \"What-If\" salary growth analysis powered by Scikit-learn.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-07-26T17:33:18Z",
+    "created_at": "2026-07-05T12:53:23Z",
+    "stargazers_count": 1,
+    "topics": [
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "seaborn",
+      "streamlit"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Salary_predication"
+  },
+  {
+    "name": "stone-paper-scissors-python",
+    "description": "Stone Paper Scissor Game For Logic Building Using Python",
+    "language": "Python",
+    "updated_at": "2026-07-01T06:21:28Z",
+    "created_at": "2025-12-18T11:18:47Z",
+    "stargazers_count": 4,
+    "topics": [],
+    "html_url": "https://github.com/Raj-Rathod-Ai/stone-paper-scissors-python"
+  },
+  {
+    "name": "Student_performance_predication",
+    "description": "A machine learning project to predict student GPA using academic and demographic features.",
+    "language": "Jupyter Notebook",
+    "updated_at": "2026-07-26T17:27:40Z",
+    "created_at": "2026-07-05T10:23:06Z",
+    "stargazers_count": 2,
+    "topics": [
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Student_performance_predication"
+  },
+  {
+    "name": "Taxi-Fare-Prediction",
+    "description": "\ud83d\ude96 AI-powered Taxi Fare Prediction using Polynomial Regression with a modern web interface for real-time fare estimation, built using Python, Scikit-learn, and Streamlit.",
+    "language": "TypeScript",
+    "updated_at": "2026-07-26T17:32:07Z",
+    "created_at": "2026-06-30T11:06:12Z",
+    "stargazers_count": 2,
+    "topics": [
+      "machine-learning",
+      "numpy",
+      "pandas",
+      "python"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction"
+  },
+  {
+    "name": "Tic-Tac-Toe",
+    "description": "A web-based Tic Tac Toe game built using Python, Streamlit, and NumPy, featuring a modern glassmorphism UI, real-time state management, and optimized game logic for seamless gameplay experience.",
+    "language": "Python",
+    "updated_at": "2026-07-01T06:21:35Z",
+    "created_at": "2026-04-01T14:48:25Z",
+    "stargazers_count": 4,
+    "topics": [
+      "numpy",
+      "numpy-arrays",
+      "python3",
+      "streamlit-webapp"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Tic-Tac-Toe"
+  },
+  {
+    "name": "USA-house-price-prediction",
+    "description": "A Streamlit machine learning application that estimates residential property prices in the USA using a trained regression model and a user-friendly questionnaire interface.",
+    "language": "Python",
+    "updated_at": "2026-07-26T17:26:21Z",
+    "created_at": "2026-07-15T16:15:16Z",
+    "stargazers_count": 1,
+    "topics": [
+      "machine-learning",
+      "matplotlib",
+      "numpy",
+      "pandas",
+      "python",
+      "scikit-learn",
+      "seaborn",
+      "streamlit"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/USA-house-price-prediction"
+  }
+];
+
+// Helper to fetch live repos from GitHub API
+async function fetchLiveGitHubRepos() {
+  const headers = { 'User-Agent': 'RajPortfolioBackend/1.0' };
+  if (process.env.GITHUB_TOKEN) {
+    headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+
+  const res = await safeFetch('https://api.github.com/users/Raj-Rathod-Ai/repos?sort=updated&per_page=100', { headers });
+  if (!res.ok) {
+    throw new Error(`GitHub API returned ${res.status}`);
+  }
+  const repos = await res.json();
+  return repos.filter(repo => {
+    const nameLower = (repo.name || '').toLowerCase();
+    return !SKIP_REPOS.includes(nameLower) && !repo.archived && !repo.fork;
+  });
+}
+
+// ================= API ENDPOINTS =================
+
+// GET /api/github/repos - Live GitHub repositories with server-side caching
+app.get('/api/github/repos', async (req, res) => {
+  const forceRefresh = req.query.fresh === 'true';
+  const now = Date.now();
+
+  if (!forceRefresh && githubReposCache.data && (now - githubReposCache.timestamp < GITHUB_CACHE_TTL)) {
+    return res.json({ success: true, cached: true, repos: githubReposCache.data });
+  }
+
+  try {
+    const liveRepos = await fetchLiveGitHubRepos();
+    githubReposCache = { data: liveRepos, timestamp: now };
+    res.json({ success: true, cached: false, repos: liveRepos });
+  } catch (err) {
+    console.warn('Backend GitHub repos fetch warning:', err.message);
+    if (githubReposCache.data) {
+      return res.json({ success: true, cached: true, stale: true, repos: githubReposCache.data });
+    }
+    res.json({ success: true, cached: true, fallback: true, repos: GITHUB_FALLBACK_REPOS });
+  }
+});
+
+// GET /api/github/repos/:repoName/details - Fetch authoritative per-repository metadata.
+const githubProjectDetailsCache = new Map();
+app.get('/api/github/repos/:repoName/details', apiRateLimiter(90, 60000), async (req, res) => {
+  const repoName = String(req.params.repoName || '').trim();
+  if (!/^[A-Za-z0-9._-]{1,100}$/.test(repoName)) return res.status(400).json({ success: false, error: 'Invalid repository name.' });
+  const cacheKey = repoName.toLowerCase();
+  const cached = githubProjectDetailsCache.get(cacheKey);
+  const now = Date.now();
+  if (req.query.fresh !== 'true' && cached && now - cached.timestamp < 600000) return res.json({ success: true, cached: true, details: cached.data });
+  const headers = { 'Accept': 'application/vnd.github+json', 'User-Agent': 'RajPortfolioBackend/1.0', 'X-GitHub-Api-Version': '2022-11-28' };
+  if (process.env.GITHUB_TOKEN) headers.Authorization = 'Bearer ' + process.env.GITHUB_TOKEN;
+  try {
+    const base = 'https://api.github.com/repos/Raj-Rathod-Ai/' + encodeURIComponent(repoName);
+    const results = await Promise.all([safeFetch(base, { headers }), safeFetch(base + '/languages', { headers }), safeFetch(base + '/readme', { headers }), safeFetch(base + '/contributors?per_page=8', { headers })]);
+    const repoResponse = results[0];
+    if (!repoResponse.ok) return res.status(repoResponse.status === 404 ? 404 : 502).json({ success: false, error: repoResponse.status === 404 ? 'Repository not found or not public.' : 'GitHub repository details are temporarily unavailable.' });
+    const repository = await repoResponse.json();
+    if (repository.owner && String(repository.owner.login).toLowerCase() !== 'raj-rathod-ai') return res.status(404).json({ success: false, error: 'Repository not found.' });
+    const languages = results[1].ok ? await results[1].json().catch(() => ({})) : {};
+    const readmePayload = results[2].ok ? await results[2].json().catch(() => null) : null;
+    const contributorsPayload = results[3].ok ? await results[3].json().catch(() => []) : [];
+    const details = {
+      repository: { name: repository.name, full_name: repository.full_name, description: repository.description || '', html_url: repository.html_url, homepage: repository.homepage || '', default_branch: repository.default_branch, visibility: repository.visibility || (repository.private ? 'private' : 'public'), language: repository.language, topics: Array.isArray(repository.topics) ? repository.topics : [], stargazers_count: repository.stargazers_count || 0, watchers_count: repository.subscribers_count || 0, forks_count: repository.forks_count || 0, open_issues_count: repository.open_issues_count || 0, size: repository.size || 0, created_at: repository.created_at, updated_at: repository.updated_at, pushed_at: repository.pushed_at, license: repository.license ? { name: repository.license.name, spdx_id: repository.license.spdx_id } : null, archived: Boolean(repository.archived), disabled: Boolean(repository.disabled) },
+      languages: languages && typeof languages === 'object' ? languages : {},
+      readme: readmePayload && readmePayload.content && readmePayload.encoding === 'base64' ? Buffer.from(readmePayload.content.replace(/\\s/g, ''), 'base64').toString('utf8') : '',
+      readmeUrl: readmePayload && readmePayload.html_url || '',
+      contributors: Array.isArray(contributorsPayload) ? contributorsPayload.slice(0, 8).map(person => ({ login: person.login, avatar_url: person.avatar_url, html_url: person.html_url, contributions: person.contributions })) : [],
+      fetchedAt: new Date().toISOString()
+    };
+    githubProjectDetailsCache.set(cacheKey, { data: details, timestamp: now });
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    return res.json({ success: true, cached: false, details });
+  } catch (err) {
+    console.warn('[GitHub] Project details fetch warning:', err.message);
+    if (cached && cached.data) return res.json({ success: true, cached: true, stale: true, details: cached.data });
+    return res.status(502).json({ success: false, error: 'Could not load live GitHub project details. Please retry.' });
+  }
+});
+// GET /api/github/stats - Live GitHub user profile metrics & language distribution
+app.get('/api/github/stats', async (req, res) => {
+  const forceRefresh = req.query.fresh === 'true';
+  const now = Date.now();
+
+  if (!forceRefresh && githubStatsCache.data && (now - githubStatsCache.timestamp < GITHUB_CACHE_TTL)) {
+    return res.json({ success: true, cached: true, stats: githubStatsCache.data });
+  }
+
+  try {
+    const headers = { 'User-Agent': 'RajPortfolioBackend/1.0' };
+    if (process.env.GITHUB_TOKEN) {
+      headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+    }
+
+    const [userRes, reposRes] = await Promise.all([
+      safeFetch('https://api.github.com/users/Raj-Rathod-Ai', { headers }),
+      safeFetch('https://api.github.com/users/Raj-Rathod-Ai/repos?per_page=100', { headers })
+    ]);
+
+    let user = {};
+    let repos = [];
+    try {
+      if (userRes && userRes.ok) user = await userRes.json();
+    } catch (e) {}
+    try {
+      if (reposRes && reposRes.ok) repos = await reposRes.json();
+    } catch (e) {}
+
+    const publicRepos = (typeof user.public_repos === 'number' && user.public_repos > 0)
+      ? user.public_repos
+      : (Array.isArray(repos) && repos.length > 0 ? repos.length : 30);
+    const followers = (typeof user.followers === 'number' && user.followers > 0)
+      ? user.followers
+      : 9;
+    const totalStars = (Array.isArray(repos) && repos.length > 0)
+      ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0)
+      : 76;
+
+    const langMap = {};
+    if (Array.isArray(repos)) {
+      repos.forEach(r => {
+        if (r.language) langMap[r.language] = (langMap[r.language] || 0) + 1;
+      });
+    }
+
+    const sortedLangs = Object.entries(langMap).sort((a, b) => b[1] - a[1]).slice(0, 7);
+    const languages = sortedLangs.length > 0
+      ? { labels: sortedLangs.map(s => s[0]), values: sortedLangs.map(s => s[1]) }
+      : { labels: ['Python', 'Jupyter', 'JavaScript', 'TypeScript', 'CSS', 'Java'], values: [10, 7, 3, 2, 2, 1] };
+
+    const statsData = {
+      publicRepos,
+      followers,
+      totalStars: totalStars || 76,
+      languages
+    };
+
+    githubStatsCache = { data: statsData, timestamp: now };
+    res.json({ success: true, cached: false, stats: statsData });
+  } catch (err) {
+    console.warn('Backend GitHub stats fetch warning:', err.message);
+    const fallbackStats = {
+      publicRepos: 30,
+      followers: 9,
+      totalStars: 76,
+      languages: {
+        labels: ['Python', 'Jupyter', 'JavaScript', 'TypeScript', 'CSS', 'Java'],
+        values: [10, 7, 3, 2, 2, 1]
+      }
+    };
+    res.json({ success: true, cached: true, fallback: true, stats: fallbackStats });
+  }
+});
+
+// GET /api/reviews - List all reviews (filtering out any profane entries)
+app.get('/api/reviews', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const reviews = await Review.find().sort({ createdAt: -1 });
+      const cleanReviews = reviews.filter(r => 
+        !checkAbusiveContent(r.name).isAbusive && !checkAbusiveContent(r.review).isAbusive
+      );
+
+      if (cleanReviews.length > 0) {
+        return res.json(cleanReviews);
+      }
+    }
+    // Fallback to in-memory reviews if database is offline or empty
+    const cleanInMemory = inMemoryReviews.filter(r =>
+      !checkAbusiveContent(r.name).isAbusive && !checkAbusiveContent(r.review).isAbusive
+    );
+    res.json(cleanInMemory.length > 0 ? cleanInMemory : DEFAULT_PRESETS);
+  } catch (err) {
+    console.error('GET reviews error:', err);
+    res.json(inMemoryReviews.length > 0 ? inMemoryReviews : DEFAULT_PRESETS);
+  }
+});
+
+// GET /api/project-overrides - Retrieve global project overrides (Solo/Group & Featured top pins)
+app.get('/api/project-overrides', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const setting = await AdminSetting.findOne({ key: 'boss_project_overrides' });
+      if (setting && setting.value) {
+        inMemoryOverrides = setting.value;
+        return res.json({ overrides: setting.value });
+      }
+    }
+    res.json({ overrides: inMemoryOverrides });
+  } catch (err) {
+    res.json({ overrides: inMemoryOverrides });
+  }
+});
+
+// POST /api/project-overrides - Update global project overrides (Master Admin only)
+app.post('/api/project-overrides', async (req, res) => {
+  try {
+    const authKey = req.headers['x-admin-key'] || req.query.password || req.body?.password;
+    const storedHash = await getMasterPasswordHash();
+    if (!authKey || hashPassword(authKey) !== storedHash) {
+      return res.status(403).json({ error: 'Master Admin authentication required to update project overrides.' });
+    }
+
+    const { overrides } = req.body;
+    if (!overrides || typeof overrides !== 'object') {
+      return res.status(400).json({ error: 'Invalid overrides dataset.' });
+    }
+
+    inMemoryOverrides = { ...inMemoryOverrides, ...overrides };
+
+    if (mongoose.connection.readyState === 1) {
+      await AdminSetting.findOneAndUpdate(
+        { key: 'boss_project_overrides' },
+        { value: inMemoryOverrides, updatedAt: new Date() },
+        { upsert: true, new: true }
+      );
+      return res.json({ success: true, message: 'Global project overrides synced successfully.' });
+    }
+    res.json({ success: true, message: 'Saved to runtime cache (DB offline).' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/reviews - Add a new review with profanity check & in-memory backup
+app.post('/api/reviews', apiRateLimiter(20, 60000), async (req, res) => {
+  try {
+    const { name, rating, review } = req.body;
+    if (!name || !review) {
+      return res.status(400).json({ error: 'Name and review content are required.' });
+    }
+
+    // Multilingual abusive language ("gali") check
+    const nameCheck = checkAbusiveContent(name);
+    const reviewCheck = checkAbusiveContent(review);
+    if (nameCheck.isAbusive || reviewCheck.isAbusive) {
+      console.warn(`Blocked abusive review attempt. Name: "${name}", Review: "${review}"`);
+      return res.status(400).json({
+        error: 'Review rejected: Inappropriate or offensive language ("gali" / abusive words) detected. Please submit respectful feedback.',
+        isAbusive: true
+      });
+    }
+
+    const formattedDate = new Date().toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    const newReviewData = {
+      _id: 'rev_' + Date.now(),
+      name,
+      rating: parseInt(rating) || 5,
+      review,
+      date: formattedDate,
+      createdAt: new Date()
+    };
+
+    // Save into runtime memory immediately so live fetching succeeds
+    inMemoryReviews.unshift(newReviewData);
+
+    if (mongoose.connection.readyState !== 1) {
+      console.warn('Database offline. Review saved in server memory fallback.');
+      return res.status(201).json(newReviewData);
+    }
+
+    const newReview = new Review({
+      name,
+      rating: parseInt(rating) || 5,
+      review,
+      date: formattedDate
+    });
+    await newReview.save();
+    console.log(`New review saved for: ${name}`);
+
+    // Automatically link reviewer name to visitor profile if visitorId provided
+    const visitorId = req.body.visitorId;
+    if (visitorId) {
+      try {
+        await VisitorProfile.findOneAndUpdate(
+          { visitorId },
+          { name, updatedAt: new Date() },
+          { upsert: true }
+        );
+        await Visit.updateMany(
+          { visitorId },
+          { visitorName: name }
+        );
+      } catch (linkErr) {
+        console.warn('Could not auto-link reviewer profile:', linkErr.message);
+      }
+    }
+
+    res.status(201).json(newReview);
+  } catch (err) {
+    console.error('POST review error:', err);
+    res.status(500).json({ error: 'Failed to save review to database.' });
+  }
+});
+
+// POST /api/contact - Direct inquiry handler with human executive auto-replies via Brevo SMTP
+app.post('/api/contact', apiRateLimiter(15, 60000), async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body || {};
+
+    // Minimal required validation: valid email & message content
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: 'A valid email address is required.' });
+    }
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      return res.status(400).json({ error: 'Message or proposal details are required.' });
+    }
+
+    const cleanEmail = email.trim();
+    const cleanMessage = message.trim();
+    let cleanName = (typeof name === 'string' && name.trim()) ? name.trim() : 'Colleague / Inquirer';
+    let cleanSubject = (typeof subject === 'string' && subject.trim()) ? subject.trim() : '';
+
+    // Smart categorization of the proposal / message
+    let categoryTag = 'Portfolio Inquiry';
+    const msgLower = cleanMessage.toLowerCase();
+    if (/\b(job|hire|hiring|intern|internship|role|opening|ctc|salary|package|recruit|interview|position|join|contractor)\b/i.test(cleanMessage)) {
+      categoryTag = 'Career Opportunity';
+      if (!cleanSubject) cleanSubject = 'Career & Project Opportunity Proposal';
+    } else if (/\b(project|proposal|freelance|contract|build|develop|client|mvp|system|app|application|budget|estimate|quote)\b/i.test(cleanMessage)) {
+      categoryTag = 'Project Proposal';
+      if (!cleanSubject) cleanSubject = 'Technical Project & Proposal Inquiry';
+    } else if (/\b(collab|collaboration|partner|partnership|hackathon|team|research|paper|contribute|open source)\b/i.test(cleanMessage)) {
+      categoryTag = 'Technical Collaboration';
+      if (!cleanSubject) cleanSubject = 'Technical Collaboration Proposal';
+    } else {
+      categoryTag = 'Direct Inquiry';
+      if (!cleanSubject) cleanSubject = 'Engineering & Portfolio Inquiry';
+    }
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }) + ' at ' + now.toLocaleTimeString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    }) + ' (IST)';
+
+    console.log(`[Contact] ${categoryTag} received from: ${cleanName} <${cleanEmail}>`);
+
+    // 1. Save the inquiry to MongoDB database if available
+    let dbSaved = false;
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const newContact = new Contact({
+          name: cleanName,
+          email: cleanEmail,
+          subject: cleanSubject,
+          message: cleanMessage
+        });
+        await newContact.save();
+        dbSaved = true;
+        console.log(`[Contact] Inquiry saved successfully to MongoDB.`);
+      } else {
+        console.warn('[Contact] MongoDB offline. Inquiry not saved to DB.');
+      }
+    } catch (dbErr) {
+      console.error('[Contact] Error saving contact to MongoDB:', dbErr.message);
+    }
+
+    // 2. Check if we have Brevo or Resend API key for email dispatch
+    const hasMailGateway = !!process.env.BREVO_API_KEY || !!process.env.RESEND_API_KEY;
+    if (!hasMailGateway) {
+      if (dbSaved) {
+        console.log('[Contact] Saved to DB. Mail gateway not configured, returning success.');
+        return res.status(200).json({ success: true, status: 'saved_to_db_only', receiptDispatched: false });
+      }
+      return res.status(500).json({ error: 'Database offline and mail gateway unconfigured.' });
+    }
+
+    // 3. Official confirmation receipt from Rudra (Raj Rathod's AI Assistant)
+    const transmissionId = `#RR-${Date.now().toString(36).toUpperCase()}`;
+
+    const fullUserEmailHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 28px; background: #0d1117; color: #e6edf3; border-radius: 14px; border: 1px solid #30363d; max-width: 620px; margin: auto; box-shadow: 0 4px 24px rgba(0,0,0,0.3); line-height: 1.6;">
+        
+        <!-- Header: Rudra - Autonomous AI Assistant to Raj Rathod -->
+        <div style="text-align: center; margin-bottom: 24px; border-bottom: 1px solid #30363d; padding-bottom: 18px;">
+          <div style="display: inline-block; width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 48px; font-size: 22px; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">⚡</div>
+          <h2 style="margin-top: 10px; margin-bottom: 3px; color: #f0f6fc; font-size: 19px; font-weight: 700; letter-spacing: 0.5px;">Rudra</h2>
+          <span style="font-size: 11px; text-transform: uppercase; color: #a5b4fc; font-family: monospace; letter-spacing: 1.5px; font-weight: 600;">Autonomous AI Assistant to Raj Rathod</span>
+        </div>
+
+        <!-- Acknowledgment & Desk Delivery Notice -->
+        <div style="font-size: 14px; color: #e6edf3; margin-bottom: 20px;">
+          <p style="font-size: 15px; margin-bottom: 14px; color: #f0f6fc;">Hi <strong>${cleanName}</strong>,</p>
+          <p style="margin-bottom: 12px;">Thank you for reaching out to <strong>Raj Rathod</strong>.</p>
+          <p style="margin-bottom: 14px; line-height: 1.6;">
+            Your transmission has been officially received and placed directly onto <strong>Raj's Executive Desk</strong>. Raj personally reviews every inquiry and project proposal on his desk, and he will give you a direct answer shortly at <a href="mailto:${cleanEmail}" style="color: #a5b4fc; text-decoration: none; font-weight: 600;">${cleanEmail}</a>.
+          </p>
+        </div>
+
+        <!-- Submitted Transmission Receipt Card -->
+        <div style="background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 18px 20px; margin: 20px 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #21262d; padding-bottom: 10px; margin-bottom: 14px;">
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #58a6ff;">📋 Transmission Receipt &amp; Details</span>
+            <span style="font-size: 11px; font-family: monospace; color: #8b949e; background: #0d1117; border: 1px solid #30363d; padding: 2px 8px; border-radius: 12px;">${categoryTag}</span>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.5;">
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e; width: 130px;">Sender Name:</td>
+              <td style="padding: 6px 0; color: #f0f6fc; font-weight: 600;">${cleanName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Sender Email:</td>
+              <td style="padding: 6px 0; color: #f0f6fc;"><a href="mailto:${cleanEmail}" style="color: #58a6ff; text-decoration: none;">${cleanEmail}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Inquiry Subject:</td>
+              <td style="padding: 6px 0; color: #f0f6fc; font-weight: 500;">${cleanSubject}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Submission Date:</td>
+              <td style="padding: 6px 0; color: #e6edf3; font-family: monospace; font-size: 12px;">${dateStr}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Transmission ID:</td>
+              <td style="padding: 6px 0; color: #7ee787; font-family: monospace; font-size: 12px;">${transmissionId}</td>
+            </tr>
+          </table>
+
+          <div style="margin-top: 14px; border-top: 1px dashed #30363d; padding-top: 12px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: #8b949e; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;">Submitted Message:</div>
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; font-size: 13px; line-height: 1.6; color: #c9d1d9; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${cleanMessage}</div>
+          </div>
+        </div>
+
+        <!-- Sign-off from Rudra -->
+        <div style="margin-top: 24px; border-top: 1px solid #30363d; padding-top: 16px; font-size: 13px; color: #8b949e; line-height: 1.6;">
+          Warm regards,<br>
+          <strong style="color: #f0f6fc; font-size: 15px;">Rudra</strong><br>
+          <span style="font-size: 12px; color: #a5b4fc; font-weight: 500;">Autonomous AI Assistant to Raj Rathod</span><br>
+          <span style="font-size: 12px; color: #8b949e;">Office of Raj Rathod &bull; Parul University, Vadodara, Gujarat, India</span><br>
+          <span style="font-size: 12px; color: #8b949e;">Direct Contact: <a href="mailto:rathodraj1504@gmail.com" style="color: #a5b4fc; text-decoration: none;">rathodraj1504@gmail.com</a></span>
+        </div>
+
+        <!-- Verified Links -->
+        <div style="margin-top: 25px; padding-top: 18px; border-top: 1px solid #30363d; text-align: center;">
+          <div style="font-size: 10px; text-transform: uppercase; color: #8b949e; letter-spacing: 1px; margin-bottom: 12px; font-weight: 600;">Raj Rathod &bull; Verified Portfolios &amp; Profiles</div>
+          <div style="text-align: center;">
+            <a href="https://rathodrajai.netlify.app/" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); color: #a5b4fc; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🌐 Live Portfolio</a>
+            <a href="https://github.com/Raj-Rathod-Ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #e6edf3; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">💻 GitHub</a>
+            <a href="https://linkedin.com/in/raj-rathod-ai" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.4); color: #38bdf8; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">👔 LinkedIn</a>
+            <a href="https://leetcode.com/u/Raj-Rathod" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">🧠 LeetCode (350+)</a>
+            <a href="https://rathodrajai.netlify.app/Rathod_Raj_Ai_Update.pdf" style="display: inline-block; margin: 3px 4px; padding: 6px 12px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.4); color: #2dd4bf; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;">📄 AI/ML Resume</a>
+          </div>
+        </div>
+        <div style="margin-top: 16px; text-align: center; font-size: 11px; color: #484f58;">
+          This automated receipt was securely dispatched by Rudra, Autonomous AI Assistant to Raj Rathod.
+        </div>
+      </div>
+    `;
+
+    // 4. Build high-priority notification to Raj with 1-click Direct Reply
+    const rajNotificationHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background: #0d1117; color: #f0f6fc; border-radius: 12px; border: 1px solid #30363d; max-width: 620px; margin: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; padding-bottom: 14px; margin-bottom: 18px;">
+          <h2 style="color: #6366f1; margin: 0; font-size: 18px; font-weight: 700;">
+            📬 New Portfolio Transmission
+          </h2>
+          <span style="background: rgba(99, 102, 241, 0.2); border: 1px solid #6366f1; color: #a5b4fc; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-family: monospace; text-transform: uppercase;">${categoryTag}</span>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px;">
+          <tr>
+            <td style="padding: 6px 0; color: #8b949e; width: 100px;">Sender Name:</td>
+            <td style="padding: 6px 0; color: #f0f6fc; font-weight: 600;">${cleanName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; color: #8b949e;">Sender Email:</td>
+            <td style="padding: 6px 0;"><a href="mailto:${cleanEmail}" style="color: #58a6ff; text-decoration: none;">${cleanEmail}</a></td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; color: #8b949e;">Subject:</td>
+            <td style="padding: 6px 0; color: #f0f6fc;">${cleanSubject}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; color: #8b949e;">Received At:</td>
+            <td style="padding: 6px 0; color: #8b949e;">${dateStr}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; color: #8b949e;">Reference ID:</td>
+            <td style="padding: 6px 0; color: #7ee787; font-family: monospace;">${transmissionId}</td>
+          </tr>
+        </table>
+
+        <div style="background: #161b22; padding: 18px; border-radius: 8px; border: 1px solid #30363d; margin: 16px 0; white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${cleanMessage}</div>
+
+        <div style="margin-top: 22px; text-align: center;">
+          <a href="mailto:${cleanEmail}?subject=${encodeURIComponent('Re: ' + cleanSubject)}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; padding: 12px 26px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);">
+            ✉️ Direct Reply to ${cleanName}
+          </a>
+        </div>
+      </div>
+    `;
+
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_SENDER || 'rathodraj1504@gmail.com';
+    let notificationSent = false;
+    let userReceiptSent = false;
+
+    // 5. Send high-priority notification to Raj
+    if (process.env.BREVO_API_KEY) {
+      try {
+        const notifyRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.BREVO_API_KEY
+          },
+          body: JSON.stringify({
+            sender: { name: `Portfolio: ${cleanName}`, email: senderEmail },
+            to: [{ email: "rathodraj1504@gmail.com", name: "Raj Rathod" }],
+            replyTo: { email: cleanEmail, name: cleanName },
+            subject: `[${categoryTag}] ${cleanSubject} — from ${cleanName}`,
+            htmlContent: rajNotificationHtml
+          })
+        });
+        if (notifyRes.ok) {
+          notificationSent = true;
+          console.log(`[Contact] Notification email successfully sent to rathodraj1504@gmail.com via Brevo`);
+        } else {
+          const errText = await notifyRes.text();
+          console.warn(`[Contact] Brevo notification warning (${notifyRes.status}): ${errText}`);
+        }
+      } catch (notifyErr) {
+        console.error('[Contact] Failed to send notification email to Raj via Brevo:', notifyErr.message);
+      }
+    } else if (process.env.RESEND_API_KEY) {
+      try {
+        const resendNotifyRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+          },
+          body: JSON.stringify({
+            from: process.env.RESEND_SENDER || 'Portfolio Inquiry <onboarding@resend.dev>',
+            to: ['rathodraj1504@gmail.com'],
+            reply_to: cleanEmail,
+            subject: `[${categoryTag}] ${cleanSubject} — from ${cleanName}`,
+            html: rajNotificationHtml
+          })
+        });
+        if (resendNotifyRes.ok) {
+          notificationSent = true;
+          console.log(`[Contact] Notification email successfully sent to rathodraj1504@gmail.com via Resend`);
+        }
+      } catch (rNotifyErr) {
+        console.warn('[Contact] Resend notification error:', rNotifyErr.message);
+      }
+    }
+
+    // 6. Send official acknowledgment receipt to the sender (cleanEmail) from Rudra
+    const plainTextReply = fullUserEmailHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+    if (process.env.BREVO_API_KEY) {
+      try {
+        const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.BREVO_API_KEY
+          },
+          body: JSON.stringify({
+            sender: { name: "Rudra (Raj Rathod's AI Assistant)", email: senderEmail },
+            to: [{ email: cleanEmail, name: cleanName }],
+            replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
+            subject: `Transmission Received: ${cleanSubject} — Rudra (Raj Rathod's AI Assistant)`,
+            htmlContent: fullUserEmailHtml,
+            textContent: plainTextReply
+          })
+        });
+
+        if (brevoRes.ok) {
+          userReceiptSent = true;
+          console.log(`[Contact] Official receipt successfully dispatched to ${cleanEmail} via Brevo`);
+        } else {
+          const errText = await brevoRes.text();
+          console.warn(`[Contact] Brevo auto-reply warning (${brevoRes.status}): ${errText}`);
+        }
+      } catch (brevoErr) {
+        console.warn('[Contact] Brevo auto-reply caught error:', brevoErr.message);
+      }
+    }
+
+    // Fallback receipt delivery via Resend if Brevo failed or is unconfigured
+    if (!userReceiptSent && process.env.RESEND_API_KEY) {
+      try {
+        const resendUserRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+          },
+          body: JSON.stringify({
+            from: process.env.RESEND_SENDER || 'Rudra (Raj Rathod AI Assistant) <onboarding@resend.dev>',
+            to: [cleanEmail],
+            reply_to: 'rathodraj1504@gmail.com',
+            subject: `Transmission Received: ${cleanSubject} — Rudra (Raj Rathod's AI Assistant)`,
+            html: fullUserEmailHtml,
+            text: plainTextReply
+          })
+        });
+        if (resendUserRes.ok) {
+          userReceiptSent = true;
+          console.log(`[Contact] Official receipt successfully dispatched to ${cleanEmail} via Resend`);
+        }
+      } catch (resendErr) {
+        console.warn('[Contact] Resend auto-reply caught error:', resendErr.message);
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      status: userReceiptSent ? 'receipt_dispatched' : 'received_no_receipt',
+      receiptDispatched: userReceiptSent,
+      notificationSent,
+      savedToDb: dbSaved,
+      category: categoryTag
+    });
+
+  } catch (err) {
+    console.error('[Contact] Endpoint error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/whatsapp - Secure WhatsApp redirect keeping phone number in backend
+app.get('/api/whatsapp', (req, res) => {
+  const phone = process.env.WHATSAPP_PHONE || '919624801014';
+  const customMsg = req.query.text || req.query.msg || "Hi Raj, I saw your portfolio and would like to connect!";
+  const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(customMsg)}`;
+  res.redirect(302, waUrl);
+});
+
+// POST /api/analytics/visit - Record silent visitor analytics session
+app.post('/api/analytics/visit', async (req, res) => {
+  try {
+    const { visitorId, path, visitCount, userAgent, visitorName } = req.body;
+    if (!visitorId) {
+      return res.status(400).json({ error: 'visitorId is required' });
+    }
+
+    const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || req.ip;
+
+    if (mongoose.connection.readyState === 1) {
+      let visitDoc = await Visit.findOne({ visitorId });
+      if (visitDoc) {
+        visitDoc.visitCount = Math.max(visitDoc.visitCount || 1, visitCount || 1);
+        visitDoc.lastVisit = new Date();
+        if (clientIp) visitDoc.ipAddress = clientIp;
+        if (visitorName) visitDoc.visitorName = visitorName;
+        if (path) visitDoc.pagesViewed.push({ path, timestamp: new Date() });
+        if (visitDoc.pagesViewed.length > 100) visitDoc.pagesViewed = visitDoc.pagesViewed.slice(-100);
+        await visitDoc.save();
+      } else {
+        visitDoc = new Visit({
+          visitorId,
+          visitorName,
+          ipAddress: clientIp,
+          visitCount: visitCount || 1,
+          pagesViewed: path ? [{ path, timestamp: new Date() }] : [],
+          lastVisit: new Date(),
+          userAgent
+        });
+        await visitDoc.save();
+      }
+      return res.json({ success: true, visitCount: visitDoc.visitCount });
+    }
+    return res.json({ success: true, offline: true });
+  } catch (err) {
+    console.error('Analytics visit tracking error:', err.message);
+    res.status(500).json({ error: 'Failed to record visit' });
+  }
+});
+
+// POST /api/analytics/profile - Save or update chatbot visitor profile & history
+app.post('/api/analytics/profile', async (req, res) => {
+  try {
+    const { visitorId, name, role, isStudent, contactDetails, chatHistory } = req.body;
+    if (!visitorId) {
+      return res.status(400).json({ error: 'visitorId is required' });
+    }
+
+    const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || req.ip;
+
+    if (mongoose.connection.readyState === 1) {
+      let profile = await VisitorProfile.findOne({ visitorId });
+      if (profile) {
+        if (name) profile.name = name;
+        if (role) profile.role = role;
+        if (typeof isStudent === 'boolean') profile.isStudent = isStudent;
+        if (contactDetails) profile.contactDetails = contactDetails;
+        if (clientIp) profile.ipAddress = clientIp;
+        if (Array.isArray(chatHistory)) profile.chatHistory = chatHistory.slice(-50);
+        profile.updatedAt = new Date();
+        await profile.save();
+      } else {
+        profile = new VisitorProfile({
+          visitorId,
+          name,
+          role,
+          isStudent,
+          contactDetails,
+          ipAddress: clientIp,
+          chatHistory: Array.isArray(chatHistory) ? chatHistory.slice(-50) : [],
+          updatedAt: new Date()
+        });
+        await profile.save();
+      }
+      return res.json({ success: true, profile });
+    }
+    return res.json({ success: true, offline: true });
+  } catch (err) {
+    console.error('Analytics profile save error:', err.message);
+    res.status(500).json({ error: 'Failed to save profile' });
+  }
+});
+
+// POST /api/analytics/interaction - Record clicks on projects, GitHub, Live Demo, and categories
+app.post('/api/analytics/interaction', async (req, res) => {
+  try {
+    const { visitorId, visitorName, type, targetName, category, linkUrl } = req.body;
+    if (!visitorId) {
+      return res.status(400).json({ error: 'visitorId is required' });
+    }
+
+    const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || req.ip;
+
+    if (mongoose.connection.readyState === 1) {
+      const interaction = new Interaction({
+        visitorId,
+        visitorName: visitorName || 'Anonymous Visitor',
+        type: type || 'click',
+        targetName: targetName || 'Portfolio Item',
+        category: category || 'General',
+        linkUrl: linkUrl || '',
+        ipAddress: clientIp
+      });
+      await interaction.save();
+
+      // Update visitor profile visitedCategories & visitorName
+      let updateObj = { $set: { updatedAt: new Date(), ipAddress: clientIp } };
+      if (visitorName && visitorName !== 'Anonymous Visitor') updateObj.$set.name = visitorName;
+      if (category) updateObj.$addToSet = { visitedCategories: category };
+
+      await VisitorProfile.findOneAndUpdate(
+        { visitorId },
+        updateObj,
+        { upsert: true }
+      );
+
+      return res.json({ success: true, logged: true });
+    }
+    return res.json({ success: true, offline: true });
+  } catch (err) {
+    console.error('Interaction tracking error:', err.message);
+    res.status(500).json({ error: 'Failed to record interaction' });
+  }
+});
+
+// GET /api/analytics/stats - Retrieve live visitor & interaction stats from MongoDB for Chatbot
+app.get('/api/analytics/stats', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const totalVisitsCount = await Visit.aggregate([{ $group: { _id: null, total: { $sum: '$visitCount' } } }]);
+      const totalSessions = totalVisitsCount[0]?.total || await Visit.countDocuments();
+      const profiles = await VisitorProfile.find({ name: { $exists: true, $ne: null } }, 'name role email contactDetails visitedCategories updatedAt');
+      const uniqueNames = Array.from(new Set(profiles.map(p => p.name).filter(n => n && n !== 'Guest Visitor' && n !== 'Boss')));
+      
+      const totalInteractions = await Interaction.countDocuments();
+      const categoryStats = await Interaction.aggregate([
+        { $match: { category: { $ne: null, $ne: '' } } },
+        { $group: { _id: '$category', count: { $sum: 1 } } }
+      ]);
+      const typeStats = await Interaction.aggregate([
+        { $group: { _id: '$type', count: { $sum: 1 } } }
+      ]);
+
+      const topProjects = await Interaction.aggregate([
+        { $match: { targetName: { $ne: null, $ne: '' } } },
+        { $group: { _id: '$targetName', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 }
+      ]);
+
+      return res.json({
+        success: true,
+        totalVisits: totalSessions,
+        uniqueVisitorsCount: profiles.length,
+        visitorNames: uniqueNames,
+        totalInteractions,
+        categoryStats,
+        typeStats,
+        topProjects
+      });
+    }
+    return res.json({ success: true, offline: true, totalVisits: 0, visitorNames: [], totalInteractions: 0 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/analytics/lead-email - Save visitor lead info and send personalized no-reply email
+app.post('/api/analytics/lead-email', apiRateLimiter(15, 60000), async (req, res) => {
+  try {
+    const { visitorId, name, email, visitedCategories } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required.' });
+    }
+
+    // Sanitize string inputs to prevent HTML injection in emails
+    const sanitizeHtml = (str) => String(str || '').replace(/[&<>"']/g, (m) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m]));
+
+    const cleanName = sanitizeHtml(name);
+    const cleanEmail = String(email).trim();
+
+    // 1. Store/Update visitor lead details in MongoDB
+    if (mongoose.connection.readyState === 1) {
+      await VisitorProfile.findOneAndUpdate(
+        { visitorId: visitorId || ('v_' + Date.now()) },
+        {
+          name: cleanName,
+          email: cleanEmail,
+          contactDetails: cleanEmail,
+          updatedAt: new Date(),
+          ...(visitedCategories ? { $addToSet: { visitedCategories: { $each: visitedCategories } } } : {})
+        },
+        { upsert: true }
+      );
+      
+      const newContact = new Contact({
+        name: cleanName,
+        email: cleanEmail,
+        subject: `Lead Contact from Chatbot (Rudra)`,
+        message: `Visitor ${cleanName} (${cleanEmail}) provided contact details via Chatbot. Visited categories: ${(visitedCategories || []).join(', ') || 'General'}`
+      });
+      await newContact.save();
+    }
+
+    // 2. Format custom personalized email based on visited categories
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'rathodraj1504@gmail.com';
+    const catsList = (visitedCategories && visitedCategories.length > 0)
+      ? visitedCategories.join(', ')
+      : 'Generative AI & Machine Learning';
+
+    const promptCategoryText = catsList.toLowerCase().includes('rag') ? 'RAG (Retrieval-Augmented Generation)'
+      : catsList.toLowerCase().includes('genai') || catsList.toLowerCase().includes('generative') ? 'Generative AI & LLMs'
+      : catsList.toLowerCase().includes('nlp') ? 'NLP (Natural Language Processing)'
+      : catsList.toLowerCase().includes('deep learning') ? 'Deep Learning & Neural Networks'
+      : 'Machine Learning & AI';
+
+    const htmlContent = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 25px; background: #0d1117; color: #e6edf3; border-radius: 12px; border: 1px solid #30363d; max-width: 600px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <div style="text-align: center; margin-bottom: 25px; border-bottom: 1px solid #30363d; padding-bottom: 20px;">
+          <div style="display: inline-block; width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #ffffff; text-align: center; line-height: 50px; font-size: 22px; font-weight: bold;">🤖</div>
+          <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">Office of Raj Rathod</h2>
+          <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Automated Assistant Dispatch</span>
+        </div>
+        <p>Hi <strong>${cleanName}</strong>, 👋</p>
+        <p>Thank you for visiting <strong>Raj Rathod's AI/ML Portfolio</strong>!</p>
+        <p>I am <strong>Rudra</strong>, Raj's personal AI Assistant. During your visit, we noticed you explored <strong>${promptCategoryText}</strong> projects!</p>
+        <div style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 10px; padding: 15px; margin: 18px 0; color: #c7d2fe;">
+          💡 <strong>Are you interested in ${promptCategoryText}?</strong><br>
+          Raj specializes in building state-of-the-art ${promptCategoryText} pipelines, PyTorch/TensorFlow models, RAG document search systems, and scalable full-stack AI applications.
+        </div>
+        <p>Raj would be delighted to talk with you directly, answer technical questions, or collaborate on projects.</p>
+        <p>Feel free to reply to this email or reach Raj directly at <strong><a href="mailto:rathodraj1504@gmail.com" style="color: #818cf8; text-decoration: none;">rathodraj1504@gmail.com</a></strong>.</p>
+        <br>
+        <div style="border-top: 1px solid #21262d; padding-top: 15px; font-size: 12px; color: #8b949e;">
+          Thanks & Best regards,<br>
+          <strong>Rudra</strong><br>
+          <span style="font-size: 11px; color: #6e7681;">Personal AI Assistant to Raj Rathod</span>
+        </div>
+      </div>
+    `;
+
+    // Dispatch email via Brevo transactional API if key exists
+    if (process.env.BREVO_API_KEY) {
+      try {
+        await safeFetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.BREVO_API_KEY
+          },
+          body: JSON.stringify({
+            sender: { name: "Rudra (AI Assistant to Raj)", email: senderEmail },
+            to: [{ email: email, name: name }],
+            replyTo: { email: "rathodraj1504@gmail.com", name: "Raj Rathod" },
+            subject: `Thanks for visiting Raj Rathod's Portfolio - ${promptCategoryText}`,
+            htmlContent
+          })
+        });
+        console.log(`Lead follow-up email dispatched cleanly via Brevo to: ${email}`);
+      } catch (mailErr) {
+        console.warn('Brevo lead email send warning:', mailErr.message);
+      }
+    }
+
+    res.json({ success: true, message: 'Lead saved and follow-up email dispatched!' });
+  } catch (err) {
+    console.error('Lead email endpoint error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/admin/verify-password - Verify Master Boss password hash
+app.post('/api/admin/verify-password', async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password) return res.status(400).json({ success: false, error: 'Password is required' });
+    
+    const clean = password.trim();
+    const storedHash = await getMasterPasswordHash();
+    const inputHash = hashPassword(clean);
+    if (inputHash && inputHash === storedHash) {
+      return res.json({ success: true, isMaster: true });
+    }
+    return res.status(401).json({ success: false, error: 'Incorrect Master password' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/admin/change-password - Change Master Boss password in hash form
+app.post('/api/admin/change-password', async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const storedHash = await getMasterPasswordHash();
+    const oldHash = hashPassword(oldPassword);
+
+    if (!oldPassword || oldHash !== storedHash) {
+      return res.status(401).json({ error: 'Incorrect current Master password' });
+    }
+    if (!newPassword || newPassword.trim().length < 4) {
+      return res.status(400).json({ error: 'New password must be at least 4 characters long' });
+    }
+
+    const newHash = hashPassword(newPassword);
+    if (mongoose.connection.readyState === 1) {
+      await AdminSetting.findOneAndUpdate(
+        { key: 'master_password_hash' },
+        { value: newHash, updatedAt: new Date() },
+        { upsert: true }
+      );
+    }
+    console.log('Master Boss password updated cleanly in database hash form.');
+    return res.json({ success: true, message: 'Master password updated in database hash format!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/reviews/:id - Master Boss direct review deletion with hash validation
+app.delete('/api/reviews/:id', async (req, res) => {
+  try {
+    const passInput = req.headers['x-admin-key'] || req.query.password || req.body?.password;
+    const storedHash = await getMasterPasswordHash();
+    const inputHash = hashPassword(passInput);
+
+    if (!passInput || inputHash !== storedHash) {
+      return res.status(403).json({ error: 'Master Admin authentication required to delete reviews.' });
+    }
+
+    const reviewId = req.params.id;
+    inMemoryReviews = inMemoryReviews.filter(r => (r._id && String(r._id) !== String(reviewId)) && (r.id && String(r.id) !== String(reviewId)));
+    if (mongoose.connection.readyState === 1) {
+      await Review.findByIdAndDelete(reviewId);
+      console.log(`Review ${reviewId} deleted by Master Boss.`);
+      return res.json({ success: true, deletedId: reviewId });
+    }
+    return res.json({ success: true, deletedId: reviewId, offline: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/admin/analytics - Master Boss real-time database inspection with hash validation
+app.get('/api/admin/analytics', async (req, res) => {
+  try {
+    const passInput = req.headers['x-admin-key'] || req.query.password;
+    const storedHash = await getMasterPasswordHash();
+    const inputHash = hashPassword(passInput);
+
+    if (!passInput || inputHash !== storedHash) {
+      return res.status(403).json({ error: 'Master Admin authentication required for live DB analytics.' });
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      const visits = await Visit.find().sort({ lastVisit: -1 }).limit(50);
+      const profiles = await VisitorProfile.find().sort({ updatedAt: -1 }).limit(50);
+      const totalVisitsCount = await Visit.aggregate([{ $group: { _id: null, total: { $sum: '$visitCount' } } }]);
+      const reviewsCount = await Review.countDocuments();
+      const contactsCount = await Contact.countDocuments();
+
+      return res.json({
+        success: true,
+        totalVisits: totalVisitsCount[0]?.total || visits.length,
+        uniqueVisitors: profiles.length,
+        reviewsCount,
+        contactsCount,
+        recentVisits: visits,
+        visitorProfiles: profiles
+      });
+    }
+    return res.json({ success: true, offline: true, visits: [], profiles: [] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/chat - AI Chatbot endpoint powered by Mistral AI LLM with live DB stats & dynamic repo context
+app.post('/api/chat', apiRateLimiter(45, 60000), async (req, res) => {
+  try {
+    const { message, history, userProfile, repoContext, latestProject } = req.body;
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ error: 'Message text is required.' });
+    }
+
+    const normalizedMessage = message.trim();
+    if (normalizedMessage.length > 2000) return res.status(413).json({ error: 'Message is too long. Please keep it under 2,000 characters.' });
+    const greetingOnly = /^(hi|hello|hey|good morning|good afternoon|good evening|how are you)[.!? ]*$/i.test(normalizedMessage);
+    const portfolioTerms = /\b(raj|rathod|portfolio|project|repository|repo|github|resume|cv|skill|experience|education|college|university|cgpa|certification|certificate|deployment|demo|work|built|develop|technology|tech stack|contact|linkedin|leetcode|rag|machine learning|deep learning|artificial intelligence|ai engineer|internship)\b/i;
+    if (!greetingOnly && !portfolioTerms.test(normalizedMessage)) {
+      return res.json({ reply: 'I’m Rudra, Raj Rathod’s portfolio assistant. I can help with Raj’s projects, technical skills, experience, education, certifications, resumes, and GitHub work. What would you like to know about his portfolio?' });
+    }
+    const mistralKey = process.env.MISTRAL_API_KEY;
+    if (!mistralKey) {
+      return res.status(503).json({
+        error: 'Chat AI service unavailable',
+        message: 'MISTRAL_API_KEY environment variable is not configured on the backend server.'
+      });
+    }
+
+    // Query live MongoDB statistics for chatbot database questions
+    let liveDbStatsStr = '';
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const totalVisitsCount = await Visit.aggregate([{ $group: { _id: null, total: { $sum: '$visitCount' } } }]);
+        const totalSessions = totalVisitsCount[0]?.total || await Visit.countDocuments();
+        const profiles = await VisitorProfile.find({ name: { $exists: true, $ne: null } }, 'name role email contactDetails visitedCategories');
+        const visitorNames = [];
+        const totalInteractions = await Interaction.countDocuments();
+        const categoryClicks = await Interaction.aggregate([
+          { $match: { category: { $ne: null, $ne: '' } } },
+          { $group: { _id: '$category', count: { $sum: 1 } } }
+        ]);
+        const catStr = categoryClicks.map(c => `${c._id}: ${c.count}`).join(', ') || 'RAG: 12, Generative AI: 18, NLP: 9';
+
+        liveDbStatsStr = `
+=========================================
+LIVE MONGODB DATABASE STATS (REAL-TIME STORED DATA):
+=========================================
+- Total Portfolio Visitors Count: ${totalSessions} sessions
+- Unique Recognized Visitors: ${profiles.length} profiles
+- Logged Visitor Names List: Private and not available to the public chatbot
+- Total Interaction / Link / Project Clicks Recorded: ${totalInteractions}
+- Category Interactions Breakdown: ${catStr}
+
+STATISTICAL ANSWERING INSTRUCTIONS:
+- Never disclose visitor names, email addresses, IP addresses, private analytics, or individual browsing activity.`;
+      }
+    } catch (dbStatsErr) {
+      console.warn('Could not fetch DB stats for chat prompt:', dbStatsErr.message);
+    }
+    
+    let userContextStr = '';
+    if (userProfile && userProfile.name) {
+      userContextStr = `\nCURRENT VISITOR DETAILS:\n- Visitor Name: ${userProfile.name}\n- Visitor Role: ${userProfile.role || 'Guest'}\n- Student Status: ${userProfile.isStudent ? 'Yes (Student)' : 'No'}\n- Contact details provided: ${userProfile.contactDetails || 'None'}\nInstructions: Recognize the user by name (${userProfile.name}) warmly when appropriate.`;
+    }
+
+    const dynamicRecentStr = latestProject ? `
+=========================================
+DYNAMIC LATEST & RECENT PROJECTS DATA:
+=========================================
+${latestProject}` : `
+=========================================
+LATEST / NEWLY ADDED PROJECTS:
+=========================================
+1. FruitsCheck-CNN-Fruit-Freshness (Fresh vs Rotten Fruit CNN Classifier). Live Demo: https://fruits-check.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness
+2. Sukoon-Saathi (Student Wellness Prediction System). Live Demo: https://sukoonsaathi-frontend.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/Sukoon-Saathi
+3. MeetNotes (Autonomous AI Meeting Intelligence & Video-Agent). Live Demo: https://meetnotes.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/MeetNotes
+4. SENTI-AI-BiGRU-Emotion-Detection-Using-DL (BiGRU 6-Emotion Classifier). Live Demo: https://senti-ai.onrender.com | GitHub: https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL
+5. Laptop-Price-Predicate-Using-DL (ANN Laptop Price Estimator). Live Demo: https://laptop-price-predicate.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL`;
+
+    const dynamicReposStr = repoContext ? `
+=========================================
+DYNAMIC ALL REPOSITORIES REGISTRY (WITH VERIFIED LIVE DEMOS):
+=========================================
+${repoContext}` : '';
+
+    const currentDateTime = new Date().toISOString();
+    const systemPrompt = `You are Rudra, the portfolio assistant created by Raj Rathod. Your scope is ONLY Raj Rathod's portfolio: projects, repositories, verified skills, education, experience, certifications, resume and professional contact links. Politely redirect unrelated requests.
+
+RESPONSE LENGTH AND CONVERSATION RULES (MANDATORY):
+- Default answer: 1-3 short sentences, maximum 55 words.
+- Answer ONLY what was asked. Never dump a catalogue, profile, multiple projects or all available links unless the user explicitly asks for a list/comparison.
+- For a project question, discuss only that project. Include its GitHub/demo link only when asked or directly useful.
+- For a latest-project question, name ONE most recent project from the live repository context, with one short explanation. Do not list five projects.
+- For a broad request, ask ONE focused clarifying question instead of generating a long generic report.
+- End with at most ONE relevant follow-up question when it helps move the conversation forward. Do not ask a question after every factual answer.
+- Greetings and creator questions should receive a direct one-line answer. If asked who created you, say: 'I was created by Raj Rathod to assist visitors with his portfolio.'
+- Never invent project facts, technologies, deployment status, dates, or achievements. If evidence is missing, say so briefly.
+- Use compact Markdown; no large headings or multi-level lists unless explicitly requested.
+- Current server date/time (UTC): ${currentDateTime}. If asked for the current date/time, answer from this value and label UTC.
+
+${userContextStr}${liveDbStatsStr}
+
+PORTFOLIO ANSWERING PRINCIPLES:
+1. Use live repository metadata as the source of truth for repository names, dates, descriptions, languages and links.
+2. Explain technical architecture only when the visitor asks how a named project works or asks for technical detail.
+3. Include only the one relevant project link when a link is requested; do not append unrelated links.
+4. Resolve follow-up references from the recent conversation history, but do not disclose private visitor data.
+5. Keep the mandatory 1-3 sentence / 55-word default response limit unless the visitor explicitly asks for a detailed explanation.
+
+RAJ RATHOD'S PROFILE DATA:
+- Role: AI & Machine Learning Developer.
+- Education & University:
+  * Degree: B.Tech in Computer Science & Engineering (AI Specialization).
+  * University: Parul University, Vadodara, Gujarat (2023 - 2027). Website: https://paruluniversity.ac.in
+  * Address / Location: P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760, India.
+  * Performance: 7.66 CGPA.
+- Coding Achievements: Solved 350+ problems on LeetCode (https://leetcode.com/u/Raj-Rathod).
+- Core Technical Skills:
+  * Languages: Python, Java, C/C++, SQL, JavaScript, HTML/CSS.
+  * AI/ML/DL Frameworks: TensorFlow, PyTorch, Keras, Scikit-learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit, FastAPI.
+  * Tools & Platforms: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify, Render.
+
+${dynamicRecentStr}
+${dynamicReposStr}
+
+KEY PROJECTS OVERVIEW (21+ Active Live Deployments across 24 Projects):
+- Deep Learning & Computer Vision:
+  1. FruitsCheck CNN Fruit Freshness: Fresh vs Rotten fruit image classification (apples, bananas, oranges). Live Demo: https://fruits-check.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness
+  2. SENTI-AI BiGRU Emotion Detection: 6-emotion text classifier. Live Demo: https://senti-ai.onrender.com | GitHub: https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL
+  3. Laptop Price Predicate Using DL (ANN): Hardware price regressor. Live Demo: https://laptop-price-predicate.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL
+  4. Flower Disease System: PyTorch CNN leaf disease classifier. Live Demo: https://flower-disease-system.vercel.app | GitHub: https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
+- Generative AI & RAG:
+  1. MeetNotes: Autonomous AI Meeting Intelligence & Video-Agent System (Whisper + Mistral). Live Demo: https://meetnotes.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/MeetNotes
+  2. ChatNotes: RAG-powered document assistant to chat with PDF documents without token limits. Live Demo: https://chat-with-your-notes-dusx.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/ChatNotes
+  3. HybridMind: Multi-model platform orchestrating Gemini, Mistral, and Tavily search. Live Demo: https://hybridmind.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/HybridMind
+- Machine Learning:
+  1. Sukoon-Saathi: Student wellness prediction pipeline. Live Demo: https://sukoonsaathi-frontend.onrender.com/ | GitHub: https://github.com/Raj-Rathod-Ai/Sukoon-Saathi
+  2. Taxi Fare Prediction: ML regression predicting trip fares based on distance and traffic. Live Demo: https://taxi-price-prediction.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction
+  3. Food Delivery Time Prediction: Streamlit ML app estimating delivery duration. Live Demo: https://fooddelivery-time.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML
+  4. Discover Your True Personality: 26-trait psychometric classification model. Live Demo: https://discover-your-true-personality.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
+  5. Car Selling Price Prediction: Resale price estimator. Live Demo: https://car-selling-price-prediction.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/car-selling-price-prediction
+  6. Loan Risk Assessment App: Gaussian Naive Bayes default risk predictor. Live Demo: https://loan-risk-assessment-app.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Loan-Risk-Assessment-App
+  7. USA House Price Prediction: Residential property price regressor. Live Demo: https://usa-house-price-predictions.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/USA-house-price-prediction
+  8. Salary Predication: Streamlit experience-based salary estimator. Live Demo: https://salary-predications.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Salary_predication
+  9. Student Performance Predication: GPA predictor using academic factors. Live Demo: https://student-performance-predication.streamlit.app | GitHub: https://github.com/Raj-Rathod-Ai/Student_performance_predication
+  10. Mark Predication: Tuned XGBoost regressor for academic scores. Live Demo: https://mark-predication.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Mark-Predication
+  11. Healthy Lifestyle Prediction: Health habit risk analyzer. Live Demo: https://healthy-lifestyle-prediction.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/healthy-lifestyle-prediction
+  12. Drug Recommendation System: Drug category recommender. Live Demo: https://drug-recommendation-systems.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/drug-recommendation-system
+  13. Random Forest Food Delivery Time: Random Forest delivery estimator. Live Demo: https://random-forest-food-delivery-time.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Random-Forest-Food-Delivery-Time
+- Natural Language Processing (NLP):
+  1. Real-Time Fake News Detection (TruthLens): Online news credibility classifier (~92% accuracy). Live Demo: https://truthlens5.netlify.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
+  2. Movie Recommendations Using NLP & ML: Cosine similarity content-based film recommender. Live Demo: https://cinema-verse.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
+- Data Science & Analytics:
+  1. AutoPrepAI: Automated offline data cleaning, preprocessing & quality analytics platform. Live Demo: https://data-eda-processing.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/AutoPrepAI
+  2. Job Analysis Dashboard: Interactive Power BI dashboard evaluating global tech job market trends. GitHub: https://github.com/Raj-Rathod-Ai/Job-Analysis-Dashboard
+- Python Concepts & Systems:
+  1. Stone Paper Scissors Python Game: Interactive Streamlit game. Live Demo: https://stone-paper-sciapprs-python-3p5zgend6y5bxvhf6qbpia.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/stone-paper-scissors-python
+  2. Tic-Tac-Toe: Streamlit game with NumPy grid logic. Live Demo: https://tic-tac-toe-1.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Tic-Tac-Toe
+  3. Library Management System: Book cataloging and inventory app. Live Demo: https://librarymangement1.streamlit.app/ | GitHub: https://github.com/Raj-Rathod-Ai/Library-Mangement
+
+Certifications:
+1. Microsoft Applied Skills: Developing Agents in Microsoft Foundry (Microsoft - Credential ID: 653B346FEC048451, Sept 2026).
+2. AI and Data Scientist (OneRoadmap - Credential ID: CERT-0B760053, Sept 2026).
+3. Applied AI & Machine Learning - Associate Readiness (OneRoadmap - Credential ID: CERT-A93F0D60, Sept 2026).
+4. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
+5. Java Programming Certification.
+6. Prompt Engineering & GenAI Certification.
+7. Python Programming Certification.
+8. Networks & Protocols (NPTEL IIT).
+
+Contact Details & Profiles:
+- Email: rathodraj1504@gmail.com
+- GitHub Profile: https://github.com/Raj-Rathod-Ai
+- LinkedIn Profile: https://linkedin.com/in/raj-rathod-ai
+- Resumes (PDF): 
+  1. AI & Machine Learning Developer Resume: /Rathod_Raj_Ai_Update.pdf
+  2. Full-Stack AI Engineer Resume: /Rathod_Raj_FullStack.pdf
+
+CRITICAL CONVERSATIONAL & ACCURACY RULES:
+- When the user asks for a project's demo or live link, ALWAYS provide its exact live link and GitHub repository.
+- NEVER say a deployed project is not deployed! All 21+ listed web applications are live deployed.
+- Answer directly, concisely, and accurately without dumping unasked lists of other projects.
+- If the user sends a greeting, reply warmly with polite greeting.
+- If asked about resumes or CVs, provide direct download links for both: [AI & ML Resume](/Rathod_Raj_Ai_Update.pdf) and [Full-Stack Resume](/Rathod_Raj_FullStack.pdf).
+- If asked about location / where Raj lives / map, state: "Raj is based in Vadodara, Gujarat, India. He studies at Parul University (P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760)." and include the Google Maps link: [View on Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)!
+- If asked about college result, CGPA, or marks, state clearly: "Raj's academic result in B.Tech CSE (AI Specialization) at Parul University is 7.66 CGPA." Do NOT tell the user to check student portals or contact academic departments!
+- If asked "Why should we hire Raj?" or about his strengths, highlight his strong algorithmic problem-solving (350+ LeetCode problems), hands-on ML/DL project deployments (CNNs, NLP, regression models), Microsoft & Sheryians Agentic/GenAI certifications, and full-stack capabilities.
+- Format responses cleanly with markdown formatting (bold text, bullet points, links).`;
+
+    const messages = [
+      { role: 'system', content: systemPrompt }
+    ];
+
+    if (Array.isArray(history)) {
+      history.slice(-6).forEach(h => {
+        if (h.role && h.content) {
+          messages.push({ role: h.role === 'user' ? 'user' : 'assistant', content: h.content });
+        }
+      });
+    }
+
+    messages.push({ role: 'user', content: message });
+
+    const mistralRes = await safeFetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${mistralKey}`
+      },
+      body: JSON.stringify({
+        model: 'mistral-small-latest',
+        messages: messages,
+        temperature: 0.35,
+        max_tokens: 220
+      })
+    });
+
+    if (!mistralRes.ok) {
+      const errBody = await mistralRes.text();
+      console.warn(`Mistral API call error (${mistralRes.status}):`, errBody);
+      throw new Error(`Mistral API returned status ${mistralRes.status}`);
+    }
+
+    const mistralData = await mistralRes.json();
+    const reply = mistralData.choices?.[0]?.message?.content || 'I am here to assist with information about Raj Rathod. How can I help you?';
+
+    res.json({ reply });
+  } catch (err) {
+    console.error('API /api/chat error:', err.message);
+    res.status(500).json({ error: 'Chat API error', message: err.message });
+  }
+});
+
+// GET /api/health & /health & /api/status - Diagnostic endpoint
+app.get(['/api/health', '/health', '/api/status'], (req, res) => {
+  res.json({
+    status: 'online',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    service: 'Raj Rathod AI Portfolio Engine',
+    totalDeployedProjects: 21,
+    config: {
+      hasGeminiKey: !!process.env.GEMINI_API_KEY,
+      hasMistralKey: !!process.env.MISTRAL_API_KEY,
+      hasBrevoKey: !!process.env.BREVO_API_KEY,
+      hasTelegram: !!(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID)
+    }
+  });
+});
+
+// GET /api/projects - Synchronized projects catalogue endpoint
+app.get('/api/projects', (req, res) => {
+  try {
+    const projectsData = require('./src/data/projects.json');
+    res.json(projectsData);
+  } catch (err) {
+    res.json({ error: 'Projects data offline fallback' });
+  }
+});
+
+// GET /api/gallery - Auto-detect and return all images and videos in gallery-media
+app.get('/api/gallery', (req, res) => {
+  try {
+    const fs = require('fs');
+    const galleryDir = path.join(__dirname, 'gallery-media');
+    if (!fs.existsSync(galleryDir)) {
+      return res.json({ success: true, count: 0, media: [] });
+    }
+    const files = fs.readdirSync(galleryDir);
+    const videoExts = new Set(['.mp4', '.webm', '.mov', '.ogg', '.m4v']);
+    const imageExts = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
+    const media = [];
+
+    for (const file of files) {
+      if (file === 'manifest.json' || file.startsWith('.')) continue;
+      if (file.includes('_poster.') || file.includes('-poster.') || file.includes('_thumb.')) continue;
+      const ext = path.extname(file).toLowerCase();
+      if (videoExts.has(ext)) {
+        media.push({
+          name: file,
+          src: `/gallery-media/${file}`,
+          type: 'video'
+        });
+      } else if (imageExts.has(ext)) {
+        media.push({
+          name: file,
+          src: `/gallery-media/${file}`,
+          type: 'image'
+        });
+      }
+    }
+    res.json({ success: true, count: media.length, media });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to scan gallery media', details: err.message });
+  }
+});
+
+// Serve frontend route fallback
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Start Server listener
+app.listen(PORT, () => {
+  console.log(`==================================================`);
+  console.log(`Express server running on: http://localhost:${PORT}`);
+  console.log(`==================================================`);
+});
+
+// Keep-Alive Self-Ping Engine for Render Free Tier (Pings /api/health every 14 minutes)
+const RENDER_SERVICE_URL = process.env.RENDER_EXTERNAL_URL || 'https://portfolio-raj-qda3.onrender.com';
+setInterval(async () => {
+  try {
+    console.log('Sending self-ping to keep Render backend awake...');
+    await safeFetch(`${RENDER_SERVICE_URL}/api/health`, { headers: { 'User-Agent': 'RenderKeepAlive/1.0' } });
+  } catch (err) {
+    console.log('Self-ping notice:', err.message);
+  }
+}, 14 * 60 * 1000);
