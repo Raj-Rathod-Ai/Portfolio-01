@@ -886,6 +886,44 @@ app.get('/api/github/repos', async (req, res) => {
   }
 });
 
+// GET /api/github/repos/:repoName/details - Fetch authoritative per-repository metadata.
+const githubProjectDetailsCache = new Map();
+app.get('/api/github/repos/:repoName/details', apiRateLimiter(90, 60000), async (req, res) => {
+  const repoName = String(req.params.repoName || '').trim();
+  if (!/^[A-Za-z0-9._-]{1,100}$/.test(repoName)) return res.status(400).json({ success: false, error: 'Invalid repository name.' });
+  const cacheKey = repoName.toLowerCase();
+  const cached = githubProjectDetailsCache.get(cacheKey);
+  const now = Date.now();
+  if (req.query.fresh !== 'true' && cached && now - cached.timestamp < 600000) return res.json({ success: true, cached: true, details: cached.data });
+  const headers = { 'Accept': 'application/vnd.github+json', 'User-Agent': 'RajPortfolioBackend/1.0', 'X-GitHub-Api-Version': '2022-11-28' };
+  if (process.env.GITHUB_TOKEN) headers.Authorization = 'Bearer ' + process.env.GITHUB_TOKEN;
+  try {
+    const base = 'https://api.github.com/repos/Raj-Rathod-Ai/' + encodeURIComponent(repoName);
+    const results = await Promise.all([safeFetch(base, { headers }), safeFetch(base + '/languages', { headers }), safeFetch(base + '/readme', { headers }), safeFetch(base + '/contributors?per_page=8', { headers })]);
+    const repoResponse = results[0];
+    if (!repoResponse.ok) return res.status(repoResponse.status === 404 ? 404 : 502).json({ success: false, error: repoResponse.status === 404 ? 'Repository not found or not public.' : 'GitHub repository details are temporarily unavailable.' });
+    const repository = await repoResponse.json();
+    if (repository.owner && String(repository.owner.login).toLowerCase() !== 'raj-rathod-ai') return res.status(404).json({ success: false, error: 'Repository not found.' });
+    const languages = results[1].ok ? await results[1].json().catch(() => ({})) : {};
+    const readmePayload = results[2].ok ? await results[2].json().catch(() => null) : null;
+    const contributorsPayload = results[3].ok ? await results[3].json().catch(() => []) : [];
+    const details = {
+      repository: { name: repository.name, full_name: repository.full_name, description: repository.description || '', html_url: repository.html_url, homepage: repository.homepage || '', default_branch: repository.default_branch, visibility: repository.visibility || (repository.private ? 'private' : 'public'), language: repository.language, topics: Array.isArray(repository.topics) ? repository.topics : [], stargazers_count: repository.stargazers_count || 0, watchers_count: repository.subscribers_count || 0, forks_count: repository.forks_count || 0, open_issues_count: repository.open_issues_count || 0, size: repository.size || 0, created_at: repository.created_at, updated_at: repository.updated_at, pushed_at: repository.pushed_at, license: repository.license ? { name: repository.license.name, spdx_id: repository.license.spdx_id } : null, archived: Boolean(repository.archived), disabled: Boolean(repository.disabled) },
+      languages: languages && typeof languages === 'object' ? languages : {},
+      readme: readmePayload && readmePayload.content && readmePayload.encoding === 'base64' ? Buffer.from(readmePayload.content.replace(/\\s/g, ''), 'base64').toString('utf8') : '',
+      readmeUrl: readmePayload && readmePayload.html_url || '',
+      contributors: Array.isArray(contributorsPayload) ? contributorsPayload.slice(0, 8).map(person => ({ login: person.login, avatar_url: person.avatar_url, html_url: person.html_url, contributions: person.contributions })) : [],
+      fetchedAt: new Date().toISOString()
+    };
+    githubProjectDetailsCache.set(cacheKey, { data: details, timestamp: now });
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    return res.json({ success: true, cached: false, details });
+  } catch (err) {
+    console.warn('[GitHub] Project details fetch warning:', err.message);
+    if (cached && cached.data) return res.json({ success: true, cached: true, stale: true, details: cached.data });
+    return res.status(502).json({ success: false, error: 'Could not load live GitHub project details. Please retry.' });
+  }
+});
 // GET /api/github/stats - Live GitHub user profile metrics & language distribution
 app.get('/api/github/stats', async (req, res) => {
   const forceRefresh = req.query.fresh === 'true';

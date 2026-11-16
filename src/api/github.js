@@ -659,3 +659,20 @@ export async function fetchGitHubRepositories(forceRefresh = false) {
   setCache(CACHE_KEY, FALLBACK_REPOS, CACHE_EXPIRY_MINS);
   return FALLBACK_REPOS;
 }
+
+/** Fetch authoritative metadata for one public repository via the backend proxy. */
+export async function fetchGitHubProjectDetails(repoName, options = {}) {
+  const cleanName = String(repoName || '').trim();
+  if (!/^[A-Za-z0-9._-]{1,100}$/.test(cleanName)) throw new Error('A valid GitHub repository name is required.');
+  const endpoint = getApiBaseUrl() + '/api/github/repos/' + encodeURIComponent(cleanName) + '/details' + (options.forceRefresh ? '?fresh=true' : '');
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  const abortFromCaller = () => controller.abort();
+  if (options.signal) { if (options.signal.aborted) controller.abort(); else options.signal.addEventListener('abort', abortFromCaller, { once: true }); }
+  try {
+    const response = await fetch(endpoint, { cache: options.forceRefresh ? 'no-store' : 'default', headers: { Accept: 'application/json' }, signal: controller.signal });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.success || !payload.details || !payload.details.repository) throw new Error(payload.error || 'Project details request failed (' + response.status + ').');
+    return payload.details;
+  } finally { clearTimeout(timeoutId); if (options.signal) options.signal.removeEventListener('abort', abortFromCaller); }
+}
