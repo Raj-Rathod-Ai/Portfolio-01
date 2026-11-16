@@ -1,6 +1,18 @@
 import { getRepoIcon, getLiveUrl, formatDate, slugify } from '../utils/helpers.js';
 import { fetchGitHubProjectDetails } from '../api/github.js';
 
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
+}
+function safeHttpUrl(value) {
+  try {
+    const url = new URL(String(value || ''));
+    return ['https:', 'http:'].includes(url.protocol) ? url.href : '#';
+  } catch (_) { return '#'; }
+}
+
 /**
  * ProjectDetails page component showing comprehensive information for a single project repository.
  */
@@ -29,17 +41,19 @@ export class ProjectDetails {
     const liveUrl = getLiveUrl(repo, localMetadata);
     const updatedDate = formatDate(repo.updated_at);
     const createdDate = formatDate(repo.created_at);
-    const repoTitle = repo.name.replace(/-/g, ' ').replace(/_/g, ' ');
-    const lang = repo.language || 'Mixed';
+    const repoTitle = escapeHtml(repo.name.replace(/-/g, ' ').replace(/_/g, ' '));
+    const repoName = escapeHtml(repo.name);
+    const repoUrl = safeHttpUrl(repo.html_url);
+    const lang = escapeHtml(repo.language || 'Mixed');
     const forksCount = repo.forks_count || 0;
     const openIssues = repo.open_issues_count || 0;
-    const licenseName = repo.license?.name || 'Not specified';
-    const defaultBranch = repo.default_branch || 'main';
+    const licenseName = escapeHtml(repo.license?.name || 'Not specified');
+    const defaultBranch = escapeHtml(repo.default_branch || 'main');
     const repoSize = repo.size ? `${(repo.size / 1024).toFixed(2)} MB` : 'Unknown';
 
     // Compute back link dynamically to point to the project's category workspace
-    const categoryName = repo.category || 'Others';
-    const categorySlug = categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const categoryName = escapeHtml(repo.category || 'Others');
+    const categorySlug = String(repo.category || 'Others').toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const backHref = `/projects/${categorySlug}`;
 
     // Group Badge
@@ -60,7 +74,7 @@ export class ProjectDetails {
     // Topics/Technologies HTML
     const topicsHTML = repo.topics && repo.topics.length > 0
       ? `<div class="flex flex-wrap gap-2">${repo.topics.map(t =>
-          `<span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/8 text-xs font-mono text-gray-400">#${t}</span>`
+          `<span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/8 text-xs font-mono text-gray-400">#${escapeHtml(t)}</span>`
         ).join('')}</div>`
       : `<p class="text-xs text-gray-600 italic">No topics tagged on GitHub.</p>`;
 
@@ -93,7 +107,7 @@ export class ProjectDetails {
               </div>
               <div class="min-w-0">
                 <h1 class="font-jakarta font-extrabold text-2xl sm:text-3xl text-gray-100 truncate">${repoTitle}</h1>
-                <p class="font-mono text-xs text-gray-500 mt-1">Repo: <a href="${repo.html_url}" target="_blank" class="hover:underline text-gray-400">${repo.name}</a></p>
+                <p class="font-mono text-xs text-gray-500 mt-1">Repo: <a href="${repoUrl}" target="_blank" class="hover:underline text-gray-400">${repo.name}</a></p>
               </div>
             </div>
             
@@ -107,7 +121,7 @@ export class ProjectDetails {
           <!-- Description content -->
           <div class="space-y-3">
             <h3 class="font-jakarta font-bold text-sm text-gray-300 uppercase tracking-wider">About the Project</h3>
-            <p class="font-inter text-sm text-gray-400 leading-relaxed">${repo.description || 'No project description was set for this repository.'}</p>
+            <p class="font-inter text-sm text-gray-400 leading-relaxed">${escapeHtml(repo.description || 'No project description was set for this repository.')}</p>
           </div>
 
           <!-- Key Technical Tags -->

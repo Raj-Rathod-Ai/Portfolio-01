@@ -4,6 +4,7 @@ import { ProjectDetails } from './pages/ProjectDetails.js?v=3.8';
 import { slugify } from './utils/helpers.js';
 import { getAllCategories } from './utils/categorize.js';
 import { trackVisit } from './utils/analytics.js';
+import { fetchGitHubRepositories } from './api/github.js';
 
 // Instantiate pages (singleton)
 const homePage = new Home();
@@ -101,7 +102,15 @@ export async function navigate(path, pushState = true) {
 
     case 'project-details': {
       const slug = match.params.projectSlug;
-      const repo = repos.find(r => slugify(r.name) === slug);
+      let repo = repos.find(r => slugify(r.name) === slug);
+      if (!repo) {
+        try {
+          const freshRepos = await fetchGitHubRepositories(true);
+          repo = freshRepos.find(r => slugify(r.name) === slug);
+        } catch (error) {
+          console.warn('Could not resolve project from live GitHub repositories:', error.message);
+        }
+      }
       html    = detailsPage.render(repo, meta);
       setupFn = () => detailsPage.setup(repo);
       break;
