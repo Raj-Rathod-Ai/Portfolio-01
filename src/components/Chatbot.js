@@ -1034,11 +1034,7 @@ ${recentTopSummary}`
       'newest project', 'latest work', 'recent work', 'newest repo', 'latest repos'
     ].some(k => lowerPrompt.includes(k));
 
-    // Priority Check: Direct RAG semantic match for high-precision queries
-    const directRAG = this.retrieveRAGContext(prompt, this.history);
-    if (directRAG && (isLinkQuery || isRecentQuery)) {
-      return directRAG;
-    }
+    // Route requests through the backend so concise-answer and scope policies apply consistently.
 
     // Attempt 1: Portfolio backend Express API endpoint
     try {
@@ -1568,6 +1564,24 @@ ${recentTopSummary}`
              `• 📍 **Location & Campus**: Vadodara, Gujarat location and interactive maps.\n` +
              `• 📬 **Contact & Collaboration**: Direct links to email, LinkedIn, and GitHub.\n\n` +
              `What would you like to explore first?`;
+    }
+
+    // 0.25 Creator / identity questions (also handles common short typos).
+    if (/who\s+(created|create|made|built)\s+(you|u)|who\s+is\s+your\s+(creator|developer)/i.test(text)) {
+      return "I was created by **Raj Rathod** to help visitors explore his portfolio. What would you like to know about his projects?";
+    }
+
+    // 0.26 Concise latest-project answer; offer one relevant next question.
+    if (/latest project|recent project|newest project|most recent project|recently added/i.test(text)) {
+      const latest = this.getRecentProjects(1)[0];
+      if (latest) {
+        const title = latest.name || 'the latest repository';
+        const description = latest.description || 'See its repository for the verified project overview.';
+        const demo = latest.live || latest.homepage;
+        const links = (demo ? '\\n[Live demo](' + demo + ')' : '') + (latest.html_url ? '\\n[GitHub](' + latest.html_url + ')' : '');
+        return '**' + title + '** — ' + description.slice(0, 220) + links + '\\n\\nWould you like its tech stack or a short architecture overview?';
+      }
+      return 'I can look up Raj’s latest GitHub project, but the repository list is currently unavailable. Would you like to try again?';
     }
 
     // 0.3 Recent & Latest Project Inquiries
