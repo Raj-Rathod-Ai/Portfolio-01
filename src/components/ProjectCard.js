@@ -192,7 +192,7 @@ export class ProjectCard {
           <button type="button" class="boss-toggle-group-btn px-2 py-0.5 rounded text-[9px] font-mono border transition-all hover:scale-105 ${isGroup ? 'bg-purple-500/25 border-purple-500/50 text-purple-200' : 'bg-teal-500/20 border-teal-500/40 text-teal-300'}" data-name="${escapeHtml(repo.name)}">
             ${isGroup ? '👥 Group' : '👤 Solo'}
           </button>
-          <button type="button" class="boss-toggle-featured-btn px-2 py-0.5 rounded text-[9px] font-mono border transition-all hover:scale-105 ${isFeatured ? 'bg-amber-500/30 border-amber-500/60 text-amber-200 font-bold' : 'bg-white/5 border-white/10 text-gray-400'}" data-name="${repo.name}">
+          <button type="button" class="boss-toggle-featured-btn px-2 py-0.5 rounded text-[9px] font-mono border transition-all hover:scale-105 ${isFeatured ? 'bg-amber-500/30 border-amber-500/60 text-amber-200 font-bold' : 'bg-white/5 border-white/10 text-gray-400'}" data-name="${escapeHtml(repo.name)}">
             ${isFeatured ? '⭐ Featured (Top)' : '☆ Pin Top'}
           </button>
         </div>

@@ -80,7 +80,7 @@ export class ProjectDetails {
 
     // Live deployment button
     const liveBtnHTML = liveUrl
-      ? `<a href="${liveUrl}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta text-xs font-semibold text-white shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+      ? `<a href="${safeHttpUrl(liveUrl)}" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary font-jakarta text-xs font-semibold text-white shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
            <i class="fa-solid fa-arrow-up-right-from-square text-sm"></i><span>Launch Live Demo</span>
          </a>`
       : '';
@@ -92,7 +92,7 @@ export class ProjectDetails {
           <a href="${backHref}" class="back-to-projects-btn flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-xs font-semibold text-gray-300 hover:text-white hover:border-primary/50 transition-all select-none">
             <i class="fa-solid fa-arrow-left"></i><span>Back</span>
           </a>
-          <span class="font-mono text-xs text-gray-600">Projects / ${repo.name}</span>
+          <span class="font-mono text-xs text-gray-600">Projects / ${repoName}</span>
         </div>
 
         <!-- Spotlight detail card wrapper -->
@@ -208,13 +208,13 @@ export class ProjectDetails {
         const topicHtml = topics.length ? topics.map(topic => '<span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/8 text-xs font-mono text-gray-400">#' + escapeHtml(topic) + '</span>').join('') : '<span class="text-xs text-gray-500">No GitHub topics have been added.</span>';
         const readmeHtml = data.readme ? '<pre class="whitespace-pre-wrap break-words max-h-[34rem] overflow-auto rounded-xl border border-white/8 bg-black/20 p-4 text-xs leading-relaxed text-gray-300 font-mono">' + escapeHtml(data.readme.slice(0, 24000)) + '</pre>' : '<p class="text-xs text-gray-500">This repository does not have a public README.</p>';
         const contributors = Array.isArray(data.contributors) ? data.contributors : [];
-        const contributorsHtml = contributors.length ? '<div class="flex flex-wrap gap-3">' + contributors.map(person => '<a href="' + escapeHtml(person.html_url) + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-gray-300 hover:text-white"><img src="' + escapeHtml(person.avatar_url) + '" alt="" loading="lazy" class="w-6 h-6 rounded-full"><span>' + escapeHtml(person.login) + '</span><span class="text-gray-600">' + (Number(person.contributions) || 0) + ' contributions</span></a>').join('') + '</div>' : '<p class="text-xs text-gray-500">Contributor data is not available.</p>';
+        const contributorsHtml = contributors.length ? '<div class="flex flex-wrap gap-3">' + contributors.map(person => '<a href="' + safeHttpUrl(person.html_url) + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs text-gray-300 hover:text-white"><img src="' + safeHttpUrl(person.avatar_url) + '" alt="" loading="lazy" class="w-6 h-6 rounded-full"><span>' + escapeHtml(person.login) + '</span><span class="text-gray-600">' + (Number(person.contributions) || 0) + ' contributions</span></a>').join('') + '</div>' : '<p class="text-xs text-gray-500">Contributor data is not available.</p>';
         target.innerHTML = '<section class="space-y-3"><div class="flex items-center justify-between gap-3 flex-wrap"><h3 class="font-jakarta font-bold text-sm text-gray-300 uppercase tracking-wider">Live GitHub Technologies</h3><span class="text-[10px] font-mono text-gray-600">Fetched ' + escapeHtml(new Date(data.fetchedAt || Date.now()).toLocaleString()) + '</span></div><div class="flex flex-wrap gap-2">' + languageHtml + '</div><div class="flex flex-wrap gap-2">' + topicHtml + '</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-3">' +
           '<div class="rounded-xl border border-white/6 p-3 bg-white/2"><span class="block text-[10px] text-gray-600 uppercase">Watchers</span><strong class="text-sm text-gray-300">' + (Number(liveRepo.watchers_count) || 0) + '</strong></div>' +
           '<div class="rounded-xl border border-white/6 p-3 bg-white/2"><span class="block text-[10px] text-gray-600 uppercase">Forks</span><strong class="text-sm text-gray-300">' + (Number(liveRepo.forks_count) || 0) + '</strong></div>' +
           '<div class="rounded-xl border border-white/6 p-3 bg-white/2"><span class="block text-[10px] text-gray-600 uppercase">Open Issues</span><strong class="text-sm text-gray-300">' + (Number(liveRepo.open_issues_count) || 0) + '</strong></div>' +
           '<div class="rounded-xl border border-white/6 p-3 bg-white/2"><span class="block text-[10px] text-gray-600 uppercase">Last Push</span><strong class="text-xs text-gray-300">' + escapeHtml(formatDate(liveRepo.pushed_at) || 'N/A') + '</strong></div></div></section>' +
-          '<section class="space-y-3"><h3 class="font-jakarta font-bold text-sm text-gray-300 uppercase tracking-wider">Repository README</h3>' + readmeHtml + (data.readmeUrl ? '<a class="inline-flex text-xs text-indigo-300 hover:text-indigo-200" href="' + escapeHtml(data.readmeUrl) + '" target="_blank" rel="noopener noreferrer">Open formatted README on GitHub</a>' : '') + '</section>' +
+          '<section class="space-y-3"><h3 class="font-jakarta font-bold text-sm text-gray-300 uppercase tracking-wider">Repository README</h3>' + readmeHtml + (data.readmeUrl ? '<a class="inline-flex text-xs text-indigo-300 hover:text-indigo-200" href="' + safeHttpUrl(data.readmeUrl) + '" target="_blank" rel="noopener noreferrer">Open formatted README on GitHub</a>' : '') + '</section>' +
           '<section class="space-y-3"><h3 class="font-jakarta font-bold text-sm text-gray-300 uppercase tracking-wider">Contributors</h3>' + contributorsHtml + '</section>';
       }).catch(error => {
         if (target) target.innerHTML = '<p class="text-xs text-amber-300" role="status">Live GitHub details could not be loaded: ' + escapeHtml(error.message) + '. The repository summary above is still available.</p>';

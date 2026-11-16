@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Canonical XML Sitemap
-Sitemap: https://rathodrajai.netlify.app/sitemap.xml

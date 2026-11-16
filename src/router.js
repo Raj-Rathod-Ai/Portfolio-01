@@ -51,7 +51,7 @@ export function matchRoute(path) {
     }
   }
 
-  return { route: 'home', params: {} };
+  return { route: 'not-found', params: { path: cleanPath } };
 }
 
 /**
@@ -85,6 +85,17 @@ export async function navigate(path, pushState = true) {
   let setupFn = () => {};
 
   switch (match.route) {
+    case 'not-found':
+      html = `
+        <section class="min-h-[75vh] flex flex-col items-center justify-center text-center px-6 py-24 max-w-3xl mx-auto">
+          <span class="font-mono text-sm text-indigo-400 tracking-widest">404 / NOT FOUND</span>
+          <h1 class="font-jakarta text-4xl sm:text-5xl font-bold text-white mt-4">This page does not exist.</h1>
+          <p class="text-sm text-gray-400 mt-4 max-w-xl">The address may be incorrect or the page may have moved.</p>
+          <a href="/" class="mt-8 rounded-xl px-5 py-3 bg-primary text-white text-sm font-semibold">Back to portfolio</a>
+        </section>
+      `;
+      break;
+
     case 'home':
       html    = homePage.render();
       setupFn = () => homePage.setup(repos, meta);
