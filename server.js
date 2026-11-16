@@ -1883,6 +1883,13 @@ app.post('/api/chat', apiRateLimiter(45, 60000), async (req, res) => {
       return res.status(400).json({ error: 'Message text is required.' });
     }
 
+    const normalizedMessage = message.trim();
+    if (normalizedMessage.length > 2000) return res.status(413).json({ error: 'Message is too long. Please keep it under 2,000 characters.' });
+    const greetingOnly = /^(hi|hello|hey|good morning|good afternoon|good evening|how are you)[.!? ]*$/i.test(normalizedMessage);
+    const portfolioTerms = /\\b(raj|rathod|portfolio|project|repository|repo|github|resume|cv|skill|experience|education|college|university|cgpa|certification|certificate|deployment|demo|work|built|develop|technology|tech stack|contact|linkedin|leetcode|rag|machine learning|deep learning|artificial intelligence|ai engineer|internship)\\b/i;
+    if (!greetingOnly && !portfolioTerms.test(normalizedMessage)) {
+      return res.json({ reply: 'I’m Rudra, Raj Rathod’s portfolio assistant. I can help with Raj’s projects, technical skills, experience, education, certifications, resumes, and GitHub work. What would you like to know about his portfolio?' });
+    }
     const mistralKey = process.env.MISTRAL_API_KEY;
     if (!mistralKey) {
       return res.status(503).json({
@@ -1898,7 +1905,7 @@ app.post('/api/chat', apiRateLimiter(45, 60000), async (req, res) => {
         const totalVisitsCount = await Visit.aggregate([{ $group: { _id: null, total: { $sum: '$visitCount' } } }]);
         const totalSessions = totalVisitsCount[0]?.total || await Visit.countDocuments();
         const profiles = await VisitorProfile.find({ name: { $exists: true, $ne: null } }, 'name role email contactDetails visitedCategories');
-        const visitorNames = Array.from(new Set(profiles.map(p => p.name).filter(n => n && n !== 'Guest Visitor' && n !== 'Boss')));
+        const visitorNames = [];
         const totalInteractions = await Interaction.countDocuments();
         const categoryClicks = await Interaction.aggregate([
           { $match: { category: { $ne: null, $ne: '' } } },
@@ -1912,12 +1919,12 @@ LIVE MONGODB DATABASE STATS (REAL-TIME STORED DATA):
 =========================================
 - Total Portfolio Visitors Count: ${totalSessions} sessions
 - Unique Recognized Visitors: ${profiles.length} profiles
-- Logged Visitor Names List: ${visitorNames.length ? visitorNames.join(', ') : 'Pooja, Amit, Priya, Rahul, Mayur, Guest Users'}
+- Logged Visitor Names List: Private and not available to the public chatbot
 - Total Interaction / Link / Project Clicks Recorded: ${totalInteractions}
 - Category Interactions Breakdown: ${catStr}
 
 STATISTICAL ANSWERING INSTRUCTIONS:
-- If the user asks how many persons visited the portfolio, who visited, or questions about visitor count, names, or project/link clicks, ALWAYS cite these live database figures directly and list the visitor names logged in the database!`;
+- Never disclose visitor names, email addresses, IP addresses, private analytics, or individual browsing activity.`;
       }
     } catch (dbStatsErr) {
       console.warn('Could not fetch DB stats for chat prompt:', dbStatsErr.message);
@@ -1948,8 +1955,7 @@ DYNAMIC ALL REPOSITORIES REGISTRY (WITH VERIFIED LIVE DEMOS):
 =========================================
 ${repoContext}` : '';
 
-    const systemPrompt = `You are Rudra, an intelligent, articulate, and technical personal AI Assistant and Agent representing Raj Rathod.
-Your mission is to represent Raj with genuine technical depth, authenticity, and agentic competence. Speak naturally as a top-tier technical representative — never sound robotic, generic, or fake.${userContextStr}${liveDbStatsStr}
+    const systemPrompt = `You are Rudra, the portfolio assistant created by Raj Rathod. Your sole scope is Raj Rathod's portfolio: his projects, repositories, verified technical skills, education, experience, certifications, resume, and professional contact links. Politely redirect unrelated requests to portfolio topics. Do not invent repository facts, project capabilities, deployments, dates, or achievements. Use only supplied verified context and say when a detail is unavailable. Speak clearly and concisely.${userContextStr}${liveDbStatsStr}
 
 AGENTIC RESPONSE PRINCIPLES:
 1. Deep Technical Fluency: When explaining projects, clearly articulate architectures and technical decisions (e.g. why BiGRU captures bidirectional context for emotion classification, why CNNs with pooling detect fruit visual freshness, why RAG with Whisper + Mistral automates meeting intelligence, why polynomial regression/Random Forests predict fares and prices).

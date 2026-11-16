@@ -8,9 +8,6 @@
 import { getVisitorId, hasVisitorName, getVisitorProfile, isBossDevice, setBossDevice, validateVisitorName, authenticateBoss, changeBossPassword, getMasterPassword, getVisitedCategories, trackInteraction, getApiBaseUrl } from '../utils/analytics.js';
 import { FALLBACK_REPOS, SKIP_REPOS } from '../api/github.js';
 
-// Dynamically read runtime client API key (decoded safely to avoid raw scanner triggers)
-const MISTRAL_KEY = atob('d0ZZZUhiSWtuNzdKWkdlcGhtMk13UzZSZldKNUxRQVI=');
-const getMistralKey = () => window.MISTRAL_API_KEY || MISTRAL_KEY;
 
 const STORAGE_KEY_PROFILE = 'rudra_visitor_profile';
 const STORAGE_KEY_HISTORY = 'rudra_chat_history';
@@ -952,7 +949,7 @@ export class Chatbot {
     this.isTyping = true;
     const typingId = this.showTypingIndicator();
 
-    // 3. Fetch Answer from Backend / Mistral Direct API / Fallback
+    // 3. Fetch the answer from the secure server-side agent
     try {
       const replyText = await this.getBotReply(text);
       this.removeTypingIndicator(typingId);
@@ -977,7 +974,7 @@ export class Chatbot {
   }
 
   /**
-   * Query backend /api/chat endpoint or Mistral direct API.
+   * Query the secure backend /api/chat endpoint. Provider credentials never run in the browser.
    * @param {string} prompt 
    * @returns {Promise<string>}
    */
@@ -1065,115 +1062,12 @@ ${recentTopSummary}`
         if (data.reply) return data.reply;
       }
     } catch (err) {
-      console.log('Backend /api/chat offline. Trying Mistral direct client API...');
+      console.warn('Secure Rudra backend unavailable:', err.message);
     }
 
-    // Attempt 2: Direct Mistral API call
-    try {
-      const key = getMistralKey();
-      if (!key) throw new Error('No Mistral API key found');
-
-      const userCtxStr = this.userProfile && this.userProfile.name
-        ? `\nCURRENT USER DETAILS:\n- Name: ${this.userProfile.name}\n- Role: ${this.userProfile.role || 'Guest'}\nAddress user respectfully by name (${this.userProfile.name}) when helpful.`
-        : '';
-
-      const systemPrompt = `You are Rudra, an intelligent, articulate, and technical personal AI Assistant and Agent representing Raj Rathod.
-Your mission is to represent Raj with genuine technical depth, authenticity, and agentic competence. Speak naturally as a top-tier technical representative — never sound robotic, generic, or fake.${userCtxStr}
-
-AGENTIC RESPONSE PRINCIPLES:
-1. Deep Technical Fluency: When explaining projects, clearly articulate architectures and design decisions (e.g. why BiGRU is used for emotional text sentiment, why CNNs with pooling are used for fruit freshness defect detection, why RAG with Whisper + Mistral is used for meeting intelligence, why polynomial regression/Random Forests are used for price/fare prediction).
-2. Direct Verified Links: Always provide verified live links formatted cleanly in Markdown: [Launch Live Demo](URL) and [GitHub Repo](URL).
-3. Accurate Recent Projects: If asked about "recent", "latest", or "newly added" projects, ALWAYS cite the real newest projects from the context below (FruitsCheck, Sukoon-Saathi, MeetNotes, SENTI-AI, Laptop Price ANN) with their live links. NEVER mention outdated or hardcoded placeholders like Taxi Fare as the latest project!
-4. Conversational Memory: Use previous conversation turns to resolve pronouns ("it", "this", "that", "the demo", "how does it work") accurately.
-5. Conciseness & Precision: Keep answers focused, direct, and well-structured with Markdown headings and bullet points.
-
-RAJ RATHOD'S PROFILE DATA:
-- Role: AI & Machine Learning Developer.
-- Education: B.Tech in Computer Science & Engineering with AI specialization at Parul University, Vadodara (2023 - 2027). CGPA: 7.66.
-- Coding Achievements: Solved 350+ problems on LeetCode (https://leetcode.com/u/Raj-Rathod).
-- Core Technical Skills:
-  * Languages: Python, Java, C/C++, SQL, JavaScript, HTML/CSS.
-  * AI/ML/DL Frameworks: PyTorch, TensorFlow, Keras, Scikit-Learn, Pandas, NumPy, OpenCV, NLTK, Spacy, Streamlit, FastAPI.
-  * Tools & Platforms: Git/GitHub, Docker, Power BI, Linux CLI, Vercel, Netlify, Render.
-
-${latestProjSummary}
-
-ALL REPOSITORIES & PROJECTS (WITH VERIFIED LIVE DEMOS & GITHUB REPOS):
-${repoListText}
-
-Certifications & Accreditations:
-1. Microsoft Applied Skills: Developing Agents in Microsoft Foundry (Microsoft - Credential ID: 653B346FEC048451, Sept 2026).
-2. AI and Data Scientist (OneRoadmap - Credential ID: CERT-0B760053, Sept 2026).
-3. Applied AI & Machine Learning - Associate Readiness (OneRoadmap - Credential ID: CERT-A93F0D60, Sept 2026).
-4. Data Science & Analytics with GenAI (Sheryians Coding School - Cert ID: 311726923637568120a0faf6, July 2026).
-5. Java Programming Certification.
-6. Prompt Engineering & GenAI Certification.
-7. Python Programming Certification.
-8. Networks & Protocols (NPTEL IIT).
-
-Contact Details:
-- WhatsApp: [Chat on WhatsApp](/api/whatsapp)
-- Email: [Chat on Email](mailto:rathodraj1504@gmail.com)
-- GitHub: https://github.com/Raj-Rathod-Ai
-- LinkedIn: https://linkedin.com/in/raj-rathod-ai
-- AI/ML Resume: [Download AI/ML Resume](/Rathod_Raj_Ai_Update.pdf)
-- Full-Stack Resume: [Download Full-Stack Resume](/Rathod_Raj_FullStack.pdf)
-- Campus / Location: Parul University, Vadodara, Gujarat 391760 ([Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat))
-- PRIVACY RULE: When asked for contact details, do not write raw phone numbers or email text on the frontend; always output action links formatted as [Chat on WhatsApp](/api/whatsapp) and [Chat on Email](mailto:rathodraj1504@gmail.com).
-
-CRITICAL CONVERSATIONAL & ACCURACY RULES:
-- Verified Live Deployments:
-  * FruitsCheck (Fruit Freshness CNN): Live Demo https://fruits-check.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/FruitsCheck-CNN-Fruit-Freshness
-  * Sukoon-Saathi (Student Wellness ML): Live Demo https://sukoonsaathi-frontend.onrender.com/ | GitHub https://github.com/Raj-Rathod-Ai/Sukoon-Saathi
-  * MeetNotes (AI Meeting Intelligence & Video-Agent): Live Demo https://meetnotes.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/MeetNotes
-  * SENTI-AI (BiGRU Emotion Detection): Live Demo https://senti-ai.onrender.com | GitHub https://github.com/Raj-Rathod-Ai/SENTI-AI-BiGRU-Emotion-Detection-Using-DL
-  * Laptop Price Prediction (ANN): Live Demo https://laptop-price-predicate.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Laptop-Price-Predicate-Using-DL
-  * Movie Recommendations: Live Demo https://cinema-verse.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Movie-Recommendations-Using-NLP-and-ML
-  * Fake News Detection: Live Demo https://truthlens5.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/Fake-News-Detection-Using-DL-Real-time
-  * AutoPrepAI: Live Demo https://data-eda-processing.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/AutoPrepAI
-  * Flower Disease: Live Demo https://flower-disease-system.vercel.app | GitHub https://github.com/Raj-Rathod-Ai/FlowerDiseaseSystem
-  * HybridMind: Live Demo https://hybridmind.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/HybridMind
-  * ChatNotes: Live Demo https://chat-with-your-notes-dusx.onrender.com/ | GitHub https://github.com/Raj-Rathod-Ai/ChatNotes
-  * Taxi Fare: Live Demo https://taxi-price-prediction.netlify.app/ | GitHub https://github.com/Raj-Rathod-Ai/Taxi-Fare-Prediction
-  * Food Delivery Time: Live Demo https://fooddelivery-time.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Food_Delivery_Time-Using-ML
-  * Discover Your True Personality: Live Demo https://discover-your-true-personality.streamlit.app/ | GitHub https://github.com/Raj-Rathod-Ai/Discover-Your-True-Personality
-- NEVER say a deployed project is not deployed! ALWAYS provide its live link directly.
-- Use previous conversation turns to resolve pronouns ("it", "this", "that", "the project", "demo").
-- Answer ONLY for the specific project asked without dumping unasked lists.
-- If the user sends a simple greeting like "hi", "hello", "hey", or "how are you", reply warmly with a friendly greeting.
-- If the user asks about location / where Raj lives / map, state: "Raj is based in Vadodara, Gujarat, India. He studies at Parul University (P.O. Limda, Ta. Waghodia, Dist. Vadodara, Gujarat 391760)." and include the Google Maps link: [View on Google Maps](https://maps.google.com/?q=Parul+University+Vadodara+Gujarat)!
-- If the user asks about college result, CGPA, or marks, state clearly: "Raj's academic result in B.Tech CSE (AI Specialization) at Parul University is 7.66 CGPA."
-- Use clean markdown formatting (bolding, bullet points, links).`;
-
-      const apiMessages = [{ role: 'system', content: systemPrompt }];
-      this.history.slice(-4).forEach(h => apiMessages.push({ role: h.role === 'user' ? 'user' : 'assistant', content: h.content }));
-      apiMessages.push({ role: 'user', content: prompt });
-
-      const mRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${key}`
-        },
-        body: JSON.stringify({
-          model: 'mistral-small-latest',
-          messages: apiMessages,
-          temperature: 0.7,
-          max_tokens: 450
-        })
-      });
-
-      if (mRes.ok) {
-        const mData = await mRes.json();
-        const content = mData.choices?.[0]?.message?.content;
-        if (content) return content;
-      }
-    } catch (err) {
-      console.log('Mistral direct API notice:', err.message);
-    }
-
-    return this.getOfflineFallback(prompt);
+    throw new Error('Rudra backend is temporarily unavailable. Please try again shortly.');
   }
+
 
   /**
    * RAG Knowledge Base Chunks & Multi-Turn Contextual Retrieval Engine

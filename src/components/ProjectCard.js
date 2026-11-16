@@ -33,6 +33,13 @@ const CAT_ICON = {
   'Python Concepts':  { icon: 'fa-snake',                color: 'text-yellow-400',  bg: 'bg-yellow-500/10',  border: 'border-yellow-500/20' },
 };
 
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>\"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;' })[char]);
+}
+
+function safeHttpUrl(value) {
+  try { const url = new URL(String(value || '')); return ['https:', 'http:'].includes(url.protocol) ? url.href : '#'; } catch (_) { return '#'; }
+}
 function getBadgeClass(cat) { return CAT_BADGE[cat] || 'cat-badge-others'; }
 function getIconData(cat)   { return CAT_ICON[cat]  || { icon: 'fa-code', color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' }; }
 
@@ -103,12 +110,12 @@ export class ProjectCard {
     const badgeClass  = getBadgeClass(repo.category);
     const liveUrl     = getLiveUrl(repo, localMeta);
     const slug        = slugify(repo.name);
-    const title       = repoTitle(repo.name);
+    const title       = escapeHtml(repoTitle(repo.name));
     const desc        = (repo.description || 'No description provided.').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
-    const lang        = repo.language || 'Mixed';
+    const lang        = escapeHtml(repo.language || 'Mixed');
     const updated     = formatDate(repo.updated_at);
     const stars       = repo.stargazers_count || 0;
-    const topics      = (repo.topics || []).slice(0, 4);
+    const topics      = (repo.topics || []).slice(0, 4).map(escapeHtml);
     const isGroup     = repo.isGroup || false;
     const isFeatured  = repo.featured || false;
     const features    = extractFeatures(repo);
@@ -120,7 +127,7 @@ export class ProjectCard {
       : '';
 
     const liveBtnHTML = liveUrl
-      ? `<a href="${liveUrl}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all hover:scale-105 active:scale-95" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#a5b4fc">
+      ? `<a href="${liveDemoUrl}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all hover:scale-105 active:scale-95" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#a5b4fc">
            <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>Live Demo
          </a>`
       : '';
@@ -134,7 +141,10 @@ export class ProjectCard {
       : `<span class="px-2 py-0.5 rounded-md text-[9px] font-mono border" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.25);color:#2dd4bf">Solo</span>`;
 
     const isUpcoming   = repo.isUpcoming || false;
-    const displayTitle = repo.displayTitle || title;
+    const displayTitle = escapeHtml(repo.displayTitle || title);
+    const categoryLabel = escapeHtml(repo.category || 'Others');
+    const repoUrl = safeHttpUrl(repo.html_url);
+    const liveDemoUrl = safeHttpUrl(liveUrl);
 
     // Normal topics HTML
     const topicsHTML = topics.length
@@ -146,14 +156,14 @@ export class ProjectCard {
       ? `<ul class="space-y-1.5 mt-1">${features.map(f =>
           `<li class="flex items-start gap-2 text-[11px] text-gray-400 leading-snug">
              <i class="fa-solid fa-circle-dot text-indigo-500 mt-0.5 flex-shrink-0 text-[7px]"></i>
-             <span>${f}</span>
+             <span>${escapeHtml(f)}</span>
            </li>`).join('')}</ul>`
       : `<p class="text-[11px] text-gray-500 italic mt-1">See GitHub for full project description.</p>`;
 
     const frameworkBadge = framework
       ? `<div class="flex items-center gap-2 mt-3 pt-3 border-t" style="border-color:rgba(255,255,255,0.05)">
            <span class="text-[9px] font-mono text-gray-600 uppercase">Framework</span>
-           <span class="px-2 py-0.5 rounded text-[9px] font-mono border" style="background:rgba(99,102,241,0.08);border-color:rgba(99,102,241,0.2);color:#818cf8">${framework}</span>
+           <span class="px-2 py-0.5 rounded text-[9px] font-mono border" style="background:rgba(99,102,241,0.08);border-color:rgba(99,102,241,0.2);color:#818cf8" >${escapeHtml(framework)}</span>
          </div>`
       : '';
 
@@ -167,7 +177,7 @@ export class ProjectCard {
       ? `<button type="button" class="upcoming-lock-btn flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-all cursor-pointer" data-title="${displayTitle}">
            Coming Soon
          </button>`
-      : `<a href="${repo.html_url}" target="_blank" rel="noopener"
+      : `<a href="${repoUrl}" target="_blank" rel="noopener"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all hover:scale-105 active:scale-95"
             style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:#9ca3af">
            <i class="fa-brands fa-github text-xs"></i>Code
@@ -179,7 +189,7 @@ export class ProjectCard {
       <div class="flex items-center justify-between gap-1.5 pt-2 border-t border-amber-500/20 bg-amber-950/20 -mx-5 -mb-2 px-5 py-1.5 mt-2">
         <span class="text-[8px] font-mono text-amber-400 font-bold tracking-wider">👑 MASTER:</span>
         <div class="flex items-center gap-1">
-          <button type="button" class="boss-toggle-group-btn px-2 py-0.5 rounded text-[9px] font-mono border transition-all hover:scale-105 ${isGroup ? 'bg-purple-500/25 border-purple-500/50 text-purple-200' : 'bg-teal-500/20 border-teal-500/40 text-teal-300'}" data-name="${repo.name}">
+          <button type="button" class="boss-toggle-group-btn px-2 py-0.5 rounded text-[9px] font-mono border transition-all hover:scale-105 ${isGroup ? 'bg-purple-500/25 border-purple-500/50 text-purple-200' : 'bg-teal-500/20 border-teal-500/40 text-teal-300'}" data-name="${escapeHtml(repo.name)}">
             ${isGroup ? '👥 Group' : '👤 Solo'}
           </button>
           <button type="button" class="boss-toggle-featured-btn px-2 py-0.5 rounded text-[9px] font-mono border transition-all hover:scale-105 ${isFeatured ? 'bg-amber-500/30 border-amber-500/60 text-amber-200 font-bold' : 'bg-white/5 border-white/10 text-gray-400'}" data-name="${repo.name}">
@@ -247,7 +257,7 @@ export class ProjectCard {
           <!-- Pinned Footer badges + actions -->
           <div class="space-y-2.5 pt-3 mt-1 border-t shrink-0 ${isUpcoming ? 'filter blur-[4px] opacity-60 select-none' : ''}" style="border-color:rgba(255,255,255,0.06)">
             <div class="flex flex-wrap items-center gap-1.5">
-              <span class="px-2 py-0.5 rounded-md text-[9px] font-mono border ${badgeClass}">${repo.category}</span>
+              <span class="px-2 py-0.5 rounded-md text-[9px] font-mono border ${badgeClass}">${categoryLabel}</span>
               ${upcomingBadge}
               ${groupBadge}
               ${featuredBadge}
