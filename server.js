@@ -180,9 +180,9 @@ function hashPassword(password) {
   return crypto.createHash('sha256').update(password.trim()).digest('hex');
 }
 
-// Default hashes initialized for Pooja1908 / pooja1908
-const DEFAULT_MASTER_HASH = hashPassword('Pooja1908');
-const DEFAULT_MASTER_HASH_LOWER = hashPassword('pooja1908');
+// Default hashes initialized
+const DEFAULT_INITIAL_PASS = process.env.MASTER_PASSWORD || 'Pooja1908';
+const DEFAULT_MASTER_HASH = hashPassword(DEFAULT_INITIAL_PASS);
 
 async function getMasterPasswordHash() {
   try {
@@ -200,7 +200,7 @@ async function getMasterPasswordHash() {
         return migratedHash;
       }
 
-      // Initialize default password hash for Pooja1908
+      // Initialize default password hash if not yet configured
       setting = new AdminSetting({ key: 'master_password_hash', value: DEFAULT_MASTER_HASH });
       await setting.save();
       return DEFAULT_MASTER_HASH;
@@ -313,6 +313,46 @@ const SKIP_REPOS = [
 ];
 
 const GITHUB_FALLBACK_REPOS = [
+  {
+    "name": "Ai-Powered-Discord-Assistant",
+    "description": "An intelligent Discord AI bot powered by Python, LangChain, and Ollama (Qwen 2.5 7B), featuring AI-powered conversations, image generation, and customizable AI agent tools.",
+    "language": "Python",
+    "updated_at": "2026-11-16T04:38:25Z",
+    "created_at": "2026-11-14T08:18:55Z",
+    "stargazers_count": 0,
+    "homepage": "",
+    "topics": [
+      "ai-agents",
+      "discord-ai-bot",
+      "discord-bot",
+      "generative-ai",
+      "image-generation",
+      "langchain",
+      "ollama",
+      "python",
+      "python3",
+      "qwen"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Ai-Powered-Discord-Assistant"
+  },
+  {
+    "name": "AI-Code-Reviewer",
+    "description": "The AI Developer Code Reviewer is an automated system that reviews code using AI-powered multi-agent analysis, LangChain, and LLMs.",
+    "language": "Python",
+    "updated_at": "2026-11-16T04:30:00Z",
+    "created_at": "2026-11-16T04:00:00Z",
+    "stargazers_count": 0,
+    "homepage": "",
+    "topics": [
+      "code-reviewer",
+      "ai-agents",
+      "multi-agent",
+      "llm",
+      "python",
+      "generative-ai"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/AI-Code-Reviewer"
+  },
   {
     "name": "FruitsCheck-CNN-Fruit-Freshness",
     "description": "FruitCheck is a CNN-based computer vision application that classifies fruit images as Fresh or Rotten. Built with TensorFlow/Keras, FastAPI, and React, it currently supports apples, bananas, and oranges with image preprocessing using Pillow and NumPy.",
@@ -961,9 +1001,15 @@ app.get('/api/project-overrides', async (req, res) => {
   }
 });
 
-// POST /api/project-overrides - Update global project overrides (Boss only)
+// POST /api/project-overrides - Update global project overrides (Master Admin only)
 app.post('/api/project-overrides', async (req, res) => {
   try {
+    const authKey = req.headers['x-admin-key'] || req.query.password || req.body?.password;
+    const storedHash = await getMasterPasswordHash();
+    if (!authKey || hashPassword(authKey) !== storedHash) {
+      return res.status(403).json({ error: 'Master Admin authentication required to update project overrides.' });
+    }
+
     const { overrides } = req.body;
     if (!overrides || typeof overrides !== 'object') {
       return res.status(400).json({ error: 'Invalid overrides dataset.' });
@@ -1577,21 +1623,33 @@ app.get('/api/analytics/stats', async (req, res) => {
 });
 
 // POST /api/analytics/lead-email - Save visitor lead info and send personalized no-reply email
-app.post('/api/analytics/lead-email', async (req, res) => {
+app.post('/api/analytics/lead-email', apiRateLimiter(15, 60000), async (req, res) => {
   try {
     const { visitorId, name, email, visitedCategories } = req.body;
     if (!name || !email) {
       return res.status(400).json({ error: 'Name and email are required.' });
     }
 
+    // Sanitize string inputs to prevent HTML injection in emails
+    const sanitizeHtml = (str) => String(str || '').replace(/[&<>"']/g, (m) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m]));
+
+    const cleanName = sanitizeHtml(name);
+    const cleanEmail = String(email).trim();
+
     // 1. Store/Update visitor lead details in MongoDB
     if (mongoose.connection.readyState === 1) {
       await VisitorProfile.findOneAndUpdate(
         { visitorId: visitorId || ('v_' + Date.now()) },
         {
-          name,
-          email,
-          contactDetails: email,
+          name: cleanName,
+          email: cleanEmail,
+          contactDetails: cleanEmail,
           updatedAt: new Date(),
           ...(visitedCategories ? { $addToSet: { visitedCategories: { $each: visitedCategories } } } : {})
         },
@@ -1599,10 +1657,10 @@ app.post('/api/analytics/lead-email', async (req, res) => {
       );
       
       const newContact = new Contact({
-        name,
-        email,
+        name: cleanName,
+        email: cleanEmail,
         subject: `Lead Contact from Chatbot (Rudra)`,
-        message: `Visitor ${name} (${email}) provided contact details via Chatbot. Visited categories: ${(visitedCategories || []).join(', ') || 'General'}`
+        message: `Visitor ${cleanName} (${cleanEmail}) provided contact details via Chatbot. Visited categories: ${(visitedCategories || []).join(', ') || 'General'}`
       });
       await newContact.save();
     }
@@ -1626,7 +1684,7 @@ app.post('/api/analytics/lead-email', async (req, res) => {
           <h2 style="margin-top: 12px; margin-bottom: 4px; color: #f0f6fc; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">Office of Raj Rathod</h2>
           <span style="font-size: 9px; text-transform: uppercase; color: #8b949e; font-family: monospace; letter-spacing: 1.5px;">Automated Assistant Dispatch</span>
         </div>
-        <p>Hi <strong>${name}</strong>, 👋</p>
+        <p>Hi <strong>${cleanName}</strong>, 👋</p>
         <p>Thank you for visiting <strong>Raj Rathod's AI/ML Portfolio</strong>!</p>
         <p>I am <strong>Rudra</strong>, Raj's personal AI Assistant. During your visit, we noticed you explored <strong>${promptCategoryText}</strong> projects!</p>
         <div style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); border-radius: 10px; padding: 15px; margin: 18px 0; color: #c7d2fe;">
@@ -1681,14 +1739,9 @@ app.post('/api/admin/verify-password', async (req, res) => {
     if (!password) return res.status(400).json({ success: false, error: 'Password is required' });
     
     const clean = password.trim();
-    const lower = clean.toLowerCase();
-    if (clean === 'Pooja1908' || lower === 'pooja1908') {
-      return res.json({ success: true, isMaster: true });
-    }
-
     const storedHash = await getMasterPasswordHash();
     const inputHash = hashPassword(clean);
-    if (inputHash && (inputHash === storedHash || inputHash === DEFAULT_MASTER_HASH || inputHash === DEFAULT_MASTER_HASH_LOWER)) {
+    if (inputHash && inputHash === storedHash) {
       return res.json({ success: true, isMaster: true });
     }
     return res.status(401).json({ success: false, error: 'Incorrect Master password' });
@@ -1792,7 +1845,13 @@ app.post('/api/chat', apiRateLimiter(45, 60000), async (req, res) => {
       return res.status(400).json({ error: 'Message text is required.' });
     }
 
-    const mistralKey = process.env.MISTRAL_API_KEY || 'wFYeHbIkn77JZGephm2MwS6RfWJ5LQAR';
+    const mistralKey = process.env.MISTRAL_API_KEY;
+    if (!mistralKey) {
+      return res.status(503).json({
+        error: 'Chat AI service unavailable',
+        message: 'MISTRAL_API_KEY environment variable is not configured on the backend server.'
+      });
+    }
 
     // Query live MongoDB statistics for chatbot database questions
     let liveDbStatsStr = '';
@@ -2028,6 +2087,7 @@ app.get('/api/gallery', (req, res) => {
 
     for (const file of files) {
       if (file === 'manifest.json' || file.startsWith('.')) continue;
+      if (file.includes('_poster.') || file.includes('-poster.') || file.includes('_thumb.')) continue;
       const ext = path.extname(file).toLowerCase();
       if (videoExts.has(ext)) {
         media.push({

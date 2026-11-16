@@ -233,36 +233,6 @@ const DETECTION_RULES = [
  */
 export const UPCOMING_PROJECTS = [
   {
-    name: 'AI-Powered-Discord-Assistant',
-    displayTitle: 'AI Powered Discord Assistant',
-    html_url: '#',
-    description: 'The AI-Powered Discord Server Assistant is a next-generation project that brings the power of Generative AI directly into a Discord environment — transforming the platform into an intelligent, multimodal assistant hub.',
-    category: 'Generative AI',
-    language: 'Python',
-    topics: ['discord-bot', 'genai', 'llm', 'multimodal', 'upcoming'],
-    stargazers_count: 0,
-    created_at: '2024-01-01T00:00:00.000Z',
-    updated_at: '2024-01-01T00:00:00.000Z',
-    isUpcoming: true,
-    isLocked: true,
-    lockedMessage: '🔒 Coming Soon — Raj Rathod is actively building this project! Full code & live demo will auto-sync when uploaded to GitHub.'
-  },
-  {
-    name: 'AI-Code-Reviewer',
-    displayTitle: 'AI Code Reviewer',
-    html_url: '#',
-    description: 'The AI Developer Code Reviewer is an automated system that reviews code using AI-powered multi-agent analysis.',
-    category: 'Generative AI',
-    language: 'Python',
-    topics: ['code-reviewer', 'ai-agents', 'multi-agent', 'llm', 'upcoming'],
-    stargazers_count: 0,
-    created_at: '2024-01-01T00:00:00.000Z',
-    updated_at: '2024-01-01T00:00:00.000Z',
-    isUpcoming: true,
-    isLocked: true,
-    lockedMessage: '🔒 Coming Soon — Raj Rathod is actively building this project! Full code & live demo will auto-sync when uploaded to GitHub.'
-  },
-  {
     name: 'AI-News-Research-Curation',
     displayTitle: 'AI News Research & Curation',
     html_url: '#',

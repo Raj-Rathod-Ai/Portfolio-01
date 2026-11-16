@@ -99,7 +99,7 @@ export class Projects {
     this.activeSort     = 'default';
     this.activeCategory = categorySlug ? categorySlug.toLowerCase() : 'all';
 
-    const categories = getAllCategories(projects);
+    let categories = getAllCategories(projects);
     const mountEl    = document.getElementById('category-projects-mount');
     const pillsBar   = document.getElementById('category-pills-bar');
     const searchEl   = document.getElementById('search-bar-mount');
@@ -242,6 +242,7 @@ export class Projects {
       const updatedRepos = e.detail?.repos || window.portfolioData?.repos || [];
       if (Array.isArray(updatedRepos) && updatedRepos.length > 0) {
         projects = updatedRepos;
+        categories = getAllCategories(projects);
         renderCategoryPills();
         renderGrid();
       }

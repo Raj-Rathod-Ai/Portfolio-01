@@ -1,22 +1,20 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const fs = require('fs');
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const galleryDir = path.resolve(__dirname, '../gallery-media');
 const manifestPath = path.join(galleryDir, 'manifest.json');
 
 const videoExts = new Set(['.mp4', '.webm', '.mov', '.ogg', '.m4v']);
 const imageExts = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
 
-export function scanGallery() {
+function scanGallery() {
   if (!fs.existsSync(galleryDir)) return [];
   const files = fs.readdirSync(galleryDir);
   const media = [];
 
   for (const file of files) {
-    if (file === 'manifest.json') continue;
+    if (file === 'manifest.json' || file.startsWith('.')) continue;
+    if (file.includes('_poster.') || file.includes('-poster.') || file.includes('_thumb.')) continue;
     const ext = path.extname(file).toLowerCase();
     if (videoExts.has(ext)) {
       media.push({
@@ -44,3 +42,5 @@ export function scanGallery() {
 }
 
 scanGallery();
+
+module.exports = { scanGallery };

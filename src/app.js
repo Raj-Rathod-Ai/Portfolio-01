@@ -169,14 +169,27 @@ export function deduplicateRepos(reposList) {
     'meetnote': 'meetnotes',
   };
 
-  return reposList.filter(repo => {
+  const cleanSlug = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  // Priority sort: ensure real active repositories are processed BEFORE upcoming placeholders.
+  // This guarantees that if a repository exists as both a real project and an upcoming stub,
+  // the real project is preserved and the upcoming stub is discarded.
+  const prioritySorted = [...reposList].sort((a, b) => {
+    const aUp = a.isUpcoming ? 1 : 0;
+    const bUp = b.isUpcoming ? 1 : 0;
+    return aUp - bUp;
+  });
+
+  return prioritySorted.filter(repo => {
     if (!repo || !repo.name) return false;
     const rawKey = repo.name.toLowerCase().trim();
     const canonicalKey = canonicalAliases[rawKey] || rawKey;
-    if (seen.has(canonicalKey)) {
+    const slugKey = cleanSlug(canonicalKey);
+    if (seen.has(canonicalKey) || (slugKey && seen.has(slugKey))) {
       return false;
     }
     seen.add(canonicalKey);
+    if (slugKey) seen.add(slugKey);
     return true;
   });
 }
@@ -682,9 +695,11 @@ async function initApp() {
     }
   } catch (err) {}
 
+  const cleanSlug = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
   const processAndSetRepos = (rawGithubRepos) => {
     const merged = rawGithubRepos.map(repo => {
-      const match = meta.find(m => m.repo && m.repo.toLowerCase() === (repo.name || '').toLowerCase());
+      const match = meta.find(m => m.repo && cleanSlug(m.repo) === cleanSlug(repo.name));
       const category = getProjectCategory(repo, meta);
       const isGroup = isGroupProject(repo.name, meta);
       const featured = match ? match.featured === true : false;
@@ -696,8 +711,8 @@ async function initApp() {
       };
     });
     UPCOMING_PROJECTS.forEach(up => {
-      const exists = merged.some(r => r.name.toLowerCase() === up.name.toLowerCase());
-      if (!exists) merged.unshift(up);
+      const exists = merged.some(r => cleanSlug(r.name) === cleanSlug(up.name));
+      if (!exists) merged.push(up);
     });
     const sorted = sortReposWithFeaturedTop(merged);
     window.portfolioData = { repos: sorted, meta };
@@ -707,7 +722,8 @@ async function initApp() {
   // Register real-time background sync callback from github.js
   window.onGitHubReposSynced = (liveRepos) => {
     if (Array.isArray(liveRepos) && liveRepos.length > 0) {
-      processAndSetRepos(liveRepos);
+      const updated = processAndSetRepos(liveRepos);
+      window.dispatchEvent(new CustomEvent('portfolioDataUpdated', { detail: { repos: updated } }));
     }
   };
 
@@ -718,6 +734,7 @@ async function initApp() {
   fetchGitHubRepositories().then(githubRepos => {
     if (Array.isArray(githubRepos) && githubRepos.length > 0) {
       repos = processAndSetRepos(githubRepos);
+      window.dispatchEvent(new CustomEvent('portfolioDataUpdated', { detail: { repos } }));
     }
   }).catch(err => {
     console.warn('Background GitHub sync notice:', err.message);
@@ -749,15 +766,15 @@ async function initApp() {
         const fresh = await fetchGitHubRepositories(true);
         if (fresh && Array.isArray(fresh) && fresh.length > 0) {
           const freshMapped = fresh.map(repo => {
-            const match = meta.find(m => m.repo.toLowerCase() === repo.name.toLowerCase());
+            const match = meta.find(m => m.repo && cleanSlug(m.repo) === cleanSlug(repo.name));
             const category = getProjectCategory(repo, meta);
             const isGroup = isGroupProject(repo.name, meta);
             const featured = match ? match.featured === true : false;
             return { ...repo, category, isGroup, featured };
           });
           UPCOMING_PROJECTS.forEach(up => {
-            if (!freshMapped.some(r => r.name.toLowerCase() === up.name.toLowerCase())) {
-              freshMapped.unshift(up);
+            if (!freshMapped.some(r => cleanSlug(r.name) === cleanSlug(up.name))) {
+              freshMapped.push(up);
             }
           });
           const updatedRepos = sortReposWithFeaturedTop(freshMapped);

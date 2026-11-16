@@ -1,5 +1,45 @@
 [
   {
+    "name": "Ai-Powered-Discord-Assistant",
+    "description": "An intelligent Discord AI bot powered by Python, LangChain, and Ollama (Qwen 2.5 7B), featuring AI-powered conversations, image generation, and customizable AI agent tools.",
+    "language": "Python",
+    "updated_at": "2026-11-16T04:38:25Z",
+    "created_at": "2026-11-14T08:18:55Z",
+    "stargazers_count": 0,
+    "homepage": "",
+    "topics": [
+      "ai-agents",
+      "discord-ai-bot",
+      "discord-bot",
+      "generative-ai",
+      "image-generation",
+      "langchain",
+      "ollama",
+      "python",
+      "python3",
+      "qwen"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/Ai-Powered-Discord-Assistant"
+  },
+  {
+    "name": "AI-Code-Reviewer",
+    "description": "The AI Developer Code Reviewer is an automated system that reviews code using AI-powered multi-agent analysis, LangChain, and LLMs.",
+    "language": "Python",
+    "updated_at": "2026-11-16T04:30:00Z",
+    "created_at": "2026-11-16T04:00:00Z",
+    "stargazers_count": 0,
+    "homepage": "",
+    "topics": [
+      "code-reviewer",
+      "ai-agents",
+      "multi-agent",
+      "llm",
+      "python",
+      "generative-ai"
+    ],
+    "html_url": "https://github.com/Raj-Rathod-Ai/AI-Code-Reviewer"
+  },
+  {
     "name": "FruitsCheck-CNN-Fruit-Freshness",
     "description": "FruitCheck is a CNN-based computer vision application that classifies fruit images as Fresh or Rotten. Built with TensorFlow/Keras, FastAPI, and React, it currently supports apples, bananas, and oranges with image preprocessing using Pillow and NumPy.",
     "language": "Python",

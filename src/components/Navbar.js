@@ -326,17 +326,26 @@ export class Navbar {
       }
     });
 
-    // Smooth scroll for menu links
-    const menuLinks = document.querySelectorAll('.pranay-menu-link, .mobile-nav-link');
+    // Smooth scroll for menu links and header anchor actions
+    const menuLinks = document.querySelectorAll('.pranay-menu-link, .mobile-nav-link, #site-header a[href^="#"]');
     menuLinks.forEach(link => {
       link.addEventListener('click', (e) => {
-        const targetId = link.getAttribute('data-target') || (link.getAttribute('href') || '').replace('#', '');
+        const href = link.getAttribute('href') || '';
+        const targetId = link.getAttribute('data-target') || href.replace('#', '');
         const targetEl = document.getElementById(targetId);
         if (targetEl) {
           e.preventDefault();
           targetEl.scrollIntoView({ behavior: 'smooth' });
           setMenuOpen(false);
           closeMobileMenu();
+        } else if (targetId) {
+          // If section is not on current page (e.g. while on /projects), navigate to homepage anchor
+          setMenuOpen(false);
+          closeMobileMenu();
+          if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
+            e.preventDefault();
+            window.location.href = '/#' + targetId;
+          }
         }
       });
     });

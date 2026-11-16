@@ -42,7 +42,7 @@ export class ProjectDetails {
     const backHref = `/projects/${categorySlug}`;
 
     // Group Badge
-    const meta = localMetadata.find(m => m.repo.toLowerCase() === repo.name.toLowerCase());
+    const meta = localMetadata.find(m => m.repo && repo?.name && m.repo.toLowerCase() === repo.name.toLowerCase());
     const isGroup = meta && meta.type ? meta.type === 'group' : repo.isGroup;
     const groupBadge = isGroup
       ? `<span class="px-2.5 py-1 rounded-md bg-secondary/10 border border-secondary/20 text-[10px] font-mono text-secondary">Group Project</span>`

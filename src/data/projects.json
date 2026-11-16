@@ -1,5 +1,19 @@
 [
   {
+    "repo": "Ai-Powered-Discord-Assistant",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Generative AI"
+  },
+  {
+    "repo": "AI-Code-Reviewer",
+    "type": "solo",
+    "live": "",
+    "featured": true,
+    "category": "Generative AI"
+  },
+  {
     "repo": "FruitsCheck-CNN-Fruit-Freshness",
     "type": "solo",
     "live": "https://fruits-check.streamlit.app/",

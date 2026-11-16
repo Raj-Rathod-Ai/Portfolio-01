@@ -12,10 +12,12 @@
  */
 export function sortProjects(projects, sortKey = 'default') {
   const arr = [...projects];
+  const clean = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
-  // Separate real vs upcoming projects
-  const upcoming = arr.filter(p => p.isUpcoming === true);
+  // Separate real vs upcoming projects and drop duplicate upcoming stubs
   const realProjects = arr.filter(p => !p.isUpcoming);
+  const realSlugs = new Set(realProjects.map(p => clean(p.name)));
+  const upcoming = arr.filter(p => p.isUpcoming === true && !realSlugs.has(clean(p.name)));
 
   const featured = realProjects.filter(p => p.featured === true);
   const nonFeatured = realProjects.filter(p => !p.featured);

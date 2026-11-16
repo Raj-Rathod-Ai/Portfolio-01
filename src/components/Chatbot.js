@@ -1830,11 +1830,15 @@ CRITICAL CONVERSATIONAL & ACCURACY RULES:
   }
 
   /**
-   * Basic markdown string formatter for bot output.
+   * Safe markdown string formatter for bot output with HTML entity sanitization.
    */
   formatMarkdown(text) {
     if (!text) return '';
-    return text
+    const safeText = String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return safeText
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-primary hover:underline">$1</a>')
       .replace(/`([^`]+)`/g, '<code class="bg-white/10 px-1 py-0.5 rounded text-[11px] font-mono text-amber-300">$1</code>')

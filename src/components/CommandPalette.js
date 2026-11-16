@@ -1,6 +1,6 @@
 /**
  * Global Command Palette (Cmd+K / Ctrl+K) Spotlight Engine (Awwwards Style)
- * Exclusively displays and launches all 21 verified project live deployments.
+ * Exclusively displays and launches all 26 verified project live deployments.
  * Features dedicated wheel scroll interception, Lenis background freezing, and keyboard navigation.
  */
 
@@ -30,9 +30,9 @@ export class CommandPalette {
       { title: 'Discover Your True Personality', category: 'Live Demo', url: 'https://discover-your-true-personality.streamlit.app/', icon: 'fa-solid fa-user-astronaut', tech: 'Classification · Psychology ML', external: true },
       { title: 'Car Selling Price Prediction', category: 'Live Demo', url: 'https://car-selling-price-prediction.streamlit.app/', icon: 'fa-solid fa-car', tech: 'Random Forest · Streamlit', external: true },
       { title: 'USA House Price Prediction', category: 'Live Demo', url: 'https://usa-house-price-predictions.streamlit.app/', icon: 'fa-solid fa-house', tech: 'Linear Regression · Analytics', external: true },
-      { title: 'Salary Predication App', category: 'Live Demo', url: 'https://salary-predications.streamlit.app/', icon: 'fa-solid fa-money-bill-trend-up', tech: 'Regression ML · Python', external: true },
-      { title: 'Student Performance Predication', category: 'Live Demo', url: 'https://student-performance-predication.streamlit.app', icon: 'fa-solid fa-graduation-cap', tech: 'Educational Data Mining', external: true },
-      { title: 'Mark Predication System', category: 'Live Demo', url: 'https://mark-predication.streamlit.app/', icon: 'fa-solid fa-chart-simple', tech: 'Predictive Analytics', external: true },
+      { title: 'Salary Prediction App', category: 'Live Demo', url: 'https://salary-predications.streamlit.app/', icon: 'fa-solid fa-money-bill-trend-up', tech: 'Regression ML · Python', external: true },
+      { title: 'Student Performance Prediction', category: 'Live Demo', url: 'https://student-performance-predication.streamlit.app', icon: 'fa-solid fa-graduation-cap', tech: 'Educational Data Mining', external: true },
+      { title: 'Mark Prediction System', category: 'Live Demo', url: 'https://mark-predication.streamlit.app/', icon: 'fa-solid fa-chart-simple', tech: 'Predictive Analytics', external: true },
       { title: 'Healthy Lifestyle Prediction', category: 'Live Demo', url: 'https://healthy-lifestyle-prediction.streamlit.app/', icon: 'fa-solid fa-heart-pulse', tech: 'Healthcare ML · Streamlit', external: true },
       { title: 'Drug Recommendation System', category: 'Live Demo', url: 'https://drug-recommendation-systems.streamlit.app/', icon: 'fa-solid fa-pills', tech: 'Bioinformatics · Decision Trees', external: true },
       { title: 'Random Forest Delivery Time', category: 'Live Demo', url: 'https://random-forest-food-delivery-time.streamlit.app/', icon: 'fa-solid fa-clock', tech: 'Ensemble Learning · Python', external: true },
@@ -54,7 +54,7 @@ export class CommandPalette {
             <!-- Search Header -->
             <div class="flex items-center px-4 py-3.5 border-b border-white/10 gap-3">
               <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
-              <input id="cmd-palette-input" type="text" placeholder="Search 21 verified live apps, models, or technologies..." class="w-full bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none font-sans" autocomplete="off" spellcheck="false" />
+              <input id="cmd-palette-input" type="text" placeholder="Search ${this.items.length} verified live apps, models, or technologies..." class="w-full bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none font-sans" autocomplete="off" spellcheck="false" />
               <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-gray-400 border border-white/10">ESC</span>
             </div>
 
@@ -69,7 +69,7 @@ export class CommandPalette {
                 <span><kbd class="px-1.5 py-0.5 rounded bg-white/10 border border-white/10 text-[9px]">↑</kbd> <kbd class="px-1.5 py-0.5 rounded bg-white/10 border border-white/10 text-[9px]">↓</kbd> Navigate</span>
                 <span><kbd class="px-1.5 py-0.5 rounded bg-white/10 border border-white/10 text-[9px]">↵</kbd> Launch Live App</span>
               </div>
-              <span>21 Live Deployments</span>
+              <span>${this.items.length} Live Deployments</span>
             </div>
 
           </div>
